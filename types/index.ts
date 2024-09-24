@@ -3,8 +3,8 @@ import { ElementsType } from "@/components/forms/FormElements";
 export interface Submission {
   id: number;
   formId: number;
-  content: any; // This is typically a JSON object with submission data
-  createdAt: string; // or Date
+  content: any;
+  createdAt: string;
 }
 
 export interface Form {
@@ -17,7 +17,7 @@ export interface Form {
 
   extraAttributes?: Record<string, any>;
   createdAt: string;
-  fields: FormField[]; // Now this is an array of FormField objects
+  fields: FormField[];
   shareURL?: string;
   businessId: number;
   landingPageId?: number | null;
@@ -33,8 +33,8 @@ export interface FormField {
     required?: boolean;
     placeHolder?: string;
     helperText?: string;
-    options?: { label: string; value: string }[]; // For select fields
-    rows?: number; // For textarea fields
+    options?: { label: string; value: string }[];
+    rows?: number;
     [key: string]: any;
   };
 }

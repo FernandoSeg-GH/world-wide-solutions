@@ -33,14 +33,14 @@ import {
     AlertDialogTitle,
     AlertDialogDescription,
 } from '../ui/alert-dialog';
-import { DeleteForm, PublishForm } from '@/actions/form'; // Updated import
+import { DeleteForm, PublishForm } from '@/actions/form';
 import { useRouter } from 'next/navigation';
 import { useToast } from '../ui/use-toast';
 
 function FormCard({ form }: { form: Form }) {
     const [isAlertOpen, setIsAlertOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
-    const [isPublishing, setIsPublishing] = useState(false); // New state for publishing/unpublishing
+    const [isPublishing, setIsPublishing] = useState(false);
     const router = useRouter()
 
     const { toast } = useToast();
@@ -74,12 +74,12 @@ function FormCard({ form }: { form: Form }) {
         setIsPublishing(true);
         try {
             const updatedStatus = form.published ? "Unpublished" : "Published";
-            await PublishForm(form.id); // Toggle publish status
+            await PublishForm(form.id);
             toast({
                 title: `Form ${updatedStatus}`,
                 description: `The form has been ${updatedStatus.toLowerCase()}.`,
             });
-            router.refresh(); // Refresh the page to reflect changes
+            router.refresh();
         } catch (error) {
             console.error(`Error ${form.published ? 'unpublishing' : 'publishing'} form:`, error);
             toast({
@@ -92,7 +92,7 @@ function FormCard({ form }: { form: Form }) {
         }
     };
 
-    // Validate createdAt before using it
+
     let formattedDistance = 'Unknown time';
     if (form.createdAt) {
         const date = new Date(form.createdAt);
@@ -148,7 +148,7 @@ function FormCard({ form }: { form: Form }) {
                     </div>
                 </CardTitle>
                 <CardDescription className="flex items-center justify-between text-muted-foreground text-sm">
-                    {formattedDistance}
+                    <span className='capitalize'>{formattedDistance}</span>
                     {form.published && (
                         <span className="flex items-center gap-2">
                             <LuView className="text-muted-foreground" />

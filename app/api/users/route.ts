@@ -1,14 +1,9 @@
-// app/api/users/route.ts
 import { NextRequest, NextResponse } from "next/server";
 
-// Hardcode the token for now (later you can fetch it dynamically)
-const TOKEN = "your_token_here";
-
 export async function GET(req: NextRequest) {
-  const backendUrl = process.env.FLASK_BACKEND_URL || "http://localhost:5000"; // Adjust as per your environment
+  const backendUrl = process.env.FLASK_BACKEND_URL || "http://localhost:5000";
 
   try {
-    // Make the request to your Flask backend to get all users
     const response = await fetch(`${backendUrl}/users/users`, {
       method: "GET",
       headers: {

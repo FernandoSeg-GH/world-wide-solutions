@@ -15,7 +15,7 @@ import { Slider } from "../ui/slider";
 const type: ElementsType = "SpacerField";
 
 const extraAttributes = {
-    height: 20, // px
+    height: 20,
 };
 
 const propertiesSchema = z.object({

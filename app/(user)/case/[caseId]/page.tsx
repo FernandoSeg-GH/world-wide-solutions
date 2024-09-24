@@ -1,6 +1,6 @@
 "use client";
 import { Search } from "@/components/ui/search";
-import { GetFormSubmissionByCaseId, getMissingFields } from "@/actions/form"; // New action for missing fields
+import { GetFormSubmissionByCaseId, getMissingFields } from "@/actions/form";
 import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,7 +13,7 @@ export default function SearchFormPage() {
     const [submission, setSubmission] = useState<any>(null);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
-    const [missingFields, setMissingFields] = useState<string[]>([]); // Missing fields state
+    const [missingFields, setMissingFields] = useState<string[]>([]);
 
     const handleSearch = async (caseId: string) => {
         setError("");
@@ -22,8 +22,8 @@ export default function SearchFormPage() {
             const result = await GetFormSubmissionByCaseId(caseId);
             if (result) {
                 setSubmission(result);
-                const missing = await getMissingFields(result); // Get missing fields
-                setMissingFields(missing); // Set missing fields in state
+                const missing = await getMissingFields(result);
+                setMissingFields(missing);
             } else {
                 setError("No submission found for this Case ID.");
                 setMissingFields([]);

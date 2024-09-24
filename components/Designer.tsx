@@ -30,7 +30,7 @@ function Designer() {
 
       const droppingSidebarBtnOverDesignerDropArea = isDesignerBtnElement && isDroppingOverDesignerDropArea;
 
-      // First scenario
+
       if (droppingSidebarBtnOverDesignerDropArea) {
         const type = active.data?.current?.type;
         const newElement = FormElements[type as ElementsType].construct(idGenerator());
@@ -48,7 +48,6 @@ function Designer() {
 
       const droppingSidebarBtnOverDesignerElement = isDesignerBtnElement && isDroppingOverDesignerElement;
 
-      // Second scenario
       if (droppingSidebarBtnOverDesignerElement) {
         const type = active.data?.current?.type;
         const newElement = FormElements[type as ElementsType].construct(idGenerator());
@@ -60,7 +59,7 @@ function Designer() {
           throw new Error("element not found");
         }
 
-        let indexForNewElement = overElementIndex; // i assume i'm on top-half
+        let indexForNewElement = overElementIndex;
         if (isDroppingOverDesignerElementBottomHalf) {
           indexForNewElement = overElementIndex + 1;
         }
@@ -69,7 +68,7 @@ function Designer() {
         return;
       }
 
-      // Third scenario
+
       const isDraggingDesignerElement = active.data?.current?.isDesignerElement;
 
       const draggingDesignerElementOverAnotherDesignerElement =
@@ -90,7 +89,7 @@ function Designer() {
         const activeElement = { ...elements[activeElementIndex] };
         removeElement(activeId);
 
-        let indexForNewElement = overElementIndex; // i assume i'm on top-half
+        let indexForNewElement = overElementIndex;
         if (isDroppingOverDesignerElementBottomHalf) {
           indexForNewElement = overElementIndex + 1;
         }
@@ -169,7 +168,7 @@ function DesignerElementWrapper({ element }: { element: FormElementInstance }) {
     },
   });
 
-  if (draggable.isDragging) return null; // temporary remove the element from designer
+  if (draggable.isDragging) return null;
 
   const DesignerElement = FormElements[element.type].designerComponent;
   return (
@@ -198,7 +197,7 @@ function DesignerElementWrapper({ element }: { element: FormElementInstance }) {
               className="flex justify-center h-full border rounded-md rounded-l-none bg-red-500"
               variant={"outline"}
               onClick={(e) => {
-                e.stopPropagation(); // avoid selection of element while deleting
+                e.stopPropagation();
                 removeElement(element.id);
               }}
             >

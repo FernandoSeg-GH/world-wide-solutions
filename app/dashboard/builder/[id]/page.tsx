@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import FormBuilder from '@/components/forms/FormBuilder';
 import { Form } from '@/types';
-import { GetFormById } from '@/actions/form'; // Import the new action
+import { GetFormById } from '@/actions/form';
 
 const BuilderPage = ({ params }: { params: { id: string } }) => {
   const [form, setForm] = useState<Form | null>(null);
@@ -14,7 +14,6 @@ const BuilderPage = ({ params }: { params: { id: string } }) => {
   useEffect(() => {
     const fetchForm = async () => {
       try {
-        // Call the GetFormById action instead of using fetch directly
         const formData = await GetFormById(Number(id));
 
         setForm(formData);

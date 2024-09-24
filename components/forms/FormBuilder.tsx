@@ -15,7 +15,7 @@ import { toast } from "../ui/use-toast";
 import Link from "next/link";
 import { BsArrowLeft, BsArrowRight } from "react-icons/bs";
 import Confetti from "react-confetti";
-import { Form } from "@/types"; // Assuming this is the correct type
+import { Form } from "@/types";
 import { ElementsType, FormElementInstance, FormElements } from "./FormElements";
 
 function FormBuilder({ form }: { form: Form }) {
@@ -24,7 +24,7 @@ function FormBuilder({ form }: { form: Form }) {
 
     const mouseSensor = useSensor(MouseSensor, {
         activationConstraint: {
-            distance: 10, // 10px
+            distance: 10,
         },
     });
 
@@ -36,33 +36,6 @@ function FormBuilder({ form }: { form: Form }) {
     });
 
     const sensors = useSensors(mouseSensor, touchSensor);
-
-    // function mapFieldTypeToElementsType(field: string): ElementsType | undefined {
-    //     const typeMapping: { [key: string]: ElementsType } = {
-
-    //         "text": "TextField",
-    //         "title": "TitleField",
-    //         "subtitle": "SubTitleField",
-    //         "paragraph": "ParagraphField",
-    //         "separator": "SeparatorField",
-    //         "spacer": "SpacerField",
-    //         "number": "NumberField",
-    //         "textarea": "TextAreaField",
-    //         "date": "DateField",
-    //         "select": "SelectField",
-    //         "tel": "TelephoneField",
-    //         "checkbox": "CheckboxField",
-    //     }
-
-    //     const mappedType = typeMapping[field.toLowerCase()];
-    //     if (mappedType) {
-    //         return mappedType
-    //     } else {
-    //         console.warn(`Unknown field type: ${field}`);
-    //         return undefined
-    //     }
-
-    // }
 
     function mapFieldTypeToElementsType(fieldType: string): ElementsType | undefined {
         if (fieldType in FormElements) {
@@ -108,7 +81,6 @@ function FormBuilder({ form }: { form: Form }) {
 
     const shareUrl = form.shareURL ? `${window.location.origin}/submit/${form.shareURL}` : '';
 
-    // Optionally, handle the undefined case gracefully in the UI
 
     if (form.published) {
         return (

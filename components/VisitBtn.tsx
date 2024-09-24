@@ -11,18 +11,18 @@ function VisitBtn({ shareUrl }: { shareUrl: string }) {
     }, []);
 
     if (!mounted) {
-        return null; // avoiding window not defined error
+        return null;
     }
 
     const shareLink = `${window.location.origin}/submit/${shareUrl}`;
     return (
         <Button
-        className="w-[200px]"
-        onClick={() => {
-            window.open(shareLink, "_blank");
-        }}
+            className="w-[200px]"
+            onClick={() => {
+                window.open(shareLink, "_blank");
+            }}
         >
-        Visit
+            Visit
         </Button>
     );
 }

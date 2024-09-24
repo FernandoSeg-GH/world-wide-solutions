@@ -43,7 +43,7 @@ function CreateFormBtn() {
                     title: "Success",
                     description: "Form created successfully",
                 });
-                router.push(`/builder/${formId}`);  // Redirect to the builder using the formId
+                router.push(`/builder/${formId}`);
             } else {
                 throw new Error("Form creation failed, no form ID returned.");
             }

@@ -34,7 +34,7 @@ const propertiesSchema = z.object({
     helperText: z.string().max(200),
     required: z.boolean().default(false),
     placeHolder: z.string().max(50),
-    options: z.array(z.object({ label: z.string(), value: z.string() })).default([]), // Adjust to match
+    options: z.array(z.object({ label: z.string(), value: z.string() })).default([]),
 });
 
 export const SelectFieldFormElement: FormElement = {
@@ -256,7 +256,7 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
                                     variant={"outline"}
                                     className="gap-2"
                                     onClick={(e) => {
-                                        e.preventDefault(); // avoid submit
+                                        e.preventDefault();
                                         form.setValue("options", field.value.concat({ label: "New option", value: "new_option" }));
                                     }}
                                 >

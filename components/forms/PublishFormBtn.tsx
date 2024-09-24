@@ -29,7 +29,7 @@ function PublishFormBtn({ id }: { id: number }) {
                 title: "Success",
                 description: "Your form is now available to the public",
             });
-            router.refresh(); // Refresh the page to reflect the published state
+            router.refresh();
         } catch (error) {
             toast({
                 title: "Error",

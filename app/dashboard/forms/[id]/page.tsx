@@ -18,9 +18,7 @@ const FormDetailPage = ({ params }: { params: { id: string } }) => {
     useEffect(() => {
         const fetchFormDetails = async () => {
             try {
-                // Fetch form details using GetFormById action
                 const formData = await GetFormById(Number(id));
-                // Fetch submissions for the form using GetFormWithSubmissions action
                 const formSubmissions = await GetFormWithSubmissions(Number(id));
 
                 setSubmissions(Array.isArray(formSubmissions.submissions) ? formSubmissions.submissions : []);
@@ -70,7 +68,6 @@ function SubmissionsTable({ submissions, form }: { submissions: Submission[], fo
     if (!Array.isArray(submissions) || submissions.length === 0) {
         return <div>No submissions found</div>;
     }
-    // Parse submissions content
     const rows = submissions.map((submission) => {
         const parsedContent = JSON.parse(submission.content);
         return {
@@ -79,13 +76,11 @@ function SubmissionsTable({ submissions, form }: { submissions: Submission[], fo
         };
     });
 
-    // Create a map of field IDs to their labels from the form's structure
     const fieldMap = form.fields.reduce((acc: { [key: string]: string }, field) => {
         acc[field.id] = field.extraAttributes?.label || `Field ${field.id}`;
         return acc;
     }, {});
 
-    // Get the field IDs from the first submission
     const fieldKeys = Object.keys(rows[0]).filter((key) => key !== 'submittedAt');
 
     return (

@@ -1,10 +1,8 @@
-// components/FormCards.tsx 
 import { Form } from '@/types';
 import { GetForms } from '@/actions/form';
-import { Skeleton } from '../ui/skeleton';
-import FormCard from './FormCard'; // Import the FormCard component
+import FormCard from './FormCard';
 
-// components/FormCards.tsx
+
 const FormCards = async () => {
     const businessId = 3;
     let forms: Form[] = [];
