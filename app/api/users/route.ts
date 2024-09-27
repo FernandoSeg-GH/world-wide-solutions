@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
-  const backendUrl = process.env.FLASK_BACKEND_URL || "http://localhost:5000";
+  const backendUrl =
+    process.env.NEXT_PUBLIC_FLASK_BACKEND_URL || "http://localhost:5000";
 
   try {
     const response = await fetch(`${backendUrl}/users/users`, {

@@ -10,19 +10,20 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { HomeIcon, PlusIcon } from "@radix-ui/react-icons"
-import { signOut, useSession } from "next-auth/react"
+import { signIn, signOut, useSession } from "next-auth/react"
 import { BiUserCircle } from "react-icons/bi"
 import { HiDocument } from "react-icons/hi"
 import { MdClose } from "react-icons/md"
 import { Skeleton } from "../ui/skeleton"
+import { useRouter } from "next/navigation"
 
 export default function UserMenu() {
 
     const { data: session, status } = useSession();
-
+    const router = useRouter()
     if (status === "loading") return <Skeleton className="w-24 h-10" />
 
-    if (!session) return <Button className="bg-black/70 hover:bg-black dark:bg-gray-300 dark:hover:bg-gray-100">Sign In</Button>;
+    if (!session) return <Button className="bg-black/70 hover:bg-black dark:bg-gray-300 dark:hover:bg-gray-100" onClick={() => router.push("/auth/sign-in")}>Sign In</Button>;
 
     return (
         <DropdownMenu>
@@ -35,7 +36,7 @@ export default function UserMenu() {
                     </Avatar>
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end" forceMount>
+            {session ? <DropdownMenuContent className="w-56" align="end" forceMount>
                 <h2 className="border-b mb-1 p-2 text-sm">
                     Welcome <span className="capitalize">{session.user.username}</span>!
                 </h2>
@@ -56,6 +57,7 @@ export default function UserMenu() {
                     </Button>
                 </DropdownMenuItem>
             </DropdownMenuContent>
+                : null}
         </DropdownMenu>
     )
 }

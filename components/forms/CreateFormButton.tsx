@@ -4,7 +4,7 @@ import { formSchema, formSchemaType } from "@/schemas/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { ImSpinner2 } from "react-icons/im";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import {
     Dialog,
     DialogContent,
@@ -13,46 +13,82 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "./ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
-import { Input } from "./ui/input";
-import { Textarea } from "./ui/textarea";
-import { toast } from "./ui/use-toast";
+} from "../ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
+import { toast } from "../ui/use-toast";
 import { CreateForm } from "@/actions/form";
 import { BsFileEarmarkPlus } from "react-icons/bs";
 import { useRouter } from "next/navigation";
+import { getSession, useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
 
 function CreateFormBtn() {
+    const { data: session } = useSession();
+    const [businessId, setBusinessId] = useState<number | undefined>(undefined);  // Initialize with undefined
     const router = useRouter();
+
+    // Move the session check logic into a useEffect to avoid state updates in render
+    useEffect(() => {
+        if (session?.user?.businessId) {
+            setBusinessId(session.user.businessId);
+        } else {
+            console.log("User does not belong to a business");
+        }
+    }, [session]);  // Only run when session changes
+
     const form = useForm<formSchemaType>({
         resolver: zodResolver(formSchema),
     });
-    const businessId = 3
 
     async function onSubmit(values: formSchemaType) {
         try {
-            const result = await CreateForm({
-                name: values.name,
-                description: String(values.description),
-                business_id: businessId,
+            const session = await getSession();  // Retrieve session
+            if (!session || !session.accessToken) {
+                throw new Error('Not authenticated');
+            }
+
+            const response = await fetch('/api/forms/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.accessToken}`,
+                },
+                body: JSON.stringify({
+                    name: values.name,
+                    description: String(values.description),
+                    business_id: businessId,
+                }),
             });
 
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to create form');
+            }
+
+            const result = await response.json();
             const formId = result?.form_id;
-            if (formId) {
+            const shareURL = result?.share_url;
+
+            if (formId && shareURL) {
                 toast({
-                    title: "Success",
-                    description: "Form created successfully",
+                    title: 'Success',
+                    description: 'Form created successfully',
                 });
-                router.push(`/builder/${formId}`);
+
+                setTimeout(() => {
+                    router.push(`/builder/${shareURL}`);
+                }, 500);  // Delay of 500ms to redirect
             } else {
-                throw new Error("Form creation failed, no form ID returned.");
+                throw new Error('Form creation failed, no form ID or share URL returned.');
             }
 
         } catch (error) {
             toast({
-                title: "Error",
-                description: "Something went wrong, please try again later",
-                variant: "destructive",
+                title: 'Error',
+                description: 'Something went wrong, please try again later',
+                variant: 'destructive',
             });
         }
     }

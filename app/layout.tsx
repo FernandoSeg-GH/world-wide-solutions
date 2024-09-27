@@ -5,7 +5,6 @@ import { Toaster } from '@/components/ui/toaster'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import DesignerContextProvider from '@/components/context/DesignerContext'
 import NextTopLoader from "nextjs-toploader";
-import { SessionProvider } from 'next-auth/react'
 import ClientProvider from '@/components/providers/ClientProvider'
 import Logo from '@/components/Logo'
 import ThemeSwitcher from '@/components/ThemeSwitcher'
@@ -22,8 +21,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <ClientProvider>
       <html lang="en">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <body className={inter.className}>
+        <body className={inter.className}>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
             <nav className="flex justify-between items-center border-b border-border h-[60px] px-4 py-2">
               <Logo />
               <div className="flex gap-4 items-center">
@@ -37,8 +36,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               {children}
               <Toaster />
             </DesignerContextProvider>
-          </body>
-        </ThemeProvider>
+          </ThemeProvider>
+        </body>
       </html>
     </ClientProvider>
   );

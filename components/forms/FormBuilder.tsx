@@ -137,7 +137,7 @@ function FormBuilder({ form }: { form: Form }) {
 
     return (
         <DndContext sensors={sensors}>
-            <main className="flex flex-col w-full">
+            <main className="flex flex-col w-full min-h-screen">
                 <nav className="flex justify-between border-b-2 p-4 gap-3 items-center">
                     <h2 className="truncate font-medium">
                         <span className="text-muted-foreground mr-2">Form:</span>
@@ -147,8 +147,9 @@ function FormBuilder({ form }: { form: Form }) {
                         <PreviewDialogBtn />
                         {!form.published && (
                             <>
-                                <SaveFormBtn id={form.id} />
-                                <PublishFormBtn id={form.id} />
+                                <SaveFormBtn id={form.id} shareUrl={form.shareURL} />
+
+                                <PublishFormBtn id={form.id} isPublished={form.published} />
                             </>
                         )}
                     </div>

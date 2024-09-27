@@ -1,10 +1,14 @@
 "use server";
 
 import { Form } from "@/types";
+import { getSession } from "next-auth/react";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export async function GetFormStats() {
   try {
-    const API_URL = process.env.FLASK_BACKEND_URL || "http://localhost:5000";
+    const API_URL =
+      process.env.NEXT_PUBLIC_FLASK_BACKEND_URL || "http://localhost:5000";
 
     const response = await fetch(`${API_URL}/forms/stats`, {
       method: "GET",
@@ -28,37 +32,44 @@ export async function GetFormStats() {
 export async function CreateForm(data: {
   name: string;
   description: string;
-  fields?: any[];
   business_id: number;
-}) {
+}): Promise<{ id: number } | undefined> {
   try {
-    const API_URL = process.env.FLASK_BACKEND_URL || "http://localhost:5000";
-    const response = await fetch(`${API_URL}/forms/create_form`, {
+    const response = await fetch("/api/forms/createform", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.JWT_TOKEN}`,
       },
       body: JSON.stringify(data),
     });
 
-    const result = await response.json();
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to create form");
+    }
 
-    return result;
+    const result = await response.json();
+    return result; // should contain the form id
   } catch (error) {
     console.error("Error creating form:", error);
-    throw new Error("Form creation failed");
+    return undefined;
   }
 }
 
 export async function GetForms(businessId: number): Promise<Form[]> {
-  const API_URL = process.env.FLASK_BACKEND_URL || "http://localhost:5000";
+  const API_URL =
+    process.env.NEXT_PUBLIC_FLASK_BACKEND_URL || "http://localhost:5000";
+
+  const session = await getSession();
+  if (!session || !session.accessToken) {
+    throw new Error("Not authenticated");
+  }
 
   try {
     const response = await fetch(`${API_URL}/forms/${businessId}`, {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${process.env.JWT_TOKEN}`,
+        Authorization: `Bearer ${session.accessToken}`,
         "Content-Type": "application/json",
       },
     });
@@ -83,12 +94,18 @@ export async function GetForms(businessId: number): Promise<Form[]> {
 
 export async function GetFormById(id: number) {
   try {
-    const API_URL = process.env.FLASK_BACKEND_URL || "http://localhost:5000";
+    const API_URL =
+      process.env.NEXT_PUBLIC_FLASK_BACKEND_URL || "http://localhost:5000";
+
+    const session = await getSession();
+    if (!session || !session.accessToken) {
+      throw new Error("Not authenticated");
+    }
 
     const response = await fetch(`${API_URL}/forms/form/${id}`, {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${process.env.JWT_TOKEN}`,
+        Authorization: `Bearer ${session.accessToken}`,
       },
     });
 
@@ -97,12 +114,10 @@ export async function GetFormById(id: number) {
       console.error(
         `Error fetching form by ID: ${response.status} ${response.statusText} ${errorText}`
       );
+      throw new Error(`Failed to fetch form by ID: ${errorText}`);
     }
 
     const form = await response.json();
-
-    if (form.fields && Array.isArray(form.fields)) {
-    }
     return form;
   } catch (error) {
     console.error("Error fetching form by ID:", error);
@@ -110,36 +125,34 @@ export async function GetFormById(id: number) {
   }
 }
 
-export async function UpdateFormContent(id: number, jsonContent: string) {
+export const UpdateFormContent = async (formId: number, elements: string) => {
   try {
-    const API_URL = process.env.FLASK_BACKEND_URL || "http://localhost:5000";
-
-    const response = await fetch(`${API_URL}/forms/form/${id}`, {
-      method: "PUT",
+    const response = await fetch(`/api/forms/save-form`, {
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.JWT_TOKEN}`,
       },
       body: JSON.stringify({
-        fields: JSON.parse(jsonContent),
+        form_id: formId,
+        fields: JSON.parse(elements), // Parsing the elements back into JSON format
       }),
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to update form content`);
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Error saving form");
     }
 
-    const updatedForm = await response.json();
-
-    return updatedForm;
+    return await response.json();
   } catch (error) {
     console.error("Error updating form content:", error);
-    throw new Error("Failed to update form content");
+    throw error;
   }
-}
+};
 
 export async function PublishForm(id: number) {
-  const API_URL = process.env.FLASK_BACKEND_URL || "http://localhost:5000";
+  const API_URL =
+    process.env.NEXT_PUBLIC_FLASK_BACKEND_URL || "http://localhost:5000";
 
   const res = await fetch(`${API_URL}/forms/${id}/publish`, {
     method: "POST",
@@ -158,7 +171,8 @@ export async function PublishForm(id: number) {
 
 export async function SubmitForm(formUrl: string, content: string) {
   try {
-    const API_URL = process.env.FLASK_BACKEND_URL || "http://localhost:5000";
+    const API_URL =
+      process.env.NEXT_PUBLIC_FLASK_BACKEND_URL || "http://localhost:5000";
 
     const response = await fetch(`${API_URL}/forms/submit/${formUrl}`, {
       method: "POST",
@@ -183,7 +197,8 @@ export async function SubmitForm(formUrl: string, content: string) {
 
 export async function GetFormWithSubmissions(id: number) {
   try {
-    const API_URL = process.env.FLASK_BACKEND_URL || "http://localhost:5000";
+    const API_URL =
+      process.env.NEXT_PUBLIC_FLASK_BACKEND_URL || "http://localhost:5000";
     const response = await fetch(`${API_URL}/forms/${id}/submissions`, {
       method: "GET",
       headers: {
@@ -209,7 +224,8 @@ export async function GetFormWithSubmissions(id: number) {
 
 export async function GetFormSubmissionByCaseId(caseId: string) {
   try {
-    const API_URL = process.env.FLASK_BACKEND_URL || "http://localhost:5000";
+    const API_URL =
+      process.env.NEXT_PUBLIC_FLASK_BACKEND_URL || "http://localhost:5000";
 
     const response = await fetch(`${API_URL}/forms/submission/case/${caseId}`, {
       method: "GET",
@@ -244,7 +260,8 @@ export async function getMissingFields(submission: any) {
 
 export async function GetFormContentByUrl(formUrl: string) {
   try {
-    const API_URL = process.env.FLASK_BACKEND_URL || "http://localhost:5000";
+    const API_URL =
+      process.env.NEXT_PUBLIC_FLASK_BACKEND_URL || "http://localhost:5000";
 
     const response = await fetch(`${API_URL}/forms/content/${formUrl}`, {
       method: "GET",
@@ -268,7 +285,8 @@ export async function GetFormContentByUrl(formUrl: string) {
 
 export async function DeleteForm(id: number): Promise<boolean> {
   try {
-    const API_URL = process.env.FLASK_BACKEND_URL || "http://localhost:5000";
+    const API_URL =
+      process.env.NEXT_PUBLIC_FLASK_BACKEND_URL || "http://localhost:5000";
 
     const response = await fetch(`${API_URL}/forms/form/${id}`, {
       method: "DELETE",

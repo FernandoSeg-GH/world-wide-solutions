@@ -11,12 +11,12 @@ import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/use-toast";
 
-export default function AuthPage() {
-  const [isRegistering, setIsRegistering] = useState(false);
+export default function AuthSignUpPage() {
+  const [isRegistering, setIsRegistering] = useState(true);
 
   return (
     <div className="flex items-center justify-center min-h-screen w-screen p-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md -mt-36">
         <CardHeader>
           <CardTitle>{isRegistering ? "Sign Up" : "Sign In"}</CardTitle>
         </CardHeader>
@@ -34,7 +34,9 @@ export default function AuthPage() {
 
 function SignInForm({ onToggle }: { onToggle: () => void }) {
   const [loading, setLoading] = useState(false);
+  const [push, setPush] = useState(false);
   const router = useRouter();
+
   const [credentials, setCredentials] = useState({
     username: "",
     password: "",
@@ -47,7 +49,8 @@ function SignInForm({ onToggle }: { onToggle: () => void }) {
     const res = await signIn("credentials", {
       username: credentials.username,
       password: credentials.password,
-      redirect: false,
+      redirect: true,
+      callbackUrl: "/dashboard",
     });
 
     setLoading(false);
@@ -58,12 +61,12 @@ function SignInForm({ onToggle }: { onToggle: () => void }) {
         description: res.error,
         variant: "destructive",
       });
-    } else {
+    } else if (res?.error) {
       toast({
         title: "Success",
         description: "You have successfully signed in.",
       });
-      router.push("/dashboard");
+      setPush(!push)
     }
   };
 

@@ -45,28 +45,40 @@ function FormCard({ form }: { form: Form }) {
 
     const { toast } = useToast();
 
+    async function deleteForm(formId: number) {
+        try {
+            const response = await fetch(`/api/forms/delete?formId=${formId}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to delete form');
+            }
+
+            return await response.json();
+        } catch (error: any) {
+            console.error('Error deleting form:', error);
+            throw new Error(error.message || 'Error deleting form');
+        }
+    }
     const handleDelete = async () => {
         setIsDeleting(true);
 
         try {
-            if (form.published) {
-                toast({
-                    title: "Alert! You may not delete a form if its status is PUBLISHED.",
-                    variant: "destructive",
-                });
-                return;
-            }
-            const response = await DeleteForm(form.id);
-            if (response) {
-                router.refresh();
+            const response = await deleteForm(form.id);
+            if (response.message) {
+                setIsDeleting(false);
+                setIsAlertOpen(false);
             } else {
-                console.error("Failed to delete the form.");
+                console.error('Failed to delete the form.');
             }
+
+            setTimeout(() => {
+                window.location.reload()
+            }, 500);
         } catch (error) {
             console.error('Error deleting form:', error);
-        } finally {
-            setIsDeleting(false);
-            setIsAlertOpen(false);
         }
     };
 
@@ -79,7 +91,8 @@ function FormCard({ form }: { form: Form }) {
                 title: `Form ${updatedStatus}`,
                 description: `The form has been ${updatedStatus.toLowerCase()}.`,
             });
-            router.refresh();
+            setIsPublishing(false);
+            router.refresh()
         } catch (error) {
             console.error(`Error ${form.published ? 'unpublishing' : 'publishing'} form:`, error);
             toast({
@@ -87,8 +100,6 @@ function FormCard({ form }: { form: Form }) {
                 description: `Failed to ${form.published ? 'unpublish' : 'publish'} the form.`,
                 variant: "destructive",
             });
-        } finally {
-            setIsPublishing(false);
         }
     };
 
@@ -106,14 +117,13 @@ function FormCard({ form }: { form: Form }) {
     } else {
         console.error(`Missing createdAt for form ID ${form.id}`);
     }
-
+    console.log('form', form)
     return (
         <Card>
             <CardHeader>
                 <CardTitle className="flex items-center gap-2 justify-between">
                     <div className="flex items-center justify-between gap-2 w-full">
                         <div>
-                            <span className="truncate font-bold mr-2">{form.id}.</span>
                             <span className="truncate font-bold">{form.name}</span>
                         </div>
                         <div className='flex items-center gap-2'>
@@ -163,25 +173,26 @@ function FormCard({ form }: { form: Form }) {
                 {form.description || 'No description'}
             </CardContent>
             <CardFooter>
-                {form.published ? (
+                {form.published && form.shareURL && (
                     <div className='flex flex-col w-full'>
                         <Button asChild variant="secondary" className="w-full mt-2 text-md gap-4">
-                            <Link href={`/builder/${form.id}`}>
+                            <Button onClick={() => router.push(`/builder/${form.shareURL}`)}>
                                 Edit form <FaEdit />
-                            </Link>
+                            </Button>
                         </Button>
                         <Button asChild className="w-full mt-2 text-md gap-4">
-                            <Link href={`/forms/${form.id}`}>
+                            <Button onClick={() => router.push(`/forms/${form.shareURL}`)}>
                                 View submissions <BiRightArrowAlt />
-                            </Link>
+                            </Button>
                         </Button>
                     </div>
-                ) : (
+                )}
+                {!form.published && form.shareURL && (
                     <div className='flex flex-col w-full items-end h-full'>
                         <Button asChild variant="secondary" className="w-full mt-2 text-md gap-4">
-                            <Link href={`/builder/${form.id}`}>
+                            <Button onClick={() => router.push(`/builder/${form.shareURL}`)}>
                                 Edit form <FaEdit />
-                            </Link>
+                            </Button>
                         </Button>
                         <Button className="w-full mt-2 text-md gap-4 border" variant="ghost">
                             Unpublished

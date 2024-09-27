@@ -1,77 +1,61 @@
-"use client"
-import { PublishForm } from "@/actions/form";
-import { useRouter } from "next/navigation";
-import { useTransition } from "react";
-import { FaSpinner } from "react-icons/fa";
-import { MdOutlinePublish } from "react-icons/md";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "../ui/alert-dialog";
+import React, { useTransition, useState } from "react";
 import { Button } from "../ui/button";
+import { HiOutlineGlobeAlt } from "react-icons/hi";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from "../ui/dropdown-menu";
 import { toast } from "../ui/use-toast";
+import { FaSpinner } from "react-icons/fa";
 
-function PublishFormBtn({ id }: { id: number }) {
+function PublishFormBtn({ id, isPublished }: { id: number, isPublished: boolean }) {
     const [loading, startTransition] = useTransition();
-    const router = useRouter();
 
-    async function publishForm() {
+    const togglePublishForm = async () => {
         try {
-            await PublishForm(id);
-            toast({
-                title: "Success",
-                description: "Your form is now available to the public",
+            const route = isPublished ? "/api/forms/unpublish-form" : "/api/forms/publish-form";
+
+            const response = await fetch(route, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    form_id: id,  // Pass the form ID
+                }),
             });
-            router.refresh();
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || `Error ${isPublished ? "unpublishing" : "publishing"} form`);
+            }
+
+            const status = isPublished ? "Unpublished" : "Published";
+            toast({
+                title: `Success`,
+                description: `Form has been ${status.toLowerCase()}.`,
+            });
+            window.location.reload();  // Refresh the page to reflect changes
         } catch (error) {
             toast({
                 title: "Error",
-                description: "Something went wrong while publishing the form",
+                description: `Something went wrong`,
+                variant: "destructive",
             });
         }
-    }
+    };
 
     return (
-        <AlertDialog>
-            <AlertDialogTrigger asChild>
-                <Button className="gap-2 text-white bg-gradient-to-r from-black to-gray-600">
-                    <MdOutlinePublish className="h-4 w-4" />
-                    Publish
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="gap-2">
+                    {isPublished ? "Published" : "Draft"}
+                    {loading && <FaSpinner className="animate-spin" />}
                 </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        This action cannot be undone. After publishing, you will not be able to edit this form. <br />
-                        <br />
-                        <span className="font-medium">
-                            By publishing this form, you will make it available to the public and you will be able to collect
-                            submissions.
-                        </span>
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                        disabled={loading}
-                        onClick={(e) => {
-                            e.preventDefault();
-                            startTransition(() => publishForm());
-                        }}
-                    >
-                        Proceed {loading && <FaSpinner className="animate-spin" />}
-                    </AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+                <DropdownMenuItem onClick={togglePublishForm}>
+                    {isPublished ? "Unpublish" : "Publish"}
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
     );
 }
 
