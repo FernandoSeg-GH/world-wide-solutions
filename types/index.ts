@@ -1,4 +1,5 @@
 import { ElementsType } from "@/components/forms/FormElements";
+import { Dispatch, SetStateAction } from "react";
 
 export interface Submission {
   id: number;
@@ -14,7 +15,6 @@ export interface Form {
   published: boolean;
   visits: number;
   submissions: number;
-
   extraAttributes?: Record<string, any>;
   createdAt: string;
   fields: FormField[];
@@ -23,12 +23,14 @@ export interface Form {
   landingPageId?: number | null;
   FormSubmissions?: Submission[];
 }
+
 export interface FormField {
   id: string;
   type: ElementsType;
   label?: string;
   required?: boolean;
-  extraAttributes?: {
+  extraAttributes: {
+    // Remove the possibility of undefined here
     label?: string;
     required?: boolean;
     placeHolder?: string;
@@ -37,4 +39,17 @@ export interface FormField {
     rows?: number;
     [key: string]: any;
   };
+}
+
+export interface FormContextType {
+  formName: string;
+  elements: FormField[];
+  setElements: (elements: FormField[]) => void;
+  setFormName: (name: string) => void;
+  unsavedChanges: boolean;
+  saveForm: () => Promise<void>;
+  publishForm: (action: "publish" | "unpublish") => Promise<void>;
+  handleFormNameChange: (newName: string) => void;
+  setUnsavedChanges: Dispatch<SetStateAction<boolean>>;
+  loading: boolean;
 }

@@ -1,57 +1,29 @@
-import React, { useTransition, useState } from "react";
+import React from "react";
 import { Button } from "../ui/button";
 import { HiOutlineGlobeAlt } from "react-icons/hi";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from "../ui/dropdown-menu";
-import { toast } from "../ui/use-toast";
 import { FaSpinner } from "react-icons/fa";
+import { useFormContext } from "@/components/context/FormContext"; // Use the form context
 
-function PublishFormBtn({ id, isPublished }: { id: number, isPublished: boolean }) {
-    const [loading, startTransition] = useTransition();
+function PublishFormBtn() {
+    const { publishForm, loading, formName } = useFormContext(); // Get necessary methods and state from context
+    const isPublished = formName === "Published"; // You can adjust this logic based on how `formName` tracks state
 
-    const togglePublishForm = async () => {
-        try {
-            const route = isPublished ? "/api/forms/unpublish-form" : "/api/forms/publish-form";
-
-            const response = await fetch(route, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    form_id: id,  // Pass the form ID
-                }),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || `Error ${isPublished ? "unpublishing" : "publishing"} form`);
-            }
-
-            const status = isPublished ? "Unpublished" : "Published";
-            toast({
-                title: `Success`,
-                description: `Form has been ${status.toLowerCase()}.`,
-            });
-            window.location.reload();  // Refresh the page to reflect changes
-        } catch (error) {
-            toast({
-                title: "Error",
-                description: `Something went wrong`,
-                variant: "destructive",
-            });
-        }
+    const handleTogglePublish = () => {
+        const action = isPublished ? "unpublish" : "publish";
+        publishForm(action); // Call `publishForm` from context
     };
 
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="gap-2">
-                    {isPublished ? "Published" : "Draft"}
+                <Button variant={!isPublished ? "outline" : "default"} className="gap-2">
+                    {isPublished ? <p>PUBLISHED</p> : <p>UNPUBLISHED</p>}
                     {loading && <FaSpinner className="animate-spin" />}
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-                <DropdownMenuItem onClick={togglePublishForm}>
+                <DropdownMenuItem onClick={handleTogglePublish}>
                     {isPublished ? "Unpublish" : "Publish"}
                 </DropdownMenuItem>
             </DropdownMenuContent>

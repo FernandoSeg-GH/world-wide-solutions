@@ -6,7 +6,6 @@ import { Button } from "./ui/button";
 import { HiCursorClick } from "react-icons/hi";
 import { toast } from "./ui/use-toast";
 import { ImSpinner2 } from "react-icons/im";
-import { SubmitForm } from "@/actions/form";
 
 function FormSubmitComponent({ formUrl, content }: { content: FormElementInstance[]; formUrl: string }) {
     const formValues = useRef<{ [key: string]: string }>({});
@@ -44,7 +43,7 @@ function FormSubmitComponent({ formUrl, content }: { content: FormElementInstanc
             setRenderKey(new Date().getTime());
             toast({
                 title: "Error",
-                description: "please check the form for errors",
+                description: "Please check the form for errors",
                 variant: "destructive",
             });
             return;
@@ -52,12 +51,28 @@ function FormSubmitComponent({ formUrl, content }: { content: FormElementInstanc
 
         try {
             const jsonContent = JSON.stringify(formValues.current);
-            await SubmitForm(formUrl, jsonContent);
+            const response = await fetch(`/api/forms/submit-form?formUrl=${formUrl}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ content: jsonContent }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || "Failed to submit the form");
+            }
+
             setSubmitted(true);
+            toast({
+                title: "Success",
+                description: "Form submitted successfully",
+            });
         } catch (error) {
             toast({
                 title: "Error",
-                description: "Something went wrong",
+                description: "Something went wrong while submitting the form",
                 variant: "destructive",
             });
         }

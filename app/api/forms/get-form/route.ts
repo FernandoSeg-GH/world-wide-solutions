@@ -6,8 +6,6 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const shareUrl = searchParams.get("shareUrl");
 
-  console.log("shareUrl in API:", shareUrl);
-
   if (!shareUrl) {
     return NextResponse.json(
       { message: "shareUrl is required" },

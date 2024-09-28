@@ -1,19 +1,20 @@
-"use client"
+'use client';
+
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import FormBuilder from '@/components/forms/FormBuilder';
 import { Form } from '@/types';
-import { FormProvider } from '@/components/context/FormContext';
+import { GetFormById } from '@/actions/form';
 
-export default function BuilderPage({ params }: { params: { shareUrl: string } }) {
-  const { shareUrl } = params;
+const BuilderPage = ({ params }: { params: { shareUrl: string } }) => {
   const [form, setForm] = useState<Form | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const { shareUrl } = params;
+  console.log('shareUrl builder page', shareUrl)
   useEffect(() => {
     const fetchForm = async () => {
       try {
+
         const response = await fetch(`/api/forms/get-form?shareUrl=${shareUrl}`);
 
         if (!response.ok) {
@@ -22,6 +23,7 @@ export default function BuilderPage({ params }: { params: { shareUrl: string } }
         }
 
         const formData = await response.json();
+        console.log('formData', formData)
         setForm(formData);
       } catch (err: any) {
         setError(err.message);
@@ -37,8 +39,7 @@ export default function BuilderPage({ params }: { params: { shareUrl: string } }
   if (error) return <div>Error: {error}</div>;
   if (!form) return <div>Form not found</div>;
 
-  return (
-    <FormProvider form={form}>
-      <FormBuilder />
-    </FormProvider>)
-}
+  return <FormBuilder form={form} />;
+};
+
+export default BuilderPage;

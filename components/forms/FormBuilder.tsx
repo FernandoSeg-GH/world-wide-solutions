@@ -1,75 +1,53 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useFormContext } from "@/components/context/FormContext"; // Use the context
 import PreviewDialogBtn from "./PreviewDialogBtn";
 import PublishFormBtn from "./PublishFormBtn";
 import SaveFormBtn from "./SaveFormBtn";
 import Designer from "../Designer";
-import { DndContext, MouseSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
-import DragOverlayWrapper from "../DragOverlayWrapper";
-import useDesigner from "../hooks/useDesigner";
-import { ImSpinner2 } from "react-icons/im";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { toast } from "../ui/use-toast";
+import { useToast } from "../ui/use-toast";
+import { DndContext, MouseSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { ImSpinner2 } from "react-icons/im";
 import Link from "next/link";
 import { BsArrowLeft, BsArrowRight } from "react-icons/bs";
 import Confetti from "react-confetti";
-import { Form } from "@/types";
-import { ElementsType, FormElementInstance, FormElements } from "./FormElements";
+import DragOverlayWrapper from "../DragOverlayWrapper";
+import useDesigner from "../hooks/useDesigner"; // Assuming this hook provides state management for form elements
 
-function FormBuilder({ form }: { form: Form }) {
-    const { setElements, setSelectedElement } = useDesigner();
-    const [isReady, setIsReady] = useState(false);
+function FormBuilder() {
+    const { formName, setFormName, elements, unsavedChanges, saveForm, publishForm, handleFormNameChange } = useFormContext(); // Use the form context
+    const { setElements, setSelectedElement } = useDesigner(); // Use designer state
+    const [isReady, setIsReady] = useState<boolean>(false); // Track if ready
+    const [isEditingName, setIsEditingName] = useState<boolean>(false); // To toggle edit mode
+    const { toast } = useToast();
 
-    const mouseSensor = useSensor(MouseSensor, {
-        activationConstraint: {
-            distance: 10,
-        },
-    });
-
-    const touchSensor = useSensor(TouchSensor, {
-        activationConstraint: {
-            delay: 300,
-            tolerance: 5,
-        },
-    });
-
+    const mouseSensor = useSensor(MouseSensor, { activationConstraint: { distance: 10 } });
+    const touchSensor = useSensor(TouchSensor, { activationConstraint: { delay: 300, tolerance: 5 } });
     const sensors = useSensors(mouseSensor, touchSensor);
 
-    function mapFieldTypeToElementsType(fieldType: string): ElementsType | undefined {
-        if (fieldType in FormElements) {
-            return fieldType as ElementsType;
-        } else {
-            console.warn(`Unknown field type: ${fieldType}`);
-            return undefined;
+    // Function to alert when navigating away with unsaved changes
+    const handleNavigationAlert = () => {
+        if (unsavedChanges) {
+            const confirmExit = window.confirm(
+                "You have unsaved changes. Do you want to save before leaving?\n\nOptions:\n- Cancel\n- Save and Close\n- Close without Saving"
+            );
+            if (confirmExit) {
+                saveForm();
+            }
         }
-    }
+    };
 
+    // Initialize form elements once ready
     useEffect(() => {
         if (isReady) return;
-
-        const parsedFields = form.fields;
-
-        const elements = Array.isArray(parsedFields)
-            ? parsedFields.map((field: any) => {
-                const mappedType = mapFieldTypeToElementsType(field.type);
-                if (!mappedType) return null;
-                return {
-                    ...field,
-                    type: mappedType,
-                    extraAttributes: field.extraAttributes || {},
-                };
-            }).filter((element): element is FormElementInstance => element !== null)
-            : [];
-
-        setElements(elements);
-        setSelectedElement(null);
+        setElements(elements); // Initialize elements from context
+        setSelectedElement(null); // Reset selected element
         const readyTimeout = setTimeout(() => setIsReady(true), 500);
         return () => clearTimeout(readyTimeout);
-    }, [form, setElements, isReady, setSelectedElement]);
-
-
+    }, [elements, setElements, isReady, setSelectedElement]);
 
     if (!isReady) {
         return (
@@ -79,79 +57,35 @@ function FormBuilder({ form }: { form: Form }) {
         );
     }
 
-    const shareUrl = form.shareURL ? `${window.location.origin}/submit/${form.shareURL}` : '';
-
-
-    if (form.published) {
-        return (
-            <>
-                <Confetti
-                    width={window.innerWidth}
-                    height={window.innerHeight}
-                    recycle={false}
-                    numberOfPieces={1000}
-                />
-                <div className="flex flex-col items-center justify-center h-full w-full">
-                    <div className="max-w-md">
-                        <h1 className="text-center text-4xl font-bold text-primary border-b pb-2 mb-10">
-                            🎊🎊 Form Published 🎊🎊
-                        </h1>
-                        <h2 className="text-2xl">Share this form</h2>
-                        <h3 className="text-xl text-muted-foreground border-b pb-10">
-                            Anyone with the link can view and submit the form
-                        </h3>
-                        <div className="my-4 flex flex-col gap-2 items-center w-full border-b pb-4">
-                            <Input className="w-full" readOnly value={shareUrl} />
-                            <Button
-                                className="mt-2 w-full"
-                                onClick={() => {
-                                    navigator.clipboard.writeText(shareUrl);
-                                    toast({
-                                        title: "Copied!",
-                                        description: "Link copied to clipboard",
-                                    });
-                                }}
-                            >
-                                Copy link
-                            </Button>
-                        </div>
-                        <div className="flex justify-between">
-                            <Button variant={"link"} asChild>
-                                <Link href={"/"} className="gap-2">
-                                    <BsArrowLeft />
-                                    Go back home
-                                </Link>
-                            </Button>
-                            <Button variant={"link"} asChild>
-                                <Link href={`/forms/${form.id}`} className="gap-2">
-                                    Form details
-                                    <BsArrowRight />
-                                </Link>
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            </>
-        );
-    }
+    const shareUrl = `${window.location.origin}/submit/${formName}`;
 
     return (
         <DndContext sensors={sensors}>
             <main className="flex flex-col w-full min-h-screen">
                 <nav className="flex justify-between border-b-2 p-4 gap-3 items-center">
-                    <h2 className="truncate font-medium">
-                        <span className="text-muted-foreground mr-2">Form:</span>
-                        {form.name}
-                    </h2>
+                    <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground mr">Form:</span>
+                        {isEditingName ? (
+                            <Input
+                                value={formName}
+                                onChange={(e) => handleFormNameChange(e.target.value)}
+                                onBlur={() => setIsEditingName(false)} // Exit edit mode
+                                autoFocus
+                                className="bg-gray-100"
+                            />
+                        ) : (
+                            <h2
+                                className="truncate font-medium min-w-[190px] p-2 rounded-md cursor-pointer hover:bg-gray-100"
+                                onClick={() => setIsEditingName(true)}
+                            >
+                                {formName}
+                            </h2>
+                        )}
+                    </div>
                     <div className="flex items-center gap-2">
                         <PreviewDialogBtn />
-                        {!form.published && (
-                            <>
-                                <SaveFormBtn id={form.id} shareUrl={form.shareURL} />
-
-                                <PublishFormBtn id={form.id} isPublished={form.published} />
-                            </>
-                        )}
+                        <SaveFormBtn />
+                        <PublishFormBtn />
                     </div>
                 </nav>
                 <div className="flex w-full flex-grow items-center justify-center relative overflow-y-auto h-[200px] bg-accent bg-[url(/paper.svg)] dark:bg-[url(/paper-dark.svg)]">

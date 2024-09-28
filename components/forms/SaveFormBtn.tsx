@@ -1,62 +1,30 @@
-import React, { useTransition } from "react";
+import React from "react";
 import { Button } from "../ui/button";
 import { HiSaveAs } from "react-icons/hi";
-import useDesigner from "../hooks/useDesigner";
-import { toast } from "../ui/use-toast";
 import { FaSpinner } from "react-icons/fa";
+import { useFormContext } from "../context/FormContext"; // Use the form context for state and actions
 
-function SaveFormBtn({ id, shareUrl }: { id: number; shareUrl?: string }) {
-    const { elements } = useDesigner(); // Custom hook to get form elements
-    const [loading, startTransition] = useTransition();
+function SaveFormBtn() {
+    // Get necessary values from FormContext
+    const { saveForm, unsavedChanges, loading } = useFormContext();
 
-    const updateFormContent = async () => {
+    const handleSave = async () => {
         try {
-            const jsonElements = JSON.stringify(elements);  // Convert elements to JSON
-
-            // Call the Next.js API route directly
-            const response = await fetch(`/api/forms/save-form`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    form_id: id,          // Pass the form ID to identify the form
-                    fields: JSON.parse(jsonElements),  // Convert elements back to JSON
-                    business_id: 1,       // Ensure a valid business_id is passed
-                    share_url: shareUrl,  // Pass the shareURL if it exists
-                }),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || "Error saving form");
-            }
-
-            toast({
-                title: "Success",
-                description: "Your form has been saved",
-            });
+            await saveForm();
         } catch (error) {
-            toast({
-                title: "Error",
-                description: "Something went wrong",
-                variant: "destructive",
-            });
+            console.error("Error during saveForm:", error); // Add logging for debugging
         }
     };
 
-
     return (
         <Button
-            variant={"outline"}
-            className="gap-2"
+            variant={unsavedChanges ? "default" : "outline"} // Highlight the button if there are unsaved changes
+            className={`gap-2 ${unsavedChanges ? "bg-yellow-500" : ""}`} // Apply style if unsavedChanges
             disabled={loading}
-            onClick={() => {
-                startTransition(updateFormContent);
-            }}
+            onClick={handleSave} // Call saveForm from context when clicked
         >
             <HiSaveAs className="h-4 w-4" />
-            Save
+            {loading ? "Saving..." : "Save"}
             {loading && <FaSpinner className="animate-spin" />}
         </Button>
     );

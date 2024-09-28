@@ -9,6 +9,8 @@ import ClientProvider from '@/components/providers/ClientProvider'
 import Logo from '@/components/Logo'
 import ThemeSwitcher from '@/components/ThemeSwitcher'
 import UserMenu from '@/components/user/UserMenu'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -17,7 +19,8 @@ export const metadata: Metadata = {
   description: 'Panel de Usuario',
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+
   return (
     <ClientProvider>
       <html lang="en">
@@ -33,6 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </nav>
             <NextTopLoader />
             <DesignerContextProvider>
+
               {children}
               <Toaster />
             </DesignerContextProvider>

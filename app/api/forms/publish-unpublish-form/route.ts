@@ -9,36 +9,43 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  const { form_id } = await req.json(); // Get form_id from the request
+  const { form_id, action } = await req.json(); // Get form_id and action from the request
 
   if (!form_id) {
     return NextResponse.json({ error: "Form ID is required" }, { status: 400 });
+  }
+
+  if (!["publish", "unpublish"].includes(action)) {
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   }
 
   const API_URL =
     process.env.NEXT_PUBLIC_FLASK_BACKEND_URL || "http://localhost:5000";
 
   try {
-    const response = await fetch(`${API_URL}/forms/publish_form`, {
+    const response = await fetch(`${API_URL}/forms/publish_unpublish_form`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${session.accessToken}`,
       },
-      body: JSON.stringify({ form_id }),
+      body: JSON.stringify({ form_id, action }),
     });
 
+    const responseText = await response.text(); // Log the response for debugging
+    console.log(responseText); // Log response text to see what is returned
+
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText || "Failed to publish form");
+      throw new Error(responseText || `Failed to ${action} form`);
     }
 
-    const result = await response.json();
+    // Optionally, if you want to return JSON back to the client
+    const result = JSON.parse(responseText); // Parse the text to JSON
     return NextResponse.json(result, { status: 200 });
   } catch (error) {
-    console.error("Error publishing form:", error);
+    console.error(`Error ${action}ing form:`, error);
     return NextResponse.json(
-      { error: "Failed to publish form" },
+      { error: `Failed to ${action} form` },
       { status: 500 }
     );
   }

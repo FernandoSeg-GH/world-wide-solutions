@@ -1,24 +1,40 @@
-import { GetFormContentByUrl } from "@/actions/form";
+"use client";
+
+import { useEffect, useState } from "react";
 import { FormElementInstance } from "@/components/forms/FormElements";
 import FormSubmitComponent from "@/components/FormSubmitComponent";
-import React from "react";
+import { useRouter } from "next/router";
 
-async function SubmitPage({
-    params,
-}: {
-    params: {
-        formUrl: string;
-    };
-}) {
-    const form = await GetFormContentByUrl(params.formUrl);
+export default function SubmitPage({ params }: { params: { formUrl: string } }) {
+    const { formUrl } = params;
+    const [formContent, setFormContent] = useState<FormElementInstance[] | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    if (!form) {
-        throw new Error("form not found");
-    }
+    useEffect(() => {
+        const fetchFormContent = async () => {
+            try {
+                const response = await fetch(`/api/forms/get-form-content?formUrl=${formUrl}`);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || "Failed to fetch form content");
+                }
 
-    const formContent = form.fields as FormElementInstance[];
+                const formData = await response.json();
+                setFormContent(formData.fields as FormElementInstance[]);
+            } catch (error: any) {
+                setError(error.message || "Error fetching form content");
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    return <FormSubmitComponent formUrl={params.formUrl} content={formContent} />;
+        fetchFormContent();
+    }, [formUrl]);
+
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div>Error: {error}</div>;
+    if (!formContent) return <div>Form not found</div>;
+
+    return <FormSubmitComponent formUrl={formUrl} content={formContent} />;
 }
-
-export default SubmitPage;
