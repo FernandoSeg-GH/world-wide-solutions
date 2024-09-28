@@ -1,12 +1,14 @@
 import React from "react";
 import { Button } from "../ui/button";
 import { MdPreview } from "react-icons/md";
-import useDesigner from "../hooks/useDesigner";
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 import { FormElements } from "./FormElements";
+import { useAppContext } from "@/components/context/AppContext"; // Import the AppContext
 
 function PreviewDialogBtn() {
-    const { elements } = useDesigner();
+    // Get form elements and other necessary data from the AppContext
+    const { data } = useAppContext();
+    const { elements } = data; // Destructure elements from context
 
     return (
         <Dialog>
@@ -34,7 +36,7 @@ function PreviewDialogBtn() {
                                 );
                             }
                             const FormComponent = formElement.formComponent;
-                            return <FormComponent key={element.id} elementInstance={element} />
+                            return <FormComponent key={element.id} elementInstance={element} />;
                         })}
                     </div>
                 </div>

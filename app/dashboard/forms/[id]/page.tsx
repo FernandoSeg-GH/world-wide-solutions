@@ -5,24 +5,32 @@ import FormLinkShare from '@/components/FormLinkShare';
 import VisitBtn from '@/components/VisitBtn';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatDistance } from 'date-fns';
+import { useAppContext } from '@/components/context/AppContext'; // Use AppContext instead of actions
 import { Form, Submission } from '@/types';
-import { GetFormById, GetFormWithSubmissions } from '@/actions/form';
 
 const FormDetailPage = ({ params }: { params: { id: string } }) => {
-    const [form, setForm] = useState<Form | null>(null);
-    const [submissions, setSubmissions] = useState<Submission[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { id } = params;
 
+    const { selectors, data, actions } = useAppContext();
+    const { setForm, setSubmissions } = selectors;
+    const { form, submissions } = data;
+    const { fetchSubmissions } = actions;
+
     useEffect(() => {
         const fetchFormDetails = async () => {
             try {
-                const formData = await GetFormById(Number(id));
-                const formSubmissions = await GetFormWithSubmissions(Number(id));
+                // Assuming `id` refers to the share URL
+                const formId = Number(id); // Or update this logic if `id` isn't a number
 
-                setSubmissions(Array.isArray(formSubmissions.submissions) ? formSubmissions.submissions : []);
+                // Fetch form details and set it in the context
+                const formDataResponse = await fetch(`/api/forms/${formId}`);
+                const formData = await formDataResponse.json();
                 setForm(formData);
+
+                // Fetch submissions separately
+                await fetchSubmissions(formData.shareURL);
             } catch (err: any) {
                 setError(err.message);
             } finally {
@@ -31,13 +39,15 @@ const FormDetailPage = ({ params }: { params: { id: string } }) => {
         };
 
         fetchFormDetails();
-    }, [id]);
+    }, [id, setForm, fetchSubmissions]);
 
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error}</div>;
     if (!form) return <div>Form not found</div>;
 
-    const submissionRate = form.visits > 0 ? (form.submissions / form.visits) * 100 : 0;
+    const submissionRate = (form.visits ?? 0) > 0
+        ? (submissions.length / (form.visits ?? 1)) * 100
+        : 0;
     const bounceRate = 100 - submissionRate;
 
     return (

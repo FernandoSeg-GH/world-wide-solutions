@@ -1,13 +1,15 @@
+'use client';
+
 import React from "react";
 import { Button } from "../ui/button";
 import { HiOutlineGlobeAlt } from "react-icons/hi";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from "../ui/dropdown-menu";
 import { FaSpinner } from "react-icons/fa";
-import { useFormContext } from "@/components/context/FormContext"; // Use the form context
+import { useAppContext } from "@/components/context/AppContext"; // Use the updated AppContext
 
 function PublishFormBtn() {
-    const { publishForm, loading, formName } = useFormContext(); // Get necessary methods and state from context
-    const isPublished = formName === "Published"; // You can adjust this logic based on how `formName` tracks state
+    const { data: { formName, loading }, actions: { publishForm } } = useAppContext(); // Use the updated AppContext
+    const isPublished = formName === "Published"; // Adjust based on how your state tracks published forms
 
     const handleTogglePublish = () => {
         const action = isPublished ? "unpublish" : "publish";

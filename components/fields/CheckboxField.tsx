@@ -7,13 +7,13 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
-import useDesigner from "../hooks/useDesigner";
 import { IoMdCheckbox } from "react-icons/io";
 
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Switch } from "../ui/switch";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "../ui/checkbox";
+import { useAppContext } from "../context/AppContext";
 
 const type: ElementsType = "CheckboxField";
 
@@ -132,7 +132,9 @@ function FormComponent({
 type propertiesFormSchemaType = z.infer<typeof propertiesSchema>;
 function PropertiesComponent({ elementInstance }: { elementInstance: FormElementInstance }) {
     const element = elementInstance as CustomInstance;
-    const { updateElement } = useDesigner();
+    const { actions } = useAppContext();  // Updated to use AppContext
+    const { updateElement } = actions;
+
     const form = useForm<propertiesFormSchemaType>({
         resolver: zodResolver(propertiesSchema),
         mode: "onBlur",

@@ -27,8 +27,8 @@ export async function GET(request: Request) {
     const response = await fetch(`${API_URL}/forms/content/${formUrl}`, {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${session.accessToken}`,
         "Content-Type": "application/json",
+        Authorization: `Bearer ${session.accessToken}`,
       },
     });
 

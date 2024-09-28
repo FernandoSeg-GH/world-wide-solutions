@@ -1,19 +1,25 @@
+// FormDetailPage.tsx
+
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import FormLinkShare from '@/components/FormLinkShare';
 import VisitBtn from '@/components/VisitBtn';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { formatDistance } from 'date-fns';
-import { Form, Submission } from '@/types';
+import { useAppContext } from '@/components/context/AppContext';
+import { Submission, Form } from '@/types';
 
 const FormDetailPage = ({ params }: { params: { share_url: string } }) => {
-    const [form, setForm] = useState<Form | null>(null);
-    const [submissions, setSubmissions] = useState<Submission[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const { share_url } = params; // Get share_url from the params
+    const { data, selectors, actions } = useAppContext();
+    const { form, forms, formsLoading, formsError, submissions } = data;
+    const { setForm } = selectors;
+    const { saveForm, publishForm } = actions;
 
+    const [loadingSubmissions, setLoadingSubmissions] = useState(true);
+    const [errorSubmissions, setErrorSubmissions] = useState<string | null>(null);
+
+    // Fetch form details and set in context
     useEffect(() => {
         const fetchFormDetails = async () => {
             try {
@@ -23,29 +29,51 @@ const FormDetailPage = ({ params }: { params: { share_url: string } }) => {
                 }
                 const formData = await formResponse.json();
 
-                const submissionsResponse = await fetch(`/api/forms/${share_url}/submissions`);
-                if (!submissionsResponse.ok) {
-                    throw new Error("Error fetching form submissions");
-                }
-                const submissionsData = await submissionsResponse.json();
-
-                setForm(formData);
-                setSubmissions(submissionsData.submissions);
+                setForm(formData); // Set form in context
             } catch (err: any) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
+                // Optionally, handle this error via toast or another mechanism
+                console.error(err.message);
             }
         };
 
         fetchFormDetails();
+    }, [share_url, setForm]);
+
+    // Fetch submissions separately
+    useEffect(() => {
+        const fetchSubmissions = async () => {
+            console.log('share_url', share_url)
+
+            try {
+                const submissionsResponse = await fetch(`/api/forms/${share_url}/submissions`);
+                if (!submissionsResponse.ok) {
+                    throw new Error("Error fetching form submissions");
+                }
+                if (!submissionsResponse) {
+                    return { message: 'Form not found' }
+                }
+                const submissionsData = await submissionsResponse.json();
+                selectors.setSubmissions(submissionsData.submissions); // You might need to add a setter in actions if not present
+            } catch (err: any) {
+                setErrorSubmissions(err.message);
+            } finally {
+                setLoadingSubmissions(false);
+            }
+        };
+
+        fetchSubmissions();
     }, [share_url]);
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error}</div>;
+    if (formsLoading) return <div>Loading form...</div>;
+    if (formsError) return <div>Error: {formsError.message}</div>;
     if (!form) return <div>Form not found</div>;
 
-    const submissionRate = form.visits > 0 ? (form.submissions / form.visits) * 100 : 0;
+    if (loadingSubmissions) return <div>Loading submissions...</div>;
+    if (errorSubmissions) return <div>Error: {errorSubmissions}</div>;
+
+    const submissionRate = (form.visits ?? 0) > 0
+        ? (submissions.length / (form.visits ?? 1)) * 100
+        : 0;
     const bounceRate = 100 - submissionRate;
 
     return (

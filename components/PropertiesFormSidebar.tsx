@@ -1,12 +1,16 @@
 import React from "react";
-import useDesigner from "./hooks/useDesigner";
 import { FormElements } from "./forms/FormElements";
 import { AiOutlineClose } from "react-icons/ai";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
+import { useAppContext } from "./context/AppContext"; // Use the AppContext
 
 function PropertiesFormSidebar() {
-    const { selectedElement, setSelectedElement } = useDesigner();
+    const {
+        data: { selectedElement },
+        selectors: { setSelectedElement },
+    } = useAppContext(); // Access AppContext data and selectors
+
     if (!selectedElement) return null;
 
     const PropertiesForm = FormElements[selectedElement?.type].propertiesComponent;
@@ -19,7 +23,7 @@ function PropertiesFormSidebar() {
                     size={"icon"}
                     variant={"ghost"}
                     onClick={() => {
-                        setSelectedElement(null);
+                        setSelectedElement(null); // Clear selected element on close
                     }}
                 >
                     <AiOutlineClose />

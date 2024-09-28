@@ -7,7 +7,6 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
-import useDesigner from "../hooks/useDesigner";
 
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Switch } from "../ui/switch";
@@ -15,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { BsTextareaResize } from "react-icons/bs";
 import { Textarea } from "../ui/textarea";
 import { Slider } from "../ui/slider";
+import { useAppContext } from "../context/AppContext";
 
 const type: ElementsType = "TextAreaField";
 
@@ -128,7 +128,8 @@ type propertiesFormSchemaType = z.infer<typeof propertiesSchema>;
 
 function PropertiesComponent({ elementInstance }: { elementInstance: FormElementInstance }) {
     const element = elementInstance as CustomInstance;
-    const { updateElement } = useDesigner();
+    const { actions } = useAppContext();
+    const { updateElement } = actions;
     const form = useForm<propertiesFormSchemaType>({
         resolver: zodResolver(propertiesSchema),
         mode: "onBlur",

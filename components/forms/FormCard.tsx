@@ -1,52 +1,27 @@
-'use client';
-
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { formatDistance } from 'date-fns';
 import { Button } from '../ui/button';
 import { BiRightArrowAlt } from 'react-icons/bi';
 import { FaEdit, FaWpforms } from 'react-icons/fa';
 import { LuView } from 'react-icons/lu';
 import { Badge } from '../ui/badge';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '../ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card';
 import { Form } from '@/types';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuTrigger,
-    DropdownMenuItem,
-} from '../ui/dropdown-menu';
-import {
-    AlertDialog,
-    AlertDialogContent,
-    AlertDialogHeader,
-    AlertDialogFooter,
-    AlertDialogTitle,
-    AlertDialogDescription,
-} from '../ui/alert-dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from '../ui/dropdown-menu';
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription } from '../ui/alert-dialog';
 import { useRouter } from 'next/navigation';
 import { useToast } from '../ui/use-toast';
-import { useFormContext } from '../context/FormContext'; // Import the FormContext
+import { useAppContext } from '../context/AppContext'; // Import the AppContext
 
 function FormCard({ form }: { form: Form }) {
     const [isAlertOpen, setIsAlertOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [publishedStatus, setPublishedStatus] = useState(form.published); // State to manage published status
-    const [deleteInputValue, setDeleteInputValue] = useState(""); // Step 3 input value
+    const [deleteInputValue, setDeleteInputValue] = useState("");
     const router = useRouter();
     const { toast } = useToast();
+    const { actions: { publishForm }, data: { loading: isPublishing } } = useAppContext();
 
-    // Use the context for publishForm
-    const { publishForm, loading: isPublishing } = useFormContext();
-
-    // UseEffect to update state when `form.published` changes
     useEffect(() => {
         setPublishedStatus(form.published);
     }, [form.published]);
@@ -55,14 +30,13 @@ function FormCard({ form }: { form: Form }) {
         const action = publishedStatus ? "unpublish" : "publish";
 
         try {
-            await publishForm(action); // Use publishForm from context
+            await publishForm(action);
             const updatedStatus = publishedStatus ? "Unpublished" : "Published";
             toast({
                 title: `Form ${updatedStatus}`,
                 description: `The form has been ${updatedStatus.toLowerCase()}.`,
             });
-
-            setPublishedStatus(!publishedStatus); // Toggle the published status in the state
+            setPublishedStatus(!publishedStatus);
         } catch (error) {
             console.error(`Error ${action}ing form:`, error);
             toast({
@@ -73,7 +47,6 @@ function FormCard({ form }: { form: Form }) {
         }
     };
 
-    // Function to delete a form
     const handleDelete = async () => {
         if (deleteInputValue !== "DELETE_THE_FORM_AND_ALL_DATA") {
             toast({
@@ -87,10 +60,7 @@ function FormCard({ form }: { form: Form }) {
         setIsDeleting(true);
 
         try {
-            const response = await fetch(`/api/forms/delete?formId=${form.id}`, {
-                method: 'DELETE',
-            });
-
+            const response = await fetch(`/api/forms/delete?formId=${form.id}`, { method: 'DELETE' });
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Failed to delete form');
@@ -115,15 +85,9 @@ function FormCard({ form }: { form: Form }) {
         }
     };
 
-    let formattedDistance = 'Unknown time';
-    if (form.createdAt) {
-        const date = new Date(form.createdAt);
-        if (!isNaN(date.getTime())) {
-            formattedDistance = formatDistance(date, new Date(), {
-                addSuffix: true,
-            });
-        }
-    }
+    const formattedDistance = form.createdAt
+        ? formatDistance(new Date(form.createdAt), new Date(), { addSuffix: true })
+        : 'Unknown time';
 
     return (
         <Card>
@@ -139,12 +103,7 @@ function FormCard({ form }: { form: Form }) {
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="ghost" className="h-8 w-8 p-0">
                                         <span className="sr-only">Open menu</span>
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            className="h-4 w-4"
-                                            viewBox="0 0 20 20"
-                                            fill="currentColor"
-                                        >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                                             <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM18 10a2 2 0 11-4 0 2 2 0 014 0z" />
                                         </svg>
                                     </Button>
@@ -165,10 +124,18 @@ function FormCard({ form }: { form: Form }) {
                     <span>{formattedDistance}</span>
                     {publishedStatus && (
                         <span className="flex items-center gap-2">
-                            <LuView className="text-muted-foreground" />
-                            <span>{form.visits.toLocaleString()}</span>
-                            <FaWpforms className="text-muted-foreground" />
-                            <span>{form.submissions.toLocaleString()}</span>
+                            {form.visits && (
+                                <>
+                                    <LuView className="text-muted-foreground" />
+                                    <span>{form.visits.toLocaleString()}</span>
+                                </>
+                            )}
+                            {form.FormSubmissions && form.FormSubmissions.length > 0 && (
+                                <>
+                                    <FaWpforms className="text-muted-foreground" />
+                                    <span>{form.FormSubmissions.length}</span>
+                                </>
+                            )}
                         </span>
                     )}
                 </CardDescription>
@@ -192,7 +159,6 @@ function FormCard({ form }: { form: Form }) {
                 </div>
             </CardFooter>
 
-            {/* Alert dialog for deletion */}
             <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>

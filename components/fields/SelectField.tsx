@@ -7,7 +7,6 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
-import useDesigner from "../hooks/useDesigner";
 import { RxDropdownMenu } from "react-icons/rx";
 
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
@@ -18,6 +17,7 @@ import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
 import { AiOutlineClose, AiOutlinePlus } from "react-icons/ai";
 import { toast } from "../ui/use-toast";
+import { useAppContext } from "../context/AppContext";
 
 const type: ElementsType = "SelectField";
 
@@ -141,7 +141,10 @@ function FormComponent({
 type propertiesFormSchemaType = z.infer<typeof propertiesSchema>;
 function PropertiesComponent({ elementInstance }: { elementInstance: FormElementInstance }) {
     const element = elementInstance as CustomInstance;
-    const { updateElement, setSelectedElement } = useDesigner();
+    const { actions, selectors } = useAppContext();
+    const { updateElement } = actions;
+    const { setSelectedElement } = selectors;
+
     const form = useForm<propertiesFormSchemaType>({
         resolver: zodResolver(propertiesSchema),
         mode: "onSubmit",

@@ -6,11 +6,11 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
-import useDesigner from "../hooks/useDesigner";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { BsTextParagraph } from "react-icons/bs";
 import { Textarea } from "../ui/textarea";
+import { useAppContext } from "../context/AppContext";
 
 const type: ElementsType = "ParagraphField";
 
@@ -66,7 +66,8 @@ type propertiesFormSchemaType = z.infer<typeof propertiesSchema>;
 
 function PropertiesComponent({ elementInstance }: { elementInstance: FormElementInstance }) {
     const element = elementInstance as CustomInstance;
-    const { updateElement } = useDesigner();
+    const { actions } = useAppContext();  // Updated to use AppContext
+    const { updateElement } = actions;
     const form = useForm<propertiesFormSchemaType>({
         resolver: zodResolver(propertiesSchema),
         mode: "onBlur",

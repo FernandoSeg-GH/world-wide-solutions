@@ -1,13 +1,25 @@
-"use client"
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import FormBuilder from '@/components/forms/FormBuilder';
-import { Form } from '@/types';
-import { FormProvider } from '@/components/context/FormContext';
+// BuilderPage.tsx
 
-export default function BuilderPage({ params }: { params: { shareUrl: string } }) {
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import FormBuilder from '@/components/forms/FormBuilder';
+import { useAppContext } from '@/components/context/AppContext';
+import { FormElementInstance } from '@/components/forms/FormElements';
+
+interface BuilderPageProps {
+  params: {
+    shareUrl: string;
+  };
+}
+
+export default function BuilderPage({ params }: BuilderPageProps) {
   const { shareUrl } = params;
-  const [form, setForm] = useState<Form | null>(null);
+  const { data, selectors, actions } = useAppContext();
+  const { form, elements, selectedElement } = data;
+  const { setForm, setElements, setSelectedElement } = selectors;
+  const { addElement, removeElement, updateElement } = actions;
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,7 +34,8 @@ export default function BuilderPage({ params }: { params: { shareUrl: string } }
         }
 
         const formData = await response.json();
-        setForm(formData);
+        setForm(formData); // Initialize form in AppContext
+        setElements(formData.fields || []); // Initialize elements in AppContext
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -31,14 +44,15 @@ export default function BuilderPage({ params }: { params: { shareUrl: string } }
     };
 
     fetchForm();
-  }, [shareUrl]);
+  }, [shareUrl, setForm, setElements]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
   if (!form) return <div>Form not found</div>;
 
   return (
-    <FormProvider form={form}>
+    <div>
       <FormBuilder />
-    </FormProvider>)
+    </div>
+  );
 }

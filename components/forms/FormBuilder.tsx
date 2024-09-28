@@ -1,53 +1,56 @@
-"use client";
+'use client';
 
 import React, { useEffect, useState } from "react";
-import { useFormContext } from "@/components/context/FormContext"; // Use the context
+import { useAppContext } from "@/components/context/AppContext"; // Updated import
 import PreviewDialogBtn from "./PreviewDialogBtn";
 import PublishFormBtn from "./PublishFormBtn";
 import SaveFormBtn from "./SaveFormBtn";
 import Designer from "../Designer";
 import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import { useToast } from "../ui/use-toast";
 import { DndContext, MouseSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { ImSpinner2 } from "react-icons/im";
-import Link from "next/link";
-import { BsArrowLeft, BsArrowRight } from "react-icons/bs";
-import Confetti from "react-confetti";
 import DragOverlayWrapper from "../DragOverlayWrapper";
-import useDesigner from "../hooks/useDesigner"; // Assuming this hook provides state management for form elements
+import { useToast } from "../ui/use-toast";
+import { Button } from "../ui/button";
+import { useRouter } from "next/navigation";
 
 function FormBuilder() {
-    const { formName, setFormName, elements, unsavedChanges, saveForm, publishForm, handleFormNameChange } = useFormContext(); // Use the form context
-    const { setElements, setSelectedElement } = useDesigner(); // Use designer state
-    const [isReady, setIsReady] = useState<boolean>(false); // Track if ready
-    const [isEditingName, setIsEditingName] = useState<boolean>(false); // To toggle edit mode
-    const { toast } = useToast();
+    const {
+        selectors: { handleFormNameChange, setSelectedElement },
+        data: { formName, unsavedChanges },
+        actions: { saveForm, publishForm, addElement, removeElement, updateElement },
+    } = useAppContext();
+
+    const [isReady, setIsReady] = useState<boolean>(false);
+    const [isEditingName, setIsEditingName] = useState<boolean>(false);
 
     const mouseSensor = useSensor(MouseSensor, { activationConstraint: { distance: 10 } });
     const touchSensor = useSensor(TouchSensor, { activationConstraint: { delay: 300, tolerance: 5 } });
     const sensors = useSensors(mouseSensor, touchSensor);
 
     // Function to alert when navigating away with unsaved changes
-    const handleNavigationAlert = () => {
+    const handleNavigationAlert = (e: BeforeUnloadEvent) => {
         if (unsavedChanges) {
-            const confirmExit = window.confirm(
-                "You have unsaved changes. Do you want to save before leaving?\n\nOptions:\n- Cancel\n- Save and Close\n- Close without Saving"
-            );
-            if (confirmExit) {
-                saveForm();
-            }
+            e.preventDefault();
+            e.returnValue = ''; // Required for Chrome
         }
     };
 
     // Initialize form elements once ready
     useEffect(() => {
         if (isReady) return;
-        setElements(elements); // Initialize elements from context
         setSelectedElement(null); // Reset selected element
         const readyTimeout = setTimeout(() => setIsReady(true), 500);
         return () => clearTimeout(readyTimeout);
-    }, [elements, setElements, isReady, setSelectedElement]);
+    }, [isReady, setSelectedElement]);
+
+    // Handle unsaved changes on page unload
+    useEffect(() => {
+        window.addEventListener('beforeunload', handleNavigationAlert);
+        return () => {
+            window.removeEventListener('beforeunload', handleNavigationAlert);
+        };
+    }, [unsavedChanges]);
 
     if (!isReady) {
         return (
@@ -56,7 +59,7 @@ function FormBuilder() {
             </div>
         );
     }
-
+    const router = useRouter()
     const shareUrl = `${window.location.origin}/submit/${formName}`;
 
     return (
@@ -69,7 +72,7 @@ function FormBuilder() {
                             <Input
                                 value={formName}
                                 onChange={(e) => handleFormNameChange(e.target.value)}
-                                onBlur={() => setIsEditingName(false)} // Exit edit mode
+                                onBlur={() => setIsEditingName(false)}
                                 autoFocus
                                 className="bg-gray-100"
                             />
@@ -86,6 +89,7 @@ function FormBuilder() {
                         <PreviewDialogBtn />
                         <SaveFormBtn />
                         <PublishFormBtn />
+                        <Button onClick={() => router.push(shareUrl)}>View Form</Button>
                     </div>
                 </nav>
                 <div className="flex w-full flex-grow items-center justify-center relative overflow-y-auto h-[200px] bg-accent bg-[url(/paper.svg)] dark:bg-[url(/paper-dark.svg)]">

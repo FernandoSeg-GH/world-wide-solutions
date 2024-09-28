@@ -1,18 +1,27 @@
+import { authOptions } from "@/lib/auth";
+import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
 export async function GET(
   req: Request,
   { params }: { params: { share_url: string } }
 ) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.accessToken) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
   const { share_url } = params;
 
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/content/${share_url}`,
+      `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/forms/share_url/${share_url}/submissions`,
       {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${session.accessToken}`,
         },
       }
     );
