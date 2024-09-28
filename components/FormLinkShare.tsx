@@ -16,7 +16,6 @@ function FormLinkShare({ shareUrl }: { shareUrl: string }) {
     if (!mounted) {
         return null;
     }
-
     const shareLink = `${window.location.origin}/submit/${shareUrl}`;
     return (
         <div className="flex flex-grow gap-4 items-center">

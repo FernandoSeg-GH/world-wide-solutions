@@ -25,9 +25,13 @@ export async function GET(
         },
       }
     );
-
     if (!response.ok) {
-      const errorData = await response.json();
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch {
+        errorData = { message: "Submissions not found" };
+      }
       return NextResponse.json(
         { error: errorData.message || "Submissions not found" },
         { status: response.status }

@@ -11,7 +11,7 @@ export async function POST(request: Request) {
 
   const API_URL =
     process.env.NEXT_PUBLIC_FLASK_BACKEND_URL || "http://localhost:5000";
-  const formData = await request.json(); // form data from the client
+  const formData = await request.json();
 
   try {
     const response = await fetch(`${API_URL}/forms/create_form`, {

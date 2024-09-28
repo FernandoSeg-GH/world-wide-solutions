@@ -1,7 +1,4 @@
-// BuilderPage.tsx
-
 'use client';
-
 import React, { useEffect, useState } from 'react';
 import FormBuilder from '@/components/forms/FormBuilder';
 import { useAppContext } from '@/components/context/AppContext';
@@ -34,8 +31,8 @@ export default function BuilderPage({ params }: BuilderPageProps) {
         }
 
         const formData = await response.json();
-        setForm(formData); // Initialize form in AppContext
-        setElements(formData.fields || []); // Initialize elements in AppContext
+        setForm(formData);
+        setElements(formData.fields || []);
       } catch (err: any) {
         setError(err.message);
       } finally {

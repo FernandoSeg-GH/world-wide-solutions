@@ -5,7 +5,7 @@ import FormLinkShare from '@/components/FormLinkShare';
 import VisitBtn from '@/components/VisitBtn';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatDistance } from 'date-fns';
-import { useAppContext } from '@/components/context/AppContext'; // Use AppContext instead of actions
+import { useAppContext } from '@/components/context/AppContext';
 import { Form, Submission } from '@/types';
 
 const FormDetailPage = ({ params }: { params: { id: string } }) => {
@@ -21,15 +21,13 @@ const FormDetailPage = ({ params }: { params: { id: string } }) => {
     useEffect(() => {
         const fetchFormDetails = async () => {
             try {
-                // Assuming `id` refers to the share URL
-                const formId = Number(id); // Or update this logic if `id` isn't a number
 
-                // Fetch form details and set it in the context
+                const formId = Number(id);
+
                 const formDataResponse = await fetch(`/api/forms/${formId}`);
                 const formData = await formDataResponse.json();
                 setForm(formData);
 
-                // Fetch submissions separately
                 await fetchSubmissions(formData.shareURL);
             } catch (err: any) {
                 setError(err.message);

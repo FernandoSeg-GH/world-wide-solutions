@@ -1,13 +1,11 @@
 import { useState, useCallback } from 'react';
 import { Form } from '@/types';
 
-// Custom hook to fetch form data
 export const useFormFetch = (shareUrl: string) => {
     const [form, setForm] = useState<Form | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Function to fetch form data
     const fetchForm = useCallback(async () => {
         try {
             const response = await fetch(`/api/forms/get-form?shareUrl=${shareUrl}`);
@@ -19,10 +17,10 @@ export const useFormFetch = (shareUrl: string) => {
 
             const formData = await response.json();
 
-            // Only update the form state if it has changed
+
             setForm((prevForm) => {
                 if (JSON.stringify(prevForm) !== JSON.stringify(formData)) {
-                    console.log('Setting form data:', formData); // Logging for debugging
+                    console.log('Setting form data:', formData);
                     return formData;
                 }
                 return prevForm;

@@ -17,7 +17,7 @@ export default function Dashboard() {
     if (status === "unauthenticated") {
       router.push("/");
     } else if (status === "authenticated") {
-      setIsLoading(false); // Only change isLoading when session is authenticated
+      setIsLoading(false);
     }
   }, [status, router]);
 

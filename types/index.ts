@@ -58,7 +58,8 @@ export interface FormContextType {
 
 export interface Submission {
   id: number;
-  formId: number;
+  formUrl: string;
+  formId?: number;
   content: any;
   createdAt: string;
 }
@@ -130,15 +131,17 @@ export interface FetchError {
   code?: number;
 }
 
+// types.ts
+
 export interface AppContextType {
   selectors: {
     setFormName: (name: string) => void;
-    setElements: Dispatch<SetStateAction<FormElementInstance[]>>;
-    setSelectedElement: Dispatch<SetStateAction<FormElementInstance | null>>;
+    setElements: (elements: FormElementInstance[]) => void;
+    setSelectedElement: (element: FormElementInstance | null) => void;
     handleFormNameChange: (newName: string) => void;
-    setUnsavedChanges: Dispatch<SetStateAction<boolean>>;
-    setForm: (newForm: Form | null) => void;
-    setSubmissions: Dispatch<SetStateAction<Submission[]>>;
+    setUnsavedChanges: (flag: boolean) => void;
+    setForm: (form: Form | null) => void;
+    setSubmissions: (submissions: Submission[]) => void;
   };
   data: {
     formName: string;
@@ -153,12 +156,19 @@ export interface AppContextType {
     submissions: Submission[];
   };
   actions: {
+    createForm: (newForm: {
+      name: string;
+      description: string;
+    }) => Promise<{ formId: number; shareURL: string } | null>;
     saveForm: () => Promise<void>;
     publishForm: (action: "publish" | "unpublish") => Promise<void>;
     addElement: (index: number, element: FormElementInstance) => void;
     removeElement: (id: string) => void;
     updateElement: (id: string, element: FormElementInstance) => void;
     deleteForm: (formId: number) => Promise<void>;
-    fetchSubmissions: (url: string) => Promise<void>;
+    fetchSubmissions: (shareURL: string) => Promise<void>;
+    fetchFormByShareUrl: (shareURL: string) => Promise<void>;
+    getFormSubmissionByCaseId: (caseId: string) => Promise<Submission | null>; // New function
+    getMissingFields: (submission: Submission) => Promise<string[]>; // New function
   };
 }

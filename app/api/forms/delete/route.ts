@@ -16,7 +16,6 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: "Form ID is required" }, { status: 400 });
   }
 
-  // Check if token is expired and refresh if necessary (Optional: implement token refresh logic)
   const API_URL =
     process.env.NEXT_PUBLIC_FLASK_BACKEND_URL || "http://localhost:5000";
 
@@ -24,7 +23,7 @@ export async function DELETE(request: Request) {
     const response = await fetch(`${API_URL}/forms/form/${formId}`, {
       method: "DELETE",
       headers: {
-        Authorization: `Bearer ${session.accessToken}`, // Use session token
+        Authorization: `Bearer ${session.accessToken}`,
         "Content-Type": "application/json",
       },
     });

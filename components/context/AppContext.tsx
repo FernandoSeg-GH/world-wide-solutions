@@ -1,12 +1,9 @@
 'use client';
-
 import React, {
     createContext,
     useContext,
     useEffect,
     useState,
-    Dispatch,
-    SetStateAction,
     ReactNode,
     useCallback,
     useMemo,
@@ -17,10 +14,8 @@ import { FormElementInstance, Form, AppContextType, FetchError, Submission } fro
 import { useFetchForms } from '../hooks/useFetchForms';
 import { toast } from '../ui/use-toast';
 
-// Create Context
 export const AppContext = createContext<AppContextType | null>(null);
 
-// Custom hook to use the AppContext
 export const useAppContext = (): AppContextType => {
     const context = useContext(AppContext);
     if (!context) {
@@ -31,10 +26,9 @@ export const useAppContext = (): AppContextType => {
 
 interface AppProviderProps {
     children: ReactNode;
-    initialForm?: Form; // Optional initial form, useful for pre-loading
+    initialForm?: Form;
 }
 
-// Helper function to deep compare two objects
 function deepEqual(obj1: any, obj2: any): boolean {
     if (obj1 === obj2) return true;
 
@@ -71,55 +65,79 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
     const [submissions, setSubmissions] = useState<Submission[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
 
-    const formInitializedRef = useRef(false); // Ref to track initialization
+    const formInitializedRef = useRef(false);
 
-    // Effect to set businessId from session
+
     useEffect(() => {
         if (status === 'authenticated' && session?.user?.businessId) {
             setBusinessId(session.user.businessId);
         }
     }, [session, status]);
 
-    // Handlers
+    const createForm = useCallback(async ({ name, description }: { name: string; description: string }) => {
+        try {
+            if (!session || !session.accessToken) {
+                throw new Error('User is not authenticated');
+            }
+
+            const response = await fetch('/api/forms/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${session.accessToken}`,
+                },
+                body: JSON.stringify({
+                    name,
+                    description,
+                    business_id: businessId,
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to create form');
+            }
+
+            const result = await response.json();
+            return {
+                formId: result?.form_id,
+                shareURL: result?.share_url,
+            };
+        } catch (error: any) {
+            toast({
+                title: 'Error',
+                description: error.message || 'Failed to create form',
+                variant: 'destructive',
+            });
+            return null;
+        }
+    }, [businessId, session]);
+
+
     const handleFormNameChange = useCallback((newName: string) => {
         setFormName(newName);
         setUnsavedChanges(true);
     }, []);
 
-    // Inside AppProvider
 
     const setForm = useCallback((newForm: Form | null) => {
-        console.log('Attempting to set form:', newForm);
         setFormState((prevForm) => {
             if (deepEqual(prevForm, newForm)) {
-                console.log('No changes detected in form. Skipping state update.');
-                return prevForm; // No change, prevent state update
+                return prevForm;
             }
-            // Update related states within the state setter to maintain consistency
+
             if (newForm) {
-                console.log('Updating formName and elements based on new form data.');
                 setFormName(newForm.name);
                 setElements(newForm.fields);
                 setUnsavedChanges(true);
             } else {
-                console.log('Resetting formName and elements as newForm is null.');
                 setFormName('');
                 setElements([]);
                 setUnsavedChanges(true);
             }
             return newForm;
         });
-    }, []); // No dependencies
-
-
-    // Effect to initialize form and elements from fetched forms once
-    useEffect(() => {
-        if (forms.length > 0 && !initialForm && !formInitializedRef.current) {
-            const fetchedForm = forms[0];
-            setForm(fetchedForm); // Calls setForm
-            formInitializedRef.current = true; // Prevent running again
-        }
-    }, [forms, initialForm, setForm]);
+    }, []);
 
     const saveForm = useCallback(async () => {
         if (!form) {
@@ -127,19 +145,16 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
             return;
         }
         try {
-            console.log('Elements before saving:', elements);
-
             setLoading(true);
-
             const response = await fetch('/api/forms/save-form', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     form_id: form.id,
                     name: formName,
-                    fields: elements, // Using centralized elements state
+                    fields: elements,
                     share_url: form.shareURL,
-                    business_id: form.businessId,
+                    business_id: session?.user.businessId
                 }),
             });
 
@@ -149,7 +164,7 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
             }
 
             const result = await response.json();
-            // Optionally, update form state with result
+
             setUnsavedChanges(false);
             toast({ title: 'Form Saved', description: 'Your changes have been saved.' });
         } catch (error: any) {
@@ -180,14 +195,13 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
             }
 
             const result = await response.json();
-            // Optionally, update form state with result
+            setForm(form ? { ...form, published: action === 'publish' } : form);
+
             toast({
                 title: `Success`,
                 description: `Form has been ${action === 'publish' ? 'published' : 'unpublished'}.`,
             });
-            // Update form state
-            setForm(form ? { ...form, published: action === 'publish' } : form);
-            window.location.reload(); // Force refresh after publishing
+
         } catch (error: any) {
             toast({ title: 'Error', description: `Something went wrong`, variant: 'destructive' });
             console.error(`${action} Form Error:`, error);
@@ -242,9 +256,7 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
                 description: 'The form and all associated data have been successfully deleted.',
             });
 
-            // Optionally, refresh forms list
-            // If using SWR or similar, you can trigger a revalidation
-            // For now, we'll just reload the page
+
             window.location.reload();
         } catch (error: any) {
             toast({
@@ -259,18 +271,41 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
     }, []);
 
     const fetchSubmissions = useCallback(async (shareURL: string) => {
-        console.log('Fetching submissions for shareURL:', shareURL);
         try {
-            const response = await fetch(`/api/forms/share_url/${shareURL}/submissions`);
+            if (status !== 'authenticated' || !session?.accessToken) {
+                throw new Error('User is not authenticated.');
+            }
+
+            const response = await fetch(`/api/forms/share_url/${shareURL}/submissions`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.accessToken}`,
+                }
+            });
+
             if (!response.ok) {
-                const errorData = await response.text();  // log the raw error data for debugging
-                console.error(`Error fetching submissions: ${errorData}`);
+                if (response.status === 404) {
+                    console.warn(`No submissions found for shareURL: ${shareURL}`);
+                    setSubmissions([]);
+                    return;
+                }
+                const errorData = await response.json();
+                console.error(`Error fetching submissions: ${errorData.message}`);
                 throw new Error(`Error fetching submissions: ${response.status}`);
             }
+
             const data = await response.json();
-            if (data.submissions.length === 0) {
-                console.log("No submissions for this form.");
+
+
+            if (!Array.isArray(data.submissions)) {
+                console.error('Invalid submissions data format:', data.submissions);
+                throw new Error('Invalid submissions data format');
             }
+
+            if (data.submissions.length === 0) {
+
+            }
+
             setSubmissions(data.submissions || []);
         } catch (error: any) {
             toast({
@@ -280,17 +315,132 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
             });
             console.error('Fetch Submissions Error:', error);
         }
-    }, []);
+    }, [session, status]);
+
+    const fetchFormByShareUrl = useCallback(async (shareURL: string) => {
+        try {
+            if (status !== 'authenticated' || !session?.accessToken) {
+                throw new Error('User is not authenticated.');
+            }
+
+            const response = await fetch(`/api/forms/share_url/${shareURL}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.accessToken}`,
+                }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Error fetching form details');
+            }
+
+            const formData = await response.json();
+            setForm(formData);
+
+        } catch (error: any) {
+            toast({
+                title: 'Error',
+                description: `Failed to fetch form details: ${error.message}`,
+                variant: 'destructive',
+            });
+            console.error('Fetch Form Error:', error);
+        }
+    }, [session, status, setForm]);
+
+    const getFormSubmissionByCaseId = useCallback(async (caseId: string): Promise<Submission | null> => {
+        try {
+            setLoading(true);
+
+            const response = await fetch(`/api/forms/get_submission_by_case_id?caseId=${caseId}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session?.accessToken}`,
+                }
+            });
+
+            if (!response.ok) {
+                if (response.status === 404) {
+                    console.warn(`No submission found for caseId: ${caseId}`);
+                    return null;
+                }
+                const errorData = await response.json();
+                console.error(`Error fetching submission by caseId: ${errorData.message}`);
+                throw new Error(`Error fetching submission: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (data && data.submission) {
+                return data.submission as Submission;
+            }
+
+            return null;
+        } catch (error: any) {
+            toast({
+                title: 'Error',
+                description: `Failed to fetch submission: ${error.message}`,
+                variant: 'destructive',
+            });
+            console.error('GetFormSubmissionByCaseId Error:', error);
+            return null;
+        } finally {
+            setLoading(false);
+        }
+    }, [session]);
+
+    const getMissingFields = useCallback(async (submission: Submission): Promise<string[]> => {
+        try {
+            if (!form) {
+                toast({
+                    title: 'Error',
+                    description: 'Form data is missing.',
+                    variant: 'destructive',
+                });
+                return [];
+            }
+
+            const parsedContent = submission.content;
+            const missing: string[] = [];
+
+            form.fields.forEach((field) => {
+                const value = parsedContent[field.id];
+                const isRequired = field.extraAttributes?.required;
+
+                if (isRequired && (value === undefined || value === null || value === '')) {
+                    const label = field.extraAttributes?.label || `Field ${field.id}`;
+                    missing.push(label);
+                }
+            });
+
+            return missing;
+        } catch (error: any) {
+            toast({
+                title: 'Error',
+                description: `Failed to determine missing fields: ${error.message}`,
+                variant: 'destructive',
+            });
+            console.error('GetMissingFields Error:', error);
+            return [];
+        }
+    }, [form]);
+
+    useEffect(() => {
+        if (forms.length > 0 && !initialForm && !formInitializedRef.current) {
+            const fetchedForm = forms[0];
+            setForm(fetchedForm);
+            formInitializedRef.current = true;
+        }
+    }, [forms, initialForm, setForm]);
 
 
-    // Effect to fetch submissions when form changes
     useEffect(() => {
         if (form) {
             fetchSubmissions(form.shareURL);
         }
     }, [form, fetchSubmissions]);
 
-    // Memoize selectors, data, and actions separately to reduce dependencies
+
     const selectors = useMemo(() => ({
         setFormName,
         setElements,
@@ -315,6 +465,7 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
     }), [formName, elements, selectedElement, unsavedChanges, loading, form, forms, formsLoading, formsError, submissions]);
 
     const actions = useMemo(() => ({
+        createForm,
         saveForm,
         publishForm,
         addElement,
@@ -322,7 +473,10 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         updateElement,
         deleteForm,
         fetchSubmissions,
-    }), [saveForm, publishForm, addElement, removeElement, updateElement, deleteForm, fetchSubmissions]);
+        fetchFormByShareUrl,
+        getFormSubmissionByCaseId,
+        getMissingFields,
+    }), [saveForm, publishForm, addElement, removeElement, updateElement, deleteForm, fetchSubmissions, fetchFormByShareUrl, getFormSubmissionByCaseId, getMissingFields,]);
 
     const contextValue: AppContextType = useMemo(() => ({
         selectors,

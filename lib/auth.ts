@@ -1,7 +1,7 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { JWT } from "next-auth/jwt";
-import jwt from "jsonwebtoken"; // Import jsonwebtoken
+import jwt from "jsonwebtoken";
 
 async function refreshAccessToken(token: JWT) {
   try {
@@ -11,7 +11,7 @@ async function refreshAccessToken(token: JWT) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token.refreshToken}`, // Use refresh token
+          Authorization: `Bearer ${token.refreshToken}`,
         },
       }
     );
@@ -30,18 +30,16 @@ async function refreshAccessToken(token: JWT) {
       throw new Error("Access token does not have an exp claim");
     }
 
-    // Return updated token and reset expiration time
     return {
       ...token,
       accessToken: refreshedTokens.access_token,
-      accessTokenExpires: decodedAccessToken.exp * 1000, // Convert to ms
+      accessTokenExpires: decodedAccessToken.exp * 1000,
       refreshToken: token.refreshToken,
       businessId: refreshedTokens.user.business_id,
     };
   } catch (error) {
     console.error("Error refreshing access token:", error);
 
-    // Return the token with an error flag
     return {
       ...token,
       error: "RefreshAccessTokenError",
@@ -76,11 +74,10 @@ export const authOptions: NextAuthOptions = {
           const data = await res.json();
 
           if (res.ok && data.access_token) {
-            // Return token information to be used in jwt callback
             return {
               access_token: data.access_token,
               refresh_token: data.refresh_token,
-              expires_in: data.expires_in, // Access token expiration in seconds
+              expires_in: data.expires_in,
               id: data.user.id,
               email: data.user.email,
               username: data.user.username,
@@ -98,7 +95,6 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user }) {
-      // Initialize token on login
       if (user) {
         token.accessToken = user.access_token;
         token.refreshToken = user.refresh_token;
@@ -120,12 +116,10 @@ export const authOptions: NextAuthOptions = {
         return token;
       }
 
-      // Check if token is still valid
       if (Date.now() < token.accessTokenExpires!) {
-        return token; // Token is still valid
+        return token;
       }
 
-      // If access token expired, try to refresh it
       const newToken = await refreshAccessToken(token);
 
       if (newToken.error) {

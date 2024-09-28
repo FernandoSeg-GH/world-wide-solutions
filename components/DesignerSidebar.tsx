@@ -1,15 +1,16 @@
 import React from "react";
-import { useAppContext } from "./context/AppContext"; // Importing AppContext
-import FormElementsSidebar from "./FormElementsSidebar";
+import { useAppContext } from "./context/AppContext";
+
 import PropertiesFormSidebar from "./PropertiesFormSidebar";
+import FormElementsSidebar from "./forms/FormElementsSidebar";
 
 function DesignerSidebar() {
-  const { data: { selectedElement } } = useAppContext(); // Use AppContext to get the selected element
+  const { data: { selectedElement } } = useAppContext();
 
   return (
     <aside className="w-[400px] max-w-[400px] flex flex-col flex-grow gap-2 border-l-2 border-muted p-4 bg-background overflow-y-auto h-full">
-      {!selectedElement && <FormElementsSidebar />} {/* Show FormElementsSidebar when no element is selected */}
-      {selectedElement && <PropertiesFormSidebar />} {/* Show PropertiesFormSidebar when an element is selected */}
+      {!selectedElement && <FormElementsSidebar />}
+      {selectedElement && <PropertiesFormSidebar />}
     </aside>
   );
 }

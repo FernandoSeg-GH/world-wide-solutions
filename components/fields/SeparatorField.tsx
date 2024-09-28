@@ -13,6 +13,7 @@ export const SeparatorFieldFormElement: FormElement = {
     construct: (id: string) => ({
         id,
         type,
+        extraAttributes: {}
     }),
     designerBtnElement: {
         icon: RiSeparator,

@@ -1,7 +1,6 @@
-// app/api/forms/get-form-content.ts
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth"; // Adjust the import path as needed
+import { authOptions } from "@/lib/auth";
 
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);

@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
       {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${session.accessToken}`, // JWT token from NextAuth session
+          Authorization: `Bearer ${session.accessToken}`,
         },
       }
     );
@@ -44,7 +44,6 @@ export async function GET(req: NextRequest) {
     }
 
     const form = await response.json();
-    console.log("form data:", form);
     return NextResponse.json(form, { status: 200 });
   } catch (error) {
     console.error("Error fetching form by share_url:", error);

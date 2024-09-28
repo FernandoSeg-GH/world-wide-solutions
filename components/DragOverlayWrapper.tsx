@@ -5,7 +5,7 @@ import { ElementsType, FormElements } from "./forms/FormElements";
 import { useAppContext } from "./context/AppContext";
 
 function DragOverlayWrapper() {
-    const { data: { elements } } = useAppContext(); // Use elements from AppContext
+    const { data: { elements } } = useAppContext();
     const [draggedItem, setDraggedItem] = useState<Active | null>(null);
 
     useDndMonitor({

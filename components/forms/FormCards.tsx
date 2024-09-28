@@ -4,12 +4,12 @@ import { Skeleton } from '../ui/skeleton';
 import { useSession } from 'next-auth/react';
 import FormCard from './FormCard';
 import { useEffect, useState } from 'react';
-import { useAppContext } from '@/components/context/AppContext'; // Import new AppContext
+import { useAppContext } from '@/components/context/AppContext';
 
 const FormCards = () => {
     const { data: session, status } = useSession();
-    const { data, selectors } = useAppContext(); // Use the context for forms
-    const { forms, formsLoading, formsError } = data; // Access forms data from context
+    const { data, selectors } = useAppContext();
+    const { forms, formsLoading, formsError } = data;
 
     const [businessId, setBusinessId] = useState<number | undefined>(undefined);
 
@@ -30,7 +30,7 @@ const FormCards = () => {
     }
 
     if (formsError) {
-        // Check if `formsError.message` is a string before rendering
+
         return <div>{typeof formsError.message === 'string' ? formsError.message : 'An error occurred'}</div>;
     }
 

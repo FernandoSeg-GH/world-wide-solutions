@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  const { form_id, action } = await req.json(); // Get form_id and action from the request
+  const { form_id, action } = await req.json();
 
   if (!form_id) {
     return NextResponse.json({ error: "Form ID is required" }, { status: 400 });
@@ -32,15 +32,13 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({ form_id, action }),
     });
 
-    const responseText = await response.text(); // Log the response for debugging
-    console.log(responseText); // Log response text to see what is returned
+    const responseText = await response.text();
 
     if (!response.ok) {
       throw new Error(responseText || `Failed to ${action} form`);
     }
 
-    // Optionally, if you want to return JSON back to the client
-    const result = JSON.parse(responseText); // Parse the text to JSON
+    const result = JSON.parse(responseText);
     return NextResponse.json(result, { status: 200 });
   } catch (error) {
     console.error(`Error ${action}ing form:`, error);

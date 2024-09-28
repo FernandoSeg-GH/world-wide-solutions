@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from "react";
-import { useAppContext } from "@/components/context/AppContext"; // Updated import
+import { useAppContext } from "@/components/context/AppContext";
 import PreviewDialogBtn from "./PreviewDialogBtn";
 import PublishFormBtn from "./PublishFormBtn";
 import SaveFormBtn from "./SaveFormBtn";
@@ -28,23 +28,21 @@ function FormBuilder() {
     const touchSensor = useSensor(TouchSensor, { activationConstraint: { delay: 300, tolerance: 5 } });
     const sensors = useSensors(mouseSensor, touchSensor);
 
-    // Function to alert when navigating away with unsaved changes
     const handleNavigationAlert = (e: BeforeUnloadEvent) => {
         if (unsavedChanges) {
             e.preventDefault();
-            e.returnValue = ''; // Required for Chrome
+            e.returnValue = '';
         }
     };
 
-    // Initialize form elements once ready
     useEffect(() => {
         if (isReady) return;
-        setSelectedElement(null); // Reset selected element
+        setSelectedElement(null);
         const readyTimeout = setTimeout(() => setIsReady(true), 500);
         return () => clearTimeout(readyTimeout);
     }, [isReady, setSelectedElement]);
 
-    // Handle unsaved changes on page unload
+
     useEffect(() => {
         window.addEventListener('beforeunload', handleNavigationAlert);
         return () => {

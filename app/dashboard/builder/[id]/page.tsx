@@ -2,18 +2,17 @@
 
 import { useEffect, useState } from 'react';
 import FormBuilder from '@/components/forms/FormBuilder';
-import { useAppContext } from '@/components/context/AppContext'; // Import useAppContext
+import { useAppContext } from '@/components/context/AppContext';
 import { Form } from '@/types';
 
 const BuilderPage = ({ params }: { params: { shareUrl: string } }) => {
-  const { selectors: { setForm }, data: { form } } = useAppContext(); // Get setForm and form from context
+  const { selectors: { setForm }, data: { form } } = useAppContext();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { shareUrl } = params;
   useEffect(() => {
     const fetchForm = async () => {
-      console.log('Fetching form with shareUrl:', shareUrl);
       try {
         const response = await fetch(`/api/forms/get-form?shareUrl=${shareUrl}`);
 
@@ -24,8 +23,7 @@ const BuilderPage = ({ params }: { params: { shareUrl: string } }) => {
         }
 
         const formData: Form = await response.json();
-        console.log('Form data fetched:', formData);
-        setForm(formData); // Set form in AppProvider's state
+        setForm(formData);
       } catch (err: any) {
         console.error('Error in fetchForm:', err);
         setError(err.message);

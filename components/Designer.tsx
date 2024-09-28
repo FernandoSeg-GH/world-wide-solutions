@@ -4,18 +4,18 @@ import React, { useState } from "react";
 import DesignerSidebar from "./DesignerSidebar";
 import { DragEndEvent, useDndMonitor, useDroppable } from "@dnd-kit/core";
 import { cn } from "@/lib/utils";
-import { ElementsType, FormElementInstance, FormElements } from "./forms/FormElements";
+import { ElementsType, FormElementInstance, FormElements } from "@/types";
 import { idGenerator } from "@/lib/idGenerator";
 import { Button } from "./ui/button";
 import { BiSolidTrash } from "react-icons/bi";
-import { useAppContext } from "./context/AppContext"; // Importing AppContext
+import { useAppContext } from "./context/AppContext";
 
 function Designer() {
   const {
     data: { elements, selectedElement },
     actions: { addElement, removeElement },
     selectors: { setSelectedElement },
-  } = useAppContext(); // Using AppContext for state and actions
+  } = useAppContext();
 
   const droppable = useDroppable({
     id: "designer-drop-area",
@@ -38,7 +38,7 @@ function Designer() {
         const type = active.data?.current?.type;
         const newElement = FormElements[type as ElementsType].construct(idGenerator());
 
-        addElement(elements.length, newElement); // Adding new element via context
+        addElement(elements.length, newElement);
         return;
       }
 
@@ -64,7 +64,7 @@ function Designer() {
           indexForNewElement = overElementIndex + 1;
         }
 
-        addElement(indexForNewElement, newElement); // Adding new element via context
+        addElement(indexForNewElement, newElement);
         return;
       }
 
@@ -84,14 +84,14 @@ function Designer() {
         }
 
         const activeElement = { ...elements[activeElementIndex] };
-        removeElement(activeId); // Removing element via context
+        removeElement(activeId);
 
         let indexForNewElement = overElementIndex;
         if (isDroppingOverDesignerElementBottomHalf) {
           indexForNewElement = overElementIndex + 1;
         }
 
-        addElement(indexForNewElement, activeElement); // Re-adding element via context
+        addElement(indexForNewElement, activeElement);
       }
     },
   });
@@ -101,7 +101,7 @@ function Designer() {
       <div
         className="p-4 w-full"
         onClick={() => {
-          if (selectedElement) setSelectedElement(null); // Deselect element
+          if (selectedElement) setSelectedElement(null);
         }}
       >
         <div
@@ -146,7 +146,7 @@ function DesignerElementWrapper({ element }: DesignerElementWrapperProps) {
     actions: { removeElement },
     data: { selectedElement },
     selectors: { setSelectedElement },
-  } = useAppContext(); // Using AppContext
+  } = useAppContext();
 
   const [mouseIsOver, setMouseIsOver] = useState<boolean>(false);
 
@@ -159,7 +159,7 @@ function DesignerElementWrapper({ element }: DesignerElementWrapperProps) {
       onMouseLeave={() => setMouseIsOver(false)}
       onClick={(e) => {
         e.stopPropagation();
-        setSelectedElement(element); // Selecting the element via context
+        setSelectedElement(element);
       }}
     >
       {mouseIsOver && (
@@ -170,7 +170,7 @@ function DesignerElementWrapper({ element }: DesignerElementWrapperProps) {
               variant={"outline"}
               onClick={(e) => {
                 e.stopPropagation();
-                removeElement(element.id); // Removing element via context
+                removeElement(element.id);
               }}
             >
               <BiSolidTrash className="h-6 w-6" />

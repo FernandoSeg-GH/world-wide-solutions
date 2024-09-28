@@ -1,8 +1,8 @@
 
 "use client";
 
-import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,14 @@ import { toast } from "@/components/ui/use-toast";
 
 export default function Home() {
     const [isRegistering, setIsRegistering] = useState(false);
+    const { data: session, status } = useSession();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (status === "authenticated") {
+            router.push("/dashboard");
+        }
+    }, [status, router]);
 
     return (
         <div className="flex items-center justify-center min-h-screen w-screen p-4">

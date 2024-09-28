@@ -66,7 +66,7 @@ type propertiesFormSchemaType = z.infer<typeof propertiesSchema>;
 
 function PropertiesComponent({ elementInstance }: { elementInstance: FormElementInstance }) {
     const element = elementInstance as CustomInstance;
-    const { actions } = useAppContext();  // Updated to use AppContext
+    const { actions } = useAppContext();
     const { updateElement } = actions;
     const form = useForm<propertiesFormSchemaType>({
         resolver: zodResolver(propertiesSchema),

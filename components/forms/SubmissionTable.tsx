@@ -1,0 +1,78 @@
+'use client';
+import React from 'react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Submission, Form } from '@/types';
+
+interface Row {
+    submittedAt: string;
+    [key: string]: any;
+}
+
+function SubmissionsTable({ submissions, form }: { submissions: Submission[]; form: Form }) {
+    if (!Array.isArray(submissions) || submissions.length === 0) {
+        return <div>No submissions found</div>;
+    }
+
+    const rows: Row[] = submissions.map((submission) => {
+        let parsedContent: { [key: string]: any } = {};
+        try {
+            parsedContent = JSON.parse(submission.content);
+        } catch (error) {
+            console.error('Error parsing submission content:', error);
+        }
+
+        const row: Row = {
+            submittedAt: submission.createdAt,
+        };
+
+
+        form.fields.forEach((field) => {
+            row[field.id] = parsedContent[field.id] ?? '';
+        });
+
+        return row;
+    });
+
+
+    const fieldMap = form.fields.reduce((acc: { [key: string]: string }, field) => {
+        acc[field.id] = field.extraAttributes?.label || `Field ${field.id}`;
+        return acc;
+    }, {});
+
+
+    const fieldKeys = form.fields.map((field) => field.id);
+
+    return (
+        <>
+            <h1 className="text-2xl font-bold my-4">Submissions</h1>
+            <div className="rounded-md border">
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            {fieldKeys.map((fieldKey) => (
+                                <TableHead key={fieldKey} className="uppercase">
+                                    {fieldMap[fieldKey] || `Field ${fieldKey}`}
+                                </TableHead>
+                            ))}
+                            <TableHead className="uppercase">Submitted At</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {rows.map((row, index) => (
+                            <TableRow key={index}>
+                                {fieldKeys.map((key) => (
+                                    <TableCell key={key}>{row[key]}</TableCell>
+                                ))}
+                                <TableCell className="text-muted-foreground text-right">
+                                    {new Date(row.submittedAt).toLocaleString()}
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </div>
+        </>
+    );
+}
+
+export default SubmissionsTable;

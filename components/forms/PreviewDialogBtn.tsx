@@ -3,12 +3,11 @@ import { Button } from "../ui/button";
 import { MdPreview } from "react-icons/md";
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 import { FormElements } from "./FormElements";
-import { useAppContext } from "@/components/context/AppContext"; // Import the AppContext
+import { useAppContext } from "@/components/context/AppContext";
 
 function PreviewDialogBtn() {
-    // Get form elements and other necessary data from the AppContext
     const { data } = useAppContext();
-    const { elements } = data; // Destructure elements from context
+    const { elements } = data;
 
     return (
         <Dialog>

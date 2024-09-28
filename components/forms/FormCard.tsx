@@ -11,12 +11,12 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuIte
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription } from '../ui/alert-dialog';
 import { useRouter } from 'next/navigation';
 import { useToast } from '../ui/use-toast';
-import { useAppContext } from '../context/AppContext'; // Import the AppContext
+import { useAppContext } from '../context/AppContext';
 
 function FormCard({ form }: { form: Form }) {
     const [isAlertOpen, setIsAlertOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
-    const [publishedStatus, setPublishedStatus] = useState(form.published); // State to manage published status
+    const [publishedStatus, setPublishedStatus] = useState(form.published);
     const [deleteInputValue, setDeleteInputValue] = useState("");
     const router = useRouter();
     const { toast } = useToast();

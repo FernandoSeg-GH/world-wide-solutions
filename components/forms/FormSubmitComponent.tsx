@@ -1,13 +1,18 @@
-"use client";
-
+'use client';
 import React, { useCallback, useRef, useState, useTransition } from "react";
-import { FormElementInstance, FormElements } from "./forms/FormElements";
-import { Button } from "./ui/button";
+import { FormElementInstance } from "./FormElements";
+import { Button } from "../ui/button";
 import { HiCursorClick } from "react-icons/hi";
-import { toast } from "./ui/use-toast";
+import { toast } from "../ui/use-toast";
 import { ImSpinner2 } from "react-icons/im";
+import { useAppContext } from "@/components/context/AppContext";
+import { FormElements } from "@/types";
 
-function FormSubmitComponent({ formUrl, content }: { content: FormElementInstance[]; formUrl: string }) {
+function FormSubmitComponent({ formUrl }: { formUrl: string }) {
+    const { data, actions } = useAppContext();
+    const { submissions } = data;
+    const { form } = data;
+
     const formValues = useRef<{ [key: string]: string }>({});
     const formErrors = useRef<{ [key: string]: boolean }>({});
     const [renderKey, setRenderKey] = useState(new Date().getTime());
@@ -16,7 +21,16 @@ function FormSubmitComponent({ formUrl, content }: { content: FormElementInstanc
     const [pending, startTransition] = useTransition();
 
     const validateForm: () => boolean = useCallback(() => {
-        for (const field of content) {
+        if (!form) {
+            toast({
+                title: "Error",
+                description: "Form data is missing.",
+                variant: "destructive",
+            });
+            return false;
+        }
+
+        for (const field of form.fields) {
             const actualValue = formValues.current[field.id] || "";
             const valid = FormElements[field.type].validate(field, actualValue);
 
@@ -30,7 +44,7 @@ function FormSubmitComponent({ formUrl, content }: { content: FormElementInstanc
         }
 
         return true;
-    }, [content]);
+    }, [form]);
 
     const submitValue = useCallback((key: string, value: string) => {
         formValues.current[key] = value;
@@ -69,7 +83,7 @@ function FormSubmitComponent({ formUrl, content }: { content: FormElementInstanc
                 title: "Success",
                 description: "Form submitted successfully",
             });
-        } catch (error) {
+        } catch (error: any) {
             toast({
                 title: "Error",
                 description: "Something went wrong while submitting the form",
@@ -89,6 +103,10 @@ function FormSubmitComponent({ formUrl, content }: { content: FormElementInstanc
         );
     }
 
+    if (!form) {
+        return <div>Form not found</div>;
+    }
+
     return (
         <div className="flex justify-center w-full h-full items-center p-8">
             <div
@@ -96,7 +114,7 @@ function FormSubmitComponent({ formUrl, content }: { content: FormElementInstanc
                 className="max-w-[620px] flex flex-col gap-4 flex-grow bg-background w-full p-8 overflow-y-auto border shadow-xl shadow-gray-200 rounded"
             >
                 <div className="flex flex-col gap-8">
-                    {content.map((element) => {
+                    {form.fields.map((element) => {
                         const FormElement = FormElements[element.type].formComponent;
                         return (
                             <FormElement
