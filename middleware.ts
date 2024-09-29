@@ -5,6 +5,10 @@ import type { NextRequest } from "next/server";
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
+  if (pathname === "/forms/submit") {
+    return NextResponse.next();
+  }
+
   if (
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/forms") ||
@@ -21,5 +25,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/forms/:path*"],
+  matcher: ["/dashboard/:path*", "/forms/:path*", "/builder/:path*"],
 };

@@ -41,12 +41,12 @@ export default function UserMenu() {
                     Welcome <span className="capitalize">{session.user.username}</span>!
                 </h2>
                 <DropdownMenuItem>
-                    <a href="#dashboard" className="flex w-full items-center">
+                    <a href="/dashboard" className="flex w-full items-center">
                         <HomeIcon className="mr-2" />Dashboard
                     </a>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                    <a href="#create-form" className="flex w-full items-center">
+                    <a href="#" className="flex w-full items-center">
                         <PlusIcon className="mr-2" /> Create Form
                     </a>
                 </DropdownMenuItem>

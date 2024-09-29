@@ -1,3 +1,4 @@
+"use client"
 import React, { useEffect, useState } from 'react';
 import { formatDistance } from 'date-fns';
 import { Button } from '../ui/button';

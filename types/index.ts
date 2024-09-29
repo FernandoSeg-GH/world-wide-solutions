@@ -12,6 +12,13 @@ import { TitleFieldFormElement } from "@/components/fields/TitleField";
 import { TelephoneFieldFormElement } from "@/components/fields/TelephoneField";
 import { Dispatch, SetStateAction } from "react";
 
+export interface SubscriptionPlan {
+  id: number;
+  name: string;
+  price: string;
+  features: string[] | null;
+}
+
 export interface Form {
   id: number;
   name: string;
@@ -131,8 +138,6 @@ export interface FetchError {
   code?: number;
 }
 
-// types.ts
-
 export interface AppContextType {
   selectors: {
     setFormName: (name: string) => void;
@@ -154,6 +159,8 @@ export interface AppContextType {
     formsLoading: boolean;
     formsError: FetchError | null;
     submissions: Submission[];
+    subscriptionPlans: SubscriptionPlan[];
+    error: string | null;
   };
   actions: {
     createForm: (newForm: {
@@ -168,7 +175,11 @@ export interface AppContextType {
     deleteForm: (formId: number) => Promise<void>;
     fetchSubmissions: (shareURL: string) => Promise<void>;
     fetchFormByShareUrl: (shareURL: string) => Promise<void>;
-    getFormSubmissionByCaseId: (caseId: string) => Promise<Submission | null>; // New function
-    getMissingFields: (submission: Submission) => Promise<string[]>; // New function
+    fetchFormByShareUrlPublic: (shareURL: string) => Promise<void>;
+    getFormSubmissionByCaseId: (caseId: string) => Promise<Submission | null>;
+    getMissingFields: (submission: Submission) => Promise<string[]>;
+    fetchClientSubmissions: (userId: number) => Promise<void>;
+    fetchSubscriptionPlans: () => Promise<void>;
+    createBusiness: (businessData: any) => Promise<boolean>;
   };
 }

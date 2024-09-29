@@ -1,22 +1,21 @@
 'use client';
+
 import React, { useCallback, useRef, useState, useTransition } from "react";
-import { FormElementInstance } from "./FormElements";
+import { FormElements } from "@/types";
 import { Button } from "../ui/button";
 import { HiCursorClick } from "react-icons/hi";
-import { toast } from "../ui/use-toast";
 import { ImSpinner2 } from "react-icons/im";
 import { useAppContext } from "@/components/context/AppContext";
-import { FormElements } from "@/types";
+import { toast } from "../ui/use-toast";
 
 function FormSubmitComponent({ formUrl }: { formUrl: string }) {
     const { data, actions } = useAppContext();
-    const { submissions } = data;
     const { form } = data;
+    const { fetchFormByShareUrl } = actions;
 
     const formValues = useRef<{ [key: string]: string }>({});
     const formErrors = useRef<{ [key: string]: boolean }>({});
     const [renderKey, setRenderKey] = useState(new Date().getTime());
-
     const [submitted, setSubmitted] = useState(false);
     const [pending, startTransition] = useTransition();
 
@@ -72,7 +71,6 @@ function FormSubmitComponent({ formUrl }: { formUrl: string }) {
                 },
                 body: JSON.stringify({ content: jsonContent }),
             });
-
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || "Failed to submit the form");
@@ -97,7 +95,9 @@ function FormSubmitComponent({ formUrl }: { formUrl: string }) {
             <div className="flex justify-center w-full h-full items-center p-8">
                 <div className="max-w-[620px] flex flex-col gap-4 flex-grow bg-background w-full p-8 overflow-y-auto border shadow-xl shadow-gray-200 rounded">
                     <h1 className="text-2xl font-bold">Form submitted</h1>
-                    <p className="text-muted-foreground">Thank you for submitting the form, you can close this page now.</p>
+                    <p className="text-muted-foreground">
+                        Thank you for submitting the form, you can close this page now.
+                    </p>
                 </div>
             </div>
         );

@@ -29,6 +29,8 @@ export async function GET(request: Request) {
         "Content-Type": "application/json",
       },
     });
+    const data = await response.json();
+    console.log("API Route Response:", data); // Debugging Line
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -40,9 +42,6 @@ export async function GET(request: Request) {
         { status: response.status }
       );
     }
-
-    const data = await response.json();
-
     return NextResponse.json(data);
   } catch (error) {
     console.error("Error fetching forms:", error);

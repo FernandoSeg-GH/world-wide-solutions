@@ -13,19 +13,13 @@ const FormCards = () => {
 
     const [businessId, setBusinessId] = useState<number | undefined>(undefined);
 
-    useEffect(() => {
-        if (status === 'authenticated' && session?.user?.businessId && businessId !== session.user.businessId) {
-            setBusinessId(session.user.businessId);
-        }
-    }, [session?.user?.businessId, businessId, status]);
-
     if (formsLoading) {
         return (
-            <>
+            <div>
                 {[1, 2, 3, 4].map((el) => (
                     <Skeleton key={el} className="border-2 border-primary-/20 h-[200px] w-full" />
                 ))}
-            </>
+            </div>
         );
     }
 
@@ -34,21 +28,18 @@ const FormCards = () => {
         return <div>{typeof formsError.message === 'string' ? formsError.message : 'An error occurred'}</div>;
     }
 
-    if (!forms || forms.length === 0) {
-        return (
-            <div className="border border-dashed flex items-center justify-center text-center leading-9">
-                No forms available.
-                <br /> Start creating a Form!
-            </div>
-        );
-    }
 
     return (
-        <>
-            {forms.map((form) => (
+        <div>
+            {forms.length > 0 ? forms.map((form) => (
                 <FormCard key={form.id} form={form} />
-            ))}
-        </>
+            )) :
+                <div className="border border-dashed flex items-center justify-center text-center leading-9 my-6 p-4">
+                    No forms found.
+                    <br /> Start creating a Form!
+                </div>
+            }
+        </div>
     );
 };
 

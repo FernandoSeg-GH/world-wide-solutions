@@ -13,21 +13,15 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const session = await getServerSession(authOptions);
-
-  if (!session || !session.accessToken) {
-    return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
-  }
-
   const API_URL =
     process.env.NEXT_PUBLIC_FLASK_BACKEND_URL || "http://localhost:5000";
   try {
-    const response = await fetch(`${API_URL}/forms/share_url/${shareUrl}`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${session.accessToken}`,
-      },
-    });
+    const response = await fetch(
+      `${API_URL}/forms/share_url/${shareUrl}/public`,
+      {
+        method: "GET",
+      }
+    );
 
     if (!response.ok) {
       const errorText = await response.text();

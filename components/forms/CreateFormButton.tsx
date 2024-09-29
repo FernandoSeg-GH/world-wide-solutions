@@ -39,6 +39,7 @@ function CreateFormBtn() {
             const result = await createForm({
                 name: values.name,
                 description: values.description,
+
             });
 
             if (result?.formId && result?.shareURL) {
@@ -66,7 +67,7 @@ function CreateFormBtn() {
                     <p className="font-bold text-xl text-muted-foreground group-hover:text-primary">Create new form</p>
                 </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="w-[90%] md:w-full">
                 <DialogHeader>
                     <DialogTitle>Create form</DialogTitle>
                     <DialogDescription>Create a new form to start collecting responses</DialogDescription>

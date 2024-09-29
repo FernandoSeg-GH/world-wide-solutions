@@ -1,29 +1,33 @@
+"use client"
 import { useState, useEffect } from 'react';
 import { Form, FetchError } from '@/types';
 
-export const useFetchForms = (businessId: number | undefined) => {
-    const [forms, setForms] = useState<Form[]>([]);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [error, setError] = useState<FetchError | null>(null);
+export const useFetchForms = (businessId: number) => {
+    const [forms, setForms] = useState([]);
+    const [isLoading, setLoading] = useState(true);
+    const [error, setError] = useState();
 
     useEffect(() => {
-        if (!businessId) return;
-
         const fetchForms = async () => {
-            setIsLoading(true);
-            try {
-                const response = await fetch(`/api/forms/get-forms?businessId=${businessId}`);
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw { message: errorData.message || 'Failed to fetch forms', code: response.status };
-                }
+            if (!businessId) {
+                setForms([]);
+                setLoading(false);
+                return;
+            }
 
+            try {
+                const response = await fetch(`/api/forms?businessId=${businessId}`);
                 const data = await response.json();
-                setForms(data.forms);
+                console.log("Fetched Forms:", data);
+                if (response.ok) {
+                    setForms(data.forms);
+                } else {
+                    setError(data.error);
+                }
             } catch (err: any) {
-                setError({ message: err.message || 'Unknown error', code: err.code });
+                setError(err);
             } finally {
-                setIsLoading(false);
+                setLoading(false);
             }
         };
 

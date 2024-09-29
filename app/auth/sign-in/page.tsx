@@ -119,6 +119,8 @@ function SignUpForm({ onToggle }: { onToggle: () => void }) {
     email: "",
     password: "",
     confirmPassword: "",
+    roleId: 2, // Default to non-admin role
+    businessId: "", // Optional for admin/superadmin role
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -145,7 +147,8 @@ function SignUpForm({ onToggle }: { onToggle: () => void }) {
           username: formData.username,
           email: formData.email,
           password: formData.password,
-          role_id: 4
+          role_id: formData.roleId,
+          business_id: formData.roleId === 1 ? formData.businessId : undefined, // Only send business_id if role_id is 1
         }),
       });
 
@@ -157,6 +160,7 @@ function SignUpForm({ onToggle }: { onToggle: () => void }) {
           description: "Registration successful. You can now sign in.",
         });
         onToggle();
+        router.push("/auth/sign-in");
       } else {
         toast({
           title: "Error",
@@ -226,6 +230,36 @@ function SignUpForm({ onToggle }: { onToggle: () => void }) {
           required
         />
       </div>
+      <div>
+        <Label htmlFor="roleId">Role</Label>
+        <select
+          id="roleId"
+          value={formData.roleId}
+          onChange={(e) => setFormData({ ...formData, roleId: Number(e.target.value) })}
+          className="w-full border-gray-300 rounded-md"
+          required
+        >
+          <option value={2}>User</option>
+          <option value={1}>Admin</option>
+        </select>
+      </div>
+
+      {/* Show business ID field only if role is admin */}
+      {formData.roleId === 1 && (
+        <div>
+          <Label htmlFor="businessId">Business ID</Label>
+          <Input
+            id="businessId"
+            type="text"
+            value={formData.businessId}
+            onChange={(e) =>
+              setFormData({ ...formData, businessId: e.target.value })
+            }
+            required
+          />
+        </div>
+      )}
+
       <Button type="submit" className="w-full" disabled={loading}>
         {loading ? "Signing up..." : "Sign Up"}
       </Button>

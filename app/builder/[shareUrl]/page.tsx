@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import FormBuilder from '@/components/forms/FormBuilder';
 import { useAppContext } from '@/components/context/AppContext';
-import { FormElementInstance } from '@/components/forms/FormElements';
 
 interface BuilderPageProps {
   params: {
@@ -13,35 +12,16 @@ interface BuilderPageProps {
 export default function BuilderPage({ params }: BuilderPageProps) {
   const { shareUrl } = params;
   const { data, selectors, actions } = useAppContext();
-  const { form, elements, selectedElement } = data;
-  const { setForm, setElements, setSelectedElement } = selectors;
-  const { addElement, removeElement, updateElement } = actions;
+  const { form, loading, error } = data;
+  const { setForm, setElements } = selectors;
+  const { fetchFormByShareUrl } = actions;
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
+  // Fetch the form using the shareUrl and context actions
   useEffect(() => {
-    const fetchForm = async () => {
-      try {
-        const response = await fetch(`/api/forms/get-form?shareUrl=${shareUrl}`);
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Failed to fetch form');
-        }
-
-        const formData = await response.json();
-        setForm(formData);
-        setElements(formData.fields || []);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchForm();
-  }, [shareUrl, setForm, setElements]);
+    if (shareUrl) {
+      fetchFormByShareUrl(shareUrl);
+    }
+  }, [shareUrl, fetchFormByShareUrl]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;

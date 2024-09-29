@@ -14,25 +14,18 @@ const FormDetailPage = ({ params }: { params: { id: string } }) => {
     const { fetchSubmissions, fetchFormByShareUrl } = actions;
 
     useEffect(() => {
-        if (form?.shareURL) {
+        if (id) {
             const fetchFormDetails = async () => {
                 try {
-
-                    await actions.fetchFormByShareUrl(form?.shareURL);
-
-
-                    if (form?.shareURL) {
-                        await actions.fetchSubmissions(form.shareURL);
-                    }
+                    await actions.fetchFormByShareUrl(id);
                 } catch (err: any) {
-
                     console.error('Error fetching form details:', err);
                 }
             };
-
             fetchFormDetails();
         }
-    }, [id, actions, form?.shareURL]);
+    }, [id, actions]);
+
 
     if (formsLoading) return <div>Loading form...</div>;
     if (formsError) return <div>Error: {formsError.message}</div>;

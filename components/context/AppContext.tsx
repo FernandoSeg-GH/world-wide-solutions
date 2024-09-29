@@ -10,7 +10,7 @@ import React, {
     useRef,
 } from 'react';
 import { useSession } from 'next-auth/react';
-import { FormElementInstance, Form, AppContextType, FetchError, Submission } from '@/types';
+import { FormElementInstance, Form, AppContextType, FetchError, Submission, SubscriptionPlan } from '@/types';
 import { useFetchForms } from '../hooks/useFetchForms';
 import { toast } from '../ui/use-toast';
 
@@ -63,16 +63,88 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
     const [selectedElement, setSelectedElement] = useState<FormElementInstance | null>(null);
     const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
     const [submissions, setSubmissions] = useState<Submission[]>([]);
+    const [subscriptionPlans, setSubscriptionPlans] = useState<SubscriptionPlan[]>([]);
+
     const [loading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
 
     const formInitializedRef = useRef(false);
 
-
     useEffect(() => {
         if (status === 'authenticated' && session?.user?.businessId) {
+
+            console.log("Setting businessId:", session.user.businessId);
             setBusinessId(session.user.businessId);
+        } else {
+            console.warn("User does not belong to any business.");
+            // Optionally set a state to handle UI accordingly
+            setBusinessId(undefined);
         }
     }, [session, status]);
+
+    const fetchSubscriptionPlans = useCallback(async () => {
+        try {
+            const res = await fetch("/api/business/subscription");
+            const data: SubscriptionPlan[] = await res.json();
+
+            if (res.ok) {
+                setSubscriptionPlans(data);
+            } else {
+                toast({
+                    title: "Error",
+                    description: "Failed to fetch subscription plans.",
+                    variant: "destructive",
+                });
+            }
+        } catch (error) {
+            toast({
+                title: "Error",
+                description: "An error occurred while fetching subscription plans.",
+                variant: "destructive",
+            });
+        }
+    }, []);
+
+    // Create a business
+    const createBusiness = useCallback(async (businessData: any) => {
+        try {
+            setLoading(true);
+
+            const res = await fetch("/api/business/create", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(businessData),
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                toast({
+                    title: "Success",
+                    description: "Business created successfully.",
+                });
+                return true;
+            } else {
+                toast({
+                    title: "Error",
+                    description: data.message || "Failed to create business.",
+                    variant: "destructive",
+                });
+                return false;
+            }
+        } catch (error) {
+            toast({
+                title: "Error",
+                description: "An error occurred while creating the business.",
+                variant: "destructive",
+            });
+            return false;
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
     const createForm = useCallback(async ({ name, description }: { name: string; description: string }) => {
         try {
@@ -270,83 +342,74 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         }
     }, []);
 
-    const fetchSubmissions = useCallback(async (shareURL: string) => {
-        try {
-            if (status !== 'authenticated' || !session?.accessToken) {
-                throw new Error('User is not authenticated.');
-            }
+    const fetchSubmissions = useCallback(async (shareUrl: string) => {
+        if (session) {
+            try {
+                const response = await fetch(`/api/forms/submissions?shareUrl=${shareUrl}`, {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${session.accessToken}`,
+                    },
+                });
 
-            const response = await fetch(`/api/forms/share_url/${shareURL}/submissions`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${session.accessToken}`,
+                if (!response.ok) {
+                    throw new Error(`Error fetching submissions: ${response.statusText}`);
                 }
-            });
 
-            if (!response.ok) {
-                if (response.status === 404) {
-                    console.warn(`No submissions found for shareURL: ${shareURL}`);
-                    setSubmissions([]);
-                    return;
+                const data = await response.json();
+                if (data?.submissions) {
+                    setSubmissions(data.submissions); // Ensure the submissions are being set correctly
+                    console.log("Submissions fetched:", data.submissions);
+                } else {
+                    console.warn("No submissions found");
                 }
-                const errorData = await response.json();
-                console.error(`Error fetching submissions: ${errorData.message}`);
-                throw new Error(`Error fetching submissions: ${response.status}`);
+            } catch (error) {
+                console.error("Failed to fetch submissions", error);
             }
-
-            const data = await response.json();
-
-
-            if (!Array.isArray(data.submissions)) {
-                console.error('Invalid submissions data format:', data.submissions);
-                throw new Error('Invalid submissions data format');
-            }
-
-            if (data.submissions.length === 0) {
-
-            }
-
-            setSubmissions(data.submissions || []);
-        } catch (error: any) {
-            toast({
-                title: 'Error',
-                description: `Failed to fetch submissions: ${error.message}`,
-                variant: 'destructive',
-            });
-            console.error('Fetch Submissions Error:', error);
         }
-    }, [session, status]);
+    }, [session?.accessToken]);
 
-    const fetchFormByShareUrl = useCallback(async (shareURL: string) => {
+
+
+    const fetchFormByShareUrl = useCallback(async (shareUrl: string) => {
+        setLoading(true);
+        setError(null);
         try {
-            if (status !== 'authenticated' || !session?.accessToken) {
-                throw new Error('User is not authenticated.');
-            }
-
-            const response = await fetch(`/api/forms/share_url/${shareURL}`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${session.accessToken}`,
-                }
-            });
-
+            const response = await fetch(`/api/forms/get-form?shareUrl=${shareUrl}`);
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.message || 'Error fetching form details');
+                throw new Error(errorData.message || 'Failed to fetch form');
             }
-
             const formData = await response.json();
-            setForm(formData);
-
-        } catch (error: any) {
-            toast({
-                title: 'Error',
-                description: `Failed to fetch form details: ${error.message}`,
-                variant: 'destructive',
-            });
-            console.error('Fetch Form Error:', error);
+            setFormState(formData);
+            setElements(formData.fields || []);
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
         }
-    }, [session, status, setForm]);
+    }, []);
+
+    const fetchFormByShareUrlPublic = useCallback(async (shareUrl: string) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await fetch(`/api/forms/get-form-public?shareUrl=${shareUrl}`);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to fetch form');
+            }
+            const formData = await response.json();
+            setFormState(formData); // Set the form in the state
+            setElements(formData.fields || []);
+            return formData; // Return the fetched form
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
 
     const getFormSubmissionByCaseId = useCallback(async (caseId: string): Promise<Submission | null> => {
         try {
@@ -425,6 +488,33 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         }
     }, [form]);
 
+    const fetchClientSubmissions = useCallback(async () => {
+        try {
+            const response = await fetch(`/api/forms/client-submissions`);
+            if (!response.ok) {
+                if (response.status === 403) {
+                    toast({
+                        title: "Access Denied",
+                        description: "You do not have permission to view these submissions.",
+                        variant: "destructive",
+                    });
+                } else {
+                    throw new Error('Failed to fetch client submissions');
+                }
+            }
+            const data = await response.json();
+            setSubmissions(data.submissions || []);
+        } catch (error) {
+            console.error('Error fetching client submissions:', error);
+            toast({
+                title: "Error",
+                description: "An error occurred while fetching your submissions.",
+                variant: "destructive",
+            });
+        }
+    }, []);
+
+
     useEffect(() => {
         if (forms.length > 0 && !initialForm && !formInitializedRef.current) {
             const fetchedForm = forms[0];
@@ -437,8 +527,10 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
     useEffect(() => {
         if (form) {
             fetchSubmissions(form.shareURL);
+        } else if (!form && forms.length > 0) {
+            setForm(forms[0]);
         }
-    }, [form, fetchSubmissions]);
+    }, [form, forms, fetchSubmissions]);
 
 
     const selectors = useMemo(() => ({
@@ -455,16 +547,20 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         formName,
         elements,
         selectedElement,
-        unsavedChanges,
         loading,
+        unsavedChanges,
         form,
         forms,
         formsLoading,
         formsError,
         submissions,
-    }), [formName, elements, selectedElement, unsavedChanges, loading, form, forms, formsLoading, formsError, submissions]);
+        subscriptionPlans,
+        error,
+    }), [formName, elements, selectedElement, unsavedChanges, loading, form, forms, formsLoading, formsError, submissions, subscriptionPlans, error]);
 
     const actions = useMemo(() => ({
+        fetchSubscriptionPlans,
+        createBusiness,
         createForm,
         saveForm,
         publishForm,
@@ -474,9 +570,11 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         deleteForm,
         fetchSubmissions,
         fetchFormByShareUrl,
+        fetchFormByShareUrlPublic,
         getFormSubmissionByCaseId,
         getMissingFields,
-    }), [saveForm, publishForm, addElement, removeElement, updateElement, deleteForm, fetchSubmissions, fetchFormByShareUrl, getFormSubmissionByCaseId, getMissingFields,]);
+        fetchClientSubmissions
+    }), [saveForm, publishForm, addElement, removeElement, updateElement, deleteForm, fetchSubmissions, fetchFormByShareUrl, fetchFormByShareUrlPublic, getFormSubmissionByCaseId, getMissingFields, fetchClientSubmissions, fetchSubscriptionPlans, createBusiness]);
 
     const contextValue: AppContextType = useMemo(() => ({
         selectors,

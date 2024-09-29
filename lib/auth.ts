@@ -72,7 +72,6 @@ export const authOptions: NextAuthOptions = {
           );
 
           const data = await res.json();
-
           if (res.ok && data.access_token) {
             return {
               access_token: data.access_token,
@@ -82,6 +81,7 @@ export const authOptions: NextAuthOptions = {
               email: data.user.email,
               username: data.user.username,
               business_id: data.user.business_id,
+              role: data.user.role, // role is an object with id and name.
             };
           }
 
@@ -106,13 +106,13 @@ export const authOptions: NextAuthOptions = {
         if (!decodedAccessToken || !decodedAccessToken.exp) {
           throw new Error("Access token does not have an exp claim");
         }
-
         token.accessTokenExpires = decodedAccessToken.exp * 1000;
         token.id = Number(user.id);
         token.email = user.email;
         token.username = user.username;
         token.name = user.username;
         token.businessId = user.business_id;
+        token.role = user.role; // Keep role as an object.
         return token;
       }
 
@@ -139,6 +139,10 @@ export const authOptions: NextAuthOptions = {
         username: String(token.username),
         name: String(token.username),
         businessId: token.businessId,
+        role: {
+          id: Number(token.role?.id ?? 1), // Use optional chaining with a default value
+          name: String(token.role?.name ?? "Unknown"), // Default to 'Unknown' if role.name is undefined
+        }, //
       };
       if (token.error) {
         session.error = token.error;

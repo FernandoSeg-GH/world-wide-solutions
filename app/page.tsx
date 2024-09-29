@@ -152,7 +152,7 @@ function SignUpForm({ onToggle }: { onToggle: () => void }) {
                     username: formData.username,
                     email: formData.email,
                     password: formData.password,
-                    role_id: 4
+                    role_id: 1
                 }),
             });
 
@@ -164,6 +164,7 @@ function SignUpForm({ onToggle }: { onToggle: () => void }) {
                     description: "Registration successful. You can now sign in.",
                 });
                 onToggle();
+                router.push('/auth/sign-in')
             } else {
                 toast({
                     title: "Error",

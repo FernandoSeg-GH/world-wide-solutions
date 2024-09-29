@@ -20,7 +20,6 @@ export const useFormFetch = (shareUrl: string) => {
 
             setForm((prevForm) => {
                 if (JSON.stringify(prevForm) !== JSON.stringify(formData)) {
-                    console.log('Setting form data:', formData);
                     return formData;
                 }
                 return prevForm;

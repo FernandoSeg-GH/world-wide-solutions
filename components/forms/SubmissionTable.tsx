@@ -13,7 +13,7 @@ function SubmissionsTable({ submissions, form }: { submissions: Submission[]; fo
         return <div>No submissions found</div>;
     }
 
-    const rows: Row[] = submissions.map((submission) => {
+    const rows = submissions.map((submission) => {
         let parsedContent: { [key: string]: any } = {};
         try {
             parsedContent = JSON.parse(submission.content);
@@ -21,13 +21,12 @@ function SubmissionsTable({ submissions, form }: { submissions: Submission[]; fo
             console.error('Error parsing submission content:', error);
         }
 
-        const row: Row = {
-            submittedAt: submission.createdAt,
+        const row: { [key: string]: any } = {
+            submittedAt: submission.createdAt,  // Ensure this field exists and is correctly formatted
         };
 
-
         form.fields.forEach((field) => {
-            row[field.id] = parsedContent[field.id] ?? '';
+            row[field.id] = parsedContent[field.id] ?? 'No data';  // Map content to form fields
         });
 
         return row;
@@ -38,7 +37,6 @@ function SubmissionsTable({ submissions, form }: { submissions: Submission[]; fo
         acc[field.id] = field.extraAttributes?.label || `Field ${field.id}`;
         return acc;
     }, {});
-
 
     const fieldKeys = form.fields.map((field) => field.id);
 
@@ -61,10 +59,10 @@ function SubmissionsTable({ submissions, form }: { submissions: Submission[]; fo
                         {rows.map((row, index) => (
                             <TableRow key={index}>
                                 {fieldKeys.map((key) => (
-                                    <TableCell key={key}>{row[key]}</TableCell>
+                                    <TableCell key={key}>{row[key] || 'No data'}</TableCell>
                                 ))}
                                 <TableCell className="text-muted-foreground text-right">
-                                    {new Date(row.submittedAt).toLocaleString()}
+                                    {new Date(row.submittedAt).toLocaleString() || 'Invalid Date'}
                                 </TableCell>
                             </TableRow>
                         ))}
