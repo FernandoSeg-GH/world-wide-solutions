@@ -55,7 +55,7 @@ function deepEqual(obj1: any, obj2: any): boolean {
 export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.Element => {
     const { data: session, status } = useSession();
     const [businessId, setBusinessId] = useState<number | undefined>(undefined);
-    const { forms, isLoading: formsLoading, error: formsError } = useFetchForms(businessId);
+    const { forms, isLoading: formsLoading, error: formsError = null } = useFetchForms(Number(businessId));
 
     const [form, setFormState] = useState<Form | null>(initialForm || null);
     const [formName, setFormName] = useState<string>(initialForm?.name || '');
