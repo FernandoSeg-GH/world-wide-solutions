@@ -89,7 +89,6 @@ function FormCard({ form }: { form: Form }) {
     const formattedDistance = form.createdAt
         ? formatDistance(new Date(form.createdAt), new Date(), { addSuffix: true })
         : 'Unknown time';
-    console.log('form card', form)
     return (
         <Card className='lg:max-w-[450px] h-[200px] w-full'>
             <CardHeader>

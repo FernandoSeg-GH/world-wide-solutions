@@ -17,7 +17,6 @@ export default function ClientView({ form, submissions }: ClientViewProps) {
 
     useEffect(() => {
         if (submissions.length) {
-            console.log('Submissions received:', submissions);
             const parsedSubmissions = submissions.map(submission => ({
                 ...submission,
                 content: JSON.parse(submission.content)

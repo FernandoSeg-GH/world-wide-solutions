@@ -30,8 +30,6 @@ export async function GET(request: Request) {
       },
     });
     const data = await response.json();
-    console.log("API Route Response:", data); // Debugging Line
-
     if (!response.ok) {
       const errorText = await response.text();
       console.error(
@@ -43,7 +41,6 @@ export async function GET(request: Request) {
       );
     }
 
-    console.log("response", response);
     return NextResponse.json(data);
   } catch (error) {
     console.error("Error fetching forms:", error);

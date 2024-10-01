@@ -72,7 +72,6 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
     useEffect(() => {
         if (status === 'authenticated' && session?.user?.businessId) {
 
-            console.log("Setting businessId:", session.user.businessId);
         } else {
             console.warn("User does not belong to any business.");
         }
@@ -375,8 +374,7 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
 
                 const data = await response.json();
                 if (data?.submissions) {
-                    setSubmissions(data.submissions); // Ensure the submissions are being set correctly
-                    console.log("Submissions fetched:", data.submissions);
+                    setSubmissions(data.submissions);
                 } else {
                     console.warn("No submissions found");
                 }

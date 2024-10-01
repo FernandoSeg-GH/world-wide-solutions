@@ -18,7 +18,6 @@ export const useFetchForms = (businessId: number) => {
             try {
                 const response = await fetch(`/api/forms/get-forms`);
                 const data = await response.json();
-                console.log("Fetched Forms:", data);
                 if (response.ok) {
                     setForms(data.forms);
                 } else {
