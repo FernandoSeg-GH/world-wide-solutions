@@ -13,10 +13,11 @@ import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 import { useToast } from "../ui/use-toast";
 
-function FormBuilder() {
+
+function FormBuilder({ formName }: { formName: string }) {
     const {
         selectors: { handleFormNameChange, setSelectedElement },
-        data: { formName, unsavedChanges, form },
+        data: { unsavedChanges, form },
         actions: { saveForm, publishForm, addElement, removeElement, updateElement },
     } = useAppContext();
 
@@ -30,27 +31,11 @@ function FormBuilder() {
     const touchSensor = useSensor(TouchSensor, { activationConstraint: { delay: 300, tolerance: 5 } });
     const sensors = useSensors(mouseSensor, touchSensor);
 
-    const handleNavigationAlert = (e: BeforeUnloadEvent) => {
-        if (unsavedChanges) {
-            e.preventDefault();
-            e.returnValue = '';
-        }
-    };
-
-    // Set isReady after a delay to simulate component readiness
     useEffect(() => {
         setSelectedElement(null);
         const readyTimeout = setTimeout(() => setIsReady(true), 500);
         return () => clearTimeout(readyTimeout);
     }, [setSelectedElement]);
-
-    // Add navigation alert for unsaved changes
-    useEffect(() => {
-        window.addEventListener('beforeunload', handleNavigationAlert);
-        return () => {
-            window.removeEventListener('beforeunload', handleNavigationAlert);
-        };
-    }, [unsavedChanges]);
 
     // Check if the form is published or not
     useEffect(() => {
@@ -62,42 +47,6 @@ function FormBuilder() {
     }, [form]);
 
     const shareUrl = `${window.location.origin}/submit/${encodeURIComponent(formName)}`;
-
-
-    // Function to handle the unpublish action
-    const handleUnpublish = async () => {
-        try {
-            const res = await fetch("/api/forms/publish-unpublish-form", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ form_id: form?.id, action: "unpublish" }),
-            });
-
-            const data = await res.json();
-            if (res.ok) {
-                setIsPublished(false);
-                toast.toast({
-                    title: "Success",
-                    description: "Form unpublished successfully.",
-                    variant: "default",
-                });
-            } else {
-                toast.toast({
-                    title: "Error",
-                    description: data.message || "Failed to unpublish form.",
-                    variant: "destructive",
-                });
-            }
-        } catch (error) {
-            toast.toast({
-                title: "Error",
-                description: "An error occurred while unpublishing the form.",
-                variant: "destructive",
-            });
-        }
-    };
 
     return (
         <DndContext sensors={sensors}>
@@ -116,6 +65,7 @@ function FormBuilder() {
                                     onChange={(e) => handleFormNameChange(e.target.value)}
                                     onBlur={() => setIsEditingName(false)}
                                     autoFocus
+                                    placeholder="Enter your form title"
                                     className="bg-gray-100"
                                 />
                             ) : (

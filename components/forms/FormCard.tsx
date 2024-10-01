@@ -89,14 +89,14 @@ function FormCard({ form }: { form: Form }) {
     const formattedDistance = form.createdAt
         ? formatDistance(new Date(form.createdAt), new Date(), { addSuffix: true })
         : 'Unknown time';
-
+    console.log('form card', form)
     return (
-        <Card>
+        <Card className='lg:max-w-[450px] h-[200px] w-full'>
             <CardHeader>
                 <CardTitle className="flex items-center gap-2 justify-between">
                     <div className="flex items-center justify-between gap-2 w-full">
                         <div>
-                            <span className="truncate font-bold">{form.name}</span>
+                            <span className="truncate text-ellipsis font-bold">{form.name}</span>
                         </div>
                         <div className='flex items-center gap-2'>
                             {publishedStatus ? <Badge variant="default" className='bg-blue-500'>Published</Badge> : <Badge variant="outline">Unpublished</Badge>}

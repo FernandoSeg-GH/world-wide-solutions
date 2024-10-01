@@ -49,7 +49,7 @@ const FormDetailPage = ({ params }: { params: { id: string } }) => {
     const bounceRate = 100 - submissionRate;
 
     return (
-        <>
+        <div>
             <div className="py-10 border-b border-muted">
                 <div className="flex justify-between container">
                     <h1 className="text-4xl font-bold truncate">{form.name}</h1>
@@ -66,7 +66,7 @@ const FormDetailPage = ({ params }: { params: { id: string } }) => {
             <div className="container pt-10">
                 <SubmissionsTable submissions={submissions} form={form} />
             </div>
-        </>
+        </div>
     );
 };
 
@@ -92,7 +92,7 @@ function SubmissionsTable({ submissions, form }: { submissions: Submission[], fo
     const fieldKeys = Object.keys(rows[0]).filter((key) => key !== 'submittedAt');
 
     return (
-        <>
+        <div>
             <h1 className="text-2xl font-bold my-4">Submissions</h1>
             <div className="rounded-md border">
                 <Table>
@@ -120,6 +120,6 @@ function SubmissionsTable({ submissions, form }: { submissions: Submission[], fo
                     </TableBody>
                 </Table>
             </div>
-        </>
+        </div>
     );
 }

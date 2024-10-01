@@ -10,75 +10,54 @@ import { useRouter } from "next/navigation";
 import ClientView from "@/components/forms/ClientView";
 import CreateBusinessForm from "@/components/business/CreateBusinessForm";
 import { useAppContext } from "@/components/context/AppContext";
+import SubmissionsTable from "@/components/forms/SubmissionTable";
 
 export default function Dashboard() {
-  const { data: session, status } = useSession();
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: session } = useSession();
   const { data, actions } = useAppContext();
-  const router = useRouter();
-  const { form, submissions, loading: formLoading } = data;
+  const { form, submissions, loading: formLoading, loading, forms } = data;
+  const { fetchForms } = actions;
 
   useEffect(() => {
-    const fetchFormAndSubmissions = async () => {
-      if (status === "authenticated" && session?.user?.businessId) {
-        if (!form) {
-          // Fetch the form if it doesn't exist in the state
-          await actions.fetchFormByShareUrlPublic('your-share-url'); // Ensure shareURL is available
-        }
-
-        if (form?.shareURL) {
-          console.log("Fetching submissions for shareURL:", form.shareURL);
-          await actions.fetchSubmissions(form.shareURL); // Fetch submissions if form has a shareURL
-        }
-
-        setIsLoading(false);
-      } else if (status === "unauthenticated") {
-        setIsLoading(false);
-        router.push("/");
-      }
-    };
-
-    fetchFormAndSubmissions();
-  }, [status, form, actions, router]);
-
-
-  useEffect(() => {
-    if (submissions) {
-      console.log('Submissions:', submissions);
+    if (session?.user?.businessId) {
+      fetchForms(session.user.businessId); // Fetch forms for the logged-in user's business
     }
-  }, [submissions]);
-  console.log('form', form)
+  }, [session, fetchForms]); // Dependencies: session and fetchForms
+
   return (
-    <div className="p-4 w-full flex flex-col justify-start items-start">
+    <div className="p-4 pb-20 w-full flex flex-col justify-start items-start">
       <Welcome />
-      {
-        isLoading || formLoading ?
-          <Skeleton className="min-w-80 min-h-20" /> : (
-            <div>
-              {session?.user.role.id === 4 ? (
-                <div className="w-full">
-                  {session.user.businessId ? (
-                    <div>
-                      <h2 className="text-2xl font-semibold col-span-2 mb-2">Your forms</h2>
-                      <div className="w-full grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2 md:gap-3 lg:gap-4">
-                        <CreateFormBtn />
-                        <FormCards />
-                      </div>
-                    </div>
-                  ) : (
-                    <CreateBusinessForm />
-                  )}
-                </div>
-              ) : null}
-              {form && session?.user.role.id === 1 ? (
-                <ClientView form={form} submissions={submissions} />
-              ) : (
-                <div>
-                  <p>You haven't submitted any form.</p>
-                </div>
-              )}
+      {loading || formLoading ? <Skeleton className="min-w-80 w-full min-h-20" /> : null}
+
+      <div className="w-full">
+        {!session?.user.businessId &&
+          <CreateBusinessForm />
+        }
+        {forms && session?.user.role.id === 4 ? (
+          <div className="px-4 py-6 border w-full mt-10 rounded-lg text-left shadow-md">
+            <h2 className="text-2xl font-semibold col-span-2 mb-2">Your forms</h2>
+            {forms.map((form) => <p key={form?.name}>{form.name}</p>)}
+            <FormCards forms={forms} />
+          </div>
+        ) : null}
+
+        <div className="px-4 py-6 border w-full mt-10 rounded-lg text-left shadow-md">
+          <h2 className="text-2xl font-semibold col-span-2 mb-2">Submissions</h2>
+          {form && session?.user.role.id === 4 ? (
+            <div className="flex flex-col gap-6">
+              <p>View Submissions</p>
+              {forms && submissions && forms.map((form, index) => {
+                return (
+                  <SubmissionsTable key={index} form={form} submissions={submissions ?? []} admin />
+                )
+              })}
             </div>
+          ) : form && (
+            <ClientView form={form} submissions={submissions ?? []} />
           )}
+        </div>
+
+      </div>
     </div>
   );
 }

@@ -1,46 +1,48 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import FormBuilder from '@/components/forms/FormBuilder';
 import { useAppContext } from '@/components/context/AppContext';
 import { Form } from '@/types';
 
 const BuilderPage = ({ params }: { params: { shareUrl: string } }) => {
-  const { selectors: { setForm }, data: { form } } = useAppContext();
+  const {
+    actions: { fetchFormByShareUrl },
+    data: { form, loading, error },
+    selectors: { setForm, setLoading, setError },
+  } = useAppContext();
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const { shareUrl } = params;
-  useEffect(() => {
-    const fetchForm = async () => {
-      try {
-        const response = await fetch(`/api/forms/get-form?shareUrl=${shareUrl}`);
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.error('Error fetching form:', errorData);
-          throw new Error(errorData.message || 'Failed to fetch form');
+  useEffect(() => {
+    const fetchFormData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const formData = await fetchFormByShareUrl(shareUrl);  // Fetch form by shareUrl
+        if (formData as Form) {
+          setForm(formData);  // Set the form in the context
+        } else {
+          setError('Form not found');
         }
 
-        const formData: Form = await response.json();
-        setForm(formData);
+        setLoading(false);
       } catch (err: any) {
         console.error('Error in fetchForm:', err);
-        setError(err.message);
-      } finally {
+        setError(err.message || 'Failed to fetch form');
         setLoading(false);
       }
     };
 
-    fetchForm();
-  }, [shareUrl, setForm]);
+    fetchFormData();
+  }, [shareUrl, fetchFormByShareUrl, setForm, setLoading, setError]);
 
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
   if (!form) return <div>Form not found</div>;
-
-  return <FormBuilder />;
+  return <FormBuilder formName={form.name} />;
 };
 
 export default BuilderPage;

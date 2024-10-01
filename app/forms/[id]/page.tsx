@@ -8,10 +8,8 @@ import SubmissionsTable from '@/components/forms/SubmissionTable';
 const FormDetailPage = ({ params }: { params: { id: string } }) => {
     const { id } = params;
 
-    const { selectors, data, actions } = useAppContext();
-    const { setForm, setSubmissions } = selectors;
-    const { form, submissions, loading: formsLoading, formsError } = data;
-    const { fetchSubmissions, fetchFormByShareUrl } = actions;
+    const { data, actions } = useAppContext();
+    const { form, submissions, loading, error } = data;
 
     useEffect(() => {
         if (id) {
@@ -27,8 +25,8 @@ const FormDetailPage = ({ params }: { params: { id: string } }) => {
     }, [id, actions]);
 
 
-    if (formsLoading) return <div>Loading form...</div>;
-    if (formsError) return <div>Error: {formsError.message}</div>;
+    if (loading) return <div>Loading form...</div>;
+    if (error) return <div>Error: {error}</div>;
     if (!form) return <div>Form not found</div>;
 
     const submissionRate = (form.visits ?? 0) > 0

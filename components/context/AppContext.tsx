@@ -54,10 +54,9 @@ function deepEqual(obj1: any, obj2: any): boolean {
 
 export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.Element => {
     const { data: session, status } = useSession();
-    const [businessId, setBusinessId] = useState<number | undefined>(undefined);
-    const { forms, isLoading: formsLoading, error: formsError = null } = useFetchForms(Number(businessId));
+    const [form, setFormState] = useState<Form | null>(initialForm ?? null);
+    const [forms, setForms] = useState<Form[]>([]);
 
-    const [form, setFormState] = useState<Form | null>(initialForm || null);
     const [formName, setFormName] = useState<string>(initialForm?.name || '');
     const [elements, setElements] = useState<FormElementInstance[]>(initialForm?.fields || []);
     const [selectedElement, setSelectedElement] = useState<FormElementInstance | null>(null);
@@ -74,11 +73,8 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         if (status === 'authenticated' && session?.user?.businessId) {
 
             console.log("Setting businessId:", session.user.businessId);
-            setBusinessId(session.user.businessId);
         } else {
             console.warn("User does not belong to any business.");
-            // Optionally set a state to handle UI accordingly
-            setBusinessId(undefined);
         }
     }, [session, status]);
 
@@ -161,7 +157,7 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
                 body: JSON.stringify({
                     name,
                     description,
-                    business_id: businessId,
+                    business_id: session.user.businessId,
                 }),
             });
 
@@ -183,7 +179,28 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
             });
             return null;
         }
-    }, [businessId, session]);
+    }, [session?.user.businessId, session]);
+
+    const fetchForms = useCallback(async (businessId: number) => {
+        if (!businessId) return;
+
+        try {
+            setLoading(true);
+            const response = await fetch(`/api/forms/get-forms?businessId=${businessId}`);
+            const data = await response.json();
+
+            if (response.ok) {
+                setForms(data.forms);  // Ensure the forms state is updated
+            } else {
+                setError(data.error);
+            }
+        } catch (err: any) {
+            setError(err.message || 'Failed to fetch forms.');
+        } finally {
+            setLoading(false);
+        }
+    }, [setLoading]); // Add only necessary dependencies
+
 
 
     const handleFormNameChange = useCallback((newName: string) => {
@@ -369,26 +386,19 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         }
     }, [session?.accessToken]);
 
-
-
-    const fetchFormByShareUrl = useCallback(async (shareUrl: string) => {
-        setLoading(true);
-        setError(null);
+    const fetchFormByShareUrl = async (shareUrl: string): Promise<Form | null> => {
         try {
-            const response = await fetch(`/api/forms/get-form?shareUrl=${shareUrl}`);
+            const response = await fetch(`/api/forms/share_url/${shareUrl}/public`);
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to fetch form');
+                throw new Error('Form not found');
             }
             const formData = await response.json();
-            setFormState(formData);
-            setElements(formData.fields || []);
-        } catch (err: any) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
+            return formData as Form;
+        } catch (error) {
+            console.error('Error fetching form:', error);
+            return null;
         }
-    }, []);
+    };
 
     const fetchFormByShareUrlPublic = useCallback(async (shareUrl: string) => {
         setLoading(true);
@@ -516,49 +526,75 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
 
 
     useEffect(() => {
-        if (forms.length > 0 && !initialForm && !formInitializedRef.current) {
+        if (forms && forms.length > 0 && !initialForm && !formInitializedRef.current) {
             const fetchedForm = forms[0];
             setForm(fetchedForm);
             formInitializedRef.current = true;
         }
     }, [forms, initialForm, setForm]);
 
-
     useEffect(() => {
         if (form) {
-            fetchSubmissions(form.shareURL);
-        } else if (!form && forms.length > 0) {
-            setForm(forms[0]);
+            setLoading(true);
+            fetchSubmissions(form.shareURL).finally(() => setLoading(false)); // Ensure async logic doesn't cause loops
+
+        } else {
+            setLoading(false);
         }
-    }, [form, forms, fetchSubmissions]);
+    }, [form, fetchSubmissions]); // Ensure only necessary dependencies are included
 
 
     const selectors = useMemo(() => ({
         setFormName,
+        setError,
+        setForms,
+        setForm,
         setElements,
         setSelectedElement,
         handleFormNameChange,
         setUnsavedChanges,
-        setForm,
         setSubmissions,
-    }), [setFormName, setElements, setSelectedElement, handleFormNameChange, setUnsavedChanges, setForm, setSubmissions]);
+        setLoading
+    }), [
+        setFormName,
+        setError,
+        setForms,
+        setForm,
+        setElements,
+        setSelectedElement,
+        handleFormNameChange,
+        setUnsavedChanges,
+        setSubmissions,
+        setLoading
+    ]);
 
     const data = useMemo(() => ({
         formName,
         elements,
         selectedElement,
         loading,
+        error,
         unsavedChanges,
         form,
         forms,
-        formsLoading,
-        formsError,
         submissions,
         subscriptionPlans,
+    }), [
+        formName,
+        elements,
+        selectedElement,
+        loading,
         error,
-    }), [formName, elements, selectedElement, unsavedChanges, loading, form, forms, formsLoading, formsError, submissions, subscriptionPlans, error]);
+        unsavedChanges,
+        form,
+        forms,
+        submissions,
+        subscriptionPlans,
+    ]);
 
     const actions = useMemo(() => ({
+        fetchForms,
+        fetchClientSubmissions,
         fetchSubscriptionPlans,
         createBusiness,
         createForm,
@@ -573,8 +609,24 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         fetchFormByShareUrlPublic,
         getFormSubmissionByCaseId,
         getMissingFields,
-        fetchClientSubmissions
-    }), [saveForm, publishForm, addElement, removeElement, updateElement, deleteForm, fetchSubmissions, fetchFormByShareUrl, fetchFormByShareUrlPublic, getFormSubmissionByCaseId, getMissingFields, fetchClientSubmissions, fetchSubscriptionPlans, createBusiness]);
+    }), [
+        fetchForms,
+        fetchClientSubmissions,
+        fetchSubscriptionPlans,
+        createBusiness,
+        createForm,
+        saveForm,
+        publishForm,
+        addElement,
+        removeElement,
+        updateElement,
+        deleteForm,
+        fetchSubmissions,
+        fetchFormByShareUrl,
+        fetchFormByShareUrlPublic,
+        getFormSubmissionByCaseId,
+        getMissingFields,
+    ]);
 
     const contextValue: AppContextType = useMemo(() => ({
         selectors,

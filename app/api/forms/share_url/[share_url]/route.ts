@@ -16,7 +16,7 @@ export async function GET(
 
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/form/share_url/${share_url}`,
+      `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/form/share_url/${share_url}/public`,
       {
         method: "GET",
         headers: {

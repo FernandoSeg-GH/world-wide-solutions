@@ -29,7 +29,7 @@ export default function BuilderPage({ params }: BuilderPageProps) {
 
   return (
     <div>
-      <FormBuilder />
+      <FormBuilder formName={form.name} />
     </div>
   );
 }

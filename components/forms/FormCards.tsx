@@ -5,40 +5,28 @@ import { useSession } from 'next-auth/react';
 import FormCard from './FormCard';
 import { useEffect, useState } from 'react';
 import { useAppContext } from '@/components/context/AppContext';
+import { Form } from '@/types';
+import CreateFormBtn from './CreateFormButton';
 
-const FormCards = () => {
-    const { data: session, status } = useSession();
+const FormCards = ({ forms }: { forms: Form[] }) => {
+
     const { data, selectors } = useAppContext();
-    const { forms, formsLoading, formsError } = data;
-
-    const [businessId, setBusinessId] = useState<number | undefined>(undefined);
-
-    if (formsLoading) {
-        return (
-            <div>
-                {[1, 2, 3, 4].map((el) => (
-                    <Skeleton key={el} className="border-2 border-primary-/20 h-[200px] w-full" />
-                ))}
-            </div>
-        );
-    }
-
-    if (formsError) {
-
-        return <div>{typeof formsError.message === 'string' ? formsError.message : 'An error occurred'}</div>;
-    }
-
-
+    const { loading, error } = data;
+    error && console.log('error', error)
     return (
-        <div>
-            {forms.length > 0 ? forms.map((form) => (
-                <FormCard key={form.id} form={form} />
-            )) :
-                <div className="border border-dashed flex items-center justify-center text-center leading-9 my-6 p-4">
-                    No forms found.
-                    <br /> Start creating a Form!
-                </div>
+        <div className='w-full  grid grid-cols-1 sm:grid-cols-2  gap-2 md:gap-3 lg:flex lg:flex-row lg:flex-wrap'>
+            <CreateFormBtn />
+            {loading &&
+                [1, 2, 3, 4].map((el) => (
+                    <Skeleton key={el} className="border-2 border-primary-/20 h-[200px] w-full" />
+                ))
+
             }
+
+            {forms && forms.map((form) => (
+                <FormCard key={form.id} form={form} />
+            ))}
+
         </div>
     );
 };

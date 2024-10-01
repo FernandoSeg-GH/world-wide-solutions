@@ -2,13 +2,14 @@
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Submission, Form } from '@/types';
+import { cn } from '@/lib/utils';
 
 interface Row {
     submittedAt: string;
     [key: string]: any;
 }
 
-function SubmissionsTable({ submissions, form }: { submissions: Submission[]; form: Form }) {
+function SubmissionsTable({ submissions, form, admin }: { submissions: Submission[]; form: Form, admin?: boolean }) {
     if (!Array.isArray(submissions) || submissions.length === 0) {
         return <div>No submissions found</div>;
     }
@@ -41,10 +42,13 @@ function SubmissionsTable({ submissions, form }: { submissions: Submission[]; fo
     const fieldKeys = form.fields.map((field) => field.id);
 
     return (
-        <>
-            <h1 className="text-2xl font-bold my-4">Submissions</h1>
-            <div className="rounded-md border">
-                <Table>
+        <div className='w-full flex flex-col items-start justify-start'>
+            {!admin ?
+                <h1 className="text-2xl font-bold my-4">Submissions</h1> :
+                <h1 className="text-2xl font-bold my-4">Form: <span className='font-normal'>{form.name}</span></h1>
+            }
+            <div className="rounded-md border w-full">
+                <Table className={cn("w-full")}>
                     <TableHeader>
                         <TableRow>
                             {fieldKeys.map((fieldKey) => (
@@ -69,7 +73,7 @@ function SubmissionsTable({ submissions, form }: { submissions: Submission[]; fo
                     </TableBody>
                 </Table>
             </div>
-        </>
+        </div>
     );
 }
 

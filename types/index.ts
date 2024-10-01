@@ -24,7 +24,7 @@ export interface Form {
   name: string;
   fields: FormElementInstance[];
   shareURL: string;
-  businessId: number;
+  businessId?: number;
   description?: string;
   extraAttributes?: Record<string, any>;
   createdAt?: string;
@@ -145,8 +145,11 @@ export interface AppContextType {
     setSelectedElement: (element: FormElementInstance | null) => void;
     handleFormNameChange: (newName: string) => void;
     setUnsavedChanges: (flag: boolean) => void;
-    setForm: (form: Form | null) => void;
     setSubmissions: (submissions: Submission[]) => void;
+    setError: React.Dispatch<React.SetStateAction<string | null>>;
+    setForms: (forms: Form[] | []) => void;
+    setForm: (form: Form | null) => void;
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   };
   data: {
     formName: string;
@@ -156,8 +159,6 @@ export interface AppContextType {
     loading: boolean;
     form: Form | null;
     forms: Form[];
-    formsLoading: boolean;
-    formsError: FetchError | null;
     submissions: Submission[];
     subscriptionPlans: SubscriptionPlan[];
     error: string | null;
@@ -167,19 +168,20 @@ export interface AppContextType {
       name: string;
       description: string;
     }) => Promise<{ formId: number; shareURL: string } | null>;
+    createBusiness: (businessData: any) => Promise<boolean>;
+    fetchForms: (businessId: number) => Promise<void>;
+    fetchSubmissions: (shareURL: string) => Promise<void>;
+    fetchFormByShareUrl: (shareURL: string) => Promise<Form | null>;
+    fetchFormByShareUrlPublic: (shareURL: string) => Promise<void>;
+    fetchClientSubmissions: (userId: number) => Promise<void>;
+    fetchSubscriptionPlans: () => Promise<void>;
     saveForm: () => Promise<void>;
     publishForm: (action: "publish" | "unpublish") => Promise<void>;
     addElement: (index: number, element: FormElementInstance) => void;
     removeElement: (id: string) => void;
     updateElement: (id: string, element: FormElementInstance) => void;
     deleteForm: (formId: number) => Promise<void>;
-    fetchSubmissions: (shareURL: string) => Promise<void>;
-    fetchFormByShareUrl: (shareURL: string) => Promise<void>;
-    fetchFormByShareUrlPublic: (shareURL: string) => Promise<void>;
     getFormSubmissionByCaseId: (caseId: string) => Promise<Submission | null>;
     getMissingFields: (submission: Submission) => Promise<string[]>;
-    fetchClientSubmissions: (userId: number) => Promise<void>;
-    fetchSubscriptionPlans: () => Promise<void>;
-    createBusiness: (businessData: any) => Promise<boolean>;
   };
 }

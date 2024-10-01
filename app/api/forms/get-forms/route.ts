@@ -13,7 +13,7 @@ export async function GET(request: Request) {
     process.env.NEXT_PUBLIC_FLASK_BACKEND_URL || "http://localhost:5000";
 
   const { searchParams } = new URL(request.url);
-  const businessId = searchParams.get("businessId");
+  const businessId = session.user.businessId;
 
   if (!businessId) {
     return NextResponse.json(
@@ -42,6 +42,8 @@ export async function GET(request: Request) {
         { status: response.status }
       );
     }
+
+    console.log("response", response);
     return NextResponse.json(data);
   } catch (error) {
     console.error("Error fetching forms:", error);
