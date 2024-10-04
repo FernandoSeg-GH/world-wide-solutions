@@ -27,9 +27,11 @@ function FormBuilder({ formName }: { formName: string }) {
     const toast = useToast();
     const router = useRouter();
 
-    const mouseSensor = useSensor(MouseSensor, { activationConstraint: { distance: 10 } });
-    const touchSensor = useSensor(TouchSensor, { activationConstraint: { delay: 300, tolerance: 5 } });
+    const mouseSensor = useSensor(MouseSensor);
+    const touchSensor = useSensor(TouchSensor);
     const sensors = useSensors(mouseSensor, touchSensor);
+
+
 
     useEffect(() => {
         setSelectedElement(null);
@@ -49,7 +51,9 @@ function FormBuilder({ formName }: { formName: string }) {
     const shareUrl = `${window.location.origin}/submit/${encodeURIComponent(formName)}`;
 
     return (
-        <DndContext sensors={sensors}>
+        <DndContext
+            sensors={sensors}
+        >
             {!isReady ? (
                 <div className="flex flex-col items-center justify-center w-full h-full">
                     <ImSpinner2 className="animate-spin h-12 w-12" />

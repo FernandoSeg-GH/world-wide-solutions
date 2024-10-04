@@ -30,14 +30,14 @@ export default function ClientView({ form, submissions }: ClientViewProps) {
     if (!form) return <Skeleton className="min-w-80 min-h-20" />;
 
     return (
-        <div className="w-full flex flex-col ">
-            <h2 className="text-2xl font-semibold w-full">Your Forms</h2>
-            <div className="my-10 w-full flex flex-row">
+        <div className="w-auto flex flex-col ">
+            <h2 className="text-2xl font-semibold w-auto">Your Submissions</h2>
+            <div className="my-10 w-auto flex flex-row">
                 <div>
                     {isMissingData && (
                         <div className="alert alert-warning flex items-center">
                             <LuAlertCircle />
-                            <span className="ml-2">You have missing data in some fields.</span>
+                            <span className="ml-2">You haven't submitted any form.</span>
                         </div>
                     )}
                 </div>
@@ -56,7 +56,7 @@ export default function ClientView({ form, submissions }: ClientViewProps) {
                             </div>
                         ))
                     ) : (
-                        <p className="border p-12 border-dashed text-center rounded-md w-full">
+                        <p className="border p-16 border-dashed text-center rounded-md m-auto pb-20 ">
                             No submissions found
                         </p>
                     )}

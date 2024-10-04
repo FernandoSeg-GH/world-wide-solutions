@@ -144,7 +144,6 @@ export interface DesignerElementWrapperProps {
 function DesignerElementWrapper({ element }: DesignerElementWrapperProps) {
   const {
     actions: { removeElement },
-    data: { selectedElement },
     selectors: { setSelectedElement },
   } = useAppContext();
 
@@ -162,28 +161,25 @@ function DesignerElementWrapper({ element }: DesignerElementWrapperProps) {
         setSelectedElement(element);
       }}
     >
-      {mouseIsOver && (
-        <>
-          <div className="absolute right-0 h-full">
-            <Button
-              className="flex justify-center h-full border rounded-md rounded-l-none bg-red-500"
-              variant={"outline"}
-              onClick={(e) => {
-                e.stopPropagation();
-                removeElement(element.id);
-              }}
-            >
-              <BiSolidTrash className="h-6 w-6" />
-            </Button>
-          </div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse">
-            <p className="text-muted-foreground text-sm">Click for properties or drag to move</p>
-          </div>
-        </>
-      )}
       <div className="flex w-full h-[120px] items-center rounded-md bg-accent/40 px-4 py-2 pointer-events-none opacity-100">
         <DesignerElement elementInstance={element} />
       </div>
+
+      {/* Remove button displayed only when hovering */}
+      {mouseIsOver && (
+        <div className="absolute right-0 top-0 h-full">
+          <Button
+            className="flex justify-center h-full border rounded-md rounded-l-none bg-red-500"
+            variant={"outline"}
+            onClick={(e) => {
+              e.stopPropagation();
+              removeElement(element.id);
+            }}
+          >
+            <BiSolidTrash className="h-6 w-6" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

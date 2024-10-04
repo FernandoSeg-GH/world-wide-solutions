@@ -11,7 +11,7 @@ interface Row {
 
 function SubmissionsTable({ submissions, form, admin }: { submissions: Submission[]; form: Form, admin?: boolean }) {
     if (!Array.isArray(submissions) || submissions.length === 0) {
-        return <div className='m-auto mt-20'>No submissions found</div>;
+        return <></>;
     }
 
     const isInputField = (fieldType: ElementsType): boolean => {
@@ -75,11 +75,9 @@ function SubmissionsTable({ submissions, form, admin }: { submissions: Submissio
     }
 
     return (
-        <div className='w-full flex flex-col items-start justify-start'>
-            {!admin ?
-                <h1 className="text-2xl font-bold my-4">Submissions</h1> :
-                <h1 className="text-2xl font-bold my-4">Form: <span className='font-normal'>{form.name}</span></h1>
-            }
+        <div className='w-auto flex flex-col items-start justify-start'>
+            <h1 className="text-2xl font-bold my-4">Submissions</h1>
+            <h2 className="text-2xl font-semibold col-span-2 mb-2">Form: <span className='font-normal'>{form.name}</span></h2>
             <div className="rounded-md border w-full">
                 <Table className={cn("w-full")}>
                     <TableHeader>
