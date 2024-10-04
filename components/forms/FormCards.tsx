@@ -1,32 +1,32 @@
-// components/FormCards.tsx 
-import { Form } from '@/types';
-import { GetForms } from '@/actions/form';
+'use client';
+
 import { Skeleton } from '../ui/skeleton';
-import FormCard from './FormCard'; // Import the FormCard component
+import FormCard from './FormCard';
+import { useAppContext } from '@/components/context/AppContext';
+import { Form } from '@/types';
+import CreateFormBtn from './CreateFormButton';
 
-// components/FormCards.tsx
-const FormCards = async () => {
-    const businessId = 3;
-    let forms: Form[] = [];
+const FormCards = ({ forms }: { forms: Form[] }) => {
 
-    try {
-        forms = await GetForms(businessId);
-    } catch (error) {
-        console.error('Error fetching forms:', error);
-        return <div>Error fetching forms</div>;
-    }
-
-    if (!forms || forms.length === 0) {
-        return <div className='border border-dashed flex items-center justify-center text-center leading-9'>No forms available.<br /> Start creating a Form!</div>;
-    }
+    const { data } = useAppContext();
+    const { loading, error } = data;
+    error && console.error('error', error)
     return (
-        <>
-            {forms && forms.map((form: Form, index) => (
-                <FormCard key={index} form={form} />
+        <div className='w-full  grid grid-cols-1 sm:grid-cols-2  gap-2 md:gap-3 lg:flex lg:flex-row lg:flex-wrap'>
+            <CreateFormBtn />
+            {loading &&
+                [1, 2, 3, 4].map((el) => (
+                    <Skeleton key={el} className="border-2 border-primary-/20 h-[200px] w-full" />
+                ))
+
+            }
+
+            {forms && forms.map((form) => (
+                <FormCard key={form.id} form={form} />
             ))}
-        </>
+
+        </div>
     );
 };
-
 
 export default FormCards;

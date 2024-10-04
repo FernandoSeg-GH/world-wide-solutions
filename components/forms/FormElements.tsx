@@ -54,13 +54,8 @@ export type FormElement = {
     validate: (formElement: FormElementInstance, currentValue: string) => boolean;
 };
 
-// export type FormElementInstance = {
-//     id: string;
-//     type: ElementsType;
-//     extraAttributes?: Record<string, any>;
-// };
 
-export type FormElementInstance = FormField; // Now uses the extended FormField type
+export type FormElementInstance = FormField;
 
 type FormElementsType = {
     [key in ElementsType]: FormElement;

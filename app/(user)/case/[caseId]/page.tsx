@@ -1,6 +1,7 @@
-"use client";
-import { Search } from "@/components/ui/search";
-import { GetFormSubmissionByCaseId, getMissingFields } from "@/actions/form"; // New action for missing fields
+// SearchFormPage.tsx
+
+'use client';
+import React from 'react';
 import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,22 +9,27 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LuAlertCircle } from "react-icons/lu";
+import { useAppContext } from "@/components/context/AppContext";
+import { Submission } from '@/types';
 
 export default function SearchFormPage() {
-    const [submission, setSubmission] = useState<any>(null);
-    const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [missingFields, setMissingFields] = useState<string[]>([]); // Missing fields state
+    const { actions } = useAppContext();
+    const { getFormSubmissionByCaseId, getMissingFields } = actions;
+
+    const [submission, setSubmission] = useState<Submission | null>(null);
+    const [error, setError] = useState<string>("");
+    const [loading, setLoading] = useState<boolean>(false);
+    const [missingFields, setMissingFields] = useState<string[]>([]);
 
     const handleSearch = async (caseId: string) => {
         setError("");
         setLoading(true);
         try {
-            const result = await GetFormSubmissionByCaseId(caseId);
+            const result = await getFormSubmissionByCaseId(caseId);
             if (result) {
                 setSubmission(result);
-                const missing = await getMissingFields(result); // Get missing fields
-                setMissingFields(missing); // Set missing fields in state
+                const missing = await getMissingFields(result);
+                setMissingFields(missing);
             } else {
                 setError("No submission found for this Case ID.");
                 setMissingFields([]);
@@ -42,14 +48,19 @@ export default function SearchFormPage() {
                 <Input
                     className="max-w-md"
                     placeholder="Enter your Internal Case ID Reference Number"
-                    onSubmit={(e: any) => {
-                        e.preventDefault();
-                        handleSearch(e.target.value);
+                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                        if (e.key === 'Enter') {
+                            const target = e.target as HTMLInputElement;
+                            handleSearch(target.value);
+                        }
                     }}
                 />
                 <Button
                     className="mt-4 w-full max-w-md"
-                    onClick={() => handleSearch((document.querySelector("input") as HTMLInputElement).value)}
+                    onClick={() => {
+                        const input = document.querySelector("input") as HTMLInputElement;
+                        handleSearch(input.value);
+                    }}
                 >
                     Search
                 </Button>
@@ -76,19 +87,19 @@ export default function SearchFormPage() {
 
                             <div className="grid grid-cols-2 gap-4 text-lg">
                                 <div className="font-semibold">First Name:</div>
-                                <div>{submission["7184"] || "Not Provided"}</div> {/* First Name Field */}
+                                <div>{submission.content["7184"] || "Not Provided"}</div>
 
                                 <div className="font-semibold">Last Name:</div>
-                                <div>{submission["3968"] || "Not Provided"}</div> {/* Last Name Field */}
+                                <div>{submission.content["3968"] || "Not Provided"}</div>
 
                                 <div className="font-semibold">Internal Case Id:</div>
-                                <div>{submission["4537"] || "Not Provided"}</div> {/* Internal Case ID Field */}
+                                <div>{submission.content["4537"] || "Not Provided"}</div>
 
                                 <div className="font-semibold">Phone Number:</div>
-                                <div>{submission["4124"] || "Not Provided"}</div> {/* Phone Number Field */}
+                                <div>{submission.content["4124"] || "Not Provided"}</div>
 
                                 <div className="font-semibold">Submitted At:</div>
-                                <div>{formatDistanceToNow(new Date(submission.submittedAt))} ago</div> {/* Submission Time */}
+                                <div>{formatDistanceToNow(new Date(submission.createdAt))} ago</div>
                             </div>
                         </CardContent>
                     </Card>

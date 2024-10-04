@@ -1,42 +1,35 @@
-import React, { useTransition } from "react";
+'use client';
+
+import React from "react";
 import { Button } from "../ui/button";
 import { HiSaveAs } from "react-icons/hi";
-import useDesigner from "../hooks/useDesigner";
-import { UpdateFormContent } from "@/actions/form";
-import { toast } from "../ui/use-toast";
 import { FaSpinner } from "react-icons/fa";
+import { useAppContext } from "../context/AppContext";
 
-function SaveFormBtn({ id }: { id: number }) {
-    const { elements } = useDesigner();
-    const [loading, startTransition] = useTransition();
+function SaveFormBtn() {
+    const {
+        data: { unsavedChanges },
+        actions: { saveForm },
+        data: { loading },
+    } = useAppContext();
 
-    const updateFormContent = async () => {
+    const handleSave = async () => {
         try {
-            const jsonElements = JSON.stringify(elements);
-            await UpdateFormContent(id, jsonElements);
-            toast({
-                title: "Success",
-                description: "Your form has been saved",
-            });
+            await saveForm();
         } catch (error) {
-            toast({
-                title: "Error",
-                description: "Something went wrong",
-                variant: "destructive",
-            });
+            console.error("Error during saveForm:", error);
         }
     };
+
     return (
         <Button
-            variant={"outline"}
-            className="gap-2"
+            variant={unsavedChanges ? "default" : "outline"}
+            className={`gap-2 ${unsavedChanges ? "bg-yellow-500" : ""}`}
             disabled={loading}
-            onClick={() => {
-                startTransition(updateFormContent);
-            }}
+            onClick={handleSave}
         >
             <HiSaveAs className="h-4 w-4" />
-            Save
+            {loading ? "Saving..." : "Save"}
             {loading && <FaSpinner className="animate-spin" />}
         </Button>
     );

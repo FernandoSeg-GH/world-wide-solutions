@@ -7,7 +7,6 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
-import useDesigner from "../hooks/useDesigner";
 import { RxDropdownMenu } from "react-icons/rx";
 
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
@@ -18,6 +17,7 @@ import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
 import { AiOutlineClose, AiOutlinePlus } from "react-icons/ai";
 import { toast } from "../ui/use-toast";
+import { useAppContext } from "../context/AppContext";
 
 const type: ElementsType = "SelectField";
 
@@ -34,7 +34,7 @@ const propertiesSchema = z.object({
     helperText: z.string().max(200),
     required: z.boolean().default(false),
     placeHolder: z.string().max(50),
-    options: z.array(z.object({ label: z.string(), value: z.string() })).default([]), // Adjust to match
+    options: z.array(z.object({ label: z.string(), value: z.string() })).default([]),
 });
 
 export const SelectFieldFormElement: FormElement = {
@@ -141,7 +141,10 @@ function FormComponent({
 type propertiesFormSchemaType = z.infer<typeof propertiesSchema>;
 function PropertiesComponent({ elementInstance }: { elementInstance: FormElementInstance }) {
     const element = elementInstance as CustomInstance;
-    const { updateElement, setSelectedElement } = useDesigner();
+    const { actions, selectors } = useAppContext();
+    const { updateElement } = actions;
+    const { setSelectedElement } = selectors;
+
     const form = useForm<propertiesFormSchemaType>({
         resolver: zodResolver(propertiesSchema),
         mode: "onSubmit",
@@ -256,7 +259,7 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
                                     variant={"outline"}
                                     className="gap-2"
                                     onClick={(e) => {
-                                        e.preventDefault(); // avoid submit
+                                        e.preventDefault();
                                         form.setValue("options", field.value.concat({ label: "New option", value: "new_option" }));
                                     }}
                                 >

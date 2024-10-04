@@ -1,190 +1,110 @@
-"use client";
+'use client';
 
 import React, { useEffect, useState } from "react";
+import { useAppContext } from "@/components/context/AppContext";
 import PreviewDialogBtn from "./PreviewDialogBtn";
-import PublishFormBtn from "./PublishFormBtn";
 import SaveFormBtn from "./SaveFormBtn";
 import Designer from "../Designer";
-import { DndContext, MouseSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
-import DragOverlayWrapper from "../DragOverlayWrapper";
-import useDesigner from "../hooks/useDesigner";
-import { ImSpinner2 } from "react-icons/im";
 import { Input } from "../ui/input";
+import { DndContext, MouseSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { ImSpinner2 } from "react-icons/im";
+import DragOverlayWrapper from "../DragOverlayWrapper";
 import { Button } from "../ui/button";
-import { toast } from "../ui/use-toast";
-import Link from "next/link";
-import { BsArrowLeft, BsArrowRight } from "react-icons/bs";
-import Confetti from "react-confetti";
-import { Form } from "@/types"; // Assuming this is the correct type
-import { ElementsType, FormElementInstance, FormElements } from "./FormElements";
+import { useRouter } from "next/navigation";
+import { useToast } from "../ui/use-toast";
 
-function FormBuilder({ form }: { form: Form }) {
-    const { setElements, setSelectedElement } = useDesigner();
-    const [isReady, setIsReady] = useState(false);
 
-    const mouseSensor = useSensor(MouseSensor, {
-        activationConstraint: {
-            distance: 10, // 10px
-        },
-    });
+function FormBuilder({ formName }: { formName: string }) {
+    const {
+        selectors: { handleFormNameChange, setSelectedElement },
+        data: { unsavedChanges, form },
+        actions: { saveForm, publishForm, addElement, removeElement, updateElement },
+    } = useAppContext();
 
-    const touchSensor = useSensor(TouchSensor, {
-        activationConstraint: {
-            delay: 300,
-            tolerance: 5,
-        },
-    });
+    const [isReady, setIsReady] = useState<boolean>(false);
+    const [isEditingName, setIsEditingName] = useState<boolean>(false);
+    const [isPublished, setIsPublished] = useState<boolean>(true); // Local state to track published status
+    const toast = useToast();
+    const router = useRouter();
 
+    const mouseSensor = useSensor(MouseSensor, { activationConstraint: { distance: 10 } });
+    const touchSensor = useSensor(TouchSensor, { activationConstraint: { delay: 300, tolerance: 5 } });
     const sensors = useSensors(mouseSensor, touchSensor);
 
-    // function mapFieldTypeToElementsType(field: string): ElementsType | undefined {
-    //     const typeMapping: { [key: string]: ElementsType } = {
-
-    //         "text": "TextField",
-    //         "title": "TitleField",
-    //         "subtitle": "SubTitleField",
-    //         "paragraph": "ParagraphField",
-    //         "separator": "SeparatorField",
-    //         "spacer": "SpacerField",
-    //         "number": "NumberField",
-    //         "textarea": "TextAreaField",
-    //         "date": "DateField",
-    //         "select": "SelectField",
-    //         "tel": "TelephoneField",
-    //         "checkbox": "CheckboxField",
-    //     }
-
-    //     const mappedType = typeMapping[field.toLowerCase()];
-    //     if (mappedType) {
-    //         return mappedType
-    //     } else {
-    //         console.warn(`Unknown field type: ${field}`);
-    //         return undefined
-    //     }
-
-    // }
-
-    function mapFieldTypeToElementsType(fieldType: string): ElementsType | undefined {
-        if (fieldType in FormElements) {
-            return fieldType as ElementsType;
-        } else {
-            console.warn(`Unknown field type: ${fieldType}`);
-            return undefined;
-        }
-    }
-
     useEffect(() => {
-        if (isReady) return;
-
-        const parsedFields = form.fields;
-
-        const elements = Array.isArray(parsedFields)
-            ? parsedFields.map((field: any) => {
-                const mappedType = mapFieldTypeToElementsType(field.type);
-                if (!mappedType) return null;
-                return {
-                    ...field,
-                    type: mappedType,
-                    extraAttributes: field.extraAttributes || {},
-                };
-            }).filter((element): element is FormElementInstance => element !== null)
-            : [];
-
-        setElements(elements);
         setSelectedElement(null);
         const readyTimeout = setTimeout(() => setIsReady(true), 500);
         return () => clearTimeout(readyTimeout);
-    }, [form, setElements, isReady, setSelectedElement]);
+    }, [setSelectedElement]);
 
+    // Check if the form is published or not
+    useEffect(() => {
+        if (form && form.published === false) {
+            setIsPublished(false);
+        } else {
+            setIsPublished(true);
+        }
+    }, [form]);
 
-
-    if (!isReady) {
-        return (
-            <div className="flex flex-col items-center justify-center w-full h-full">
-                <ImSpinner2 className="animate-spin h-12 w-12" />
-            </div>
-        );
-    }
-
-    const shareUrl = form.shareURL ? `${window.location.origin}/submit/${form.shareURL}` : '';
-
-    // Optionally, handle the undefined case gracefully in the UI
-
-    if (form.published) {
-        return (
-            <>
-                <Confetti
-                    width={window.innerWidth}
-                    height={window.innerHeight}
-                    recycle={false}
-                    numberOfPieces={1000}
-                />
-                <div className="flex flex-col items-center justify-center h-full w-full">
-                    <div className="max-w-md">
-                        <h1 className="text-center text-4xl font-bold text-primary border-b pb-2 mb-10">
-                            🎊🎊 Form Published 🎊🎊
-                        </h1>
-                        <h2 className="text-2xl">Share this form</h2>
-                        <h3 className="text-xl text-muted-foreground border-b pb-10">
-                            Anyone with the link can view and submit the form
-                        </h3>
-                        <div className="my-4 flex flex-col gap-2 items-center w-full border-b pb-4">
-                            <Input className="w-full" readOnly value={shareUrl} />
-                            <Button
-                                className="mt-2 w-full"
-                                onClick={() => {
-                                    navigator.clipboard.writeText(shareUrl);
-                                    toast({
-                                        title: "Copied!",
-                                        description: "Link copied to clipboard",
-                                    });
-                                }}
-                            >
-                                Copy link
-                            </Button>
-                        </div>
-                        <div className="flex justify-between">
-                            <Button variant={"link"} asChild>
-                                <Link href={"/"} className="gap-2">
-                                    <BsArrowLeft />
-                                    Go back home
-                                </Link>
-                            </Button>
-                            <Button variant={"link"} asChild>
-                                <Link href={`/forms/${form.id}`} className="gap-2">
-                                    Form details
-                                    <BsArrowRight />
-                                </Link>
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            </>
-        );
-    }
+    const shareUrl = `${window.location.origin}/submit/${encodeURIComponent(formName)}`;
 
     return (
         <DndContext sensors={sensors}>
-            <main className="flex flex-col w-full">
-                <nav className="flex justify-between border-b-2 p-4 gap-3 items-center">
-                    <h2 className="truncate font-medium">
-                        <span className="text-muted-foreground mr-2">Form:</span>
-                        {form.name}
-                    </h2>
-                    <div className="flex items-center gap-2">
-                        <PreviewDialogBtn />
-                        {!form.published && (
-                            <>
-                                <SaveFormBtn id={form.id} />
-                                <PublishFormBtn id={form.id} />
-                            </>
-                        )}
-                    </div>
-                </nav>
-                <div className="flex w-full flex-grow items-center justify-center relative overflow-y-auto h-[200px] bg-accent bg-[url(/paper.svg)] dark:bg-[url(/paper-dark.svg)]">
-                    <Designer />
+            {!isReady ? (
+                <div className="flex flex-col items-center justify-center w-full h-full">
+                    <ImSpinner2 className="animate-spin h-12 w-12" />
                 </div>
-            </main>
+            ) : (
+                <main className="flex flex-col w-full min-h-screen">
+                    <nav className="flex justify-between border-b-2 p-4 gap-3 items-center">
+                        <div className="flex items-center gap-2">
+                            <span className="text-muted-foreground mr">Form:</span>
+                            {isEditingName ? (
+                                <Input
+                                    value={formName}
+                                    onChange={(e) => handleFormNameChange(e.target.value)}
+                                    onBlur={() => setIsEditingName(false)}
+                                    autoFocus
+                                    placeholder="Enter your form title"
+                                    className="bg-gray-100"
+                                />
+                            ) : (
+                                <h2
+                                    className="truncate font-medium min-w-[190px] p-2 rounded-md cursor-pointer hover:bg-gray-100"
+                                    onClick={() => setIsEditingName(true)}
+                                >
+                                    {formName}
+                                </h2>
+                            )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                            {!isPublished && (
+                                <span className="text-red-500 font-bold">Unpublished</span>
+                            )}
+                            <PreviewDialogBtn />
+                            <SaveFormBtn />
+
+                            <Button
+                                variant={!isPublished ? "outline" : "default"}
+                                className="gap-2"
+                                onClick={() => {
+                                    !isPublished ?
+                                        publishForm("publish") :
+                                        publishForm("unpublish")
+                                }}
+                            >
+                                {!isPublished ? 'Publish' : 'Unpublish'}
+                            </Button>
+                            {isPublished ? (
+                                <Button onClick={() => router.push(shareUrl)}>View Form</Button>
+                            ) : null}
+                        </div>
+                    </nav>
+                    <div className="flex w-full flex-grow items-center justify-center relative overflow-y-auto h-[200px] bg-accent bg-[url(/paper.svg)] dark:bg-[url(/paper-dark.svg)]">
+                        <Designer />
+                    </div>
+                </main>
+            )}
             <DragOverlayWrapper />
         </DndContext>
     );

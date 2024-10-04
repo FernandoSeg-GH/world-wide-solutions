@@ -1,24 +1,33 @@
-import { GetFormContentByUrl } from "@/actions/form";
-import { FormElementInstance } from "@/components/forms/FormElements";
-import FormSubmitComponent from "@/components/FormSubmitComponent";
-import React from "react";
+'use client';
 
-async function SubmitPage({
-    params,
-}: {
-    params: {
-        formUrl: string;
-    };
-}) {
-    const form = await GetFormContentByUrl(params.formUrl);
+import { useEffect } from "react";
+import FormSubmitComponent from "@/components/forms/FormSubmitComponent";
+import { useAppContext } from "@/components/context/AppContext";
 
-    if (!form) {
-        throw new Error("form not found");
-    }
+const SubmitPage = ({ params }: { params: { formUrl: string } }) => {
+    const { formUrl } = params;
+    const { data, actions } = useAppContext();
+    const { form } = data;
 
-    const formContent = form.fields as FormElementInstance[];
+    // Destructure the specific functions you need outside of the `useEffect` hook
+    const { fetchFormByShareUrlPublic, fetchSubmissions } = actions;
 
-    return <FormSubmitComponent formUrl={params.formUrl} content={formContent} />;
-}
+    // Decode the URL parameter
+    const decodedFormUrl = decodeURIComponent(formUrl);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            await fetchFormByShareUrlPublic(decodedFormUrl); // Use decoded URL
+            // await fetchSubmissions(decodedFormUrl); // Use decoded URL
+        };
+
+        fetchData(); // Fetch data only once
+        // }, [decodedFormUrl, fetchFormByShareUrlPublic, fetchSubmissions]); // Only re-run when `formUrl` changes
+    }, [decodedFormUrl, fetchFormByShareUrlPublic]); // Only re-run when `formUrl` changes
+
+    if (!form) return <div>Form not found</div>;
+
+    return <FormSubmitComponent formUrl={decodedFormUrl} />;
+};
 
 export default SubmitPage;

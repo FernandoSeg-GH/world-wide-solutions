@@ -1,12 +1,16 @@
 import React from "react";
-import useDesigner from "./hooks/useDesigner";
 import { FormElements } from "./forms/FormElements";
 import { AiOutlineClose } from "react-icons/ai";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
+import { useAppContext } from "./context/AppContext";
 
 function PropertiesFormSidebar() {
-    const { selectedElement, setSelectedElement } = useDesigner();
+    const {
+        data: { selectedElement },
+        selectors: { setSelectedElement },
+    } = useAppContext();
+
     if (!selectedElement) return null;
 
     const PropertiesForm = FormElements[selectedElement?.type].propertiesComponent;

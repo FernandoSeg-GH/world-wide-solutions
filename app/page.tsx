@@ -1,101 +1,249 @@
-import Image from "next/image";
+
+"use client";
+
+import { useEffect, useState } from "react";
+import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Label } from "@/components/ui/label";
+import { toast } from "@/components/ui/use-toast";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    const [isRegistering, setIsRegistering] = useState(false);
+    const { data: session, status } = useSession();
+    const router = useRouter();
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    useEffect(() => {
+        if (status === "authenticated") {
+            router.push("/dashboard");
+        }
+    }, [status, router]);
+
+    return (
+        <div className="flex items-center justify-center min-h-screen w-screen p-4">
+            <Card className="w-full max-w-md -mt-36">
+                <CardHeader>
+                    <CardTitle>{isRegistering ? "Sign Up" : "Sign In"}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    {isRegistering ? (
+                        <SignUpForm onToggle={() => setIsRegistering(false)} />
+                    ) : (
+                        <SignInForm onToggle={() => setIsRegistering(true)} />
+                    )}
+                </CardContent>
+            </Card>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+    );
+}
+
+function SignInForm({ onToggle }: { onToggle: () => void }) {
+    const [loading, setLoading] = useState(false);
+    const [push, setPush] = useState(false);
+    const router = useRouter();
+    const [credentials, setCredentials] = useState({
+        username: "",
+        password: "",
+    });
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+
+        const res = await signIn("credentials", {
+            username: credentials.username,
+            password: credentials.password,
+            redirect: true,
+            callbackUrl: "/dashboard",
+        });
+
+        setLoading(false);
+
+        if (res?.error) {
+            toast({
+                title: "Error",
+                description: res.error,
+                variant: "destructive",
+            });
+        } else {
+            toast({
+                title: "Success",
+                description: "You have successfully signed in.",
+            });
+            setPush(!push)
+            router.push('/dashboard')
+        }
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+                <Label htmlFor="username">Username</Label>
+                <Input
+                    id="username"
+                    type="text"
+                    value={credentials.username}
+                    onChange={(e) =>
+                        setCredentials({ ...credentials, username: e.target.value })
+                    }
+                    required
+                />
+            </div>
+            <div>
+                <Label htmlFor="password">Password</Label>
+                <Input
+                    id="password"
+                    type="password"
+                    value={credentials.password}
+                    onChange={(e) =>
+                        setCredentials({ ...credentials, password: e.target.value })
+                    }
+                    required
+                />
+            </div>
+            <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Signing in..." : "Sign In"}
+            </Button>
+            <Separator />
+            <p className="text-sm text-center">
+                Don't have an account?{" "}
+                <Button variant="link" onClick={onToggle}>
+                    Sign Up
+                </Button>
+            </p>
+        </form>
+    );
+}
+
+function SignUpForm({ onToggle }: { onToggle: () => void }) {
+    const [loading, setLoading] = useState(false);
+    const router = useRouter();
+    const [formData, setFormData] = useState({
+        username: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+    });
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+
+        if (formData.password !== formData.confirmPassword) {
+            toast({
+                title: "Error",
+                description: "Passwords do not match.",
+                variant: "destructive",
+            });
+            setLoading(false);
+            return;
+        }
+
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/auth/register`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    username: formData.username,
+                    email: formData.email,
+                    password: formData.password,
+                    role_id: 1
+                }),
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                toast({
+                    title: "Success",
+                    description: "Registration successful. You can now sign in.",
+                });
+                onToggle();
+                router.push('/auth/sign-in')
+            } else {
+                toast({
+                    title: "Error",
+                    description: data.message || "Registration failed.",
+                    variant: "destructive",
+                });
+            }
+        } catch (error) {
+            console.error("Registration error:", error);
+            toast({
+                title: "Error",
+                description: "An error occurred during registration.",
+                variant: "destructive",
+            });
+        }
+
+        setLoading(false);
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+                <Label htmlFor="username">Username</Label>
+                <Input
+                    id="username"
+                    type="text"
+                    value={formData.username}
+                    onChange={(e) =>
+                        setFormData({ ...formData, username: e.target.value })
+                    }
+                    required
+                />
+            </div>
+            <div>
+                <Label htmlFor="email">Email</Label>
+                <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) =>
+                        setFormData({ ...formData, email: e.target.value })
+                    }
+                    required
+                />
+            </div>
+            <div>
+                <Label htmlFor="password">Password</Label>
+                <Input
+                    id="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) =>
+                        setFormData({ ...formData, password: e.target.value })
+                    }
+                    required
+                />
+            </div>
+            <div>
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Input
+                    id="confirmPassword"
+                    type="password"
+                    value={formData.confirmPassword}
+                    onChange={(e) =>
+                        setFormData({ ...formData, confirmPassword: e.target.value })
+                    }
+                    required
+                />
+            </div>
+            <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Signing up..." : "Sign Up"}
+            </Button>
+            <Separator />
+            <p className="text-sm text-center">
+                Already have an account?{" "}
+                <Button variant="link" onClick={onToggle}>
+                    Sign In
+                </Button>
+            </p>
+        </form>
+    );
 }

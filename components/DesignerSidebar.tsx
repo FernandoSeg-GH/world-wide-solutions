@@ -1,10 +1,12 @@
 import React from "react";
-import useDesigner from "./hooks/useDesigner";
-import FormElementsSidebar from "./FormElementsSidebar";
+import { useAppContext } from "./context/AppContext";
+
 import PropertiesFormSidebar from "./PropertiesFormSidebar";
+import FormElementsSidebar from "./forms/FormElementsSidebar";
 
 function DesignerSidebar() {
-  const { selectedElement } = useDesigner();
+  const { data: { selectedElement } } = useAppContext();
+
   return (
     <aside className="w-[400px] max-w-[400px] flex flex-col flex-grow gap-2 border-l-2 border-muted p-4 bg-background overflow-y-auto h-full">
       {!selectedElement && <FormElementsSidebar />}
