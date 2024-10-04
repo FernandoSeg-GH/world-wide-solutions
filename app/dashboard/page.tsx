@@ -30,35 +30,29 @@ export default function Dashboard() {
       <Welcome />
       {/* {loading || formLoading ? <Skeleton className="min-w-80 w-full min-h-20" /> : null} */}
 
-      <div className="w-auto">
-        {!session?.user.businessId && (session?.user.role.id === 4 || session?.user.role.id === 3) &&
+      <div className="w-full">
+        {!session?.user.businessId && session?.user.role.id !== 1 &&
           <CreateBusinessForm />
         }
-        {forms && (session?.user.role.id === 4 || session?.user.role.id === 3) ? (
+        {forms && session?.user.role.id !== 1 ? (
           <div className="px-4 py-6 border w-full mt-10 rounded-lg text-left shadow-md">
             <h2 className="text-2xl font-semibold col-span-2 mb-2">Your forms</h2>
             {forms.map((form) => <p key={form?.name}>{form.name}</p>)}
             <FormCards forms={forms} />
           </div>
-        ) : <SubmissionFormCard forms={forms} />}
-
-        {forms && submissions &&
-          <div className="px-4 py-6 border mt-10 rounded-lg text-left shadow-md w-auto">
-
-            {form && (session?.user.role.id === 4 || session?.user.role.id === 3) ? (
-              <div className="flex flex-col gap-6 ">
-                {forms.map((form, index) => {
-                  return (
-                    <SubmissionsTable key={index} form={form} submissions={submissions ?? []} admin />
-                  )
-                })}
-              </div>
-            ) : form && (
-              <ClientView form={form} submissions={submissions ?? []} />
-            )}
-          </div>
+        ) : <SubmissionFormCard forms={forms} />
         }
       </div>
+
+      {forms && submissions &&
+        form && session?.user.role.id !== 1 ?
+        forms.map((form, index) =>
+          <SubmissionsTable key={index} form={form} submissions={submissions ?? []} admin />
+        ) : form ? (
+          <ClientView form={form} submissions={submissions ?? []} />
+        ) : null
+
+      }
     </div>
   );
 }

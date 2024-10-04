@@ -75,7 +75,7 @@ function SubmissionsTable({ submissions, form, admin }: { submissions: Submissio
     }
 
     return (
-        <div className='w-auto flex flex-col items-start justify-start'>
+        <div className='w-full flex flex-col items-start justify-start'>
             <h1 className="text-2xl font-bold my-4">Submissions</h1>
             <h2 className="text-2xl font-semibold col-span-2 mb-2">Form: <span className='font-normal'>{form.name}</span></h2>
             <div className="rounded-md border w-full">
