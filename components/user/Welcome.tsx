@@ -19,7 +19,7 @@ function Welcome({ }: Props) {
                     <h1 className="text-2xl font-bold">
                         Welcome <span className="capitalize">{session.user.username}</span>!
                     </h1>
-                    <p className='text-xl leading-7'>This is your personal dashboard. You may follow up and check on the submitted infromtion for your current case.</p>
+                    <p className='text-xl leading-7'>This is your personal dashboard. You may follow up and check on the submitted infromation for your current case.</p>
                 </div>
             )}
             {status !== "authenticated" && (

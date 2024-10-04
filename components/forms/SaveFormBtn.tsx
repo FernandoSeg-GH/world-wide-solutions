@@ -5,12 +5,16 @@ import { Button } from "../ui/button";
 import { HiSaveAs } from "react-icons/hi";
 import { FaSpinner } from "react-icons/fa";
 import { useAppContext } from "../context/AppContext";
+import { DiscIcon } from "@radix-ui/react-icons";
 
-function SaveFormBtn() {
+type SaveFormBtnType = {
+    unsavedChanges: boolean
+    loading: boolean
+}
+
+function SaveFormBtn({ unsavedChanges, loading }: SaveFormBtnType) {
     const {
-        data: { unsavedChanges },
         actions: { saveForm },
-        data: { loading },
     } = useAppContext();
 
     const handleSave = async () => {
@@ -20,19 +24,29 @@ function SaveFormBtn() {
             console.error("Error during saveForm:", error);
         }
     };
-
-    return (
+    if (unsavedChanges) {
+        return (
+            <Button
+                variant={unsavedChanges ? "default" : "outline"}
+                className={`gap-2 ${unsavedChanges ? "" : ""}`}
+                disabled={loading}
+                onClick={handleSave}
+            >
+                <DiscIcon className="h-4 w-4" />
+                {loading ? "Saving..." : "Save"}
+                {loading && <FaSpinner className="animate-spin" />}
+            </Button>
+        );
+    } else {
         <Button
-            variant={unsavedChanges ? "default" : "outline"}
-            className={`gap-2 ${unsavedChanges ? "bg-yellow-500" : ""}`}
+            variant={"outline"}
             disabled={loading}
-            onClick={handleSave}
         >
-            <HiSaveAs className="h-4 w-4" />
+            <DiscIcon className="h-4 w-4" />qdwqdqw
             {loading ? "Saving..." : "Save"}
-            {loading && <FaSpinner className="animate-spin" />}
         </Button>
-    );
+
+    }
 }
 
 export default SaveFormBtn;

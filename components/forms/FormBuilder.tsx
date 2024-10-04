@@ -17,7 +17,7 @@ import { useToast } from "../ui/use-toast";
 function FormBuilder({ formName }: { formName: string }) {
     const {
         selectors: { handleFormNameChange, setSelectedElement },
-        data: { unsavedChanges, form },
+        data: { unsavedChanges, form, loading },
         actions: { saveForm, publishForm, addElement, removeElement, updateElement },
     } = useAppContext();
 
@@ -78,11 +78,11 @@ function FormBuilder({ formName }: { formName: string }) {
                             )}
                         </div>
                         <div className="flex items-center gap-2">
-                            {!isPublished && (
+                            {/* {!isPublished && (
                                 <span className="text-red-500 font-bold">Unpublished</span>
-                            )}
+                            )} */}
                             <PreviewDialogBtn />
-                            <SaveFormBtn />
+                            <SaveFormBtn unsavedChanges={unsavedChanges} loading={loading} />
 
                             <Button
                                 variant={!isPublished ? "outline" : "default"}
