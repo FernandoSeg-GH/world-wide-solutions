@@ -62,14 +62,11 @@ export const authOptions: NextAuthOptions = {
       },
       authorize: async (credentials) => {
         try {
-          const res = await fetch(
-            `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/auth/login`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(credentials),
-            }
-          );
+          const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(credentials),
+          });
 
           const data = await res.json();
           if (res.ok && data.access_token) {
