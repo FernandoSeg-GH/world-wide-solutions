@@ -48,7 +48,7 @@ async function refreshAccessToken(token: JWT) {
 }
 
 export const authOptions: NextAuthOptions = {
-  useSecureCookies: false,
+  useSecureCookies: process.env.NODE_ENV === "production",
   pages: {
     signIn: "/auth/sign",
     signOut: "/",
