@@ -20,7 +20,7 @@ export default function Home() {
         if (status === "authenticated" && session?.accessToken) {
             router.push("/dashboard");
         }
-    }, [status, router]);
+    }, [session]);
 
     return (
         <div className="flex items-center justify-center min-h-screen w-screen p-4">
