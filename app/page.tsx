@@ -17,7 +17,7 @@ export default function Home() {
     const router = useRouter();
 
     useEffect(() => {
-        if (status === "authenticated") {
+        if (status === "authenticated" && session?.accessToken) {
             router.push("/dashboard");
         }
     }, [status, router]);

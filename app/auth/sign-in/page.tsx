@@ -49,7 +49,7 @@ function SignInForm({ onToggle }: { onToggle: () => void }) {
     const res = await signIn("credentials", {
       username: credentials.username,
       password: credentials.password,
-      redirect: true,
+      redirect: false,
       callbackUrl: "/dashboard",
     });
 
@@ -61,7 +61,7 @@ function SignInForm({ onToggle }: { onToggle: () => void }) {
         description: res.error,
         variant: "destructive",
       });
-    } else if (res?.error) {
+    } else {
       toast({
         title: "Success",
         description: "You have successfully signed in.",
