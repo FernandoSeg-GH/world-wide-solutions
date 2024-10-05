@@ -12,6 +12,7 @@ export async function middleware(req: NextRequest) {
   if (
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/forms") ||
+    pathname.startsWith("/submit") ||
     pathname.startsWith("/builder")
   ) {
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
@@ -25,5 +26,10 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/forms/:path*", "/builder/:path*"],
+  matcher: [
+    "/dashboard/:path*",
+    "/forms/:path*",
+    "/builder/:path*",
+    "/submit/:path*",
+  ],
 };

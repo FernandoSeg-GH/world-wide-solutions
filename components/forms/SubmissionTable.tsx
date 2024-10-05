@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Submission, Form } from '@/types';
+import { Submission, Form, ElementsType } from '@/types';
 import { cn } from '@/lib/utils';
 
 interface Row {
@@ -11,8 +11,21 @@ interface Row {
 
 function SubmissionsTable({ submissions, form, admin }: { submissions: Submission[]; form: Form, admin?: boolean }) {
     if (!Array.isArray(submissions) || submissions.length === 0) {
-        return <div>No submissions found</div>;
+        return <></>;
     }
+
+    const isInputField = (fieldType: ElementsType): boolean => {
+        const inputFieldTypes: ElementsType[] = [
+            "TextField",
+            "NumberField",
+            "TextAreaField",
+            "DateField",
+            "SelectField",
+            "TelephoneField",
+            "CheckboxField"
+        ];
+        return inputFieldTypes.includes(fieldType);
+    };
 
     const rows = submissions.map((submission) => {
         let parsedContent: { [key: string]: any } = {};
@@ -23,30 +36,48 @@ function SubmissionsTable({ submissions, form, admin }: { submissions: Submissio
         }
 
         const row: { [key: string]: any } = {
-            submittedAt: submission.createdAt,  // Ensure this field exists and is correctly formatted
+            submittedAt: submission.createdAt,
         };
 
         form.fields.forEach((field) => {
-            row[field.id] = parsedContent[field.id] ?? 'No data';  // Map content to form fields
+            if (isInputField(field.type) && parsedContent[field.id] !== undefined) {
+                row[field.id] = parsedContent[field.id];
+            }
         });
-
         return row;
     });
 
 
     const fieldMap = form.fields.reduce((acc: { [key: string]: string }, field) => {
-        acc[field.id] = field.extraAttributes?.label || `Field ${field.id}`;
+        if (isInputField(field.type)) {
+            acc[field.id] = field.extraAttributes?.label || `Field ${field.id}`;
+        }
         return acc;
     }, {});
 
-    const fieldKeys = form.fields.map((field) => field.id);
 
+    const fieldKeys = Object.keys(fieldMap);
+
+    function formatDate(dateString: string): string {
+        const date = new Date(dateString);
+
+        const options: Intl.DateTimeFormatOptions = {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            timeZoneName: 'short',
+        };
+
+        return date.toLocaleDateString('en-US', options);
+    }
+    console.log('submissions', submissions)
     return (
         <div className='w-full flex flex-col items-start justify-start'>
-            {!admin ?
-                <h1 className="text-2xl font-bold my-4">Submissions</h1> :
-                <h1 className="text-2xl font-bold my-4">Form: <span className='font-normal'>{form.name}</span></h1>
-            }
+            <h1 className="text-2xl font-bold my-4">Submissions</h1>
+            <h2 className="text-2xl font-semibold col-span-2 mb-2">Form: <span className='font-normal'>{form.name}</span></h2>
             <div className="rounded-md border w-full">
                 <Table className={cn("w-full")}>
                     <TableHeader>
@@ -60,16 +91,19 @@ function SubmissionsTable({ submissions, form, admin }: { submissions: Submissio
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {rows.map((row, index) => (
-                            <TableRow key={index}>
-                                {fieldKeys.map((key) => (
-                                    <TableCell key={key}>{row[key] || 'No data'}</TableCell>
-                                ))}
-                                <TableCell className="text-muted-foreground text-right">
-                                    {new Date(row.submittedAt).toLocaleString() || 'Invalid Date'}
-                                </TableCell>
-                            </TableRow>
-                        ))}
+                        {rows.map((row, index) => {
+                            console.log('row', row)
+                            return (
+                                <TableRow key={index}>
+                                    {fieldKeys.map((key) => (
+                                        <TableCell key={key}>{row[key]}</TableCell>
+                                    ))}
+                                    <TableCell className="text-muted-foreground text-right">
+                                        {formatDate(row.submittedAt)}
+                                    </TableCell>
+                                </TableRow>
+                            )
+                        })}
                     </TableBody>
                 </Table>
             </div>

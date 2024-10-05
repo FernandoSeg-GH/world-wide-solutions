@@ -17,7 +17,7 @@ import { useToast } from "../ui/use-toast";
 function FormBuilder({ formName }: { formName: string }) {
     const {
         selectors: { handleFormNameChange, setSelectedElement },
-        data: { unsavedChanges, form },
+        data: { unsavedChanges, form, loading },
         actions: { saveForm, publishForm, addElement, removeElement, updateElement },
     } = useAppContext();
 
@@ -27,9 +27,11 @@ function FormBuilder({ formName }: { formName: string }) {
     const toast = useToast();
     const router = useRouter();
 
-    const mouseSensor = useSensor(MouseSensor, { activationConstraint: { distance: 10 } });
-    const touchSensor = useSensor(TouchSensor, { activationConstraint: { delay: 300, tolerance: 5 } });
+    const mouseSensor = useSensor(MouseSensor);
+    const touchSensor = useSensor(TouchSensor);
     const sensors = useSensors(mouseSensor, touchSensor);
+
+
 
     useEffect(() => {
         setSelectedElement(null);
@@ -49,7 +51,9 @@ function FormBuilder({ formName }: { formName: string }) {
     const shareUrl = `${window.location.origin}/submit/${encodeURIComponent(formName)}`;
 
     return (
-        <DndContext sensors={sensors}>
+        <DndContext
+            sensors={sensors}
+        >
             {!isReady ? (
                 <div className="flex flex-col items-center justify-center w-full h-full">
                     <ImSpinner2 className="animate-spin h-12 w-12" />
@@ -78,11 +82,11 @@ function FormBuilder({ formName }: { formName: string }) {
                             )}
                         </div>
                         <div className="flex items-center gap-2">
-                            {!isPublished && (
+                            {/* {!isPublished && (
                                 <span className="text-red-500 font-bold">Unpublished</span>
-                            )}
+                            )} */}
                             <PreviewDialogBtn />
-                            <SaveFormBtn />
+                            <SaveFormBtn unsavedChanges={unsavedChanges} loading={loading} />
 
                             <Button
                                 variant={!isPublished ? "outline" : "default"}
@@ -100,7 +104,7 @@ function FormBuilder({ formName }: { formName: string }) {
                             ) : null}
                         </div>
                     </nav>
-                    <div className="flex w-full flex-grow items-center justify-center relative overflow-y-auto h-[200px] bg-accent bg-[url(/paper.svg)] dark:bg-[url(/paper-dark.svg)]">
+                    <div className="flex w-full flex-grow items-center justify-center relative overflow-y-auto h-[210px] bg-accent bg-[url(/paper.svg)] dark:bg-[url(/paper-dark.svg)]">
                         <Designer />
                     </div>
                 </main>
