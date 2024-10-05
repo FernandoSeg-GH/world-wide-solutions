@@ -11,7 +11,7 @@ interface Row {
 
 function SubmissionsTable({ submissions, form, admin }: { submissions: Submission[]; form: Form, admin?: boolean }) {
     if (!Array.isArray(submissions) || submissions.length === 0) {
-        return <></>;
+        return <p className="text-muted-foreground">No submissions available.</p>;
     }
 
     const isInputField = (fieldType: ElementsType): boolean => {
@@ -63,7 +63,7 @@ function SubmissionsTable({ submissions, form, admin }: { submissions: Submissio
 
         const options: Intl.DateTimeFormatOptions = {
             year: 'numeric',
-            month: 'long',
+            month: 'short',
             day: 'numeric',
             hour: '2-digit',
             minute: '2-digit',
@@ -73,37 +73,36 @@ function SubmissionsTable({ submissions, form, admin }: { submissions: Submissio
 
         return date.toLocaleDateString('en-US', options);
     }
-    console.log('submissions', submissions)
+
     return (
-        <div className='w-full flex flex-col items-start justify-start'>
-            <h1 className="text-2xl font-bold my-4">Submissions</h1>
-            <h2 className="text-2xl font-semibold col-span-2 mb-2">Form: <span className='font-normal'>{form.name}</span></h2>
-            <div className="rounded-md border w-full">
-                <Table className={cn("w-full")}>
+        <div className="w-full flex flex-col items-start justify-start my-10">
+            <h1 className="text-3xl font-bold my-6">Submissions</h1>
+            <h2 className="text-2xl font-semibold mb-6">Form: <span className='font-normal'>{form.name}</span></h2>
+            <div className="rounded-lg border shadow-sm w-full overflow-x-auto">
+                <Table className={cn("w-full table-auto")}>
                     <TableHeader>
-                        <TableRow>
+                        <TableRow className="bg-gray-100">
                             {fieldKeys.map((fieldKey) => (
-                                <TableHead key={fieldKey} className="uppercase">
+                                <TableHead key={fieldKey} className="uppercase text-sm font-semibold px-6 py-3">
                                     {fieldMap[fieldKey] || `Field ${fieldKey}`}
                                 </TableHead>
                             ))}
-                            <TableHead className="uppercase">Submitted At</TableHead>
+                            <TableHead className="uppercase text-sm font-semibold px-6 py-3">Submitted At</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {rows.map((row, index) => {
-                            console.log('row', row)
-                            return (
-                                <TableRow key={index}>
-                                    {fieldKeys.map((key) => (
-                                        <TableCell key={key}>{row[key]}</TableCell>
-                                    ))}
-                                    <TableCell className="text-muted-foreground text-right">
-                                        {formatDate(row.submittedAt)}
+                        {rows.map((row, index) => (
+                            <TableRow key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                                {fieldKeys.map((key) => (
+                                    <TableCell key={key} className="px-6 py-4 text-sm text-gray-700">
+                                        {row[key] || <span className="text-gray-400">N/A</span>}
                                     </TableCell>
-                                </TableRow>
-                            )
-                        })}
+                                ))}
+                                <TableCell className="px-6 py-4 text-sm text-gray-600 text-right">
+                                    {formatDate(row.submittedAt)}
+                                </TableCell>
+                            </TableRow>
+                        ))}
                     </TableBody>
                 </Table>
             </div>

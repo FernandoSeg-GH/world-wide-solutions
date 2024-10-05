@@ -45,7 +45,6 @@ export default function Dashboard() {
       </div>
       <div className="flex flex-col gap-6 w-full">
         <div>
-
           {form && session?.user.role.id !== 1 && forms && submissions ?
             forms.map((form, index) =>
               <SubmissionsTable key={index} form={form} submissions={submissions} admin />

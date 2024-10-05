@@ -29,13 +29,12 @@ export default function ClientView({ form, submissions }: ClientViewProps) {
 
     useEffect(() => {
         if (submissions.length) {
+            console.log('submissions', submissions)
             const parsedSubmissions = submissions.map(submission => ({
                 ...submission,
                 content: JSON.parse(submission.content)
             }));
             setUserSubmissions(parsedSubmissions);
-        } else {
-            setUserSubmissions([]); // Clear if no submissions are available
         }
     }, [submissions]);
 
@@ -44,6 +43,7 @@ export default function ClientView({ form, submissions }: ClientViewProps) {
     return (
         <div className="w-full flex flex-col py-8 px-6 bg-white shadow-md rounded-lg">
             <h2 className="text-3xl font-semibold mb-6">Your Submissions</h2>
+            <p className="text-italic mb-3">Esta sección será editable, y los usuarios podrán actualizar su información:</p>
             {userSubmissions.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {userSubmissions.map((submission, index) => {

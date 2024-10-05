@@ -99,7 +99,7 @@ function FormCard({ form }: { form: Form }) {
                 <CardTitle className="flex items-center gap-2 justify-between">
                     <div className="flex items-center justify-between gap-2 w-full">
 
-                        <p className="truncate text-ellipsis font-bold">{form.name}</p>
+                        <span className="truncate text-ellipsis font-bold">{form.name}</span>
 
                         {session?.user.role.id !== 1 ?
                             <div className='flex items-center gap-2'>
@@ -156,10 +156,10 @@ function FormCard({ form }: { form: Form }) {
                 </CardDescription>
             </CardHeader>
             <CardContent className="h-[20px] truncate text-sm text-muted-foreground">
-                {form.description || 'No description'}
+                {form.description || ''}
             </CardContent>
             <CardFooter>
-                <div className='flex flex-col w-full'>
+                {session?.user.role.id !== 1 ? <div className='flex flex-col w-full'>
                     {publishedStatus ? (
                         <Button className="w-full mt-2 text-md gap-4" onClick={() => router.push(`/forms/${form.shareURL}`)}>
                             View submissions <BiRightArrowAlt />
@@ -171,7 +171,10 @@ function FormCard({ form }: { form: Form }) {
                             </Button>
                         </Button>
                     )}
+                </div> : <div>
+                    <p>You have already submitted this forms.</p>
                 </div>
+                }
             </CardFooter>
 
             <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
