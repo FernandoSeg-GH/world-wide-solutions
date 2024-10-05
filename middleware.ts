@@ -5,6 +5,10 @@ import type { NextRequest } from "next/server";
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
+  if (pathname.startsWith("/auth")) {
+    return NextResponse.next();
+  }
+
   if (pathname === "/forms/submit") {
     return NextResponse.next();
   }
