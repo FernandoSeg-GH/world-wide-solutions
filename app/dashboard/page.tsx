@@ -31,28 +31,35 @@ export default function Dashboard() {
       {/* {loading || formLoading ? <Skeleton className="min-w-80 w-full min-h-20" /> : null} */}
 
       <div className="w-full">
-        {!session?.user.businessId && session?.user.role.id !== 1 &&
-          <CreateBusinessForm />
+        {!session?.user?.businessId && session?.user?.role.id !== 1 ?
+          <CreateBusinessForm /> : null
         }
         {forms && session?.user.role.id !== 1 ? (
           <div className="px-4 py-6 border w-full mt-10 rounded-lg text-left shadow-md">
             <h2 className="text-2xl font-semibold col-span-2 mb-2">Your forms</h2>
-            {forms.map((form) => <p key={form?.name}>{form.name}</p>)}
+            {/* {forms.map((form) => <p key={form?.name}>{form.name}</p>)} */}
             <FormCards forms={forms} />
           </div>
         ) : <SubmissionFormCard forms={forms} />
         }
       </div>
+      <div className="flex flex-col gap-6 w-full">
+        <div>
 
-      {forms && submissions &&
-        form && session?.user.role.id !== 1 ?
-        forms.map((form, index) =>
-          <SubmissionsTable key={index} form={form} submissions={submissions ?? []} admin />
-        ) : form ? (
-          <ClientView form={form} submissions={submissions ?? []} />
-        ) : null
-
-      }
+          {form && session?.user.role.id !== 1 && forms && submissions ?
+            forms.map((form, index) =>
+              <SubmissionsTable key={index} form={form} submissions={submissions} admin />
+            )
+            : null
+          }
+        </div>
+        <div className="w-full">
+          {form ?
+            <ClientView form={form} submissions={submissions ?? []} />
+            : null
+          }
+        </div>
+      </div>
     </div>
   );
 }

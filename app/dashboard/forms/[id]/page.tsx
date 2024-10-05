@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { formatDistance } from 'date-fns';
 import { useAppContext } from '@/components/context/AppContext';
 import { Form, Submission } from '@/types';
+import SubmissionsTable from '@/components/forms/SubmissionTable';
 
 const FormDetailPage = ({ params }: { params: { id: string } }) => {
     const [loading, setLoading] = useState(true);
@@ -71,55 +72,3 @@ const FormDetailPage = ({ params }: { params: { id: string } }) => {
 };
 
 export default FormDetailPage;
-
-function SubmissionsTable({ submissions, form }: { submissions: Submission[], form: Form }) {
-    if (!Array.isArray(submissions) || submissions.length === 0) {
-        return <div>No submissions found</div>;
-    }
-    const rows = submissions.map((submission) => {
-        const parsedContent = JSON.parse(submission.content);
-        return {
-            ...parsedContent,
-            submittedAt: submission.createdAt,
-        };
-    });
-
-    const fieldMap = form.fields.reduce((acc: { [key: string]: string }, field) => {
-        acc[field.id] = field.extraAttributes?.label || `Field ${field.id}`;
-        return acc;
-    }, {});
-
-    const fieldKeys = Object.keys(rows[0]).filter((key) => key !== 'submittedAt');
-
-    return (
-        <div>
-            <h1 className="text-2xl font-bold my-4">Submissions</h1>
-            <div className="rounded-md border">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            {fieldKeys.map((fieldKey) => (
-                                <TableHead key={fieldKey} className="uppercase">
-                                    {fieldMap[fieldKey] || `Field ${fieldKey}`}
-                                </TableHead>
-                            ))}
-                            <TableHead className="uppercase">Submitted At</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {rows.map((row, index) => (
-                            <TableRow key={index}>
-                                {fieldKeys.map((key) => (
-                                    <TableCell key={key}>{row[key]}</TableCell>
-                                ))}
-                                <TableCell className="text-muted-foreground text-right">
-                                    {row.submittedAt}
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </div>
-        </div>
-    );
-}

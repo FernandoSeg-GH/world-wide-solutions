@@ -276,7 +276,7 @@ function FormBuilder({ formName }: { formName: string }) {
               ) : null}
             </div>
           </nav>
-          <div className="flex w-full flex-grow items-center justify-center relative overflow-y-auto h-[200px] bg-accent bg-[url(/paper.svg)] dark:bg-[url(/paper-dark.svg)]">
+          <div className="flex w-full flex-grow items-center justify-center relative overflow-y-auto h-[210px] bg-accent bg-[url(/paper.svg)] dark:bg-[url(/paper-dark.svg)]">
             <Designer />
           </div>
         </main>

@@ -94,41 +94,43 @@ function FormCard({ form }: { form: Form }) {
         ? formatDistance(new Date(form.createdAt), new Date(), { addSuffix: true })
         : 'Unknown time';
     return (
-        <Card className={cn('lg:max-w-[450px] w-full', session?.user.role.id !== 1 ? ' h-[200px] ' : 'h-auto')}>
+        <Card className={cn('lg:max-w-[450px] w-full', session?.user.role.id !== 1 ? ' h-[210px] ' : 'h-auto')}>
             <CardHeader>
                 <CardTitle className="flex items-center gap-2 justify-between">
                     <div className="flex items-center justify-between gap-2 w-full">
-                        <div>
-                            <span className="truncate text-ellipsis font-bold">{form.name}</span>
-                        </div>
-                        {session?.user.role.id !== 1 ? <div className='flex items-center gap-2'>
-                            {publishedStatus ? <Badge variant="default" className='bg-blue-500'>Published</Badge> : <Badge variant="outline">Unpublished</Badge>}
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" className="h-8 w-8 p-0">
-                                        <span className="sr-only">Open menu</span>
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                            <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM18 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                        </svg>
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent>
-                                    <DropdownMenuItem onSelect={handlePublishToggle} disabled={isPublishing}>
-                                        {isPublishing ? "Processing..." : publishedStatus ? "Unpublish Form" : "Publish Form"}
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onSelect={() => setIsAlertOpen(true)} disabled={publishedStatus}>
-                                        {publishedStatus ? "Unpublish to Delete" : "Delete Form"}
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </div> : null}
+
+                        <p className="truncate text-ellipsis font-bold">{form.name}</p>
+
+                        {session?.user.role.id !== 1 ?
+                            <div className='flex items-center gap-2'>
+                                {publishedStatus ? <Badge variant="default" className='bg-blue-500'>Published</Badge> : <Badge variant="outline">Unpublished</Badge>}
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" className="h-8 w-8 p-0">
+                                            <span className="sr-only">Open menu</span>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM18 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                            </svg>
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent>
+                                        <DropdownMenuItem onSelect={handlePublishToggle} disabled={isPublishing}>
+                                            {isPublishing ? "Processing..." : publishedStatus ? "Unpublish Form" : "Publish Form"}
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => setIsAlertOpen(true)} disabled={publishedStatus}>
+                                            {publishedStatus ? "Unpublish to Delete" : "Delete Form"}
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div> : null
+                        }
                     </div>
                 </CardTitle>
                 <CardDescription className="flex items-center justify-between text-muted-foreground text-sm">
                     <div>
                         {session?.user.role.id !== 1 ?
                             <div>
-                                <span>{formattedDistance}</span>
+                                <>{formattedDistance}</>
                                 {publishedStatus && (
                                     <span className="flex items-center gap-2">
                                         {form.visits && (

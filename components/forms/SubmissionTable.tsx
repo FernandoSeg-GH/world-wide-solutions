@@ -73,7 +73,7 @@ function SubmissionsTable({ submissions, form, admin }: { submissions: Submissio
 
         return date.toLocaleDateString('en-US', options);
     }
-
+    console.log('submissions', submissions)
     return (
         <div className='w-full flex flex-col items-start justify-start'>
             <h1 className="text-2xl font-bold my-4">Submissions</h1>
