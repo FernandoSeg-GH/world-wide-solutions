@@ -52,7 +52,7 @@ export default function UserMenu() {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
-                    <Button variant="ghost" className="flex w-full justify-start p-1 items-center hover:bg-red-50" onClick={() => signOut({ callbackUrl: `${process.env.NEXT_PUBLIC_URL}/auth/sign-in` })}>
+                    <Button variant="ghost" className="flex w-full justify-start p-1 items-center hover:bg-red-50" onClick={() => signOut({ callbackUrl: 'https://world-wide-solutions.vercel.app/auth/sign-in' })}>
                         <MdClose className="mr-2" /> Logout
                     </Button>
                 </DropdownMenuItem>
