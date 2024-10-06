@@ -23,7 +23,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <ClientProvider>
       <html lang="en">
         <body className={inter.className}>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
             <AppProvider >
 
               <nav className="flex justify-between items-center border-b border-border h-[60px] px-4 py-2">
