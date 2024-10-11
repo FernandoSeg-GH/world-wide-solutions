@@ -161,6 +161,8 @@ export interface AppContextType {
     forms: Form[];
     submissions: Submission[];
     subscriptionPlans: SubscriptionPlan[];
+    businesses: Business[];
+    business: Business | null;
     error: string | null;
     godMode: boolean;
   };
@@ -176,6 +178,14 @@ export interface AppContextType {
     fetchFormByShareUrlPublic: (shareURL: string) => Promise<void>;
     fetchClientSubmissions: (userId: number) => Promise<void>;
     fetchSubscriptionPlans: () => Promise<void>;
+    getAllBusinesses: () => Promise<void>;
+    getBusinessById: (businessId: number) => Promise<void>;
+    editBusiness: (
+      businessId: number,
+      businessData: Partial<Business>
+    ) => Promise<boolean>;
+    deleteBusiness: (businessId: number) => Promise<boolean>;
+
     saveForm: () => Promise<void>;
     publishForm: (action: "publish" | "unpublish") => Promise<void>;
     addElement: (index: number, element: FormElementInstance) => void;
@@ -183,7 +193,7 @@ export interface AppContextType {
     updateElement: (id: string, element: FormElementInstance) => void;
     deleteForm: (formId: number) => Promise<void>;
     getFormSubmissionByCaseId: (caseId: string) => Promise<Submission | null>;
-    getMissingFields: (submission: Submission) => Promise<string[]>;
+    getMissingFields: (submission: Submission, form: Form) => Promise<string[]>;
     toggleGodMode: () => void;
   };
 }
@@ -235,4 +245,96 @@ export interface DashboardBodyProps {
   summaryCards?: SummaryCard[];
   recentOrders?: Order[];
   selectedOrder?: OrderDetail;
+}
+
+export interface User {
+  id: number;
+  username: string;
+  email: string;
+}
+
+export interface Task {
+  id: number;
+  name: string;
+  status: string;
+}
+
+export interface AICharacter {
+  id: number;
+  name: string;
+}
+
+export interface Form {
+  id: number;
+  name: string;
+}
+
+export interface LandingPage {
+  id: number;
+  url: string;
+}
+
+export interface SocialMediaPost {
+  id: number;
+  platform: string;
+  posted_at: string;
+}
+
+export interface Business {
+  id: number;
+  name: string;
+  domain?: string;
+  subscription_plan_id?: number;
+  subscription_plan_name?: string;
+  description?: string;
+  phone?: string;
+  url_linkedin?: string;
+  url_instagram?: string;
+  url_facebook?: string;
+  url_twitter?: string;
+  url_tiktok?: string;
+  url_youtube?: string;
+  seo_description?: string;
+  business_email?: string;
+  profile_image_url?: string;
+  background_image_url?: string;
+  users?: User[];
+  tasks?: Task[];
+  ai_characters?: AICharacter[];
+  forms?: Form[];
+  landing_pages?: LandingPage[];
+  social_media_posts?: SocialMediaPost[];
+}
+
+export interface SubscriptionPlan {
+  id: number;
+  name: string;
+  price: string;
+  features: string[] | null;
+}
+
+export interface Business {
+  id: number;
+  name: string;
+  domain?: string;
+  subscription_plan_id?: number;
+  subscription_plan_name?: string;
+  description?: string;
+  phone?: string;
+  url_linkedin?: string;
+  url_instagram?: string;
+  url_facebook?: string;
+  url_twitter?: string;
+  url_tiktok?: string;
+  url_youtube?: string;
+  seo_description?: string;
+  business_email?: string;
+  profile_image_url?: string;
+  background_image_url?: string;
+  users?: User[];
+  forms?: Form[];
+  tasks?: Task[];
+  ai_characters?: AICharacter[];
+  landing_pages?: LandingPage[];
+  social_media_posts?: SocialMediaPost[];
 }

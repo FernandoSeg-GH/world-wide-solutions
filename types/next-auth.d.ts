@@ -31,7 +31,7 @@ declare module "next-auth" {
     };
   }
 }
-
+export type User = NextAuthUser;
 declare module "next-auth/jwt" {
   interface JWT extends NextAuthJWT {
     accessToken?: string;

@@ -41,12 +41,19 @@ export default function CreateBusinessForm() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const success = await createBusiness(businessData);
+
+        const dataToSend = {
+            ...businessData,
+            subscription_plan_id: Number(businessData.subscription_plan_id),
+        };
+
+        const success = await createBusiness(dataToSend);
 
         if (success) {
             router.push("/dashboard");
         }
     };
+
 
     return (
         <div className="flex items-start justify-start w-full mb-6">
