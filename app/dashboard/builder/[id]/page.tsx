@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import FormBuilder from '@/components/forms/FormBuilder';
 import { useAppContext } from '@/components/context/AppContext';
 import { Form } from '@/types';
+import Spinner from '@/components/ui/spinner';
 
 const BuilderPage = ({ params }: { params: { shareUrl: string } }) => {
   const {
@@ -39,7 +40,7 @@ const BuilderPage = ({ params }: { params: { shareUrl: string } }) => {
   }, [shareUrl, fetchFormByShareUrl, setForm, setLoading, setError]);
 
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Spinner />;
   if (error) return <div>Error: {error}</div>;
   if (!form) return <div>Form not found</div>;
   return <FormBuilder formName={form.name} />;

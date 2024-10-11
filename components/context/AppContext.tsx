@@ -47,13 +47,6 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
 
     const formInitializedRef = useRef(false);
 
-    useEffect(() => {
-        if (status === 'authenticated' && session?.user?.businessId) {
-
-        } else {
-            console.warn("User does not belong to any business.");
-        }
-    }, [session, status]);
 
     const fetchSubscriptionPlans = useCallback(async () => {
         try {

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Spinner from './ui/spinner';
 
 interface User {
     id: number;
@@ -38,7 +39,7 @@ const UsersList = () => {
         fetchUsers();
     }, []);
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <Spinner />;
     if (error) return <div>Error: {error}</div>;
 
     return (

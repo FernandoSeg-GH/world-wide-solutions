@@ -5,6 +5,7 @@ import FormLinkShare from '@/components/forms/FormLinkShare';
 import VisitBtn from '@/components/VisitBtn';
 import { useAppContext } from '@/components/context/AppContext';
 import SubmissionsTable from '@/components/forms/SubmissionTable';
+import Spinner from '@/components/ui/spinner';
 
 const FormDetailPage = ({ params }: { params: { id: string } }) => {
     const [loading, setLoading] = useState(true);
@@ -37,7 +38,7 @@ const FormDetailPage = ({ params }: { params: { id: string } }) => {
         fetchFormDetails();
     }, [id, setForm, fetchSubmissions]);
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <Spinner />;
     if (error) return <div>Error: {error}</div>;
     if (!form) return <div>Form not found</div>;
 

@@ -1,6 +1,7 @@
 "use client"
 import { useSession } from 'next-auth/react';
 import React from 'react'
+import Spinner from '../ui/spinner';
 
 type Props = {}
 
@@ -8,7 +9,7 @@ function Welcome({ }: Props) {
 
     const { data: session, status } = useSession();
 
-    if (status === "loading") return <div>Loading...</div>;
+    if (status === "loading") return <Spinner />;
 
     if (!session) return <div>You are not logged in</div>;
 

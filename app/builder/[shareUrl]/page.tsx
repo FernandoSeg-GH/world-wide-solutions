@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import FormBuilder from '@/components/forms/FormBuilder';
 import { useAppContext } from '@/components/context/AppContext';
+import Spinner from '@/components/ui/spinner';
 
 interface BuilderPageProps {
   params: {
@@ -23,7 +24,7 @@ export default function BuilderPage({ params }: BuilderPageProps) {
     }
   }, [shareUrl, fetchFormByShareUrl]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Spinner />;
   if (error) return <div>Error: {error}</div>;
   if (!form) return <div>Form not found</div>;
 
