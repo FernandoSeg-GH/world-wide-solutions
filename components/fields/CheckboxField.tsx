@@ -13,7 +13,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Switch } from "../ui/switch";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "../ui/checkbox";
-import { useAppContext } from "../context/AppContext";
+import { useAppContext } from "../../context/AppContext";
 
 const type: ElementsType = "CheckboxField";
 

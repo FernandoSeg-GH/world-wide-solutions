@@ -5,7 +5,7 @@ import { Toaster } from '@/components/ui/toaster'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import NextTopLoader from "nextjs-toploader";
 import ClientProvider from '@/components/providers/ClientProvider'
-import { AppProvider } from '@/components/context/AppContext'
+import { AppProvider } from '@/context/AppContext'
 
 const inter = Inter({ subsets: ['latin'] })
 

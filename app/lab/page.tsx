@@ -1,7 +1,7 @@
 'use client';
 
 import { useSession } from "next-auth/react";
-import { useAppContext } from "@/components/context/AppContext";
+import { useAppContext } from "@/context/AppContext";
 import Dashboard from "@/components/layout/Dashboard";
 import { useEffect } from "react";
 

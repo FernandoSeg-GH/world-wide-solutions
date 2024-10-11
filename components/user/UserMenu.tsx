@@ -16,7 +16,7 @@ import { HiDocument } from "react-icons/hi"
 import { MdClose } from "react-icons/md"
 import { Skeleton } from "../ui/skeleton"
 import { useRouter } from "next/navigation"
-import { useAppContext } from "../context/AppContext"
+import { useAppContext } from "../../context/AppContext"
 import { cn } from "@/lib/utils"
 
 export default function UserMenu() {

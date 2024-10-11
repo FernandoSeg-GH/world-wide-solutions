@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 import { Bs123 } from "react-icons/bs";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Switch } from "../ui/switch";
-import { useAppContext } from "../context/AppContext";
+import { useAppContext } from "../../context/AppContext";
 
 const type: ElementsType = "NumberField";
 

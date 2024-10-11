@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { useAppContext } from '@/components/context/AppContext'; // Import the AppContext
+import { useAppContext } from '@/context/AppContext'; // Import the AppContext
 
 export default function CreateBusinessForm() {
     const router = useRouter();

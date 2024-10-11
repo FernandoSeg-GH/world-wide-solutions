@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ClientView from "@/components/forms/ClientView";
 import CreateBusinessForm from "@/components/business/CreateBusinessForm";
-import { useAppContext } from "@/components/context/AppContext";
+import { useAppContext } from "@/context/AppContext";
 import SubmissionsTable from "@/components/forms/SubmissionTable";
 import SubmissionFormCard from "@/components/forms/SubmissionFormCard";
 

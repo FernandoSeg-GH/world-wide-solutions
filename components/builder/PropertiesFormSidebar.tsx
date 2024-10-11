@@ -3,7 +3,7 @@ import { FormElements } from "@/components/forms/FormElements";
 import { AiOutlineClose } from "react-icons/ai";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { useAppContext } from "@/components/context/AppContext";
+import { useAppContext } from "@/context/AppContext";
 
 function PropertiesFormSidebar() {
     const {

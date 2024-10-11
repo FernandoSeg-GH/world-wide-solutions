@@ -3,7 +3,7 @@ import { Button } from "../ui/button";
 import { MdPreview } from "react-icons/md";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { FormElements } from "./FormElements";
-import { useAppContext } from "@/components/context/AppContext";
+import { useAppContext } from "@/context/AppContext";
 
 function PreviewDialogBtn() {
     const { data } = useAppContext();

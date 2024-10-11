@@ -10,7 +10,7 @@ import { useEffect } from "react";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { LuSeparatorHorizontal } from "react-icons/lu";
 import { Slider } from "../ui/slider";
-import { useAppContext } from "../context/AppContext";
+import { useAppContext } from "../../context/AppContext";
 
 const type: ElementsType = "SpacerField";
 

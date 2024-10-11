@@ -8,7 +8,7 @@ import { ElementsType, FormElementInstance, FormElements } from "@/types";
 import { idGenerator } from "@/lib/idGenerator";
 import { Button } from "../ui/button";
 import { BiSolidTrash } from "react-icons/bi";
-import { useAppContext } from "../context/AppContext";
+import { useAppContext } from "../../context/AppContext";
 
 function Designer() {
   const {

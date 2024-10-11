@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import FormBuilder from '@/components/forms/FormBuilder';
-import { useAppContext } from '@/components/context/AppContext';
+import { useAppContext } from '@/context/AppContext';
 import { Form } from '@/types';
 import Spinner from '@/components/ui/spinner';
 

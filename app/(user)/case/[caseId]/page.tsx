@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LuAlertCircle } from "react-icons/lu";
-import { useAppContext } from "@/components/context/AppContext";
+import { useAppContext } from "@/context/AppContext";
 import { Submission } from '@/types';
 
 export default function SearchFormPage() {

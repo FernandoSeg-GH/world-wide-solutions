@@ -1,5 +1,5 @@
 import React from "react";
-import { useAppContext } from "@/components/context/AppContext";
+import { useAppContext } from "@/context/AppContext";
 
 import PropertiesFormSidebar from "@/components/builder/PropertiesFormSidebar";
 import FormElementsSidebar from "@/components/forms/FormElementsSidebar";

@@ -5,7 +5,7 @@ import { RecentOrders } from "./RecentOrders";
 import { OrderDetails } from "./OrderDetails";
 import { DashboardBodyProps } from "@/types";
 import { useSession } from "next-auth/react";
-import { useAppContext } from "../context/AppContext";
+import { useAppContext } from "../../context/AppContext";
 import CreateBusinessForm from "../business/CreateBusinessForm";
 
 export const Body: React.FC<DashboardBodyProps> = ({

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import FormLinkShare from '@/components/forms/FormLinkShare';
 import VisitBtn from '@/components/VisitBtn';
-import { useAppContext } from '@/components/context/AppContext';
+import { useAppContext } from '@/context/AppContext';
 import SubmissionsTable from '@/components/forms/SubmissionTable';
 import Spinner from '@/components/ui/spinner';
 

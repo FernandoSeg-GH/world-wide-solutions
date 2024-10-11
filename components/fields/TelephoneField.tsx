@@ -14,7 +14,7 @@ import { Bs123, BsTelephone, BsTelephoneInbound, BsTelephoneX } from "react-icon
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Switch } from "../ui/switch";
 import { RiCellphoneFill } from "react-icons/ri";
-import { useAppContext } from "../context/AppContext";
+import { useAppContext } from "../../context/AppContext";
 
 const type: ElementsType = "TelephoneField";
 

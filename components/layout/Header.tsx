@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input"
 import ThemeSwitcher from "../ThemeSwitcher"
 import UserMenu from "../user/UserMenu"
 import { useSession } from "next-auth/react"
-import { useAppContext } from "../context/AppContext"
+import { useAppContext } from "../../context/AppContext"
 import { cn } from "@/lib/utils"
 
 // interface Breadcrumb {

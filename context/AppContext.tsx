@@ -12,7 +12,7 @@ import React, {
 import { useSession } from 'next-auth/react';
 import { FormElementInstance, Form, AppContextType, FetchError, Submission, SubscriptionPlan } from '@/types';
 import { useFetchForms } from '../hooks/useFetchForms';
-import { toast } from '../ui/use-toast';
+import { toast } from '../components/ui/use-toast';
 import { deepEqual } from '@/lib/utils';
 
 export const AppContext = createContext<AppContextType | null>(null);

@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import FormSubmitComponent from "@/components/forms/FormSubmitComponent";
-import { useAppContext } from "@/components/context/AppContext";
+import { useAppContext } from "@/context/AppContext";
 
 const SubmitPage = ({ params }: { params: { formUrl: string } }) => {
     const { formUrl } = params;

@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 import { BsTextareaResize } from "react-icons/bs";
 import { Textarea } from "../ui/textarea";
 import { Slider } from "../ui/slider";
-import { useAppContext } from "../context/AppContext";
+import { useAppContext } from "../../context/AppContext";
 
 const type: ElementsType = "TextAreaField";
 

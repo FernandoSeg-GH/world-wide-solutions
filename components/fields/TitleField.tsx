@@ -10,7 +10,7 @@ import { useEffect } from "react";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { LuHeading1 } from "react-icons/lu";
-import { useAppContext } from "../context/AppContext";
+import { useAppContext } from "../../context/AppContext";
 
 const type: ElementsType = "TitleField";
 

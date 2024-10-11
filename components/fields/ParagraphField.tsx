@@ -10,7 +10,7 @@ import { useEffect } from "react";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { BsTextParagraph } from "react-icons/bs";
 import { Textarea } from "../ui/textarea";
-import { useAppContext } from "../context/AppContext";
+import { useAppContext } from "../../context/AppContext";
 
 const type: ElementsType = "ParagraphField";
 

@@ -2,7 +2,7 @@
 'use client';
 
 import { useSession } from "next-auth/react";
-import { useAppContext } from "@/components/context/AppContext";
+import { useAppContext } from "@/context/AppContext";
 import { useEffect, useState } from "react";
 import Welcome from "@/components/user/Welcome";
 import CreateBusinessForm from "@/components/business/CreateBusinessForm";

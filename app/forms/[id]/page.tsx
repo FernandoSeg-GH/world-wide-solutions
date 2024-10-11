@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import FormLinkShare from '@/components/forms/FormLinkShare';
 import VisitBtn from '@/components/VisitBtn';
-import { useAppContext } from '@/components/context/AppContext';
+import { useAppContext } from '@/context/AppContext';
 import SubmissionsTable from '@/components/forms/SubmissionTable';
 
 const FormDetailPage = ({ params }: { params: { id: string } }) => {

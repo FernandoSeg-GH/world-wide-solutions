@@ -2,7 +2,7 @@
 
 import { Skeleton } from '../ui/skeleton';
 import FormCard from './FormCard';
-import { useAppContext } from '@/components/context/AppContext';
+import { useAppContext } from '@/context/AppContext';
 import { Form } from '@/types';
 import CreateFormBtn from './CreateFormButton';
 

@@ -5,7 +5,7 @@ import { FormElements } from "@/types";
 import { Button } from "../ui/button";
 import { HiCursorClick } from "react-icons/hi";
 import { ImSpinner2 } from "react-icons/im";
-import { useAppContext } from "@/components/context/AppContext";
+import { useAppContext } from "@/context/AppContext";
 import { toast } from "../ui/use-toast";
 
 function FormSubmitComponent({ formUrl }: { formUrl: string }) {
