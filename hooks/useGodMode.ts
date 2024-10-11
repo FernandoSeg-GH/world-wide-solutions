@@ -19,16 +19,24 @@ export const useGodMode = () => {
     let keySequence: string[] = [];
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      const { key } = event;
-      keySequence.push(key.toUpperCase());
+      const { key, ctrlKey } = event;
 
-      if (keySequence.length > 3) {
-        keySequence.shift();
-      }
+      // Check if key is defined before using toUpperCase
+      if (!key) return;
 
-      if (keySequence.join("") === "GOD") {
-        toggleGodMode();
-        keySequence = [];
+      // Only add to the sequence if `Ctrl` is pressed
+      if (ctrlKey) {
+        keySequence.push(key.toUpperCase());
+
+        // Limit the sequence to a max of 4 characters
+        if (keySequence.length > 4) {
+          keySequence.shift();
+        }
+
+        if (keySequence.join("") === "GOD") {
+          toggleGodMode();
+          keySequence = []; // Reset the sequence after toggling
+        }
       }
     };
 
