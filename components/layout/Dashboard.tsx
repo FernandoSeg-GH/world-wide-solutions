@@ -14,7 +14,7 @@ import ClientView from "@/components/forms/ClientView";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
 import { Body } from "./Body";
-import { mockData } from "./mock-data";
+import { mockData } from "../../lib/mock-data";
 
 export default function Dashboard() {
     const [isExpanded, setIsExpanded] = useState(false);
@@ -37,14 +37,17 @@ export default function Dashboard() {
                 sidebarItems={mockData.sidebarItems}
             />
             <div
-                className={`flex flex-col gap-6 transition-all duration-300 ${isExpanded ? "sm:pl-64" : "sm:pl-14"
+                className={`flex p-4 h-auto w-full flex-col gap-6 transition-all duration-300 ${isExpanded ? "sm:pl-64" : "sm:pl-14"
                     }`}
             >
-                <div className="p-4 pb-20 w-full flex flex-col justify-start items-start">
-                    <Welcome />
-                    {/* {loading || formLoading ? <Skeleton className="min-w-80 w-full min-h-20" /> : null} */}
+                <Header
+                // breadcrumbs={mockData.breadcrumbs} 
 
-                    {/* <div className="w-full">
+                />
+                <Welcome />
+                {/* {loading || formLoading ? <Skeleton className="min-w-80 w-full min-h-20" /> : null} */}
+
+                {/* <div className="w-full">
                         {!session?.user?.businessId && session?.user?.role.id !== 1 ?
                             <CreateBusinessForm /> : null
                         }
@@ -72,11 +75,9 @@ export default function Dashboard() {
                             }
                         </div>
                     </div> */}
-                </div>
-                <Header breadcrumbs={mockData.breadcrumbs} user={mockData.user} />
                 <Body
                     summaryCards={mockData.summaryCards}
-                    recentOrders={mockData.recentOrders}
+                    // recentOrders={mockData.recentOrders}
                     selectedOrder={mockData.selectedOrder}
                 />
             </div>

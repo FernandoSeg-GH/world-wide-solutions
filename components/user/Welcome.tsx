@@ -14,13 +14,13 @@ function Welcome({ }: Props) {
     if (!session) return <div>You are not logged in</div>;
 
     return (
-        <div className='my-6 w-full border-b pb-2'>
+        <div className='w-full p-4'>
             {status === "authenticated" && session.user && (
                 <div>
                     <h1 className="text-2xl font-bold">
                         Welcome <span className="capitalize">{session.user.username}</span>!
                     </h1>
-                    <p className='text-xl leading-7'>This is your personal dashboard. You may follow up and check on the submitted infromation for your current case.</p>
+                    <p className='text-lg 2xl:text-xl leading-7'>This is your personal dashboard. Follow up and check on your activity.</p>
                 </div>
             )}
             {status !== "authenticated" && (

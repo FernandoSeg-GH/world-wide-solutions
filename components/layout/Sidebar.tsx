@@ -2,6 +2,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Menu, Package2 } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 interface SidebarItem {
     icon: React.ElementType
@@ -23,14 +24,26 @@ export function Sidebar({ isExpanded, setIsExpanded, sidebarItems }: SidebarProp
                 }`}
         >
             <div className="flex h-14 items-center justify-between px-2">
-                <Link
-                    href="#"
-                    className={`flex items-center gap-2 font-semibold ${isExpanded ? "" : "justify-center"
-                        }`}
-                >
-                    <Package2 className="h-6 w-6" />
-                    {isExpanded && <span>Acme Inc</span>}
-                </Link>
+                {isExpanded &&
+                    <Link
+                        href="#"
+                        className={cn(
+                            'flex items-center gap-2 font-semibold transition-all duration-300 ease-in-out',
+                            isExpanded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 pointer-events-none'
+                        )}
+                    >
+                        <Package2 className="h-6 w-6" />
+                        <h1
+                            className={
+                                cn("whitespace-nowrap",
+                                    isExpanded ? 'block opacity-100 translate-x-0' :
+                                        'hidden opacity-0 -translate-x-4 pointer-events-none')}
+                        >
+                            Vinci Suite
+
+                        </h1>
+                    </Link>
+                }
                 <Button
                     variant="ghost"
                     size="icon"

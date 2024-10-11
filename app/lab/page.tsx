@@ -18,10 +18,5 @@ export default function Laboratory() {
     }
   }, [session, fetchForms]);
 
-  return (
-    <div className="p-4 pb-20 w-full flex flex-col justify-start items-start">
-      {/* {loading || formLoading ? <Skeleton className="min-w-80 w-full min-h-20" /> : null} */}
-      <Dashboard />
-    </div>
-  );
+  return (<Dashboard />);
 }

@@ -32,6 +32,7 @@ interface AppProviderProps {
 
 export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.Element => {
     const { data: session, status } = useSession();
+    const [godMode, setGodMode] = useState<boolean>(false);
     const [form, setFormState] = useState<Form | null>(initialForm ?? null);
     const [forms, setForms] = useState<Form[]>([]);
 
@@ -46,6 +47,42 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
     const [error, setError] = useState<string | null>(null);
 
     const formInitializedRef = useRef(false);
+
+    const toggleGodMode = useCallback(() => {
+        setGodMode((prev) => !prev);
+        toast({
+            title: godMode ? 'God Mode Disabled' : 'God Mode Enabled',
+            description: godMode
+                ? 'You are now in normal mode.'
+                : 'You have special privileges now.',
+        });
+    }, [godMode]);
+
+    useEffect(() => {
+        let keySequence: string[] = [];
+
+        const handleKeyDown = (event: KeyboardEvent) => {
+            const { key } = event;
+
+
+            keySequence.push(key.toUpperCase());
+
+            if (keySequence.length > 3) {
+                keySequence.shift();
+            }
+
+            if (keySequence.join('') === 'GOD') {
+                toggleGodMode();
+                keySequence = [];
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [toggleGodMode]);
 
 
     const fetchSubscriptionPlans = useCallback(async () => {
@@ -554,6 +591,7 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         forms,
         submissions,
         subscriptionPlans,
+        godMode
     }), [
         formName,
         elements,
@@ -565,6 +603,7 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         forms,
         submissions,
         subscriptionPlans,
+        godMode
     ]);
 
     const actions = useMemo(() => ({
@@ -584,6 +623,7 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         fetchFormByShareUrlPublic,
         getFormSubmissionByCaseId,
         getMissingFields,
+        toggleGodMode
     }), [
         fetchForms,
         fetchClientSubmissions,
@@ -601,6 +641,7 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         fetchFormByShareUrlPublic,
         getFormSubmissionByCaseId,
         getMissingFields,
+        toggleGodMode
     ]);
 
     const contextValue: AppContextType = useMemo(() => ({

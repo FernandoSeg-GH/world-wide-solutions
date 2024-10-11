@@ -16,10 +16,13 @@ import { HiDocument } from "react-icons/hi"
 import { MdClose } from "react-icons/md"
 import { Skeleton } from "../ui/skeleton"
 import { useRouter } from "next/navigation"
+import { useAppContext } from "../context/AppContext"
+import { cn } from "@/lib/utils"
 
 export default function UserMenu() {
 
     const { data: session, status } = useSession();
+    const { data: godMode } = useAppContext()
     const router = useRouter()
     if (status === "loading") return <Skeleton className="w-24 h-10" />
 

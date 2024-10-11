@@ -162,6 +162,7 @@ export interface AppContextType {
     submissions: Submission[];
     subscriptionPlans: SubscriptionPlan[];
     error: string | null;
+    godMode: boolean;
   };
   actions: {
     createForm: (newForm: {
@@ -183,6 +184,7 @@ export interface AppContextType {
     deleteForm: (formId: number) => Promise<void>;
     getFormSubmissionByCaseId: (caseId: string) => Promise<Submission | null>;
     getMissingFields: (submission: Submission) => Promise<string[]>;
+    toggleGodMode: () => void;
   };
 }
 
