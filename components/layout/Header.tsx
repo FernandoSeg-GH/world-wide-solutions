@@ -65,7 +65,20 @@ export function Header({ }: HeaderProps) {
                     className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]"
                 />
             </div>
-            {godMode && <div className={cn(godMode && "bg-yellow-400 rounded-full p-1 shadow-2xl")}><Zap width={22} height={22} /></div>}
+            {godMode && (
+                <div
+                    className={cn(
+                        godMode && "bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-400 rounded-full p-1 shadow-lg border-yellow-300 border-2"
+                    )}
+                    style={{
+                        backgroundImage: "linear-gradient(135deg, #FFD700 25%, #FFA500 50%, #FFFACD 75%)",
+                        boxShadow: "0px 4px 6px rgba(255, 165, 0, 0.4), inset 0px 2px 4px rgba(255, 255, 255, 0.3)"
+                    }}
+                >
+                    <Zap width={18} height={18} className="text-yellow-800" />
+                </div>
+            )}
+
             <div className="flex gap-4 items-center">
                 <ThemeSwitcher />
                 <UserMenu />

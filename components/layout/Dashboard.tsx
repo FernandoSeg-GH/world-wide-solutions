@@ -36,16 +36,12 @@ export default function Dashboard() {
                 setIsExpanded={setIsExpanded}
                 sidebarItems={mockData.sidebarItems}
             />
-            <div
-                className={`flex p-4 h-auto w-full flex-col gap-6 transition-all duration-300 ${isExpanded ? "sm:pl-64" : "sm:pl-14"
-                    }`}
-            >
+            <div className={`flex p-4 h-auto w-full flex-col gap-6 transition-all duration-300 ${isExpanded ? "sm:pl-64" : "sm:pl-14"}`}>
                 <Header
                 // breadcrumbs={mockData.breadcrumbs} 
-
                 />
                 <Welcome />
-                {/* {loading || formLoading ? <Skeleton className="min-w-80 w-full min-h-20" /> : null} */}
+
 
                 {/* <div className="w-full">
                         {!session?.user?.businessId && session?.user?.role.id !== 1 ?
