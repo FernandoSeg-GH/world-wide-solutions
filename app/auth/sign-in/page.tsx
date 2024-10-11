@@ -34,7 +34,6 @@ export default function AuthPage() {
 
 function SignInForm({ onToggle }: { onToggle: () => void }) {
   const [loading, setLoading] = useState(false);
-  const [push, setPush] = useState(false);
   const router = useRouter();
 
   const [credentials, setCredentials] = useState({
@@ -53,7 +52,6 @@ function SignInForm({ onToggle }: { onToggle: () => void }) {
       callbackUrl: "/dashboard",
     });
 
-    setLoading(false);
 
     if (res?.error) {
       toast({
@@ -61,13 +59,17 @@ function SignInForm({ onToggle }: { onToggle: () => void }) {
         description: res.error,
         variant: "destructive",
       });
+      setLoading(false);
     } else {
       toast({
         title: "Success",
         description: "You have successfully signed in.",
       });
-      setPush(!push)
-      router.push('/dashboard')
+
+      setLoading(false);
+      // Add a slight delay to ensure the token is set before navigating
+      console.log('router pushing')
+      router.push("/dashboard");
     }
   };
 

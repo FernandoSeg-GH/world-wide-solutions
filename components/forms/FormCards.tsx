@@ -16,16 +16,10 @@ const FormCards = ({ forms }: { forms: Form[] }) => {
             {loading ? <Skeleton className="border-2 border-primary-/20 h-[210px] w-full lg:max-w-[448px]" /> :
                 <CreateFormBtn />
             }
-            {/* {loading &&
-                [1, 2, 3, 4].map((el) => (
-                    <Skeleton key={el} className="border-2 border-primary-/20 h-[210px] w-full" />
-                    ))
-                    
-                    } */}
-            {loading ? <Skeleton className="border-2 border-primary-/20 h-[210px] w-full" />
-                : forms && forms.map((form) => (
-                    <FormCard key={form.id} form={form} />
-                ))}
+            {loading ? <Skeleton className="border-2 border-primary-/20 h-[210px] w-full lg:max-w-[448px]" /> : null}
+            {forms ? forms.map((form) => (
+                <FormCard key={form.id} form={form} />
+            )) : null}
 
         </div>
     );

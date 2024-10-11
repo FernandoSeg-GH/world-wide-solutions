@@ -1,8 +1,8 @@
 import { Active, DragOverlay, useDndMonitor } from "@dnd-kit/core";
 import React, { useState } from "react";
-import { SidebarBtnElementDragOverlay } from "./SidebarBtnElement";
-import { ElementsType, FormElements } from "./forms/FormElements";
-import { useAppContext } from "./context/AppContext";
+import { SidebarBtnElementDragOverlay } from "@/components/builder/SidebarBtnElement";
+import { ElementsType, FormElements } from "@/components/forms/FormElements";
+import { useAppContext } from "@/components/context/AppContext";
 
 function DragOverlayWrapper() {
     const { data: { elements } } = useAppContext();

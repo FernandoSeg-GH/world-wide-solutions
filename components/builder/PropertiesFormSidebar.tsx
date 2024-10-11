@@ -1,9 +1,9 @@
 import React from "react";
-import { FormElements } from "./forms/FormElements";
+import { FormElements } from "@/components/forms/FormElements";
 import { AiOutlineClose } from "react-icons/ai";
-import { Button } from "./ui/button";
-import { Separator } from "./ui/separator";
-import { useAppContext } from "./context/AppContext";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { useAppContext } from "@/components/context/AppContext";
 
 function PropertiesFormSidebar() {
     const {

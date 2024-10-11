@@ -20,7 +20,9 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith("/builder")
   ) {
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-
+    if (token) {
+      return NextResponse.next();
+    }
     if (!token) {
       return NextResponse.redirect(new URL("/auth/sign-in", req.url));
     }

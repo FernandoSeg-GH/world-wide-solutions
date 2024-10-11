@@ -1,5 +1,5 @@
 import React from "react";
-import SidebarBtnElement from "@/components/SidebarBtnElement";
+import SidebarBtnElement from "@/components/builder/SidebarBtnElement";
 import { FormElements } from "@/components/forms/FormElements";
 import { Separator } from "@/components/ui/separator";
 

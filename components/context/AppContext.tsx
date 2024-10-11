@@ -13,6 +13,7 @@ import { useSession } from 'next-auth/react';
 import { FormElementInstance, Form, AppContextType, FetchError, Submission, SubscriptionPlan } from '@/types';
 import { useFetchForms } from '../hooks/useFetchForms';
 import { toast } from '../ui/use-toast';
+import { deepEqual } from '@/lib/utils';
 
 export const AppContext = createContext<AppContextType | null>(null);
 
@@ -27,29 +28,6 @@ export const useAppContext = (): AppContextType => {
 interface AppProviderProps {
     children: ReactNode;
     initialForm?: Form;
-}
-
-function deepEqual(obj1: any, obj2: any): boolean {
-    if (obj1 === obj2) return true;
-
-    if (typeof obj1 !== typeof obj2 || obj1 == null || obj2 == null) return false;
-
-    if (typeof obj1 === 'object') {
-        const keys1 = Object.keys(obj1);
-        const keys2 = Object.keys(obj2);
-
-        if (keys1.length !== keys2.length) return false;
-
-        for (let key of keys1) {
-            if (!keys2.includes(key) || !deepEqual(obj1[key], obj2[key])) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    return false;
 }
 
 export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.Element => {
@@ -309,10 +287,16 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
     }, []);
 
     const removeElement = useCallback((id: string) => {
-        setElements((prev) => prev.filter((element) => element.id !== id));
+        console.log("Removing element with id:", id);
+        setElements((prev) => {
+            const updatedElements = prev.filter((element) => element.id !== id);
+            console.log("Updated elements:", updatedElements);
+            return updatedElements;
+        });
         toast({ title: 'Element Removed', description: 'An element has been removed.', variant: 'default' });
         setUnsavedChanges(true);
     }, []);
+
 
     const updateElement = useCallback((id: string, element: FormElementInstance) => {
         setElements((prev) => {
@@ -386,7 +370,7 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
 
     const fetchFormByShareUrl = async (shareUrl: string): Promise<Form | null> => {
         try {
-            const response = await fetch(`/api/forms/share_url/${shareUrl}/public`);
+            const response = await fetch(`/api/forms/share_url/${shareUrl}`);
             if (!response.ok) {
                 throw new Error('Form not found');
             }

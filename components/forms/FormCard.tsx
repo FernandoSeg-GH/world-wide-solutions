@@ -130,26 +130,26 @@ function FormCard({ form }: { form: Form }) {
                     <div>
                         {session?.user.role.id !== 1 ?
                             <div>
-                                <>{formattedDistance}</>
+                                <span>{formattedDistance}</span>
                                 {publishedStatus && (
-                                    <span className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2">
                                         {form.visits && (
-                                            <>
+                                            <div>
                                                 <LuView className="text-muted-foreground" />
                                                 <span>{form.visits.toLocaleString()}</span>
-                                            </>
+                                            </div>
                                         )}
                                         {form.FormSubmissions && form.FormSubmissions.length > 0 && (
-                                            <>
+                                            <div>
                                                 <FaWpforms className="text-muted-foreground" />
                                                 <span>{form.FormSubmissions.length + 1}</span>
-                                            </>
+                                            </div>
                                         )}
-                                    </span>
+                                    </div>
                                 )}
                             </div>
 
-                            : <div></div>
+                            : null
                         }
                     </div>
 
@@ -159,35 +159,39 @@ function FormCard({ form }: { form: Form }) {
                 {form.description || ''}
             </CardContent>
             <CardFooter>
-                {session?.user.role.id !== 1 ? <div className='flex flex-col w-full'>
-                    {publishedStatus ? (
-                        <Button className="w-full mt-2 text-md gap-4" onClick={() => router.push(`/forms/${form.shareURL}`)}>
-                            View submissions <BiRightArrowAlt />
-                        </Button>
-                    ) : (
-                        <Button asChild variant="secondary" className="w-full mt-2 text-md gap-4">
-                            <Button onClick={() => router.push(`/builder/${form.shareURL}`)}>
-                                Edit form <FaEdit />
+                {session?.user.role.id !== 1 ? (
+                    <div className="flex flex-col w-full">
+                        {publishedStatus ? (
+                            <Button className="w-full mt-2 text-md gap-4" onClick={() => router.push(`/forms/${form.shareURL}`)}>
+                                View submissions <BiRightArrowAlt />
                             </Button>
-                        </Button>
-                    )}
-                </div> : <div>
-                    <p>You have already submitted this forms.</p>
-                </div>
-                }
+                        ) : (
+                            <Button asChild variant="secondary" className="w-full mt-2 text-md gap-4">
+                                <Button onClick={() => router.push(`/builder/${form.shareURL}`)}>
+                                    Edit form <FaEdit />
+                                </Button>
+                            </Button>
+                        )}
+                    </div>
+                ) : (
+                    <div>
+                        <span>You have already submitted this form.</span>
+                    </div>
+                )}
             </CardFooter>
-
             <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Delete Form</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to delete this form? This action will remove the form and all associated submissions permanently and cannot be undone.
+                            <div>Are you sure you want to delete this form? This action will remove the form and all associated submissions permanently and cannot be undone.</div>
                         </AlertDialogDescription>
+
                     </AlertDialogHeader>
                     <AlertDialogDescription>
-                        Please type "<span className='font-bold'>DELETE_THE_FORM_AND_ALL_DATA</span>" below to confirm.
+                        <span>Please type "<span className='font-bold'>DELETE_THE_FORM_AND_ALL_DATA</span>" below to confirm.</span>
                     </AlertDialogDescription>
+
                     <input
                         className="mt-2 w-full border p-2"
                         type="text"
@@ -197,10 +201,10 @@ function FormCard({ form }: { form: Form }) {
                     />
                     <AlertDialogFooter>
                         <Button variant="secondary" onClick={() => setIsAlertOpen(false)}>
-                            Cancel
+                            <span> Cancel</span>
                         </Button>
                         <Button variant="destructive" onClick={handleDelete} disabled={isDeleting || deleteInputValue !== "DELETE_THE_FORM_AND_ALL_DATA"}>
-                            {isDeleting ? 'Deleting...' : 'Delete'}
+                            <span>{isDeleting ? 'Deleting...' : 'Delete'}</span>
                         </Button>
                     </AlertDialogFooter>
                 </AlertDialogContent>

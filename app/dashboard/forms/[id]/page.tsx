@@ -1,12 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import FormLinkShare from '@/components/FormLinkShare';
+import FormLinkShare from '@/components/forms/FormLinkShare';
 import VisitBtn from '@/components/VisitBtn';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { formatDistance } from 'date-fns';
 import { useAppContext } from '@/components/context/AppContext';
-import { Form, Submission } from '@/types';
 import SubmissionsTable from '@/components/forms/SubmissionTable';
 
 const FormDetailPage = ({ params }: { params: { id: string } }) => {

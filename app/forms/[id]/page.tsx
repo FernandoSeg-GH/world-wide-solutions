@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect } from 'react';
-import FormLinkShare from '@/components/FormLinkShare';
+import FormLinkShare from '@/components/forms/FormLinkShare';
 import VisitBtn from '@/components/VisitBtn';
 import { useAppContext } from '@/components/context/AppContext';
 import SubmissionsTable from '@/components/forms/SubmissionTable';
