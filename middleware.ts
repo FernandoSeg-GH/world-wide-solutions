@@ -15,6 +15,7 @@ export async function middleware(req: NextRequest) {
 
   if (
     pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/lab") ||
     pathname.startsWith("/forms") ||
     pathname.startsWith("/submit") ||
     pathname.startsWith("/builder")
@@ -35,6 +36,7 @@ export const config = {
   matcher: [
     "/dashboard/:path*",
     "/forms/:path*",
+    "/lab/:path*",
     "/builder/:path*",
     "/submit/:path*",
   ],

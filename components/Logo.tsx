@@ -5,9 +5,9 @@ function Logo() {
   return (
     <Link
       href={"/"}
-      className="font-bold text-3xl hover:cursor-pointer"
+      className="font-semibold text-2xl hover:cursor-pointer"
     >
-      VWS
+      Vinci Suite
     </Link>
   );
 }

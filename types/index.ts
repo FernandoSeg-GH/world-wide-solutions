@@ -185,3 +185,52 @@ export interface AppContextType {
     getMissingFields: (submission: Submission) => Promise<string[]>;
   };
 }
+
+// ==================================================================================
+// ==================================================================================
+
+export interface SummaryCard {
+  title: string;
+  value: string;
+  change: string;
+  changePercentage: number;
+}
+
+export interface Customer {
+  name: string;
+  email: string;
+  phone: string;
+}
+
+export interface Order {
+  id: string;
+  customer: Customer;
+  type: string;
+  status: string;
+  date: string;
+  amount: string;
+}
+
+export interface OrderDetail extends Order {
+  items: Array<{
+    name: string;
+    quantity: number;
+    price: string;
+  }>;
+  shipping: {
+    address: string;
+    city: string;
+    postalCode: string;
+    cost: string;
+  };
+  payment: {
+    method: string;
+    cardLastFour: string;
+  };
+}
+
+export interface DashboardBodyProps {
+  summaryCards?: SummaryCard[];
+  recentOrders?: Order[];
+  selectedOrder?: OrderDetail;
+}
