@@ -1,5 +1,3 @@
-// components/EditBusinessForm.tsx
-
 'use client';
 
 import { useState, useEffect } from "react";
@@ -11,12 +9,11 @@ import { Label } from "@/components/ui/label";
 import { useAppContext } from '@/context/AppContext'; // Import the AppContext
 import { SubscriptionPlan } from "@/types";
 
-export default function EditBusinessForm() {
+export default function EditBusinessForm({ businessId }: { businessId: number | null }) {
     const router = useRouter();
-    const searchParams = useSearchParams();
     const { data, actions } = useAppContext();
     const { business, loading, error, subscriptionPlans } = data;
-    const { fetchSubscriptionPlans, getBusinessById, editBusiness, deleteBusiness } = actions;
+    const { fetchSubscriptionPlans, getAllBusinesses, getBusinessById, editBusiness, deleteBusiness } = actions;
 
     const [businessData, setBusinessData] = useState({
         name: "",
@@ -36,15 +33,20 @@ export default function EditBusinessForm() {
         background_image_url: "",
     });
 
-    const businessId = searchParams.get('businessId');
 
     // Fetch subscription plans and business data on component mount
+    // Fetch the business data when businessId is available
     useEffect(() => {
-        fetchSubscriptionPlans();
         if (businessId) {
             getBusinessById(Number(businessId));
         }
-    }, [fetchSubscriptionPlans, getBusinessById, businessId]);
+    }, [businessId, getBusinessById]);
+
+    useEffect(() => {
+        fetchSubscriptionPlans();
+
+    }, [fetchSubscriptionPlans]);
+
 
     // Populate form with business data once fetched
     useEffect(() => {
@@ -83,7 +85,7 @@ export default function EditBusinessForm() {
         });
 
         if (success) {
-            router.push("/dashboard");
+            router.push("/lab");
         }
     };
 
@@ -93,7 +95,7 @@ export default function EditBusinessForm() {
         if (confirmed) {
             const success = await deleteBusiness(Number(businessId));
             if (success) {
-                router.push("/dashboard");
+                router.push("/lab");
             }
         }
     };

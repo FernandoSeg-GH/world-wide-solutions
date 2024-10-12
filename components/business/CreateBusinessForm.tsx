@@ -56,7 +56,7 @@ export default function CreateBusinessForm() {
 
 
     return (
-        <div className="flex items-start justify-start w-full mb-6">
+        <div className="flex items-start justify-start w-full">
             <Card className="w-full lg:max-w-md">
                 <CardHeader>
                     <CardTitle>Create Business</CardTitle>
