@@ -8,7 +8,7 @@ import { ElementsType, FormElementInstance, FormElements } from "@/types";
 import { idGenerator } from "@/lib/idGenerator";
 import { Button } from "../ui/button";
 import { BiSolidTrash } from "react-icons/bi";
-import { useAppContext } from "../../context/AppContext";
+import { useAppContext } from "../../context/AppProvider";
 
 function Designer() {
   const {
@@ -194,7 +194,7 @@ function DesignerElementWrapper({ element }: DesignerElementWrapperProps) {
       {...draggable.attributes}
       className={cn(
         "relative h-[120px] flex flex-col text-foreground hover:cursor-pointer rounded-md ring-1 ring-accent ring-inset",
-        selectedElement?.id === element.id && "ring-4 ring-primary" // Highlight the selected element
+        selectedElement?.id === element.id && "ring-4 ring-primary"
       )}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

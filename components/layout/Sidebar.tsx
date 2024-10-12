@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Menu } from "lucide-react";
 import { FaHome, FaBusinessTime, FaRobot, FaListAlt, FaClipboardList, FaBell } from 'react-icons/fa';
-import { useAppContext } from "@/context/AppContext";
+import { useAppContext } from "@/context/AppProvider";
 import React from 'react';
 import { cn } from "@/lib/utils";
 
@@ -55,8 +55,8 @@ export const getSidebarItems = (godMode: boolean): SidebarItem[] => {
 
 export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
     const { actions: layoutState, data } = useAppContext();
-    const { switchSection } = layoutState; // Retrieve the function to switch sections
-    const { currentSection, godMode } = data; // Get current section and godMode
+    const { switchSection } = layoutState;
+    const { currentSection, godMode } = data;
     const sidebarItems = getSidebarItems(godMode);
 
     return (
@@ -80,7 +80,7 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
                         <Tooltip key={item.label}>
                             <TooltipTrigger asChild>
                                 <button
-                                    onClick={() => switchSection(item.label)} // Correctly switch section on click
+                                    onClick={() => switchSection(item.label)}
                                     className={cn(
                                         "flex h-9 items-center rounded-lg transition-colors hover:text-foreground trasition-all ease-out",
                                         currentSection === item.label ? "bg-accent text-accent-foreground" : "text-muted-foreground",

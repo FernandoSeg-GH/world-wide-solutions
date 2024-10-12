@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { useAppContext } from '@/context/AppContext'; // Import the AppContext
+import { useAppContext } from '@/context/AppProvider';
 import { SubscriptionPlan } from "@/types";
 
 export default function EditBusinessForm({ businessId }: { businessId: number | null }) {
@@ -34,8 +34,6 @@ export default function EditBusinessForm({ businessId }: { businessId: number | 
     });
 
 
-    // Fetch subscription plans and business data on component mount
-    // Fetch the business data when businessId is available
     useEffect(() => {
         if (businessId) {
             getBusinessById(Number(businessId));
@@ -48,7 +46,6 @@ export default function EditBusinessForm({ businessId }: { businessId: number | 
     }, [fetchSubscriptionPlans]);
 
 
-    // Populate form with business data once fetched
     useEffect(() => {
         if (business) {
             setBusinessData({

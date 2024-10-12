@@ -1,9 +1,9 @@
 import React from "react";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { MdPreview } from "react-icons/md";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { FormElements } from "./FormElements";
-import { useAppContext } from "@/context/AppContext";
+import { useAppContext } from "@/context/AppProvider";
 
 function PreviewDialogBtn() {
     const { data } = useAppContext();

@@ -3,13 +3,13 @@
 import React from 'react'
 
 import { useSession } from "next-auth/react";
-import { useAppContext } from "@/context/AppContext";
+import { useAppContext } from "@/context/AppProvider";
 import { useEffect, useState } from "react";
 import { useGodMode } from "@/hooks/useGodMode";
-import FormCards from "../forms/FormCards";
-import SubmissionFormCard from "../forms/SubmissionFormCard";
-import SubmissionsTable from "../forms/SubmissionTable";
-import ClientView from "../forms/ClientView";
+import FormCards from "@/components/business/forms/FormCards";
+import SubmissionFormCard from "@/components/business/forms/submissions/SubmissionFormCard";
+import SubmissionsTable from "@/components/business/forms/submissions/SubmissionTable";
+import ClientView from './ClientView';
 
 type Props = {}
 
@@ -35,10 +35,31 @@ function Forms({ }: Props) {
     }, [forms])
     return (
         <div>
-            <div className="w-full flex flex-col gap-6 px-4">
+            <div className="w-full flex flex-col gap-6">
                 {forms && forms.length > 0 ?
                     <FormCards forms={forms} />
                     : <p>No Forms Available.</p>}
+
+                {forms && forms.length > 0 ?
+                    <SubmissionFormCard forms={forms} />
+
+                    : <p>No Submissions Form Card Available.</p>}
+
+                {forms && forms.length > 0 ?
+                    forms.map((form, index) =>
+                        <SubmissionsTable key={index} form={form} submissions={submissions} admin />
+                    )
+
+                    : <p> No SubmissionsTable Available.</p>}
+
+                {forms ?
+                    forms.map((form, index) =>
+                        <ClientView key={index} form={form} submissions={submissions ?? []} />
+                    )
+
+                    : <p> No ClientView Available.</p>}
+
+
                 {/* <div className="w-full">
                     {forms && session?.user.role.id !== 1 ? (
                         <div className="">

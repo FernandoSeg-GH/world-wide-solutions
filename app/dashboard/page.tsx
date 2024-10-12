@@ -1,31 +1,22 @@
 'use client';
 
 import { useSession } from "next-auth/react";
-import FormCards from "@/components/forms/FormCards";
 import Welcome from "@/components/user/Welcome";
-import { useEffect, useState } from "react";
-import ClientView from "@/components/forms/ClientView";
 import CreateBusinessForm from "@/components/business/CreateBusinessForm";
-import { useAppContext } from "@/context/AppContext";
-import SubmissionsTable from "@/components/forms/SubmissionTable";
-import SubmissionFormCard from "@/components/forms/SubmissionFormCard";
+import { useAppContext } from "@/context/AppProvider";
+import FormCards from "@/components/business/forms/FormCards";
+import SubmissionFormCard from "@/components/business/forms/submissions/SubmissionFormCard";
+import SubmissionsTable from "@/components/business/forms/submissions/SubmissionTable";
+import ClientView from "@/components/business/forms/ClientView";
 
 export default function Dashboard() {
   const { data: session } = useSession();
   const { data, actions } = useAppContext();
   const { form, submissions, loading: formLoading, loading, forms } = data;
-  // const { fetchForms } = actions;
-
-  // useEffect(() => {
-  //   if (session?.user?.businessId) {
-  //     fetchForms(session.user.businessId);
-  //   }
-  // }, [session, fetchForms]);
 
   return (
     <div className="p-4 pb-20 w-full flex flex-col justify-start items-start">
       <Welcome />
-      {/* {loading || formLoading ? <Skeleton className="min-w-80 w-full min-h-20" /> : null} */}
 
       <div className="w-full">
         {!session?.user?.businessId && session?.user?.role.id !== 1 ?

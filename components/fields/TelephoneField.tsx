@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { ElementsType, FormElement, FormElementInstance, SubmitFunction } from "../forms/FormElements";
+import { ElementsType, FormElement, FormElementInstance, SubmitFunction } from "@/components/business/forms/FormElements";
 
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
@@ -14,7 +14,7 @@ import { Bs123, BsTelephone, BsTelephoneInbound, BsTelephoneX } from "react-icon
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Switch } from "../ui/switch";
 import { RiCellphoneFill } from "react-icons/ri";
-import { useAppContext } from "../../context/AppContext";
+import { useAppContext } from "../../context/AppProvider";
 
 const type: ElementsType = "TelephoneField";
 

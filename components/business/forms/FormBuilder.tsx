@@ -1,17 +1,17 @@
 'use client';
 
 import React, { useEffect, useState } from "react";
-import { useAppContext } from "@/context/AppContext";
+import { useAppContext } from "@/context/AppProvider";
 import PreviewDialogBtn from "./PreviewDialogBtn";
 import SaveFormBtn from "./SaveFormBtn";
-import Designer from "../builder/Designer";
-import { Input } from "../ui/input";
+import Designer from "@/components/builder/Designer";
+import { Input } from "@/components/ui/input";
 import { DndContext, MouseSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { ImSpinner2 } from "react-icons/im";
 import DragOverlayWrapper from "@/components/builder/DragOverlayWrapper";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { useToast } from "../ui/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 
 function FormBuilder({ formName }: { formName: string }) {
@@ -23,7 +23,7 @@ function FormBuilder({ formName }: { formName: string }) {
 
     const [isReady, setIsReady] = useState<boolean>(false);
     const [isEditingName, setIsEditingName] = useState<boolean>(false);
-    const [isPublished, setIsPublished] = useState<boolean>(true); // Local state to track published status
+    const [isPublished, setIsPublished] = useState<boolean>(true);
     const toast = useToast();
     const router = useRouter();
 
@@ -39,7 +39,7 @@ function FormBuilder({ formName }: { formName: string }) {
         return () => clearTimeout(readyTimeout);
     }, [setSelectedElement]);
 
-    // Check if the form is published or not
+
     useEffect(() => {
         if (form && form.published === false) {
             setIsPublished(false);

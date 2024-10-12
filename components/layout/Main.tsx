@@ -1,17 +1,12 @@
 'use client';
 
 import { useSession } from "next-auth/react";
-import { useAppContext } from "@/context/AppContext";
+import { useAppContext } from "@/context/AppProvider";
 import { useEffect } from "react";
 import Welcome from "@/components/user/Welcome";
 import CreateBusinessForm from "@/components/business/CreateBusinessForm";
 import BusinessesTable from "../business/BusinessesTable";
 import { useGodMode } from "@/hooks/useGodMode";
-import FormCards from "../forms/FormCards";
-import SubmissionFormCard from "../forms/SubmissionFormCard";
-import SubmissionsTable from "../forms/SubmissionTable";
-import ClientView from "../forms/ClientView";
-import FormCard from "../forms/FormCard";
 
 export default function Main() {
     const { data: session } = useSession();

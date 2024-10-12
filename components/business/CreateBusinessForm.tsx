@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { useAppContext } from '@/context/AppContext'; // Import the AppContext
+import { useAppContext } from '@/context/AppProvider';
 
 export default function CreateBusinessForm() {
     const router = useRouter();
@@ -34,7 +34,6 @@ export default function CreateBusinessForm() {
         background_image_url: "",
     });
 
-    // Fetch subscription plans on component mount
     useEffect(() => {
         fetchSubscriptionPlans();
     }, [fetchSubscriptionPlans]);

@@ -1,6 +1,6 @@
 import { useForm, FormProvider } from "react-hook-form";
 import { ImSpinner2 } from "react-icons/im";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import {
     Dialog,
     DialogContent,
@@ -9,13 +9,13 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "../ui/dialog";
-import { FormItem, FormLabel, FormControl, FormMessage } from "../ui/form";
-import { Input } from "../ui/input";
-import { Textarea } from "../ui/textarea";
+} from "@/components/ui/dialog";
+import { FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { BsFileEarmarkPlus } from "react-icons/bs";
 import { useRouter } from "next/navigation";
-import { useAppContext } from "@/context/AppContext";
+import { useAppContext } from "@/context/AppProvider";
 import { useState } from "react";
 
 type FormValues = {
@@ -31,10 +31,10 @@ function CreateFormBtn() {
     const methods = useForm<FormValues>();
     const { handleSubmit, formState: { errors, isSubmitting } } = methods;
 
-    const [isLoading, setIsLoading] = useState(false); // For manual control over loading state
+    const [isLoading, setIsLoading] = useState(false);
 
     async function onSubmit(values: FormValues) {
-        setIsLoading(true); // Set loading state to true
+        setIsLoading(true);
         try {
             const result = await createForm({
                 name: values.name,
@@ -52,7 +52,7 @@ function CreateFormBtn() {
         } catch (error) {
             console.error("Error creating form:", error);
         } finally {
-            setIsLoading(false); // Set loading state back to false after form creation
+            setIsLoading(false);
         }
     }
 
@@ -94,8 +94,8 @@ function CreateFormBtn() {
                                 <Textarea
                                     rows={5}
                                     {...methods.register("description", {
-                                        // required: "Description is required",
-                                        // minLength: { value: 10, message: "Description should be at least 10 characters long" },
+
+
                                     })}
                                 />
                             </FormControl>
@@ -105,7 +105,7 @@ function CreateFormBtn() {
                         <DialogFooter>
                             <Button
                                 type="submit"
-                                disabled={isSubmitting || isLoading} // Disable when form is submitting or loading
+                                disabled={isSubmitting || isLoading}
                                 className={`w-full mt-4 ${isLoading ? 'animate-pulse bg-primary' : ''}`}
                             >
                                 {!isLoading && !isSubmitting && <span>Save</span>}

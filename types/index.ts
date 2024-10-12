@@ -173,7 +173,6 @@ export interface AppContextType {
       description: string;
     }) => Promise<{ formId: number; shareURL: string } | null>;
     createBusiness: (businessData: any) => Promise<boolean>;
-    // fetchForms: (businessId: number) => Promise<void>;
     fetchFormsByBusinessId: (businessId: number) => Promise<void>;
     fetchAllForms: () => void;
     fetchSubmissions: (shareURL: string) => Promise<void>;
@@ -202,8 +201,8 @@ export interface AppContextType {
   };
 }
 
-// ==================================================================================
-// ==================================================================================
+/* ==================================================================================*/
+/* ==================================================================================*/
 
 export interface SummaryCard {
   title: string;

@@ -1,20 +1,20 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import { formatDistance } from 'date-fns';
-import { Button } from '../ui/button';
+import { Button } from '@/components/ui/button';
 import { BiRightArrowAlt } from 'react-icons/bi';
 import { FaEdit, FaWpforms } from 'react-icons/fa';
 import { LuView } from 'react-icons/lu';
-import { Badge } from '../ui/badge';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form } from '@/types';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from '../ui/dropdown-menu';
-import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription } from '../ui/alert-dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription } from '@/components/ui/alert-dialog';
 import { useRouter } from 'next/navigation';
-import { useToast } from '../ui/use-toast';
-import { useAppContext } from '../../context/AppContext';
+import { useToast } from '@/components/ui/use-toast';
 import { useSession } from 'next-auth/react';
 import { cn } from '@/lib/utils';
+import { useAppContext } from '@/context/AppProvider';
 
 function FormCard({ form }: { form: Form }) {
 

@@ -1,5 +1,3 @@
-// src/mock-data.ts
-
 import { SummaryCard, Order, OrderDetail } from "@/types";
 import {
   Home,
@@ -83,9 +81,9 @@ export const mockData = {
       email: "liam@acme.com",
       phone: "+1 234 567 890",
     },
-    type: "Sale", // Added property
-    status: "Fulfilled", // Added property
-    amount: "$329.00", // Added property
+    type: "Sale",
+    status: "Fulfilled",
+    amount: "$329.00",
     date: "November 23, 2023",
     items: [
       { name: "Glimmer Lamps", quantity: 2, price: "$250.00" },

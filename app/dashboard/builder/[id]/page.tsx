@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect } from 'react';
-import FormBuilder from '@/components/forms/FormBuilder';
-import { useAppContext } from '@/context/AppContext';
+import FormBuilder from '@/components/business/forms/FormBuilder';
+import { useAppContext } from '@/context/AppProvider';
 import { Form } from '@/types';
 import Spinner from '@/components/ui/spinner';
 
@@ -21,9 +21,9 @@ const BuilderPage = ({ params }: { params: { shareUrl: string } }) => {
         setLoading(true);
         setError(null);
 
-        const formData = await fetchFormByShareUrl(shareUrl);  // Fetch form by shareUrl
+        const formData = await fetchFormByShareUrl(shareUrl);
         if (formData as Form) {
-          setForm(formData);  // Set the form in the context
+          setForm(formData);
         } else {
           setError('Form not found');
         }

@@ -1,14 +1,5 @@
 'use client';
-
 import React from 'react';
-import {
-    Table,
-    TableHeader,
-    TableBody,
-    TableRow,
-    TableCell,
-    TableHead,
-} from '@/components/ui/table'; // Ensure correct import paths
 import { Order } from '@/types';
 
 interface RecentOrdersProps {

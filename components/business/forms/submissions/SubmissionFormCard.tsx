@@ -1,10 +1,10 @@
 'use client';
 
-import { Skeleton } from '../ui/skeleton';
-import FormCard from './FormCard';
-import { useAppContext } from '@/context/AppContext';
+import { Skeleton } from '@/components/ui/skeleton';
+import FormCard from '../FormCard';
+import { useAppContext } from '@/context/AppProvider';
 import { Form } from '@/types';
-import CreateFormBtn from './CreateFormButton';
+import CreateFormBtn from '../CreateFormButton';
 
 const SubmissionFormCard = ({ forms }: { forms: Form[] }) => {
 

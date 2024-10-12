@@ -27,7 +27,7 @@ function SubmissionsTable({ submissions, form, admin }: { submissions: Submissio
         return inputFieldTypes.includes(fieldType);
     };
 
-    // Ensure fields exist and are an array
+
     const fields = Array.isArray(form.fields) ? form.fields : [];
 
     const rows = submissions.map((submission) => {
@@ -36,7 +36,7 @@ function SubmissionsTable({ submissions, form, admin }: { submissions: Submissio
                 return JSON.parse(submission.content);
             } catch (error) {
                 console.error('Error parsing submission content:', error);
-                return {}; // Return empty object if parsing fails
+                return {};
             }
         })();
 

@@ -1,5 +1,4 @@
-// hooks/useLayout.ts
-
+"use client";
 import { useState, useCallback } from "react";
 
 export const useLayout = () => {

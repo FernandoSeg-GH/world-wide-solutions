@@ -1,7 +1,4 @@
-// hooks/business/useBusiness.ts
-
 "use client";
-
 import { useState, useCallback } from "react";
 import { SubscriptionPlan, Business } from "@/types";
 import { toast } from "@/components/ui/use-toast";
@@ -16,7 +13,6 @@ export const useBusiness = () => {
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [business, setBusiness] = useState<Business | null>(null);
 
-  // Create Business
   const createBusiness = useCallback(
     async (businessData: any): Promise<boolean> => {
       try {
@@ -38,7 +34,7 @@ export const useBusiness = () => {
             title: "Success",
             description: "Business created successfully.",
           });
-          // Optionally, add the new business to the local state
+
           setBusinesses((prev) => [...prev, data]);
           return true;
         } else {
@@ -63,7 +59,6 @@ export const useBusiness = () => {
     [session?.accessToken]
   );
 
-  // Fetch Subscription Plans
   const fetchSubscriptionPlans = useCallback(async (): Promise<void> => {
     try {
       setLoading(true);
@@ -90,7 +85,6 @@ export const useBusiness = () => {
     }
   }, []);
 
-  // Get All Businesses (Superadmin Only)
   const getAllBusinesses = useCallback(async (): Promise<void> => {
     try {
       setLoading(true);
@@ -124,7 +118,6 @@ export const useBusiness = () => {
     }
   }, [session?.accessToken]);
 
-  // Get Business by ID
   const getBusinessById = useCallback(
     async (businessId: number): Promise<void> => {
       try {
@@ -161,7 +154,6 @@ export const useBusiness = () => {
     [session?.accessToken]
   );
 
-  // Edit Business
   const editBusiness = useCallback(
     async (
       businessId: number,
@@ -186,7 +178,7 @@ export const useBusiness = () => {
             title: "Success",
             description: "Business updated successfully.",
           });
-          // Update the local state
+
           setBusinesses((prev) =>
             prev.map((biz) =>
               biz.id === businessId ? { ...biz, ...businessData } : biz
@@ -218,7 +210,6 @@ export const useBusiness = () => {
     [session?.accessToken, business]
   );
 
-  // Delete Business
   const deleteBusiness = useCallback(
     async (businessId: number): Promise<boolean> => {
       try {
@@ -236,7 +227,7 @@ export const useBusiness = () => {
             title: "Success",
             description: "Business deleted successfully.",
           });
-          // Remove from local state
+
           setBusinesses((prevBusinesses) =>
             prevBusinesses.filter((biz) => biz.id !== businessId)
           );

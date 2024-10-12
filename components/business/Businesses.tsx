@@ -1,7 +1,7 @@
 import React from 'react'
 import CreateBusinessForm from './CreateBusinessForm'
 import BusinessesTable from './BusinessesTable'
-import { useAppContext } from '@/context/AppContext';
+import { useAppContext } from '@/context/AppProvider';
 
 type Props = {}
 

@@ -38,8 +38,8 @@ function SignUpForm({ onToggle }: { onToggle: () => void }) {
     email: "",
     password: "",
     confirmPassword: "",
-    roleId: 2, // Default to non-admin role
-    businessId: "", // Optional for admin/superadmin role
+    roleId: 2,
+    businessId: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -67,7 +67,7 @@ function SignUpForm({ onToggle }: { onToggle: () => void }) {
           email: formData.email,
           password: formData.password,
           role_id: formData.roleId,
-          business_id: formData.roleId === 1 ? formData.businessId : undefined, // Only send business_id if role_id is 1
+          business_id: formData.roleId === 1 ? formData.businessId : undefined,
         }),
       });
 

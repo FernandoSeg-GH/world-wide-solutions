@@ -1,7 +1,7 @@
 "use client";
 
 import { MdTextFields } from "react-icons/md";
-import { ElementsType, FormElement, FormElementInstance, SubmitFunction } from "../forms/FormElements";
+import { ElementsType, FormElement, FormElementInstance, SubmitFunction } from "@/components/business/forms/FormElements";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { z } from "zod";
@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Switch } from "../ui/switch";
 import { cn } from "@/lib/utils";
-import { useAppContext } from "../../context/AppContext";
+import { useAppContext } from "../../context/AppProvider";
 
 const type: ElementsType = "TextField";
 

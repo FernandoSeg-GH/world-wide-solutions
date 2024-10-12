@@ -1,9 +1,9 @@
 'use client';
 import React, { useEffect } from 'react';
-import FormLinkShare from '@/components/forms/FormLinkShare';
+import FormLinkShare from '@/components/business/forms/FormLinkShare';
 import VisitBtn from '@/components/VisitBtn';
-import { useAppContext } from '@/context/AppContext';
-import SubmissionsTable from '@/components/forms/SubmissionTable';
+import { useAppContext } from '@/context/AppProvider';
+import SubmissionsTable from '@/components/business/forms/submissions/SubmissionTable';
 
 const FormDetailPage = ({ params }: { params: { id: string } }) => {
     const { id } = params;

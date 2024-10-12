@@ -1,6 +1,6 @@
 "use client";
 
-import { ElementsType, FormElement, FormElementInstance } from "../forms/FormElements";
+import { ElementsType, FormElement, FormElementInstance } from "@/components/business/forms/FormElements";
 import { Label } from "../ui/label";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -10,7 +10,7 @@ import { useEffect } from "react";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { LuSeparatorHorizontal } from "react-icons/lu";
 import { Slider } from "../ui/slider";
-import { useAppContext } from "../../context/AppContext";
+import { useAppContext } from "../../context/AppProvider";
 
 const type: ElementsType = "SpacerField";
 

@@ -2,11 +2,11 @@
 
 import React, { useCallback, useRef, useState, useTransition } from "react";
 import { FormElements } from "@/types";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { HiCursorClick } from "react-icons/hi";
 import { ImSpinner2 } from "react-icons/im";
-import { useAppContext } from "@/context/AppContext";
-import { toast } from "../ui/use-toast";
+import { useAppContext } from "@/context/AppProvider";
+import { toast } from "@/components/ui/use-toast";
 
 function FormSubmitComponent({ formUrl }: { formUrl: string }) {
     const { data, actions } = useAppContext();

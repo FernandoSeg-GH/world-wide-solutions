@@ -81,7 +81,7 @@ export const authOptions: NextAuthOptions = {
               email: data.user.email,
               username: data.user.username,
               business_id: data.user.business_id,
-              role: data.user.role, // role is an object with id and name.
+              role: data.user.role,
             };
           }
 
@@ -112,7 +112,7 @@ export const authOptions: NextAuthOptions = {
         token.username = user.username;
         token.name = user.username;
         token.businessId = user.business_id;
-        token.role = user.role; // Keep role as an object.
+        token.role = user.role;
         return token;
       }
 
@@ -140,8 +140,8 @@ export const authOptions: NextAuthOptions = {
         name: String(token.username),
         businessId: token.businessId,
         role: {
-          id: Number(token.role?.id ?? 1), // Use optional chaining with a default value
-          name: String(token.role?.name ?? "Unknown"), // Default to 'Unknown' if role.name is undefined
+          id: Number(token.role?.id ?? 1),
+          name: String(token.role?.name ?? "Unknown"),
         }, //
       };
       if (token.error) {

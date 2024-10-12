@@ -6,14 +6,13 @@ import { Submission, FormElementInstance, Form } from '@/types';
 import { useState, useEffect } from 'react';
 import { FaRegFileAlt } from 'react-icons/fa';
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { RocketIcon } from "@radix-ui/react-icons"; // If you prefer using this icon
+import { RocketIcon } from "@radix-ui/react-icons"
 
 interface ClientViewProps {
     form: Form;
     submissions: Submission[];
 }
 
-// Define a list of fillable field types
 const fillableFieldTypes = [
     "TextField",
     "NumberField",
@@ -47,7 +46,6 @@ export default function ClientView({ form, submissions }: ClientViewProps) {
             {userSubmissions.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {userSubmissions.map((submission, index) => {
-                        // Identify missing fields
                         const missingFields = form.fields
                             .filter((field: FormElementInstance) =>
                                 fillableFieldTypes.includes(field.type) &&
@@ -64,7 +62,6 @@ export default function ClientView({ form, submissions }: ClientViewProps) {
                                     </h3>
                                 </div>
 
-                                {/* Submission Fields */}
                                 <div className="space-y-4">
                                     {form.fields
                                         .filter((field: FormElementInstance) =>
@@ -88,7 +85,6 @@ export default function ClientView({ form, submissions }: ClientViewProps) {
                                         ))}
                                 </div>
 
-                                {/* Alert for Missing Fields */}
                                 {
                                     missingFields.length > 0 && (
                                         <Alert variant="destructive" className="my-4 mt-8 flex gap-4">

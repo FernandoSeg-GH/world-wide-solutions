@@ -2,10 +2,10 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { Toaster } from '@/components/ui/toaster'
-import { ThemeProvider } from '@/components/providers/ThemeProvider'
+import { ThemeProvider } from '@/context/ThemeProvider'
 import NextTopLoader from "nextjs-toploader";
-import ClientProvider from '@/components/providers/ClientProvider'
-import { AppProvider } from '@/context/AppContext'
+import ClientProvider from '@/context/ClientProvider'
+import { AppProvider } from '@/context/AppProvider'
 
 const inter = Inter({ subsets: ['latin'] })
 

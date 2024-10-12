@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import FormBuilder from '@/components/forms/FormBuilder';
-import { useAppContext } from '@/context/AppContext';
+import FormBuilder from '@/components/business/forms/FormBuilder';
+import { useAppContext } from '@/context/AppProvider';
 import Spinner from '@/components/ui/spinner';
 
 interface BuilderPageProps {
@@ -17,7 +17,6 @@ export default function BuilderPage({ params }: BuilderPageProps) {
   const { setForm, setElements } = selectors;
   const { fetchFormByShareUrl } = actions;
 
-  // Fetch the form using the shareUrl and context actions
   useEffect(() => {
     if (shareUrl) {
       fetchFormByShareUrl(shareUrl);

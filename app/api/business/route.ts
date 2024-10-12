@@ -1,7 +1,5 @@
-// pages/api/business/route.ts
-
 import { NextRequest, NextResponse } from "next/server";
-import { authOptions } from "@/lib/auth"; // Ensure correct path
+import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth/next";
 
 export async function GET(req: NextRequest) {
@@ -11,7 +9,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  console.log("Session Token", session.accessToken); // Debug the session token
+  console.log("Session Token", session.accessToken);
 
   try {
     const response = await fetch(

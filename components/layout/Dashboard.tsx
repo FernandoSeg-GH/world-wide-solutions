@@ -2,19 +2,21 @@
 'use client';
 
 import { useState } from "react";
-import Welcome from "@/components/user/Welcome";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
 import Main from "./Main";
-import { useAppContext } from "@/context/AppContext";
-import Businesses from "../business/Businesses";
-import Forms from "../forms/Forms";
+import { useAppContext } from "@/context/AppProvider";
+import Businesses from "@/components/business";
+import Forms from "@/components/business/forms";
+import Submissions from "@/components/business/forms/submissions";
+import Notifications from "@/components/business/notifications";
+import Leo from "../leo";
 
 export default function Dashboard() {
     const [isExpanded, setIsExpanded] = useState(false);
 
     const { data } = useAppContext();
-    const { currentSection } = data; // Get the current section
+    const { currentSection } = data;
 
     const renderComponent = () => {
         switch (currentSection) {
@@ -23,13 +25,13 @@ export default function Dashboard() {
             case "Forms":
                 return <Forms />;
             case "Submissions":
-                return <p>Submissions Component</p>;
+                return <Submissions />;
             case "Notifications":
-                return <p>Notifications</p>;
+                return <Notifications />;
             case "Businesses":
                 return <Businesses />;
             case "AI Characters":
-                return <p>AI Characters</p>;
+                return <Leo />;
             default:
                 return <p>Select a section</p>;
         }

@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import FormLinkShare from '@/components/forms/FormLinkShare';
+import FormLinkShare from '@/components/business/forms/FormLinkShare';
 import VisitBtn from '@/components/VisitBtn';
-import { useAppContext } from '@/context/AppContext';
-import SubmissionsTable from '@/components/forms/SubmissionTable';
+import { useAppContext } from '@/context/AppProvider';
+import SubmissionsTable from '@/components/business/forms/submissions/SubmissionTable';
 import Spinner from '@/components/ui/spinner';
 
 const FormDetailPage = ({ params }: { params: { id: string } }) => {

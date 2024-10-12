@@ -1,9 +1,7 @@
-// components/business/BusinessesTable.tsx
-
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useAppContext } from '@/context/AppContext';
+import { useAppContext } from '@/context/AppProvider';
 import { useRouter } from 'next/navigation';
 import { Business } from '@/types';
 import { Button } from '@/components/ui/button';

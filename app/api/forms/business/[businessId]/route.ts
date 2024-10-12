@@ -12,7 +12,7 @@ export async function GET(
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  const { businessId } = params; // Extract businessId from route params
+  const { businessId } = params;
   console.log("Business ID:", businessId);
 
   if (!businessId) {

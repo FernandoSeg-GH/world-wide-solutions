@@ -1,8 +1,8 @@
 import React from "react";
-import { useAppContext } from "@/context/AppContext";
+import { useAppContext } from "@/context/AppProvider";
 
 import PropertiesFormSidebar from "@/components/builder/PropertiesFormSidebar";
-import FormElementsSidebar from "@/components/forms/FormElementsSidebar";
+import FormElementsSidebar from "@/components/business/forms/FormElementsSidebar";
 
 function DesignerSidebar() {
   const { data: { selectedElement } } = useAppContext();

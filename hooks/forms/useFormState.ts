@@ -156,7 +156,6 @@ export const useFormState = (initialForm?: Form) => {
             "The form and all associated data have been successfully deleted.",
         });
 
-        // Update forms state after deletion
         setForms((prevForms) => prevForms.filter((f) => f.id !== formId));
         if (form?.id === formId) {
           setForm(null);
@@ -262,30 +261,6 @@ export const useFormState = (initialForm?: Form) => {
     [setLoading, setError, setFormState, setElements]
   );
 
-  // const fetchForms = useCallback(
-  //   async (businessId: number) => {
-  //     console.log("calling", businessId);
-  //     try {
-  //       setLoading(true);
-  //       const response = await fetch(
-  //         `/api/forms/get-forms?businessId=${businessId}`
-  //       );
-  //       if (!response.ok) {
-  //         const errorText = await response.text();
-  //         throw new Error(errorText || "Error fetching forms.");
-  //       }
-  //       const data = await response.json();
-  //       setForms(data.forms);
-  //     } catch (err) {
-  //       setError("Failed to fetch forms.");
-  //       console.error("Error fetching forms:", err);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   },
-  //   [setLoading, setForms, setError]
-  // );
-
   const fetchFormsByBusinessId = useCallback(
     async (businessId: number) => {
       try {
@@ -354,7 +329,6 @@ export const useFormState = (initialForm?: Form) => {
     }
   }, [session?.accessToken]);
 
-  // createForm function (remains in AppProvider)
   const createForm = useCallback(
     async ({ name, description }: { name: string; description: string }) => {
       try {
@@ -365,10 +339,10 @@ export const useFormState = (initialForm?: Form) => {
         const formData = {
           name,
           description,
-          business_id: session.user.businessId, // Ensure businessId is passed
+          business_id: session.user.businessId,
         };
 
-        console.log("Form Data:", formData); // Add this for debugging
+        console.log("Form Data:", formData);
 
         const response = await fetch("/api/forms/business/create", {
           method: "POST",
@@ -425,7 +399,7 @@ export const useFormState = (initialForm?: Form) => {
     saveForm,
     publishForm,
     deleteForm,
-    // fetchForms,
+
     fetchFormsByBusinessId,
     fetchAllForms,
     fetchFormByShareUrl,
