@@ -5,7 +5,7 @@ import React from 'react'
 import { useSession } from "next-auth/react";
 import { useAppContext } from "@/context/AppProvider";
 import { useEffect, useState } from "react";
-import { useGodMode } from "@/hooks/useGodMode";
+import { useGodMode } from "@/hooks/user/useGodMode";
 import FormCards from "@/components/business/forms/FormCards";
 import SubmissionFormCard from "@/components/business/forms/submissions/SubmissionFormCard";
 import SubmissionsTable from "@/components/business/forms/submissions/SubmissionTable";
@@ -18,15 +18,15 @@ function Forms({ }: Props) {
     const { godMode } = useGodMode();
     const { data, actions } = useAppContext();
     const { form, submissions, loading: formLoading, loading, forms } = data;
-    const { fetchAllForms, fetchFormsByBusinessId } = actions;
+    const { formActions } = actions;
 
     useEffect(() => {
         if (godMode) {
-            fetchAllForms();
+            formActions.fetchAllForms();
         } else if (session?.user?.businessId) {
-            fetchFormsByBusinessId(session.user.businessId);
+            formActions.fetchFormsByBusinessId(session.user.businessId);
         }
-    }, [godMode, session?.user.businessId, fetchAllForms, fetchFormsByBusinessId]);
+    }, [godMode, session?.user.businessId, formActions.fetchAllForms, formActions.fetchFormsByBusinessId]);
 
     useEffect(() => {
         if (forms.length > 0) {

@@ -13,7 +13,7 @@ import { useAppContext } from "../../context/AppProvider";
 function Designer() {
   const {
     data: { elements, selectedElement },
-    actions: { addElement, removeElement },
+    actions: { formActions },
     selectors: { setSelectedElement },
   } = useAppContext();
 
@@ -38,7 +38,7 @@ function Designer() {
         const type = active.data?.current?.type;
         const newElement = FormElements[type as ElementsType].construct(idGenerator());
 
-        addElement(elements.length, newElement);
+        formActions.addElement(elements.length, newElement);
         return;
       }
 
@@ -64,7 +64,7 @@ function Designer() {
           indexForNewElement = overElementIndex + 1;
         }
 
-        addElement(indexForNewElement, newElement);
+        formActions.addElement(indexForNewElement, newElement);
         return;
       }
 
@@ -84,14 +84,14 @@ function Designer() {
         }
 
         const activeElement = { ...elements[activeElementIndex] };
-        removeElement(activeId);
+        formActions.removeElement(activeId);
 
         let indexForNewElement = overElementIndex;
         if (isDroppingOverDesignerElementBottomHalf) {
           indexForNewElement = overElementIndex + 1;
         }
 
-        addElement(indexForNewElement, activeElement);
+        formActions.addElement(indexForNewElement, activeElement);
       }
     },
   });
@@ -144,7 +144,7 @@ export interface DesignerElementWrapperProps {
 function DesignerElementWrapper({ element }: DesignerElementWrapperProps) {
   const {
     data: { selectedElement },
-    actions: { removeElement },
+    actions: { formActions },
     selectors: { setSelectedElement },
   } = useAppContext();
 
@@ -217,7 +217,7 @@ function DesignerElementWrapper({ element }: DesignerElementWrapperProps) {
               variant={"outline"}
               onClick={(e) => {
                 e.stopPropagation();
-                removeElement(element.id);
+                formActions.removeElement(element.id);
               }}
             >
               <BiSolidTrash className="h-6 w-6" />
@@ -248,7 +248,7 @@ function DesignerElementWrapper({ element }: DesignerElementWrapperProps) {
             variant={"outline"}
             onClick={(e) => {
               e.stopPropagation();
-              removeElement(element.id);
+              formActions.removeElement(element.id);
             }}
           >
             <BiSolidTrash className="h-6 w-6" />

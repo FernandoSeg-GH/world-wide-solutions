@@ -25,7 +25,7 @@ function FormCard({ form }: { form: Form }) {
     const [deleteInputValue, setDeleteInputValue] = useState("");
     const router = useRouter();
     const { toast } = useToast();
-    const { actions: { publishForm }, data: { loading: isPublishing } } = useAppContext();
+    const { actions: { formActions }, data: { loading: isPublishing } } = useAppContext();
 
     useEffect(() => {
         setPublishedStatus(form.published);
@@ -35,7 +35,7 @@ function FormCard({ form }: { form: Form }) {
         const action = publishedStatus ? "unpublish" : "publish";
 
         try {
-            await publishForm(action);
+            await formActions.publishForm(action);
             const updatedStatus = publishedStatus ? "Unpublished" : "Published";
             toast({
                 title: `Form ${updatedStatus}`,

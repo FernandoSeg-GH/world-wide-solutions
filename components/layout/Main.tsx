@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import Welcome from "@/components/user/Welcome";
 import CreateBusinessForm from "@/components/business/CreateBusinessForm";
 import BusinessesTable from "../business/BusinessesTable";
-import { useGodMode } from "@/hooks/useGodMode";
+import { useGodMode } from "@/hooks/user/useGodMode";
 import Stats from "../business/stats";
 import BusinessStats from "../business/stats/BusinessStats";
 
@@ -15,11 +15,11 @@ export default function Main() {
     const { godMode } = useGodMode();
     const { data, actions } = useAppContext();
     const { form, submissions, loading: formLoading, loading, forms } = data;
-    const { fetchFormsByBusinessId } = actions;
+    const { formActions } = actions;
 
     useEffect(() => {
         if (session?.user?.businessId) {
-            fetchFormsByBusinessId(session.user.businessId);
+            formActions.fetchFormsByBusinessId(session.user.businessId);
         }
     }, [session]);
     useEffect(() => {

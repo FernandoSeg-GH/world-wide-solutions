@@ -15,12 +15,12 @@ type SaveFormBtnType = {
 
 function SaveFormBtn({ unsavedChanges, loading }: SaveFormBtnType) {
     const {
-        actions: { saveForm },
+        actions: { formActions },
     } = useAppContext();
 
     const handleSave = async () => {
         try {
-            await saveForm();
+            await formActions.saveForm();
         } catch (error) {
             console.error("Error during saveForm:", error);
         }

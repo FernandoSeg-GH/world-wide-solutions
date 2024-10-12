@@ -10,7 +10,7 @@ const FormCards = ({ forms }: { forms: Form[] }) => {
 
     const { data } = useAppContext();
     const { loading, error } = data;
-    error && console.error('error', error)
+
     return (
         <div>
             <h2 className="text-2xl font-semibold col-span-2 mb-2">Your forms</h2>

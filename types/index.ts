@@ -150,6 +150,8 @@ export interface AppContextType {
     setForms: (forms: Form[] | []) => void;
     setForm: (form: Form | null) => void;
     setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+    setCurrentBusiness: React.Dispatch<React.SetStateAction<Business | null>>;
+    setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>;
   };
   data: {
     formName: string;
@@ -166,15 +168,24 @@ export interface AppContextType {
     error: string | null;
     godMode: boolean;
     currentSection: string;
+    currentUser: User | null;
   };
   actions: {
-    createForm: (newForm: {
-      name: string;
-      description: string;
-    }) => Promise<{ formId: number; shareURL: string } | null>;
+    formActions: {
+      createForm: (newForm: {
+        name: string;
+        description: string;
+      }) => Promise<{ formId: number; shareURL: string } | null>;
+      saveForm: () => Promise<void>;
+      publishForm: (action: "publish" | "unpublish") => Promise<void>;
+      addElement: (index: number, element: FormElementInstance) => void;
+      removeElement: (id: string) => void;
+      updateElement: (id: string, element: FormElementInstance) => void;
+      deleteForm: (formId: number) => Promise<void>;
+      fetchFormsByBusinessId: (businessId: number) => Promise<void>;
+      fetchAllForms: () => void;
+    };
     createBusiness: (businessData: any) => Promise<boolean>;
-    fetchFormsByBusinessId: (businessId: number) => Promise<void>;
-    fetchAllForms: () => void;
     fetchSubmissions: (shareURL: string) => Promise<void>;
     fetchFormByShareUrl: (shareURL: string) => Promise<Form | null>;
     fetchFormByShareUrlPublic: (shareURL: string) => Promise<void>;
@@ -187,13 +198,6 @@ export interface AppContextType {
       businessData: Partial<Business>
     ) => Promise<boolean>;
     deleteBusiness: (businessId: number) => Promise<boolean>;
-
-    saveForm: () => Promise<void>;
-    publishForm: (action: "publish" | "unpublish") => Promise<void>;
-    addElement: (index: number, element: FormElementInstance) => void;
-    removeElement: (id: string) => void;
-    updateElement: (id: string, element: FormElementInstance) => void;
-    deleteForm: (formId: number) => Promise<void>;
     getFormSubmissionByCaseId: (caseId: string) => Promise<Submission | null>;
     getMissingFields: (submission: Submission, form: Form) => Promise<string[]>;
     toggleGodMode: () => void;
@@ -244,12 +248,6 @@ export interface OrderDetail extends Order {
   };
 }
 
-export interface DashboardBodyProps {
-  summaryCards?: SummaryCard[];
-  recentOrders?: Order[];
-  selectedOrder?: OrderDetail;
-}
-
 export interface User {
   id: number;
   username: string;
@@ -281,32 +279,6 @@ export interface SocialMediaPost {
   id: number;
   platform: string;
   posted_at: string;
-}
-
-export interface Business {
-  id: number;
-  name: string;
-  domain?: string;
-  subscription_plan_id?: number;
-  subscription_plan_name?: string;
-  description?: string;
-  phone?: string;
-  url_linkedin?: string;
-  url_instagram?: string;
-  url_facebook?: string;
-  url_twitter?: string;
-  url_tiktok?: string;
-  url_youtube?: string;
-  seo_description?: string;
-  business_email?: string;
-  profile_image_url?: string;
-  background_image_url?: string;
-  users?: User[];
-  tasks?: Task[];
-  ai_characters?: AICharacter[];
-  forms?: Form[];
-  landing_pages?: LandingPage[];
-  social_media_posts?: SocialMediaPost[];
 }
 
 export interface SubscriptionPlan {

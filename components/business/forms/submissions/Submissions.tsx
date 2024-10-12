@@ -4,7 +4,7 @@ import SubmissionFormCard from './SubmissionFormCard';
 import SubmissionsTable from './SubmissionTable';
 import ClientView from '../ClientView';
 import { useSession } from 'next-auth/react';
-import { useGodMode } from '@/hooks/useGodMode';
+import { useGodMode } from '@/hooks/user/useGodMode';
 import { useAppContext } from '@/context/AppProvider';
 
 type Props = {}
@@ -14,15 +14,15 @@ function Submissions({ }: Props) {
     const { godMode } = useGodMode();
     const { data, actions } = useAppContext();
     const { form, submissions, loading: formLoading, loading, forms } = data;
-    const { fetchAllForms, fetchFormsByBusinessId } = actions;
+    const { formActions } = actions;
 
     useEffect(() => {
         if (godMode) {
-            fetchAllForms();
+            formActions.fetchAllForms();
         } else if (session?.user?.businessId) {
-            fetchFormsByBusinessId(session.user.businessId);
+            formActions.fetchFormsByBusinessId(session.user.businessId);
         }
-    }, [godMode, session?.user.businessId, fetchAllForms, fetchFormsByBusinessId]);
+    }, [godMode, session?.user.businessId, formActions.fetchAllForms, formActions.fetchFormsByBusinessId]);
 
     return (
         <div>

@@ -123,7 +123,7 @@ type propertiesFormSchemaType = z.infer<typeof propertiesSchema>;
 function PropertiesComponent({ elementInstance }: { elementInstance: FormElementInstance }) {
   const element = elementInstance as CustomInstance;
   const { actions } = useAppContext();
-  const { updateElement } = actions;
+  const { formActions } = actions;
   const form = useForm<propertiesFormSchemaType>({
     resolver: zodResolver(propertiesSchema),
     mode: "onBlur",
@@ -141,7 +141,7 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
 
   function applyChanges(values: propertiesFormSchemaType) {
     const { label, helperText, placeHolder, required } = values;
-    updateElement(element.id, {
+    formActions.updateElement(element.id, {
       ...element,
       extraAttributes: {
         label,

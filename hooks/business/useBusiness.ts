@@ -1,6 +1,8 @@
+// hooks/business/useBusiness.ts
 "use client";
+
 import { useState, useCallback } from "react";
-import { SubscriptionPlan, Business } from "@/types";
+import { Business, SubscriptionPlan } from "@/types";
 import { toast } from "@/components/ui/use-toast";
 import { useSession } from "next-auth/react";
 
@@ -11,93 +13,18 @@ export const useBusiness = () => {
     SubscriptionPlan[]
   >([]);
   const [businesses, setBusinesses] = useState<Business[]>([]);
-  const [business, setBusiness] = useState<Business | null>(null);
+  const [currentBusiness, setCurrentBusiness] = useState<Business | null>(null);
 
-  const createBusiness = useCallback(
-    async (businessData: any): Promise<boolean> => {
-      try {
-        setLoading(true);
-
-        const res = await fetch("/api/business", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session?.accessToken}`,
-          },
-          body: JSON.stringify(businessData),
-        });
-
-        const data = await res.json();
-
-        if (res.ok) {
-          toast({
-            title: "Success",
-            description: "Business created successfully.",
-          });
-
-          setBusinesses((prev) => [...prev, data]);
-          return true;
-        } else {
-          toast({
-            title: "Error",
-            description: data.message || "Failed to create business.",
-            variant: "destructive",
-          });
-          return false;
-        }
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: "An error occurred while creating the business.",
-          variant: "destructive",
-        });
-        return false;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [session?.accessToken]
-  );
-
-  const fetchSubscriptionPlans = useCallback(async (): Promise<void> => {
+  const fetchAllBusinesses = useCallback(async (): Promise<void> => {
     try {
       setLoading(true);
-      const res = await fetch("/api/business/subscription");
-      const data: SubscriptionPlan[] = await res.json();
-
-      if (res.ok) {
-        setSubscriptionPlans(data);
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to fetch subscription plans.",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "An error occurred while fetching subscription plans.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const getAllBusinesses = useCallback(async (): Promise<void> => {
-    try {
-      setLoading(true);
-
       const res = await fetch("/api/business", {
-        method: "GET",
         headers: {
           Authorization: `Bearer ${session?.accessToken}`,
         },
       });
 
-      const data: Business[] = await res.json();
-      console.log("data", data);
+      const data = await res.json();
       if (res.ok) {
         setBusinesses(data);
       } else {
@@ -118,22 +45,49 @@ export const useBusiness = () => {
     }
   }, [session?.accessToken]);
 
-  const getBusinessById = useCallback(
+  const fetchSubscriptionPlans = useCallback(async (): Promise<void> => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/business/subscription-plans", {
+        headers: {
+          Authorization: `Bearer ${session?.accessToken}`,
+        },
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setSubscriptionPlans(data);
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to fetch subscription plans.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An error occurred while fetching subscription plans.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [session?.accessToken]);
+
+  const fetchBusinessById = useCallback(
     async (businessId: number): Promise<void> => {
       try {
         setLoading(true);
-
         const res = await fetch(`/api/business/${businessId}`, {
-          method: "GET",
           headers: {
             Authorization: `Bearer ${session?.accessToken}`,
           },
         });
 
-        const data: Business = await res.json();
-
+        const data = await res.json();
         if (res.ok) {
-          setBusiness(data);
+          setCurrentBusiness(data);
         } else {
           toast({
             title: "Error",
@@ -184,8 +138,8 @@ export const useBusiness = () => {
               biz.id === businessId ? { ...biz, ...businessData } : biz
             )
           );
-          if (business && business.id === businessId) {
-            setBusiness({ ...business, ...businessData });
+          if (currentBusiness?.id === businessId) {
+            setCurrentBusiness({ ...currentBusiness, ...businessData });
           }
           return true;
         } else {
@@ -207,14 +161,59 @@ export const useBusiness = () => {
         setLoading(false);
       }
     },
-    [session?.accessToken, business]
+    [session?.accessToken, currentBusiness]
+  );
+
+  const createBusiness = useCallback(
+    async (businessData: any): Promise<boolean> => {
+      try {
+        setLoading(true);
+
+        const res = await fetch("/api/business", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.accessToken}`,
+          },
+          body: JSON.stringify(businessData),
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          toast({
+            title: "Success",
+            description: "Business created successfully.",
+          });
+
+          setBusinesses((prev) => [...prev, data]);
+          return true;
+        } else {
+          toast({
+            title: "Error",
+            description: data.message || "Failed to create business.",
+            variant: "destructive",
+          });
+          return false;
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "An error occurred while creating the business.",
+          variant: "destructive",
+        });
+        return false;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [session?.accessToken]
   );
 
   const deleteBusiness = useCallback(
     async (businessId: number): Promise<boolean> => {
       try {
         setLoading(true);
-
         const res = await fetch(`/api/business/${businessId}`, {
           method: "DELETE",
           headers: {
@@ -231,8 +230,8 @@ export const useBusiness = () => {
           setBusinesses((prevBusinesses) =>
             prevBusinesses.filter((biz) => biz.id !== businessId)
           );
-          if (business && business.id === businessId) {
-            setBusiness(null);
+          if (currentBusiness && currentBusiness.id === businessId) {
+            setCurrentBusiness(null);
           }
           return true;
         } else {
@@ -255,20 +254,20 @@ export const useBusiness = () => {
         setLoading(false);
       }
     },
-    [session?.accessToken, business]
+    [session?.accessToken, currentBusiness]
   );
 
   return {
-    createBusiness,
-    fetchSubscriptionPlans,
     subscriptionPlans,
-    getAllBusinesses,
-    getBusinessById,
-    editBusiness,
-    deleteBusiness,
+    fetchSubscriptionPlans,
     businesses,
-    business,
+    currentBusiness, // Ensure 'business' is correctly returned
     loading,
-    setLoading,
+    fetchAllBusinesses,
+    fetchBusinessById,
+    editBusiness,
+    createBusiness,
+    deleteBusiness,
+    setCurrentBusiness,
   };
 };

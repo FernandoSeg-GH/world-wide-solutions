@@ -8,6 +8,7 @@ export const useSubmissions = () => {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const { data: session } = useSession();
   const [loading, setLoading] = useState<boolean>(false);
+
   const fetchSubmissions = useCallback(
     async (shareUrl: string) => {
       if (session) {
@@ -167,11 +168,77 @@ export const useSubmissions = () => {
     }
   }, [session]);
 
+  const fetchFormByShareUrl = useCallback(
+    async (shareURL: string): Promise<Form | null> => {
+      try {
+        setLoading(true);
+        const res = await fetch(`/api/forms/share/${shareURL}`, {
+          headers: {
+            Authorization: `Bearer ${session?.accessToken}`,
+          },
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          return data;
+        } else {
+          toast({
+            title: "Error",
+            description: data.message || "Failed to fetch form.",
+            variant: "destructive",
+          });
+          return null;
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "An error occurred while fetching the form.",
+          variant: "destructive",
+        });
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [session?.accessToken]
+  );
+
+  const fetchFormByShareUrlPublic = useCallback(
+    async (shareURL: string): Promise<void> => {
+      try {
+        setLoading(true);
+        const res = await fetch(`/api/forms/public/share/${shareURL}`);
+
+        if (res.ok) {
+          // Handle public form fetch logic here
+        } else {
+          const data = await res.json();
+          toast({
+            title: "Error",
+            description: data.message || "Failed to fetch public form.",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "An error occurred while fetching the public form.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
   return {
-    loading,
     submissions,
-    setSubmissions,
+    loading,
     fetchSubmissions,
+    fetchFormByShareUrl,
+    fetchFormByShareUrlPublic,
+    setSubmissions,
     getFormSubmissionByCaseId,
     getMissingFields,
     fetchClientSubmissions,

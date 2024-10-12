@@ -26,7 +26,7 @@ type FormValues = {
 function CreateFormBtn() {
     const router = useRouter();
     const { actions } = useAppContext();
-    const { createForm } = actions;
+    const { formActions } = actions;
 
     const methods = useForm<FormValues>();
     const { handleSubmit, formState: { errors, isSubmitting } } = methods;
@@ -36,7 +36,7 @@ function CreateFormBtn() {
     async function onSubmit(values: FormValues) {
         setIsLoading(true);
         try {
-            const result = await createForm({
+            const result = await formActions.createForm({
                 name: values.name,
                 description: values.description,
 

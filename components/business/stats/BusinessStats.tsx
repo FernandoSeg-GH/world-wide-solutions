@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+"use client"
 import { useAppContext } from '@/context/AppProvider'
 import { Users, Briefcase, FileText, DollarSign } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
@@ -7,21 +7,21 @@ import StatCard from './StatCard'
 const BusinessStats = () => {
     const { data, actions } = useAppContext()
     const { businesses, subscriptionPlans, forms, loading } = data
-    const { getAllBusinesses, fetchSubscriptionPlans, fetchAllForms } = actions
+    const { getAllBusinesses, fetchSubscriptionPlans, formActions } = actions
 
     const [userCount, setUserCount] = useState<number>(0)
 
     useEffect(() => {
         getAllBusinesses()
         fetchSubscriptionPlans()
-        fetchAllForms()
+        formActions.fetchAllForms()
 
-        // Simulate fetching all users (you can replace this with your actual API call to get user count)
-        fetch('/api/users') // replace with your actual API route for fetching users
+
+        fetch('/api/users')
             .then((res) => res.json())
-            .then((data) => setUserCount(data.length)) // assuming the response gives an array of users
+            .then((data) => setUserCount(data.length))
             .catch((error) => console.error(error))
-    }, [getAllBusinesses, fetchSubscriptionPlans, fetchAllForms])
+    }, [getAllBusinesses, fetchSubscriptionPlans, formActions.fetchAllForms])
 
     return (
         <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">

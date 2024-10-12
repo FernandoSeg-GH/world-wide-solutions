@@ -18,7 +18,7 @@ function FormBuilder({ formName }: { formName: string }) {
     const {
         selectors: { handleFormNameChange, setSelectedElement },
         data: { unsavedChanges, form, loading },
-        actions: { saveForm, publishForm, addElement, removeElement, updateElement },
+        actions: { formActions },
     } = useAppContext();
 
     const [isReady, setIsReady] = useState<boolean>(false);
@@ -93,8 +93,8 @@ function FormBuilder({ formName }: { formName: string }) {
                                 className="gap-2"
                                 onClick={() => {
                                     !isPublished ?
-                                        publishForm("publish") :
-                                        publishForm("unpublish")
+                                        formActions.publishForm("publish") :
+                                        formActions.publishForm("unpublish")
                                 }}
                             >
                                 {!isPublished ? 'Publish' : 'Unpublish'}

@@ -142,7 +142,7 @@ type propertiesFormSchemaType = z.infer<typeof propertiesSchema>;
 function PropertiesComponent({ elementInstance }: { elementInstance: FormElementInstance }) {
     const element = elementInstance as CustomInstance;
     const { actions, selectors } = useAppContext();
-    const { updateElement } = actions;
+    const { formActions } = actions;
     const { setSelectedElement } = selectors;
 
     const form = useForm<propertiesFormSchemaType>({
@@ -163,7 +163,7 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
 
     function applyChanges(values: propertiesFormSchemaType) {
         const { label, helperText, placeHolder, required, options } = values;
-        updateElement(element.id, {
+        formActions.updateElement(element.id, {
             ...element,
             extraAttributes: {
                 label,
