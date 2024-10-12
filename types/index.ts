@@ -173,7 +173,9 @@ export interface AppContextType {
       description: string;
     }) => Promise<{ formId: number; shareURL: string } | null>;
     createBusiness: (businessData: any) => Promise<boolean>;
-    fetchForms: (businessId: number) => Promise<void>;
+    // fetchForms: (businessId: number) => Promise<void>;
+    fetchFormsByBusinessId: (businessId: number) => Promise<void>;
+    fetchAllForms: () => void;
     fetchSubmissions: (shareURL: string) => Promise<void>;
     fetchFormByShareUrl: (shareURL: string) => Promise<Form | null>;
     fetchFormByShareUrlPublic: (shareURL: string) => Promise<void>;

@@ -262,30 +262,97 @@ export const useFormState = (initialForm?: Form) => {
     [setLoading, setError, setFormState, setElements]
   );
 
-  const fetchForms = useCallback(
-    async (businessId: number) => {
-      if (!businessId) return;
+  // const fetchForms = useCallback(
+  //   async (businessId: number) => {
+  //     console.log("calling", businessId);
+  //     try {
+  //       setLoading(true);
+  //       const response = await fetch(
+  //         `/api/forms/get-forms?businessId=${businessId}`
+  //       );
+  //       if (!response.ok) {
+  //         const errorText = await response.text();
+  //         throw new Error(errorText || "Error fetching forms.");
+  //       }
+  //       const data = await response.json();
+  //       setForms(data.forms);
+  //     } catch (err) {
+  //       setError("Failed to fetch forms.");
+  //       console.error("Error fetching forms:", err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   },
+  //   [setLoading, setForms, setError]
+  // );
 
+  const fetchFormsByBusinessId = useCallback(
+    async (businessId: number) => {
       try {
         setLoading(true);
-        const response = await fetch(
-          `/api/forms/get-forms?businessId=${businessId}`
-        );
+        const response = await fetch(`/api/forms/business/${businessId}`, {
+          headers: {
+            Authorization: `Bearer ${session?.accessToken}`,
+          },
+        });
+
         const data = await response.json();
 
-        if (response.ok) {
-          setForms(data.forms);
-        } else {
-          setError(data.error);
+        if (!response.ok) {
+          toast({
+            title: "Error",
+            description:
+              data.message || "Failed to fetch forms for this business.",
+            variant: "destructive",
+          });
+          return;
         }
-      } catch (err: any) {
-        setError(err.message || "Failed to fetch forms.");
+
+        setForms(data.forms);
+      } catch (error) {
+        console.error("Error fetching forms for business:", error);
+        toast({
+          title: "Error",
+          description:
+            "An error occurred while fetching forms for this business.",
+          variant: "destructive",
+        });
       } finally {
         setLoading(false);
       }
     },
-    [setLoading, setForms, setError]
+    [session?.accessToken]
   );
+
+  const fetchAllForms = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/forms/all`, {
+        headers: {
+          Authorization: `Bearer ${session?.accessToken}`,
+        },
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        toast({
+          title: "Error",
+          description: data.message || "Failed to fetch all forms.",
+          variant: "destructive",
+        });
+        return;
+      }
+      setForms(data.forms);
+    } catch (error) {
+      console.error("Error fetching all forms:", error);
+      toast({
+        title: "Error",
+        description: "An error occurred while fetching all forms.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [session?.accessToken]);
 
   // createForm function (remains in AppProvider)
   const createForm = useCallback(
@@ -295,17 +362,21 @@ export const useFormState = (initialForm?: Form) => {
           throw new Error("User is not authenticated");
         }
 
-        const response = await fetch("/api/forms/create", {
+        const formData = {
+          name,
+          description,
+          business_id: session.user.businessId, // Ensure businessId is passed
+        };
+
+        console.log("Form Data:", formData); // Add this for debugging
+
+        const response = await fetch("/api/forms/business/create", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${session.accessToken}`,
           },
-          body: JSON.stringify({
-            name,
-            description,
-            business_id: session.user.businessId,
-          }),
+          body: JSON.stringify(formData),
         });
 
         if (!response.ok) {
@@ -354,7 +425,9 @@ export const useFormState = (initialForm?: Form) => {
     saveForm,
     publishForm,
     deleteForm,
-    fetchForms,
+    // fetchForms,
+    fetchFormsByBusinessId,
+    fetchAllForms,
     fetchFormByShareUrl,
     fetchFormByShareUrlPublic,
     setLoading,

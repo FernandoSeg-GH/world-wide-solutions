@@ -9,14 +9,14 @@ export default function Laboratory() {
   const { data: session } = useSession();
   const { data, actions } = useAppContext();
   const { form, submissions, loading: formLoading, loading, forms } = data;
-  const { fetchForms } = actions;
+  // const { fetchForms } = actions;
 
   useEffect(() => {
     if (session?.user) {
       // fetchForms(session.user.businessId); 
       console.log('session.user', session.user)
     }
-  }, [session, fetchForms]);
+  }, [session]);
 
   return (<Dashboard />);
 }

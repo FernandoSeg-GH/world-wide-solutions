@@ -14,13 +14,13 @@ export default function Dashboard() {
   const { data: session } = useSession();
   const { data, actions } = useAppContext();
   const { form, submissions, loading: formLoading, loading, forms } = data;
-  const { fetchForms } = actions;
+  // const { fetchForms } = actions;
 
-  useEffect(() => {
-    if (session?.user?.businessId) {
-      fetchForms(session.user.businessId);
-    }
-  }, [session, fetchForms]);
+  // useEffect(() => {
+  //   if (session?.user?.businessId) {
+  //     fetchForms(session.user.businessId);
+  //   }
+  // }, [session, fetchForms]);
 
   return (
     <div className="p-4 pb-20 w-full flex flex-col justify-start items-start">

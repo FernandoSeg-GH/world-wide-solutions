@@ -22,12 +22,13 @@ import { cn } from "@/lib/utils"
 
 interface HeaderProps {
     // breadcrumbs?: Breadcrumb[]
+    currentSection: string
 }
 
-export function Header({ }: HeaderProps) {
+export function Header({ currentSection }: HeaderProps) {
     // const { data: session } = useSession();
-    const { data, actions } = useAppContext();
-    const { godMode, form, submissions, loading: formLoading, loading, forms } = data;
+    const { data } = useAppContext();
+    const { godMode } = data;
     // const { fetchForms } = actions;
 
     // useEffect(() => {
@@ -57,6 +58,7 @@ export function Header({ }: HeaderProps) {
                     </BreadcrumbList>
                 </Breadcrumb>
             } */}
+            <h2 className="font-bold text-2xl">{currentSection}</h2>
             <div className="relative ml-auto flex-1 md:grow-0">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input

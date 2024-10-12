@@ -27,19 +27,24 @@ function SubmissionsTable({ submissions, form, admin }: { submissions: Submissio
         return inputFieldTypes.includes(fieldType);
     };
 
+    // Ensure fields exist and are an array
+    const fields = Array.isArray(form.fields) ? form.fields : [];
+
     const rows = submissions.map((submission) => {
-        let parsedContent: { [key: string]: any } = {};
-        try {
-            parsedContent = JSON.parse(submission.content);
-        } catch (error) {
-            console.error('Error parsing submission content:', error);
-        }
+        const parsedContent: { [key: string]: any } = (() => {
+            try {
+                return JSON.parse(submission.content);
+            } catch (error) {
+                console.error('Error parsing submission content:', error);
+                return {}; // Return empty object if parsing fails
+            }
+        })();
 
         const row: { [key: string]: any } = {
             submittedAt: submission.createdAt,
         };
 
-        form.fields.forEach((field) => {
+        fields.forEach((field) => {
             if (isInputField(field.type) && parsedContent[field.id] !== undefined) {
                 row[field.id] = parsedContent[field.id];
             }
@@ -47,14 +52,12 @@ function SubmissionsTable({ submissions, form, admin }: { submissions: Submissio
         return row;
     });
 
-
-    const fieldMap = form.fields.reduce((acc: { [key: string]: string }, field) => {
+    const fieldMap = fields.reduce((acc: { [key: string]: string }, field) => {
         if (isInputField(field.type)) {
             acc[field.id] = field.extraAttributes?.label || `Field ${field.id}`;
         }
         return acc;
     }, {});
-
 
     const fieldKeys = Object.keys(fieldMap);
 

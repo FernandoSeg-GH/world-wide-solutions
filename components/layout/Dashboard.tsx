@@ -41,7 +41,7 @@ export default function Dashboard() {
                 setIsExpanded={setIsExpanded}
             />
             <div className={`flex p-4 h-auto w-full flex-col gap-6 transition-all duration-300 ${isExpanded ? "sm:pl-64" : "sm:pl-14"}`}>
-                <Header
+                <Header currentSection={currentSection}
                 // breadcrumbs={mockData.breadcrumbs} 
                 />
                 <div className="p-4">
