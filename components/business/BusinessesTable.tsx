@@ -30,10 +30,8 @@ export default function BusinessesTable() {
     const router = useRouter();
 
     useEffect(() => {
-        if (godMode) {
-            getAllBusinesses();
-        }
-    }, [godMode, getAllBusinesses]);
+        getAllBusinesses();
+    }, []);
 
     const handleEdit = (businessId: number) => {
         router.push(`/edit-business?businessId=${businessId}`);

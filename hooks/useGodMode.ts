@@ -3,7 +3,7 @@ import { toast } from "@/components/ui/use-toast";
 import { useState, useEffect, useCallback } from "react";
 
 export const useGodMode = () => {
-  const [godMode, setGodMode] = useState<boolean>(true);
+  const [godMode, setGodMode] = useState<boolean>(false);
 
   const toggleGodMode = useCallback(() => {
     setGodMode((prev) => !prev);

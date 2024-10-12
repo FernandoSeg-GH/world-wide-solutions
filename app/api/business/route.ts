@@ -11,9 +11,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
+  console.log("Session Token", session.accessToken); // Debug the session token
+
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/business/`,
+      `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/business`,
       {
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
@@ -21,16 +23,16 @@ export async function GET(req: NextRequest) {
       }
     );
 
+    const data = await response.json();
+
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Error fetching businesses:", errorData);
+      console.error("Error fetching businesses:", data);
       return NextResponse.json(
-        { message: errorData.message || "Failed to fetch businesses." },
+        { message: data.message || "Failed to fetch businesses." },
         { status: response.status }
       );
     }
 
-    const data = await response.json();
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
     console.error("Error fetching businesses:", error);

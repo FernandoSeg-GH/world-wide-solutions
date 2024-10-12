@@ -1,12 +1,9 @@
 'use client';
 
-import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "next-auth/react";
-import CreateFormBtn from "@/components/forms/CreateFormButton";
 import FormCards from "@/components/forms/FormCards";
 import Welcome from "@/components/user/Welcome";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import ClientView from "@/components/forms/ClientView";
 import CreateBusinessForm from "@/components/business/CreateBusinessForm";
 import { useAppContext } from "@/context/AppContext";
@@ -21,9 +18,9 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (session?.user?.businessId) {
-      fetchForms(session.user.businessId); // Fetch forms for the logged-in user's business
+      fetchForms(session.user.businessId);
     }
-  }, [session, fetchForms]); // Dependencies: session and fetchForms
+  }, [session, fetchForms]);
 
   return (
     <div className="p-4 pb-20 w-full flex flex-col justify-start items-start">

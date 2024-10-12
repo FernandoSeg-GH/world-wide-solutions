@@ -165,6 +165,7 @@ export interface AppContextType {
     business: Business | null;
     error: string | null;
     godMode: boolean;
+    currentSection: string;
   };
   actions: {
     createForm: (newForm: {
@@ -195,6 +196,7 @@ export interface AppContextType {
     getFormSubmissionByCaseId: (caseId: string) => Promise<Submission | null>;
     getMissingFields: (submission: Submission, form: Form) => Promise<string[]>;
     toggleGodMode: () => void;
+    switchSection: (section: string) => void;
   };
 }
 
