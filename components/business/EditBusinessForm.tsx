@@ -82,7 +82,7 @@ export default function EditBusinessForm({ businessId }: { businessId: number | 
         });
 
         if (success) {
-            router.push("/lab");
+            router.push("/dashboard");
         }
     };
 
@@ -92,7 +92,7 @@ export default function EditBusinessForm({ businessId }: { businessId: number | 
         if (confirmed) {
             const success = await deleteBusiness(Number(businessId));
             if (success) {
-                router.push("/lab");
+                router.push("/dashboard");
             }
         }
     };

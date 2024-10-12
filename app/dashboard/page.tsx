@@ -1,52 +1,16 @@
 'use client';
 
 import { useSession } from "next-auth/react";
-import Welcome from "@/components/user/Welcome";
-import CreateBusinessForm from "@/components/business/CreateBusinessForm";
-import { useAppContext } from "@/context/AppProvider";
-import FormCards from "@/components/business/forms/FormCards";
-import SubmissionFormCard from "@/components/business/forms/submissions/SubmissionFormCard";
-import SubmissionsTable from "@/components/business/forms/submissions/SubmissionTable";
-import ClientView from "@/components/business/forms/ClientView";
+import Dashboard from "@/components/layout/Dashboard";
+import { useEffect } from "react";
 
-export default function Dashboard() {
+export default function DashboardPage() {
   const { data: session } = useSession();
-  const { data, actions } = useAppContext();
-  const { form, submissions, loading: formLoading, loading, forms } = data;
+  useEffect(() => {
+    if (session?.user) {
+      console.log('session.user', session.user)
+    }
+  }, [session]);
 
-  return (
-    <div className="p-4 pb-20 w-full flex flex-col justify-start items-start">
-      <Welcome />
-
-      <div className="w-full">
-        {!session?.user?.businessId && session?.user?.role.id !== 1 ?
-          <CreateBusinessForm /> : null
-        }
-        {forms && session?.user.role.id !== 1 ? (
-          <div className="px-4 py-6 border w-full mt-10 rounded-lg text-left shadow-md">
-            <h2 className="text-2xl font-semibold col-span-2 mb-2">Your forms</h2>
-            {/* {forms.map((form) => <p key={form?.name}>{form.name}</p>)} */}
-            <FormCards forms={forms} />
-          </div>
-        ) : <SubmissionFormCard forms={forms} />
-        }
-      </div>
-      <div className="flex flex-col gap-6 w-full">
-        <div>
-          {form && session?.user.role.id !== 1 && forms && submissions ?
-            forms.map((form, index) =>
-              <SubmissionsTable key={index} form={form} submissions={submissions} admin />
-            )
-            : null
-          }
-        </div>
-        <div className="w-full">
-          {form ?
-            <ClientView form={form} submissions={submissions ?? []} />
-            : null
-          }
-        </div>
-      </div>
-    </div>
-  );
+  return (<Dashboard />);
 }
