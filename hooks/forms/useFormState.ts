@@ -6,16 +6,24 @@ import { deepEqual } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 
 export const useFormState = (initialForm?: Form) => {
-  const [form, setFormState] = useState<Form | null>(initialForm ?? null);
   const [forms, setForms] = useState<Form[]>([]);
+  const [form, setFormState] = useState<Form | null>(initialForm ?? null);
   const [formName, setFormName] = useState<string>(initialForm?.name || "");
+  const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
+  const formInitializedRef = useRef<boolean>(false);
+
   const [elements, setElements] = useState<FormElementInstance[]>(
     initialForm?.fields || []
   );
+  // const [elements, setElements] = useState<FormField[]>(
+  //   initialForm?.fields || []
+  // );
+
   const [selectedElement, setSelectedElement] =
     useState<FormElementInstance | null>(null);
-  const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
-  const formInitializedRef = useRef(false);
+  // const [selectedElement, setSelectedElement] = useState<FormField | null>(
+  //   null
+  // );
 
   const { data: session } = useSession();
   const [loading, setLoading] = useState<boolean>(false);
@@ -204,7 +212,7 @@ export const useFormState = (initialForm?: Form) => {
       try {
         setLoading(true);
 
-        const response = await fetch("/api/forms/publish-unpublish-form", {
+        const response = await fetch("/api/forms/publish-unpublish", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ form_id: form.id, action }),
@@ -299,15 +307,16 @@ export const useFormState = (initialForm?: Form) => {
     [session?.accessToken]
   );
 
-  const fetchAllForms = useCallback(async () => {
+  const fetchAllForms = useCallback(async (): Promise<void> => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/forms/all`, {
-        headers: {
-          Authorization: `Bearer ${session?.accessToken}`,
-        },
-      });
+      const response =
+        session?.user.role.id === 4
+          ? await fetch(`/api/forms/all_forms`)
+          : await fetch(`/api/forms/${session?.user.businessId}`);
+
       const data = await response.json();
+
       if (!response.ok) {
         toast({
           title: "Error",
@@ -327,7 +336,7 @@ export const useFormState = (initialForm?: Form) => {
     } finally {
       setLoading(false);
     }
-  }, [session?.accessToken]);
+  }, [session?.user.businessId, session?.user.role.id]);
 
   const createForm = useCallback(
     async ({ name, description }: { name: string; description: string }) => {
@@ -342,9 +351,7 @@ export const useFormState = (initialForm?: Form) => {
           business_id: session.user.businessId,
         };
 
-        console.log("Form Data:", formData);
-
-        const response = await fetch("/api/forms/business/create", {
+        const response = await fetch("/api/forms/create", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

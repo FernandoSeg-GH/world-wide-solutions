@@ -6,6 +6,7 @@ import { ThemeProvider } from '@/context/ThemeProvider'
 import NextTopLoader from "nextjs-toploader";
 import ClientProvider from '@/context/ClientProvider'
 import { AppProvider } from '@/context/AppProvider'
+import ErrorBoundary from '@/components/ui/error-boundary'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -22,9 +23,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <body className={inter.className}>
           <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
             <AppProvider >
-              <NextTopLoader />
-              {children}
-              <Toaster />
+              <ErrorBoundary>
+                <NextTopLoader />
+                {children}
+                <Toaster />
+              </ErrorBoundary>
             </AppProvider>
           </ThemeProvider>
         </body>

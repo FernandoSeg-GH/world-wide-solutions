@@ -5,7 +5,7 @@ export async function GET(req: NextRequest) {
     process.env.NEXT_PUBLIC_FLASK_BACKEND_URL || "http://localhost:5000";
 
   try {
-    const response = await fetch(`${backendUrl}/users/users`, {
+    const response = await fetch(`${backendUrl}/users`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${process.env.JWT_TOKEN}`,

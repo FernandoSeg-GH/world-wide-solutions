@@ -28,11 +28,6 @@ function Forms({ }: Props) {
         }
     }, [godMode, session?.user.businessId, formActions.fetchAllForms, formActions.fetchFormsByBusinessId]);
 
-    useEffect(() => {
-        if (forms.length > 0) {
-            console.log('forms', forms)
-        }
-    }, [forms])
     return (
         <div>
             <div className="w-full flex flex-col gap-6">

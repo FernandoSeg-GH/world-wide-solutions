@@ -1,4 +1,4 @@
-// context/AppProvider.tsx
+
 "use client";
 
 import React, {
@@ -16,7 +16,7 @@ import { useSubmissions } from '@/hooks/forms/useSubmissions';
 import { useGodMode } from '@/hooks/user/useGodMode';
 import { useBusiness } from '@/hooks/business/useBusiness';
 import { useUser } from '@/hooks/user/useUser';
-import { useLayout } from '@/hooks/useLayout';
+import { useLayout } from '@/hooks/layout/useLayout';
 
 export const AppContext = createContext<AppContextType | null>(null);
 
@@ -35,10 +35,20 @@ interface AppProviderProps {
 
 export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.Element => {
     const { data: session } = useSession();
+
+    /* LAYOUT */
     const layoutState = useLayout();
+
+    /* FORM */
     const formState = useFormState(initialForm);
+
+    /* SUBMISSIONS */
     const submissionState = useSubmissions();
+
+    /* GODMODE */
     const { godMode, toggleGodMode } = useGodMode();
+
+    /* BUSINESS */
     const {
         createBusiness,
         fetchSubscriptionPlans,
@@ -53,12 +63,13 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         fetchBusinessById
     } = useBusiness();
 
+    /* USER */
     const { users, currentUser, loading: userLoading, fetchAllUsers, setCurrentUser } = useUser();
 
     const [loading, setLoadingState] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Aggregate loading states
+
     useEffect(() => {
         setLoadingState(
             formState.loading ||
@@ -68,22 +79,23 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         );
     }, [formState.loading, submissionState.loading, businessLoading, userLoading]);
 
-    // Initialize the first form if not already set
+
     useEffect(() => {
-        if (formState.forms.length > 0 && !initialForm && !formState.formInitializedRef.current) {
+        if (Array.isArray(formState.forms) && formState.forms.length > 0 && !initialForm && !formState.formInitializedRef.current) {
             formState.setForm(formState.forms[0]);
             formState.formInitializedRef.current = true;
         }
     }, [formState.forms, initialForm, formState.setForm]);
 
-    // Fetch submissions when a form is set
+
+
     useEffect(() => {
         if (formState.form) {
             submissionState.fetchSubmissions(formState.form.shareURL);
         }
     }, [formState.form, submissionState.fetchSubmissions]);
 
-    // Define selectors
+
     const selectors = useMemo(() => ({
         setError,
         setLoading: setLoadingState,
@@ -99,7 +111,7 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         setCurrentUser,
     }), [setError, setLoadingState, formState, submissionState, setCurrentBusiness, setCurrentUser]);
 
-    // Define data
+
     const data = useMemo(() => ({
         ...layoutState,
         formName: formState.formName,
@@ -112,11 +124,14 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         submissions: submissionState.submissions,
         subscriptionPlans,
         businesses,
-        business: currentBusiness, // Explicitly map 'currentBusiness' to 'business'
+        business: currentBusiness,
         godMode,
         error,
         currentSection: layoutState.currentSection,
+        currentPage: submissionState.currentPage,
+        totalPages: submissionState.totalPages,
         currentUser,
+        users
     }), [
         layoutState,
         formState.formName,
@@ -133,10 +148,13 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         godMode,
         error,
         layoutState.currentSection,
+        submissionState.currentPage,
+        submissionState.totalPages,
         currentUser,
+        users
     ]);
 
-    // Define form-related actions
+
     const formActions = useMemo(() => ({
         createForm: formState.createForm,
         saveForm: formState.saveForm,
@@ -149,13 +167,14 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         fetchAllForms: formState.fetchAllForms,
     }), [formState]);
 
-    // Destructure the missing methods from useSubmissions
-    const { fetchFormByShareUrl, fetchFormByShareUrlPublic } = submissionState;
 
-    // Define all actions
+    const { fetchFormByShareUrl, fetchFormByShareUrlPublic, fetchAllSubmissions } = submissionState;
+
+
     const actions = useMemo(() => ({
         formActions,
         fetchSubmissions: submissionState.fetchSubmissions,
+        fetchAllSubmissions,
         getFormSubmissionByCaseId: submissionState.getFormSubmissionByCaseId,
         getMissingFields: submissionState.getMissingFields,
         fetchClientSubmissions: submissionState.fetchClientSubmissions,
@@ -169,6 +188,7 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         fetchFormByShareUrlPublic,
         toggleGodMode,
         switchSection: layoutState.switchSection,
+        fetchAllUsers
     }), [
         formActions,
         submissionState,
@@ -180,9 +200,10 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         deleteBusiness,
         toggleGodMode,
         layoutState.switchSection,
+        fetchAllUsers
     ]);
 
-    // Define the context value
+
     const contextValue: AppContextType = useMemo(() => ({
         selectors,
         data,

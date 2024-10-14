@@ -1,7 +1,7 @@
 'use client';
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Menu } from "lucide-react";
+import { DnaIcon, Menu } from "lucide-react";
 import { FaHome, FaBusinessTime, FaRobot, FaListAlt, FaClipboardList, FaBell } from 'react-icons/fa';
 import { useAppContext } from "@/context/AppProvider";
 import React from 'react';
@@ -46,7 +46,11 @@ export const getSidebarItems = (godMode: boolean): SidebarItem[] => {
             {
                 icon: FaRobot,
                 label: "AI Characters",
-            }
+            },
+            {
+                icon: DnaIcon,
+                label: "Vinci",
+            },
         );
     }
 

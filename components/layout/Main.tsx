@@ -22,11 +22,6 @@ export default function Main() {
             formActions.fetchFormsByBusinessId(session.user.businessId);
         }
     }, [session]);
-    useEffect(() => {
-        if (form) {
-            console.log('form', form)
-        }
-    }, [form]);
 
     return (
         <div className="flex h-full w-full flex-col bg-muted/40">

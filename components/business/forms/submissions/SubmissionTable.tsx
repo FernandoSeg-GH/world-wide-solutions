@@ -1,4 +1,5 @@
 'use client';
+
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Submission, Form, ElementsType } from '@/types';
@@ -9,7 +10,7 @@ interface Row {
     [key: string]: any;
 }
 
-function SubmissionsTable({ submissions, form, admin }: { submissions: Submission[]; form: Form, admin?: boolean }) {
+function SubmissionsTable({ submissions, form, admin }: { submissions: Submission[]; form: Form; admin?: boolean }) {
     if (!Array.isArray(submissions) || submissions.length === 0) {
         return <p className="text-muted-foreground">No submissions available.</p>;
     }
@@ -27,18 +28,11 @@ function SubmissionsTable({ submissions, form, admin }: { submissions: Submissio
         return inputFieldTypes.includes(fieldType);
     };
 
-
     const fields = Array.isArray(form.fields) ? form.fields : [];
 
     const rows = submissions.map((submission) => {
-        const parsedContent: { [key: string]: any } = (() => {
-            try {
-                return JSON.parse(submission.content);
-            } catch (error) {
-                console.error('Error parsing submission content:', error);
-                return {};
-            }
-        })();
+        // Use submission.content directly as it's already an object
+        const parsedContent: Record<string, any> = submission.content || {};
 
         const row: { [key: string]: any } = {
             submittedAt: submission.createdAt,

@@ -12,26 +12,180 @@ import { TitleFieldFormElement } from "@/components/fields/TitleField";
 import { TelephoneFieldFormElement } from "@/components/fields/TelephoneField";
 import { Dispatch, SetStateAction } from "react";
 
+export interface Role {
+  id: number;
+  name: string;
+
+  users?: User[];
+}
+
+export interface User {
+  id: number;
+  username: string;
+  email: string;
+  role_id: number;
+  role_name?: string;
+  business_id?: number;
+  business_name?: string;
+  last_login_at?: string;
+  is_active: boolean;
+  onboarded: boolean;
+
+  sent_messages?: Message[];
+  received_messages?: MessageRecipient[];
+  tasks?: Task[];
+  chats?: Chat[];
+  ai_characters?: UserAICharacter[];
+}
+
+export interface Business {
+  id: number;
+  name: string;
+  domain?: string;
+  subscription_plan_id?: number;
+  subscription_plan_name?: string;
+  description?: string;
+  phone?: string;
+  url_linkedin?: string;
+  url_instagram?: string;
+  url_facebook?: string;
+  url_twitter?: string;
+  url_tiktok?: string;
+  url_youtube?: string;
+  seo_description?: string;
+  business_email?: string;
+  profile_image_url?: string;
+  background_image_url?: string;
+
+  users?: User[];
+  forms?: Form[];
+  tasks?: Task[];
+  ai_characters?: AICharacter[];
+  landing_pages?: LandingPage[];
+  social_media_posts?: SocialMediaPost[];
+}
+
 export interface SubscriptionPlan {
   id: number;
   name: string;
   price: string;
   features: string[] | null;
+
+  businesses?: Business[];
 }
 
 export interface Form {
   id: number;
   name: string;
-  fields: FormElementInstance[];
+  fields: FormField[];
   shareURL: string;
-  businessId?: number;
+  businessId: number;
+  business_name?: string;
   description?: string;
   extraAttributes?: Record<string, any>;
-  createdAt?: string;
-  published?: boolean;
-  visits?: number;
+  createdAt: string;
+  published: boolean;
+  visits: number;
   submissionsCount?: number;
+
+  landing_page_id?: number;
+  landing_page_url?: string;
   FormSubmissions?: Submission[];
+}
+
+export interface Submission {
+  id: number;
+  formId: number;
+  form_name?: string;
+  user_id: number;
+  username?: string;
+  formUrl: string;
+  content: Record<string, any>;
+  createdAt: string;
+}
+
+export interface LandingPage {
+  id: number;
+  url: string;
+  content?: string;
+  business_id: number;
+
+  forms?: Form[];
+}
+
+export interface SocialMediaPost {
+  id: number;
+  content: string;
+  image_url?: string;
+  posted_at: string;
+  platform: string;
+  metrics?: Record<string, any>;
+  business_id: number;
+}
+
+export interface Task {
+  id: number;
+  name: string;
+  description?: string;
+  assigned_to_id?: number;
+  assigned_to_username?: string;
+  ai_character_id?: number;
+  ai_character_name?: string;
+  business_id: number;
+  status: string;
+  priority: string;
+  due_date?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AICharacter {
+  id: number;
+  name: string;
+  business_id: number;
+
+  tasks?: Task[];
+  users?: UserAICharacter[];
+}
+
+export interface Chat {
+  id: number;
+  user_id: number;
+  message: string;
+  ai_response?: string;
+  timestamp: string;
+  chat_type: string;
+
+  user?: User;
+}
+
+export interface Message {
+  id: number;
+  sender_id: number;
+  content: string;
+  timestamp: string;
+
+  sender?: User;
+  recipients?: MessageRecipient[];
+}
+
+export interface MessageRecipient {
+  message_id: number;
+  user_id: number;
+  read: boolean;
+  read_at?: string;
+
+  user?: User;
+  message?: Message;
+}
+
+export interface UserAICharacter {
+  user_id: number;
+  ai_character_id: number;
+  permissions: string;
+
+  user?: User;
+  ai_character?: AICharacter;
 }
 
 export interface FormField {
@@ -48,27 +202,6 @@ export interface FormField {
     rows?: number;
     [key: string]: any;
   };
-}
-
-export interface FormContextType {
-  formName: string;
-  elements: FormField[];
-  setElements: (elements: FormField[]) => void;
-  setFormName: (name: string) => void;
-  unsavedChanges: boolean;
-  saveForm: () => Promise<void>;
-  publishForm: (action: "publish" | "unpublish") => Promise<void>;
-  handleFormNameChange: (newName: string) => void;
-  setUnsavedChanges: Dispatch<SetStateAction<boolean>>;
-  loading: boolean;
-}
-
-export interface Submission {
-  id: number;
-  formUrl: string;
-  formId?: number;
-  content: any;
-  createdAt: string;
 }
 
 export type ElementsType =
@@ -141,8 +274,8 @@ export interface FetchError {
 export interface AppContextType {
   selectors: {
     setFormName: (name: string) => void;
-    setElements: (elements: FormElementInstance[]) => void;
-    setSelectedElement: (element: FormElementInstance | null) => void;
+    setElements: (elements: FormField[]) => void;
+    setSelectedElement: (element: FormField | null) => void;
     handleFormNameChange: (newName: string) => void;
     setUnsavedChanges: (flag: boolean) => void;
     setSubmissions: (submissions: Submission[]) => void;
@@ -155,8 +288,8 @@ export interface AppContextType {
   };
   data: {
     formName: string;
-    elements: FormElementInstance[];
-    selectedElement: FormElementInstance | null;
+    elements: FormField[];
+    selectedElement: FormField | null;
     unsavedChanges: boolean;
     loading: boolean;
     form: Form | null;
@@ -168,7 +301,17 @@ export interface AppContextType {
     error: string | null;
     godMode: boolean;
     currentSection: string;
+    users: User[] | null;
     currentUser: User | null;
+    currentPage?: number;
+    totalPages?: number;
+    roles?: Role[];
+    tasks?: Task[];
+    messages?: Message[];
+    chats?: Chat[];
+    aiCharacters?: AICharacter[];
+    landingPages?: LandingPage[];
+    socialMediaPosts?: SocialMediaPost[];
   };
   actions: {
     formActions: {
@@ -183,13 +326,14 @@ export interface AppContextType {
       updateElement: (id: string, element: FormElementInstance) => void;
       deleteForm: (formId: number) => Promise<void>;
       fetchFormsByBusinessId: (businessId: number) => Promise<void>;
-      fetchAllForms: () => void;
+      fetchAllForms: () => Promise<void>;
     };
     createBusiness: (businessData: any) => Promise<boolean>;
     fetchSubmissions: (shareURL: string) => Promise<void>;
-    fetchFormByShareUrl: (shareURL: string) => Promise<Form | null>;
-    fetchFormByShareUrlPublic: (shareURL: string) => Promise<void>;
-    fetchClientSubmissions: (userId: number) => Promise<void>;
+    fetchAllSubmissions: (page?: number) => Promise<Submission[] | null>;
+    getFormSubmissionByCaseId: (caseId: string) => Promise<Submission | null>;
+    getMissingFields: (submission: Submission, form: Form) => Promise<string[]>;
+    fetchClientSubmissions: () => Promise<void>;
     fetchSubscriptionPlans: () => Promise<void>;
     getAllBusinesses: () => Promise<void>;
     getBusinessById: (businessId: number) => Promise<void>;
@@ -198,10 +342,18 @@ export interface AppContextType {
       businessData: Partial<Business>
     ) => Promise<boolean>;
     deleteBusiness: (businessId: number) => Promise<boolean>;
-    getFormSubmissionByCaseId: (caseId: string) => Promise<Submission | null>;
-    getMissingFields: (submission: Submission, form: Form) => Promise<string[]>;
+    fetchFormByShareUrl: (shareURL: string) => Promise<Form | null>;
+    fetchFormByShareUrlPublic: (shareURL: string) => Promise<void>;
     toggleGodMode: () => void;
     switchSection: (section: string) => void;
+    fetchAllUsers: () => Promise<User[] | null>;
+    fetchAllRoles?: () => Promise<Role[] | null>;
+    fetchAllTasks?: () => Promise<Task[] | null>;
+    fetchAllMessages?: () => Promise<Message[] | null>;
+    fetchAllChats?: () => Promise<Chat[] | null>;
+    fetchAllAICharacters?: () => Promise<AICharacter[] | null>;
+    fetchAllLandingPages?: () => Promise<LandingPage[] | null>;
+    fetchAllSocialMediaPosts?: () => Promise<SocialMediaPost[] | null>;
   };
 }
 
@@ -248,12 +400,6 @@ export interface OrderDetail extends Order {
   };
 }
 
-export interface User {
-  id: number;
-  username: string;
-  email: string;
-}
-
 export interface Task {
   id: number;
   name: string;
@@ -265,14 +411,10 @@ export interface AICharacter {
   name: string;
 }
 
-export interface Form {
-  id: number;
-  name: string;
-}
-
 export interface LandingPage {
   id: number;
   url: string;
+  content?: string;
 }
 
 export interface SocialMediaPost {

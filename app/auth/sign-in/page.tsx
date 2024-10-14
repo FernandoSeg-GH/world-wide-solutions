@@ -67,7 +67,6 @@ function SignInForm({ onToggle }: { onToggle: () => void }) {
       });
 
       setLoading(false);
-      console.log('router pushing')
       router.push("/dashboard");
     }
   };

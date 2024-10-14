@@ -2,39 +2,43 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 
-export async function GET(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { businessId: string } }
+) {
+  const { businessId } = params;
+
   const session = await getServerSession(authOptions);
 
   if (!session || !session.accessToken) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  const url = new URL(request.url);
-  const pathSegments = url.pathname.split("/").filter((seg) => seg);
-
-  let endpoint = "";
-  if (pathSegments.length === 2 && pathSegments[1] === "all_forms") {
-    endpoint = "all_forms";
-  } else if (pathSegments.length === 2 && !isNaN(Number(pathSegments[1]))) {
-    endpoint = pathSegments[1];
-  } else {
+  if (!businessId || isNaN(Number(businessId))) {
     return NextResponse.json(
-      { message: "Invalid API endpoint" },
+      { message: "Invalid or missing businessId" },
       { status: 400 }
     );
   }
 
   try {
-    const businessId = endpoint;
-    const fetchUrl = `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/forms/all_forms`;
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/forms/${businessId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      }
+    );
 
-    const response = await fetch(fetchUrl, {
-      headers: {
-        Authorization: `Bearer ${session.accessToken}`,
-      },
-    });
     if (!response.ok) {
-      const errorData = await response.json();
+      let errorData;
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        errorData = await response.json();
+      } else {
+        errorData = { message: "Failed to fetch forms" };
+      }
       return NextResponse.json(
         { message: errorData.message || "Failed to fetch forms" },
         { status: response.status }

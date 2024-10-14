@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useCallback } from "react";
 import { Form, Submission } from "@/types";
 import { useSession } from "next-auth/react";
@@ -8,40 +9,45 @@ export const useSubmissions = () => {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const { data: session } = useSession();
   const [loading, setLoading] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
 
-  const fetchSubmissions = useCallback(
-    async (shareUrl: string) => {
-      if (session) {
-        try {
-          const response = await fetch(
-            `/api/forms/submissions?shareUrl=${shareUrl}`,
-            {
-              method: "GET",
-              headers: {
-                Authorization: `Bearer ${session.accessToken}`,
-              },
-            }
-          );
+  const fetchSubmissions = useCallback(async (shareUrl: string) => {
+    if (!shareUrl) {
+      toast({
+        title: "Error",
+        description: "Share URL is missing.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-          if (!response.ok) {
-            throw new Error(
-              `Error fetching submissions: ${response.statusText}`
-            );
-          }
+    try {
+      const encodedShareUrl = encodeURIComponent(shareUrl);
+      const response = await fetch(
+        `/api/forms/share_url/${encodedShareUrl}/submissions`
+      );
 
-          const data = await response.json();
-          if (data?.submissions) {
-            setSubmissions(data.submissions);
-          } else {
-            console.warn("No submissions found");
-          }
-        } catch (error) {
-          console.error("Failed to fetch submissions", error);
-        }
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to fetch submissions.");
       }
-    },
-    [session]
-  );
+
+      const data = await response.json();
+      if (data?.submissions) {
+        setSubmissions(data.submissions);
+      } else {
+        console.warn("No submissions found");
+      }
+    } catch (error: any) {
+      console.error("Failed to fetch submissions", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch submissions.",
+        variant: "destructive",
+      });
+    }
+  }, []);
 
   const getFormSubmissionByCaseId = useCallback(
     async (caseId: string): Promise<Submission | null> => {
@@ -93,6 +99,7 @@ export const useSubmissions = () => {
     },
     [session]
   );
+
   const getMissingFields = useCallback(
     async (submission: Submission, form: Form): Promise<string[]> => {
       try {
@@ -134,6 +141,7 @@ export const useSubmissions = () => {
     },
     []
   );
+
   const fetchClientSubmissions = useCallback(async () => {
     if (!session) return;
 
@@ -210,7 +218,7 @@ export const useSubmissions = () => {
         const res = await fetch(`/api/forms/public/share/${shareURL}`);
 
         if (res.ok) {
-          // Handle public form fetch logic here
+          //
         } else {
           const data = await res.json();
           toast({
@@ -232,10 +240,58 @@ export const useSubmissions = () => {
     []
   );
 
+  const fetchAllSubmissions = useCallback(
+    async (page: number = 1): Promise<Submission[] | null> => {
+      if (!session || !session.accessToken) return null;
+
+      try {
+        setLoading(true);
+        const businessId = session.user?.businessId;
+        if (!businessId) {
+          throw new Error("Business ID is missing in session.");
+        }
+
+        const response = await fetch(
+          `/api/forms/submissions?businessId=${businessId}&page=${page}`,
+          {
+            headers: {
+              Authorization: `Bearer ${session.accessToken}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(`Error fetching submissions: ${errorData.message}`);
+        }
+
+        const data = await response.json();
+        setSubmissions(data.submissions || []);
+        setTotalPages(data.pages || 1);
+        setCurrentPage(data.page || 1);
+        return data.submissions;
+      } catch (error: any) {
+        console.error("Failed to fetch all submissions", error);
+        toast({
+          title: "Error",
+          description: "An error occurred while fetching all submissions.",
+          variant: "destructive",
+        });
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [session]
+  );
+
   return {
     submissions,
     loading,
+    currentPage,
+    totalPages,
     fetchSubmissions,
+    fetchAllSubmissions,
     fetchFormByShareUrl,
     fetchFormByShareUrlPublic,
     setSubmissions,

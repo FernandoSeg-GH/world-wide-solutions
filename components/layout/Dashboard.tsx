@@ -10,7 +10,8 @@ import Businesses from "@/components/business";
 import Forms from "@/components/business/forms";
 import Submissions from "@/components/business/forms/submissions";
 import Notifications from "@/components/business/notifications";
-import Leo from "../leo";
+import Leo from "@/components/leo";
+import Vinci from "@/components/vinci/Vinci";
 
 export default function Dashboard() {
     const [isExpanded, setIsExpanded] = useState(false);
@@ -32,6 +33,8 @@ export default function Dashboard() {
                 return <Businesses />;
             case "AI Characters":
                 return <Leo />;
+            case "Vinci":
+                return <Vinci />;
             default:
                 return <p>Select a section</p>;
         }

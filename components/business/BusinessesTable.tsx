@@ -54,7 +54,7 @@ export default function BusinessesTable() {
     }
 
     return (
-        <div className="p-4 bg-white rounded-lg shadow">
+        <div className="p-4 rounded-lg shadow">
             <h2 className="text-xl font-bold mb-4">Businesses</h2>
             <Table>
                 <TableHeader>

@@ -4,12 +4,9 @@ import { getServerSession } from "next-auth/next";
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
-
   if (!session) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
-
-  console.log("Session Token", session.accessToken);
 
   try {
     const response = await fetch(
@@ -20,7 +17,6 @@ export async function GET(req: NextRequest) {
         },
       }
     );
-
     const data = await response.json();
 
     if (!response.ok) {

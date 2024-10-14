@@ -27,3 +27,16 @@ export function deepEqual(obj1: any, obj2: any): boolean {
 
   return false;
 }
+
+export function transformKeys(obj: any): any {
+  if (Array.isArray(obj)) {
+    return obj.map(transformKeys);
+  } else if (obj !== null && typeof obj === "object") {
+    return Object.keys(obj).reduce((acc, key) => {
+      const camelKey = key.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+      acc[camelKey] = transformKeys(obj[key]);
+      return acc;
+    }, {} as Record<string, any>);
+  }
+  return obj;
+}

@@ -34,8 +34,9 @@ async function refreshAccessToken(token: JWT) {
       ...token,
       accessToken: refreshedTokens.access_token,
       accessTokenExpires: decodedAccessToken.exp * 1000,
-      refreshToken: token.refreshToken,
+      refreshToken: refreshedTokens.refresh_token,
       businessId: refreshedTokens.user.business_id,
+      role: refreshedTokens.user.role,
     };
   } catch (error) {
     console.error("Error refreshing access token:", error);
@@ -116,7 +117,7 @@ export const authOptions: NextAuthOptions = {
         return token;
       }
 
-      if (Date.now() < token.accessTokenExpires!) {
+      if (Date.now() < (token.accessTokenExpires as number)) {
         return token;
       }
 
@@ -142,7 +143,7 @@ export const authOptions: NextAuthOptions = {
         role: {
           id: Number(token.role?.id ?? 1),
           name: String(token.role?.name ?? "Unknown"),
-        }, //
+        },
       };
       if (token.error) {
         session.error = token.error;

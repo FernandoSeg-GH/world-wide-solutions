@@ -1,4 +1,3 @@
-// hooks/user/useUser.ts
 "use client";
 
 import { toast } from "@/components/ui/use-toast";
@@ -12,26 +11,36 @@ export const useUser = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
-  const fetchAllUsers = useCallback(async (): Promise<void> => {
+  const fetchAllUsers = useCallback(async () => {
+    if (
+      !session ||
+      !session.accessToken ||
+      !session.user?.role?.id ||
+      !session.user?.businessId
+    )
+      return null;
+
     try {
       setLoading(true);
-      const res = await fetch("/api/auth/users", {
-        headers: {
-          Authorization: `Bearer ${session?.accessToken}`,
-        },
-      });
+      const res = await fetch(
+        `/api/users?roleId=${session.user.role.id}&businessId=${session.user.businessId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${session.accessToken}`,
+          },
+        }
+      );
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to fetch users");
+      }
 
       const data = await res.json();
-      if (res.ok) {
-        setUsers(data);
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to fetch users.",
-          variant: "destructive",
-        });
-      }
+      setUsers(data);
+      return data;
     } catch (error) {
+      console.error("Failed to fetch users:", error);
       toast({
         title: "Error",
         description: "An error occurred while fetching users.",
@@ -40,30 +49,32 @@ export const useUser = () => {
     } finally {
       setLoading(false);
     }
-  }, [session?.accessToken]);
+  }, [session]);
 
   const fetchCurrentUser = useCallback(async (): Promise<void> => {
     if (!session?.user?.id) return;
-
+    setLoading(true);
     try {
-      setLoading(true);
-      const res = await fetch(`/api/auth/users/${session.user.id}`, {
+      const res = await fetch(`/api/users/${session.user.id}`, {
         headers: {
           Authorization: `Bearer ${session?.accessToken}`,
         },
       });
 
-      const data = await res.json();
-      if (res.ok) {
-        setCurrentUser(data);
-      } else {
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error("Failed to fetch user:", errorData);
         toast({
           title: "Error",
-          description: "Failed to fetch current user.",
+          description: errorData.message || "Failed to fetch current user.",
           variant: "destructive",
         });
+      } else {
+        const data = await res.json();
+        setCurrentUser(data);
       }
     } catch (error) {
+      console.error("An error occurred:", error);
       toast({
         title: "Error",
         description: "An error occurred while fetching the current user.",
@@ -85,6 +96,6 @@ export const useUser = () => {
     currentUser,
     loading,
     fetchAllUsers,
-    setCurrentUser, // Expose setCurrentUser
+    setCurrentUser,
   };
 };

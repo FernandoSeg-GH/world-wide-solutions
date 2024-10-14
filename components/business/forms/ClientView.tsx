@@ -5,7 +5,8 @@ import { LuAlertCircle } from 'react-icons/lu';
 import { Submission, FormElementInstance, Form } from '@/types';
 import { FaRegFileAlt } from 'react-icons/fa';
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useSession, signIn } from "next-auth/react";
 
 interface ClientViewProps {
     form: Form;
@@ -23,16 +24,38 @@ const fillableFieldTypes = [
 ];
 
 export default function ClientView({ form, submissions }: ClientViewProps) {
+    const { data: session, status } = useSession();
+
+    // Redirect to sign-in if token refresh failed
+    useEffect(() => {
+        if (session?.error === "RefreshAccessTokenError") {
+            signIn();
+        }
+    }, [session]);
+
     if (!form || !form.fields) return <Skeleton className="min-w-80 min-h-20" />;
 
     return (
         <div className="w-full flex flex-col py-8 px-6 bg-white shadow-md rounded-lg">
             <h2 className="text-3xl font-semibold mb-6">Your Submissions</h2>
-            <p className="text-italic mb-3">Esta sección será editable, y los usuarios podrán actualizar su información:</p>
+            <p className="italic mb-3">Esta sección será editable, y los usuarios podrán actualizar su información:</p>
             {submissions.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {submissions.map((submission, index) => {
-                        const parsedContent = submission.content ? JSON.parse(submission.content) : {};
+                        // Handle both string and object types for content
+                        let parsedContent: Record<string, any> = {};
+                        if (submission.content) {
+                            if (typeof submission.content === 'string') {
+                                try {
+                                    parsedContent = JSON.parse(submission.content);
+                                } catch (e) {
+                                    console.error(`Error parsing submission.content for submission ${submission.id}:`, e);
+                                    parsedContent = {};
+                                }
+                            } else {
+                                parsedContent = submission.content;
+                            }
+                        }
 
                         const missingFields = form.fields
                             ?.filter((field: FormElementInstance) =>
@@ -42,7 +65,7 @@ export default function ClientView({ form, submissions }: ClientViewProps) {
                             .map((field: FormElementInstance) => field.extraAttributes?.label || field.id);
 
                         return (
-                            <div key={index} className="border rounded-lg p-6 bg-gray-50">
+                            <div key={submission.id} className="border rounded-lg p-6 bg-gray-50">
                                 <div className="flex items-center mb-4">
                                     <FaRegFileAlt className="text-blue-500 mr-2" />
                                     <h3 className="text-xl font-bold">

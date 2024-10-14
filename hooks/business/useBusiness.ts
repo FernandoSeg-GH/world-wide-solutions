@@ -1,4 +1,3 @@
-// hooks/business/useBusiness.ts
 "use client";
 
 import { useState, useCallback } from "react";
@@ -18,11 +17,7 @@ export const useBusiness = () => {
   const fetchAllBusinesses = useCallback(async (): Promise<void> => {
     try {
       setLoading(true);
-      const res = await fetch("/api/business", {
-        headers: {
-          Authorization: `Bearer ${session?.accessToken}`,
-        },
-      });
+      const res = await fetch("/api/business");
 
       const data = await res.json();
       if (res.ok) {
@@ -30,7 +25,7 @@ export const useBusiness = () => {
       } else {
         toast({
           title: "Error",
-          description: "Failed to fetch businesses.",
+          description: data.message || "Failed to fetch businesses.",
           variant: "destructive",
         });
       }
@@ -43,16 +38,12 @@ export const useBusiness = () => {
     } finally {
       setLoading(false);
     }
-  }, [session?.accessToken]);
+  }, []);
 
   const fetchSubscriptionPlans = useCallback(async (): Promise<void> => {
     try {
       setLoading(true);
-      const res = await fetch("/api/business/subscription-plans", {
-        headers: {
-          Authorization: `Bearer ${session?.accessToken}`,
-        },
-      });
+      const res = await fetch("/api/business/subscription");
 
       const data = await res.json();
       if (res.ok) {
@@ -79,11 +70,7 @@ export const useBusiness = () => {
     async (businessId: number): Promise<void> => {
       try {
         setLoading(true);
-        const res = await fetch(`/api/business/${businessId}`, {
-          headers: {
-            Authorization: `Bearer ${session?.accessToken}`,
-          },
-        });
+        const res = await fetch(`/api/business/${businessId}`);
 
         const data = await res.json();
         if (res.ok) {
@@ -261,7 +248,7 @@ export const useBusiness = () => {
     subscriptionPlans,
     fetchSubscriptionPlans,
     businesses,
-    currentBusiness, // Ensure 'business' is correctly returned
+    currentBusiness,
     loading,
     fetchAllBusinesses,
     fetchBusinessById,

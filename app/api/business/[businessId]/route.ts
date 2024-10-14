@@ -13,7 +13,12 @@ export async function GET(
   }
 
   const { businessId } = params;
-
+  if (!businessId) {
+    return NextResponse.json(
+      { message: "No business id provided." },
+      { status: 400 }
+    );
+  }
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/business/${businessId}`,

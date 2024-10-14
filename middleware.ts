@@ -5,7 +5,7 @@ import type { NextRequest } from "next/server";
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  if (pathname.startsWith("/auth")) {
+  if (pathname.startsWith("/api/auth") || pathname.startsWith("/auth")) {
     return NextResponse.next();
   }
 
@@ -21,14 +21,14 @@ export async function middleware(req: NextRequest) {
   ) {
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
     if (token) {
-      return NextResponse.next();
+      const response = NextResponse.next();
+      response.headers.set("x-access-token", token.accessToken as string);
+      return response;
     }
     if (!token) {
       return NextResponse.redirect(new URL("/auth/sign-in", req.url));
     }
   }
-
-  return NextResponse.next();
 }
 
 export const config = {
