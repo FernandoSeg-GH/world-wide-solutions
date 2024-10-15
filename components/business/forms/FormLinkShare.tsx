@@ -7,15 +7,7 @@ import { ImShare } from "react-icons/im";
 import { toast } from "@/components/ui/use-toast";
 
 function FormLinkShare({ shareUrl }: { shareUrl: string }) {
-    const [mounted, setMounted] = useState(false);
 
-    useEffect(() => {
-        setMounted(true);
-    }, []);
-
-    if (!mounted) {
-        return null;
-    }
     const shareLink = `${window.location.origin}/submit/${shareUrl}`;
     return (
         <div className="flex flex-grow gap-4 items-center">

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import FormBuilder from '@/components/business/forms/FormBuilder';
 import { useAppContext } from '@/context/AppProvider';
 import Spinner from '@/components/ui/spinner';
+import { useSession } from 'next-auth/react';
 
 interface BuilderPageProps {
   params: {
@@ -16,21 +17,24 @@ export default function BuilderPage({ params }: BuilderPageProps) {
   const { form, loading, error } = data;
   const { setForm, setElements } = selectors;
   const { fetchFormByShareUrl } = actions;
+  const { data: session } = useSession();
 
   useEffect(() => {
-    if (shareUrl) {
+    if (shareUrl && session?.user.businessId) {
       console.log("Fetching form with shareUrl:", shareUrl); // Add this line
-      fetchFormByShareUrl(shareUrl);
+      fetchFormByShareUrl(shareUrl, session.user.businessId);
     }
-  }, [shareUrl, fetchFormByShareUrl]);
+  }, [shareUrl, fetchFormByShareUrl, session?.user.businessId]);
 
-  if (loading) return <Spinner />;
+  if (loading) return <div className='m-auto flex items-center justify-center h-screen w-screen'><Spinner /></div>;
   if (error) return <div>Error: {error}</div>;
-  if (!form) return <div>Form not found</div>;
 
   return (
     <div>
-      <FormBuilder formName={form.name} />
+      {form ?
+        <FormBuilder formName={form.name} /> :
+        <div>Form not found</div>
+      }
     </div>
   );
 }

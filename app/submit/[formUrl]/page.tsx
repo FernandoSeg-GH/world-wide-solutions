@@ -3,25 +3,24 @@
 import { useEffect } from "react";
 import FormSubmitComponent from "@/components/business/forms/FormSubmitComponent";
 import { useAppContext } from "@/context/AppProvider";
+import { useSession } from "next-auth/react";
 
 const SubmitPage = ({ params }: { params: { formUrl: string } }) => {
     const { formUrl } = params;
-    const { data, actions } = useAppContext();
-    const { form } = data;
-
-    const { fetchFormByShareUrlPublic, fetchSubmissions } = actions;
+    const { actions: formActions } = useAppContext();
+    const { data: session } = useSession()
+    const { fetchFormByShareUrlPublic } = formActions;
 
     const decodedFormUrl = decodeURIComponent(formUrl);
 
     useEffect(() => {
-        const fetchData = async () => {
-            await fetchFormByShareUrlPublic(decodedFormUrl);
-        };
-        fetchData();
-
-    }, [decodedFormUrl, fetchFormByShareUrlPublic]);
-
-    if (!form) return <div>Form not found</div>;
+        if (session?.user.businessId) {
+            const fetchData = async () => {
+                await fetchFormByShareUrlPublic(decodedFormUrl, Number(session.user.businessId));
+            };
+            fetchData();
+        }
+    }, [decodedFormUrl, fetchFormByShareUrlPublic, session?.user.businessId]);
 
     return <FormSubmitComponent formUrl={decodedFormUrl} />;
 };

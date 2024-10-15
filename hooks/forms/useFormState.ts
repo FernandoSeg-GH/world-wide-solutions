@@ -70,10 +70,7 @@ export const useFormState = (initialForm?: Form) => {
   );
 
   const removeElement = useCallback((id: string) => {
-    setElements((prev) => {
-      const updatedElements = prev.filter((element) => element.id !== id);
-      return updatedElements;
-    });
+    setElements((prev) => prev.filter((element) => element.id !== id));
     toast({
       title: "Element Removed",
       description: "An element has been removed.",
@@ -183,9 +180,14 @@ export const useFormState = (initialForm?: Form) => {
   );
 
   const fetchFormByShareUrl = useCallback(
-    async (shareUrl: string): Promise<Form | null> => {
+    async (shareUrl: string, businessId: number): Promise<Form | null> => {
+      if (!businessId) {
+        console.warn("No business id provided to fetch form.");
+      }
       try {
-        const response = await fetch(`/api/forms/share_url/${shareUrl}`);
+        const response = await fetch(
+          `/api/forms/${businessId}/share_url/${shareUrl}`
+        );
         if (!response.ok) {
           throw new Error("Form not found");
         }
@@ -249,24 +251,31 @@ export const useFormState = (initialForm?: Form) => {
     async (shareUrl: string) => {
       setLoading(true);
       setError(null);
-      try {
-        const response = await fetch(
-          `/api/forms/get-form-public?shareUrl=${shareUrl}`
-        );
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Failed to fetch form");
+      if (session?.user.businessId) {
+        console.log("session.user.businessId", session.user.businessId);
+        try {
+          const response = await fetch(
+            `/api/forms/${
+              session.user.businessId
+            }/share_url/${encodeURIComponent(shareUrl)}/public`
+          );
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Failed to fetch form");
+          }
+          const formData = await response.json();
+          console.log("Fetched Form Data:", formData); // Debug log
+          setFormState(formData);
+          setElements(formData.fields || []);
+        } catch (err: any) {
+          console.error("Error in fetchFormByShareUrlPublic:", err); // Debug log
+          setError(err.message);
+        } finally {
+          setLoading(false);
         }
-        const formData = await response.json();
-        setFormState(formData);
-        setElements(formData.fields || []);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
       }
     },
-    [setLoading, setError, setFormState, setElements]
+    [setLoading, setError, setFormState, setElements, session?.user.businessId]
   );
 
   const fetchFormsByBusinessId = useCallback(

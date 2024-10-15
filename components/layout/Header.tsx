@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils"
 interface HeaderProps {
     // breadcrumbs?: Breadcrumb[]
     currentSection: string
+    submit?: boolean
 }
 
 export function Header({ currentSection }: HeaderProps) {

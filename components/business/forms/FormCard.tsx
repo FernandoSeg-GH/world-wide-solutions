@@ -51,9 +51,9 @@ export function FormCard({ form }: FormCardProps) {
         data: { loading: isPublishing },
     } = useAppContext();
 
-    useEffect(() => {
-        setPublishedStatus(form.published);
-    }, [form.published]);
+    // useEffect(() => {
+    //     setPublishedStatus(form.published);
+    // }, [form.published]);
 
     // Convertir role.id a número
     const userRoleId = Number(session?.user.role.id);
@@ -121,6 +121,12 @@ export function FormCard({ form }: FormCardProps) {
             setIsDeleting(false);
         }
     };
+
+    const handleNavigate = () => {
+        // Push the correct form URL based on the shareURL of the form
+        router.push(`/forms/${form.shareURL}`);
+    };
+
 
     const formattedDistance = form.createdAt
         ? formatDistance(new Date(form.createdAt), new Date(), {
@@ -220,7 +226,7 @@ export function FormCard({ form }: FormCardProps) {
                         {publishedStatus ? (
                             <Button
                                 className="w-full mt-2 text-md gap-4"
-                                onClick={() => router.push(`/forms/${form.shareURL}`)}
+                                onClick={handleNavigate}
                             >
                                 View submissions <BiRightArrowAlt />
                             </Button>

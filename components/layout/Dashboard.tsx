@@ -12,6 +12,7 @@ import Submissions from "@/components/business/forms/submissions";
 import Notifications from "@/components/business/notifications";
 import Leo from "@/components/leo";
 import Vinci from "@/components/vinci/Vinci";
+import { renderComponent } from "@/lib/renderComponent";
 
 export default function Dashboard() {
     const [isExpanded, setIsExpanded] = useState(false);
@@ -19,26 +20,7 @@ export default function Dashboard() {
     const { data } = useAppContext();
     const { currentSection } = data;
 
-    const renderComponent = () => {
-        switch (currentSection) {
-            case "Dashboard":
-                return <Main />;
-            case "Forms":
-                return <Forms />;
-            case "Submissions":
-                return <Submissions />;
-            case "Notifications":
-                return <Notifications />;
-            case "Businesses":
-                return <Businesses />;
-            case "AI Characters":
-                return <Leo />;
-            case "Vinci":
-                return <Vinci />;
-            default:
-                return <p>Select a section</p>;
-        }
-    };
+
     return (
         <div className="flex min-h-screen w-full flex-col bg-muted/40">
             <Sidebar
@@ -50,7 +32,7 @@ export default function Dashboard() {
                 // breadcrumbs={mockData.breadcrumbs} 
                 />
                 <div className="p-4">
-                    {renderComponent()}
+                    {renderComponent(currentSection)}
                 </div>
             </div>
         </div>

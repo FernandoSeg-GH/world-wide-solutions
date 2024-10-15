@@ -13,6 +13,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { SubscriptionPlan } from "@/types";
+import SubmissionCards from "../business/forms/submissions/SubmissionsCards";
 
 function isStringArray(features: any): features is string[] {
     return Array.isArray(features) && features.every(item => typeof item === 'string');
@@ -110,6 +111,8 @@ export default function Vinci() {
             actions.fetchAllSubmissions(currentPage as number + 1);
         }
     };
+
+    if (submissions) console.log('submissions', submissions)
     return (
         <div className="p-4 rounded-lg shadow overflow-auto">
             <h1 className="text-3xl font-bold mb-6">Vinci Database Viewer</h1>
@@ -376,43 +379,7 @@ export default function Vinci() {
             {/* Submissions Table */}
             <div className="mb-12">
                 <h2 className="text-2xl font-semibold mb-4">Submissions</h2>
-                <Table className="min-w-full">
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>ID</TableHead>
-                            <TableHead>Form ID</TableHead>
-                            <TableHead>Form Name</TableHead>
-                            <TableHead>User ID</TableHead>
-                            <TableHead>Username</TableHead>
-                            <TableHead>Content</TableHead>
-                            <TableHead>Created At</TableHead>
-                            {/* Add other submission fields as needed */}
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {submissions.map((submission) => (
-                            <TableRow key={submission.id}>
-                                <TableCell>{submission.id}</TableCell>
-                                <TableCell>{submission.formId}</TableCell>
-                                <TableCell>{submission.form_name || "N/A"}</TableCell>
-                                <TableCell>{submission.user_id}</TableCell>
-                                <TableCell>{submission.username || "N/A"}</TableCell>
-                                <TableCell>
-                                    {/* Display content as JSON string */}
-                                    <pre className="whitespace-pre-wrap text-xs">
-                                        {JSON.stringify(submission.content, null, 2)}
-                                    </pre>
-                                </TableCell>
-                                <TableCell>
-                                    {submission.createdAt
-                                        ? new Date(submission.createdAt).toLocaleString()
-                                        : "N/A"}
-                                </TableCell>
-                                {/* Add other submission fields as needed */}
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
+                <SubmissionCards submissions={submissions} forms={forms} />
                 <div className="flex justify-between items-center mt-4">
                     <button
                         onClick={handlePrevious}

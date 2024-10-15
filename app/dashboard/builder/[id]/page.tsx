@@ -5,6 +5,7 @@ import FormBuilder from '@/components/business/forms/FormBuilder';
 import { useAppContext } from '@/context/AppProvider';
 import { Form } from '@/types';
 import Spinner from '@/components/ui/spinner';
+import { useSession } from 'next-auth/react';
 
 const BuilderPage = ({ params }: { params: { shareUrl: string } }) => {
   const {
@@ -12,32 +13,34 @@ const BuilderPage = ({ params }: { params: { shareUrl: string } }) => {
     data: { form, loading, error },
     selectors: { setForm, setLoading, setError },
   } = useAppContext();
-
+  const { data: session } = useSession();
   const { shareUrl } = params;
 
   useEffect(() => {
     const fetchFormData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+      if (session?.user.businessId) {
+        try {
+          setLoading(true);
+          setError(null);
 
-        const formData = await fetchFormByShareUrl(shareUrl);
-        if (formData as Form) {
-          setForm(formData);
-        } else {
-          setError('Form not found');
+          const formData = await fetchFormByShareUrl(shareUrl, session.user.businessId);
+          if (formData as Form) {
+            setForm(formData);
+          } else {
+            setError('Form not found');
+          }
+
+          setLoading(false);
+        } catch (err: any) {
+          console.error('Error in fetchForm:', err);
+          setError(err.message || 'Failed to fetch form');
+          setLoading(false);
         }
-
-        setLoading(false);
-      } catch (err: any) {
-        console.error('Error in fetchForm:', err);
-        setError(err.message || 'Failed to fetch form');
-        setLoading(false);
-      }
+      };
     };
 
     fetchFormData();
-  }, [shareUrl, fetchFormByShareUrl, setForm, setLoading, setError]);
+  }, [shareUrl, fetchFormByShareUrl, setForm, setLoading, setError, session?.user.businessId]);
 
 
   if (loading) return <Spinner />;

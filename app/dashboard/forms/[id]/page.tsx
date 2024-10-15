@@ -6,37 +6,41 @@ import VisitBtn from '@/components/VisitBtn';
 import { useAppContext } from '@/context/AppProvider';
 import SubmissionsTable from '@/components/business/forms/submissions/SubmissionTable';
 import Spinner from '@/components/ui/spinner';
+import { useSession } from 'next-auth/react';
 
 const FormDetailPage = ({ params }: { params: { id: string } }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { id } = params;
-
+    const { data: session } = useSession()
     const { selectors, data, actions } = useAppContext();
     const { setForm, setSubmissions } = selectors;
     const { form, submissions } = data;
     const { fetchSubmissions } = actions;
 
     useEffect(() => {
-        const fetchFormDetails = async () => {
-            try {
+        if (session?.user) {
+            const fetchFormDetails = async () => {
+                try {
 
-                const formId = Number(id);
+                    const formId = Number(id);
+                    console.log('formId', formId)
+                    const formDataResponse = await fetch(`/api/forms/${formId}`);
+                    const formData = await formDataResponse.json();
+                    setForm(formData);
+                    console.log('formData', formData)
 
-                const formDataResponse = await fetch(`/api/forms/${formId}`);
-                const formData = await formDataResponse.json();
-                setForm(formData);
+                    await fetchSubmissions(formData.shareURL);
+                } catch (err: any) {
+                    setError(err.message);
+                } finally {
+                    setLoading(false);
+                }
+            };
 
-                await fetchSubmissions(formData.shareURL);
-            } catch (err: any) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchFormDetails();
-    }, [id, setForm, fetchSubmissions]);
+            fetchFormDetails();
+        }
+    }, [id, setForm, fetchSubmissions, session?.user]);
 
     if (loading) return <Spinner />;
     if (error) return <div>Error: {error}</div>;

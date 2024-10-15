@@ -1,6 +1,6 @@
-import { authOptions } from "@/lib/auth";
-import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export async function GET(
   req: NextRequest,
@@ -8,6 +8,7 @@ export async function GET(
 ) {
   const { share_url } = params;
   const session = await getServerSession(authOptions);
+
   if (!session) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
@@ -19,7 +20,7 @@ export async function GET(
       }/forms/share_url/${encodeURIComponent(share_url)}/public`,
       {
         headers: {
-          Authorization: `Bearer ${session.accessToken}`,
+          Authorization: `Bearer ${session.accessToken}`, // Ensure accessToken is included
         },
       }
     );

@@ -4,25 +4,27 @@ import FormLinkShare from '@/components/business/forms/FormLinkShare';
 import VisitBtn from '@/components/VisitBtn';
 import { useAppContext } from '@/context/AppProvider';
 import SubmissionsTable from '@/components/business/forms/submissions/SubmissionTable';
+import { useSession } from 'next-auth/react';
 
-const FormDetailPage = ({ params }: { params: { id: string } }) => {
-    const { id } = params;
-
-    const { data, actions } = useAppContext();
+const FormDetailPage = ({ params }: { params: { formUrl: string } }) => {
+    const { data: session } = useSession();
+    const { formUrl } = params;
+    console.log('formUrl', formUrl)
+    const { data, actions: formActions } = useAppContext();
     const { form, submissions, loading, error } = data;
 
     useEffect(() => {
-        if (id) {
+        if (formUrl && session?.user.businessId) {
             const fetchFormDetails = async () => {
                 try {
-                    await actions.fetchFormByShareUrl(id);
+                    await formActions.fetchFormByShareUrl(String(formUrl), Number(session.user.businessId));
                 } catch (err: any) {
                     console.error('Error fetching form details:', err);
                 }
             };
             fetchFormDetails();
         }
-    }, [id, actions]);
+    }, [formUrl, formActions.fetchFormByShareUrl, session?.user.businessId]);
 
 
     if (loading) return <div>Loading form...</div>;
@@ -38,13 +40,13 @@ const FormDetailPage = ({ params }: { params: { id: string } }) => {
             <div className="py-10 border-b border-muted">
                 <div className="flex justify-between container">
                     <h1 className="text-4xl font-bold truncate">{form.name}</h1>
-                    <VisitBtn shareUrl={String(form.shareURL)} />
+                    <VisitBtn shareUrl={String(formUrl)} />
                 </div>
             </div>
 
             <div className="py-4 border-b border-muted">
                 <div className="container flex gap-2 items-center justify-between">
-                    <FormLinkShare shareUrl={String(form.shareURL)} />
+                    <FormLinkShare shareUrl={String(formUrl)} />
                 </div>
             </div>
 

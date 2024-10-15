@@ -6,6 +6,7 @@ import { FaHome, FaBusinessTime, FaRobot, FaListAlt, FaClipboardList, FaBell } f
 import { useAppContext } from "@/context/AppProvider";
 import React from 'react';
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 interface SidebarProps {
     isExpanded: boolean;
@@ -62,12 +63,12 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
     const { switchSection } = layoutState;
     const { currentSection, godMode } = data;
     const sidebarItems = getSidebarItems(godMode);
-
+    const router = useRouter()
     return (
         <aside className={`fixed inset-y-0 left-0 z-10 flex flex-col border-r bg-background transition-all duration-300 ${isExpanded ? "w-64" : "w-14"}`}>
             <div className="flex h-14 items-center justify-between px-2">
 
-                <h1 className={cn("text-lg font-semibold whitespace-nowrap hidden", isExpanded && "block")}>Vinci Suite</h1>
+                <h1 className={cn("text-lg font-semibold whitespace-nowrap hidden cursor-pointer ml-4", isExpanded && "block")} onClick={() => router.push("/dashboard")}>Vinci Suite</h1>
 
                 <Button
                     variant="ghost"

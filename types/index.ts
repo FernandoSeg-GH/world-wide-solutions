@@ -100,7 +100,7 @@ export interface Submission {
   user_id: number;
   username?: string;
   formUrl: string;
-  content: Record<string, any>;
+  content?: Record<string, any>;
   createdAt: string;
 }
 
@@ -342,8 +342,14 @@ export interface AppContextType {
       businessData: Partial<Business>
     ) => Promise<boolean>;
     deleteBusiness: (businessId: number) => Promise<boolean>;
-    fetchFormByShareUrl: (shareURL: string) => Promise<Form | null>;
-    fetchFormByShareUrlPublic: (shareURL: string) => Promise<void>;
+    fetchFormByShareUrl: (
+      shareURL: string,
+      businessId: number
+    ) => Promise<Form | null>;
+    fetchFormByShareUrlPublic: (
+      shareURL: string,
+      businessId: number
+    ) => Promise<void>;
     toggleGodMode: () => void;
     switchSection: (section: string) => void;
     fetchAllUsers: () => Promise<User[] | null>;
