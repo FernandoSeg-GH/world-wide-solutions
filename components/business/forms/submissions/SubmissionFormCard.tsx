@@ -12,7 +12,7 @@ const SubmissionFormCard = ({ forms }: { forms: Form[] }) => {
     const { loading, error } = data;
     error && console.error('error', error)
     return loading ? <Skeleton className="border-2 border-primary-/20 h-[210px] w-full" /> :
-        <div className="w-full flex flex-col py-8 px-6 bg-white shadow-md rounded-lg">
+        <div className="w-full flex flex-col py-8 px-6   shadow-lg rounded-lg">
             <h2 className="text-3xl font-semibold mb-6">Pending Forms</h2>
             <div className='w-full  md:grid md:grid-cols-1 sm:grid-cols-2  gap-2 md:gap-3 lg:flex lg:flex-row lg:flex-wrap'>
                 {

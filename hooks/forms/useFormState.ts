@@ -273,7 +273,7 @@ export const useFormState = (initialForm?: Form) => {
     async (businessId: number) => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/forms/business/${businessId}`, {
+        const response = await fetch(`/api/forms/${businessId}`, {
           headers: {
             Authorization: `Bearer ${session?.accessToken}`,
           },

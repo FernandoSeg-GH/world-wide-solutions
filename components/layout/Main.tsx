@@ -9,6 +9,7 @@ import BusinessesTable from "../business/BusinessesTable";
 import { useGodMode } from "@/hooks/user/useGodMode";
 import Stats from "../business/stats";
 import BusinessStats from "../business/stats/BusinessStats";
+import Forms from "../business/forms";
 
 export default function Main() {
     const { data: session } = useSession();
@@ -26,18 +27,17 @@ export default function Main() {
     return (
         <div className="flex h-full w-full flex-col bg-muted/40">
             <Welcome />
-            {godMode ? (
-                <div className="w-full flex flex-col gap-6 px-4">
-                    <BusinessStats />
-                    {/* <Stats />  */}
+            <div className="w-full flex flex-col gap-6 p-4">
+                <BusinessStats />
+                {/* <Stats />  */}
 
-                    <CreateBusinessForm />
-                    <BusinessesTable />
+                <Forms />
 
-                </div>
-            ) : (
-                <p className="text-center">You do not have access to this view.</p>
-            )}
+                {godMode ? <BusinessesTable /> : null}
+                {godMode ? <CreateBusinessForm /> : null}
+
+
+            </div>
         </div>
     );
 }

@@ -107,13 +107,27 @@ export const authOptions: NextAuthOptions = {
         if (!decodedAccessToken || !decodedAccessToken.exp) {
           throw new Error("Access token does not have an exp claim");
         }
+
         token.accessTokenExpires = decodedAccessToken.exp * 1000;
         token.id = Number(user.id);
         token.email = user.email;
         token.username = user.username;
         token.name = user.username;
         token.businessId = user.business_id;
-        token.role = user.role;
+
+        // Add a check to ensure role exists and has an id and name
+        if (user.role && user.role.id && user.role.name) {
+          token.role = {
+            id: Number(user.role.id), // Ensure role.id is properly passed
+            name: user.role.name, // Ensure role.name is properly passed
+          };
+        } else {
+          // Default to role ID 1 (assuming it's a regular user) and name "Unknown"
+          token.role = {
+            id: 1,
+            name: "Unknown",
+          };
+        }
         return token;
       }
 
@@ -142,13 +156,13 @@ export const authOptions: NextAuthOptions = {
         businessId: token.businessId,
         role: {
           id: Number(token.role?.id ?? 1),
-          name: String(token.role?.name ?? "Unknown"),
+          name: String(token.role?.name ?? "Unknown"), // Use proper role name
         },
       };
       if (token.error) {
         session.error = token.error;
       }
-
+      console.log("session", session);
       return session;
     },
   },
