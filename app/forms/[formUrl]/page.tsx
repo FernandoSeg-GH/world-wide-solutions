@@ -9,7 +9,6 @@ import { useSession } from 'next-auth/react';
 const FormDetailPage = ({ params }: { params: { formUrl: string } }) => {
     const { data: session } = useSession();
     const { formUrl } = params;
-    console.log('formUrl', formUrl)
     const { data, actions: formActions } = useAppContext();
     const { form, submissions, loading, error } = data;
 

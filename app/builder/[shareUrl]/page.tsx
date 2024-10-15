@@ -21,7 +21,6 @@ export default function BuilderPage({ params }: BuilderPageProps) {
 
   useEffect(() => {
     if (shareUrl && session?.user.businessId) {
-      console.log("Fetching form with shareUrl:", shareUrl); // Add this line
       fetchFormByShareUrl(shareUrl, session.user.businessId);
     }
   }, [shareUrl, fetchFormByShareUrl, session?.user.businessId]);

@@ -27,7 +27,6 @@ const fillableFieldTypes = [
 export default function ClientView({ form, submissions }: ClientViewProps) {
     const { data: session, status } = useSession();
 
-    // Redirect to sign-in if token refresh failed
     useEffect(() => {
         if (session?.error === "RefreshAccessTokenError") {
             signIn();
@@ -44,7 +43,6 @@ export default function ClientView({ form, submissions }: ClientViewProps) {
                 {submissions.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {submissions.map((submission, index) => {
-                            // Handle both string and object types for content
                             let parsedContent: Record<string, any> = {};
                             if (submission.content) {
                                 if (typeof submission.content === 'string') {

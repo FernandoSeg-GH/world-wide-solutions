@@ -7,7 +7,6 @@ import Welcome from "@/components/user/Welcome";
 import CreateBusinessForm from "@/components/business/CreateBusinessForm";
 import BusinessesTable from "../business/BusinessesTable";
 import { useGodMode } from "@/hooks/user/useGodMode";
-import Stats from "../business/stats";
 import BusinessStats from "../business/stats/BusinessStats";
 import Forms from "../business/forms";
 

@@ -9,10 +9,8 @@ import Leo from "@/components/leo";
 import Vinci from "@/components/vinci/Vinci";
 
 export const renderComponent = (currentSection: string) => {
-    const url = usePathname(); // Get the current path
-    console.log('url', url);
+    const url = usePathname();
 
-    // Check if we are on the '/submit' route
     if (url === "/submit") {
         return (
             <>
@@ -23,7 +21,7 @@ export const renderComponent = (currentSection: string) => {
         );
     }
 
-    // If we are on '/dashboard', render everything normally based on currentSection
+
     switch (currentSection) {
         case "Dashboard":
             return <Main />;
@@ -40,6 +38,6 @@ export const renderComponent = (currentSection: string) => {
         case "Vinci":
             return <Vinci />;
         default:
-            return <Forms />; // Default to Forms if nothing is selected
+            return <Forms />;
     }
 };

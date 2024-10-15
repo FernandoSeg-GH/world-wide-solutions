@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
+"use client";
+
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { format } from 'date-fns';
 import { Submission } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { ArrowDownFromLineIcon } from 'lucide-react';
+import { DoubleArrowDownIcon, DoubleArrowUpIcon } from '@radix-ui/react-icons';
+import { cn } from '@/lib/utils';
 
 interface Field {
     id: string;
@@ -19,7 +24,7 @@ interface Form {
 
 interface Props {
     submissions: Submission[];
-    forms: Form[]; // Pass the forms data as a prop
+    forms: Form[];
 }
 
 const SubmissionCards: React.FC<Props> = ({ submissions, forms }) => {
@@ -34,10 +39,10 @@ const SubmissionCards: React.FC<Props> = ({ submissions, forms }) => {
         setExpandedField(expandedField === fieldKey ? null : fieldKey);
     };
 
-    // Create a map of form fields for easy lookup
+
     const fieldMap = forms.reduce((acc, form) => {
         form.fields.forEach(field => {
-            acc[field.id] = field.extraAttributes.label || field.id; // Use label or fallback to id
+            acc[field.id] = field.extraAttributes.label || field.id;
         });
         return acc;
     }, {} as Record<string, string>);
@@ -61,8 +66,8 @@ const SubmissionCards: React.FC<Props> = ({ submissions, forms }) => {
                         <CardHeader className="flex flex-col bg-muted/50 p-4">
                             <CardTitle className="flex justify-between items-center text-lg font-semibold">
                                 Submission ID: {submission.id}
-                                <Button onClick={() => toggleExpand(submission.id)}>
-                                    {isExpanded ? 'Collapse' : 'More'}
+                                <Button onClick={() => toggleExpand(submission.id)} variant={isExpanded ? "outline" : "default"}>
+                                    {isExpanded ? 'Collapse' : 'Details'} {isExpanded ? <DoubleArrowUpIcon width={12} height={12} className='ml-2' /> : <DoubleArrowDownIcon width={12} height={12} className='ml-2' />}
                                 </Button>
                             </CardTitle>
                             <p className="text-sm text-muted-foreground">
@@ -75,7 +80,7 @@ const SubmissionCards: React.FC<Props> = ({ submissions, forms }) => {
                                     <h4 className="font-semibold">Submission Details</h4>
                                     <ul className="grid gap-2">
                                         {Object.entries(contentParsed).map(([key, value], index) => {
-                                            const fieldName = fieldMap[key] || key; // Map ID to field name
+                                            const fieldName = fieldMap[key] || key;
                                             return (
                                                 <li key={index} className="flex justify-between items-center">
                                                     <span className="text-muted-foreground">{fieldName}</span>
@@ -116,3 +121,4 @@ const SubmissionCards: React.FC<Props> = ({ submissions, forms }) => {
 };
 
 export default SubmissionCards;
+

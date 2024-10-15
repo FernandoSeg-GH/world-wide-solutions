@@ -35,24 +35,22 @@ function Forms({ }: Props) {
                     <FormCards forms={forms} />
                     : <p>No Forms Available.</p>}
 
-                {forms && forms.length > 0 && session?.user.role.id === 1 ?
+                {/* {forms && forms.length > 0 && session?.user.role.id === 1 ?
                     <SubmissionFormCard forms={forms} />
 
-                    : <p>No Submissions Form Card Available.</p>}
+                    : <p>No Submissions Form Card Available.</p>} */}
 
-                {forms && forms.length > 0 ?
+                {/* {forms && forms.length > 0 ?
                     forms.map((form, index) =>
                         <SubmissionsTable key={index} form={form} submissions={submissions} admin />
                     )
 
-                    : <p> No SubmissionsTable Available.</p>}
+                    : <p> No SubmissionsTable Available.</p>} */}
 
                 {forms && session?.user.role.id === 1 ?
                     forms.map((form, index) =>
                         <ClientView key={index} form={form} submissions={submissions ?? []} />
-                    )
-
-                    : <p> No Data Available.</p>}
+                    ) : null}
 
 
                 {/* <div className="w-full">

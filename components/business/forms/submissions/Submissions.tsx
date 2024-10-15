@@ -6,27 +6,122 @@ import ClientView from '../ClientView';
 import { useSession } from 'next-auth/react';
 import { useGodMode } from '@/hooks/user/useGodMode';
 import { useAppContext } from '@/context/AppProvider';
+import Spinner from '@/components/ui/spinner';
+import SubmissionCards from './SubmissionsCards';
 
 type Props = {}
 
 function Submissions({ }: Props) {
-    const { data: session } = useSession();
-    const { godMode } = useGodMode();
     const { data, actions } = useAppContext();
-    const { form, submissions, loading: formLoading, loading, forms } = data;
-    const { formActions } = actions;
+    const {
+        godMode,
+        loading,
+        businesses,
+        users,
+        forms,
+        submissions,
+        subscriptionPlans,
+        currentPage,
+        totalPages,
+        roles,
+        tasks,
+        messages,
+        chats,
+        aiCharacters,
+        landingPages,
+        socialMediaPosts,
+    } = data;
+    const {
+        getAllBusinesses,
+        fetchAllUsers,
+        formActions: { fetchAllForms },
+        fetchAllSubmissions,
+        fetchSubscriptionPlans,
+        // fetchAllRoles,
+        // fetchAllTasks,
+        // fetchAllMessages,
+        // fetchAllChats,
+        // fetchAllAICharacters,
+        // fetchAllLandingPages,
+        // fetchAllSocialMediaPosts,
+    } = actions;
 
     useEffect(() => {
         if (godMode) {
-            formActions.fetchAllForms();
-        } else if (session?.user?.businessId) {
-            formActions.fetchFormsByBusinessId(session.user.businessId);
+            actions.fetchAllSubmissions();
+            fetchAllForms();
+            getAllBusinesses();
+            fetchAllUsers();
+            fetchSubscriptionPlans();
+            // fetchAllRoles();
+            // fetchAllTasks();
+            // fetchAllMessages();
+            // fetchAllChats();
+            // fetchAllAICharacters();
+            // fetchAllLandingPages();
+            // fetchAllSocialMediaPosts();
         }
-    }, [godMode, session?.user.businessId, formActions.fetchAllForms, formActions.fetchFormsByBusinessId]);
+    }, [
+        godMode,
+        fetchAllUsers,
+        getAllBusinesses,
+        fetchAllForms,
+        fetchAllSubmissions,
+        fetchSubscriptionPlans,
+        // fetchAllRoles,
+        // fetchAllTasks,
+        // fetchAllMessages,
+        // fetchAllChats,
+        // fetchAllAICharacters,
+        // fetchAllLandingPages,
+        // fetchAllSocialMediaPosts,
+    ]);
+
+    if (!godMode) {
+        return null;
+    }
+
+    if (loading) {
+        return <Spinner />;
+    }
+    const handlePrevious = () => {
+        if (currentPage as number > 1) {
+            actions.fetchAllSubmissions(currentPage as number - 1);
+        }
+    };
+
+    const handleNext = () => {
+        if (currentPage as number < Number(totalPages)) {
+            actions.fetchAllSubmissions(currentPage as number + 1);
+        }
+    };
 
     return (
         <div>
-            <div className="w-full flex flex-col gap-6">
+            <div className="mb-12">
+
+                <SubmissionCards submissions={submissions} forms={forms} />
+                <div className="flex justify-between items-center mt-4">
+                    <button
+                        onClick={handlePrevious}
+                        disabled={currentPage === 1}
+                        className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+                    >
+                        Previous
+                    </button>
+                    <span>
+                        Page {currentPage} of {totalPages}
+                    </span>
+                    <button
+                        onClick={handleNext}
+                        disabled={currentPage === totalPages}
+                        className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+                    >
+                        Next
+                    </button>
+                </div>
+            </div>
+            {/* <div className="w-full flex flex-col gap-6">
                 {forms && forms.length > 0 ?
                     <SubmissionFormCard forms={forms} />
 
@@ -46,7 +141,7 @@ function Submissions({ }: Props) {
 
                     : <p> No ClientView Available.</p>}
 
-            </div>
+            </div> */}
         </div>
     )
 }

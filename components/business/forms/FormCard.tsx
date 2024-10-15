@@ -1,3 +1,4 @@
+"use client"
 import React, { useEffect, useState } from "react";
 import { formatDistance } from "date-fns";
 import { Button } from "@/components/ui/button";
@@ -55,7 +56,7 @@ export function FormCard({ form }: FormCardProps) {
     //     setPublishedStatus(form.published);
     // }, [form.published]);
 
-    // Convertir role.id a número
+
     const userRoleId = Number(session?.user.role.id);
     const isAdminRole = [2, 3, 4].includes(userRoleId);
 
@@ -110,7 +111,7 @@ export function FormCard({ form }: FormCardProps) {
 
             setIsDeleting(false);
             setIsAlertOpen(false);
-            router.refresh(); // Utiliza router.refresh en lugar de window.location.reload
+            router.refresh();
         } catch (error) {
             console.error("Error deleting form:", error);
             toast({
@@ -123,7 +124,7 @@ export function FormCard({ form }: FormCardProps) {
     };
 
     const handleNavigate = () => {
-        // Push the correct form URL based on the shareURL of the form
+
         router.push(`/forms/${form.shareURL}`);
     };
 

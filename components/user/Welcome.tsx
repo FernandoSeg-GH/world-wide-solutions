@@ -14,7 +14,7 @@ function Welcome({ }: Props) {
     if (!session) return <div>You are not logged in</div>;
 
     return (
-        <div className='w-full p-4'>
+        <div className='w-full px-4'>
             {status === "authenticated" && session.user && (
                 <div>
                     <h1 className="text-2xl font-bold">

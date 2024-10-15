@@ -15,7 +15,6 @@ export const useSubmissions = () => {
   const fetchSubmissions = useCallback(
     async (shareUrl: string) => {
       const businessId = session?.user.businessId;
-      console.log("businessId", businessId);
       if (!shareUrl) {
         toast({
           title: "Error",
@@ -127,7 +126,22 @@ export const useSubmissions = () => {
           return [];
         }
 
-        const parsedContent = submission.content;
+        let parsedContent: Record<string, any> = {};
+
+        if (submission.content) {
+          try {
+            parsedContent = JSON.parse(String(submission.content));
+          } catch (error) {
+            toast({
+              title: "Error",
+              description: "Failed to parse submission content.",
+              variant: "destructive",
+            });
+            console.error("Parsing Error:", error);
+            return [];
+          }
+        }
+
         const missing: string[] = [];
 
         form.fields.forEach((field) => {
@@ -244,8 +258,6 @@ export const useSubmissions = () => {
     totalPages,
     fetchSubmissions,
     fetchAllSubmissions,
-    // fetchFormByShareUrl,
-    // fetchFormByShareUrlPublic,
     setSubmissions,
     getFormSubmissionByCaseId,
     getMissingFields,

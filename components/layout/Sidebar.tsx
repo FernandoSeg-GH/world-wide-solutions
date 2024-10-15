@@ -1,7 +1,7 @@
 'use client';
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { DnaIcon, Menu } from "lucide-react";
+import { BookText, DnaIcon, Menu, NotebookPen } from "lucide-react";
 import { FaHome, FaBusinessTime, FaRobot, FaListAlt, FaClipboardList, FaBell } from 'react-icons/fa';
 import { useAppContext } from "@/context/AppProvider";
 import React from 'react';
@@ -25,11 +25,11 @@ export const getSidebarItems = (godMode: boolean): SidebarItem[] => {
             label: "Dashboard",
         },
         {
-            icon: FaListAlt,
+            icon: BookText,
             label: "Forms",
         },
         {
-            icon: FaClipboardList,
+            icon: NotebookPen,
             label: "Submissions",
         },
         {
@@ -65,7 +65,7 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
     const sidebarItems = getSidebarItems(godMode);
     const router = useRouter()
     return (
-        <aside className={`fixed inset-y-0 left-0 z-10 flex flex-col border-r bg-background transition-all duration-300 ${isExpanded ? "w-64" : "w-14"}`}>
+        <aside className={`fixed inset-y-0 left-0 z-10 flex flex-col border-r bg-background transition-all duration-300 ${isExpanded ? "w-64" : "w-14"}`} >
             <div className="flex h-14 items-center justify-between px-2">
 
                 <h1 className={cn("text-lg font-semibold whitespace-nowrap hidden cursor-pointer ml-4", isExpanded && "block")} onClick={() => router.push("/dashboard")}>Vinci Suite</h1>

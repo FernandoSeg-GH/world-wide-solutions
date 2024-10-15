@@ -112,7 +112,6 @@ export default function Vinci() {
         }
     };
 
-    if (submissions) console.log('submissions', submissions)
     return (
         <div className="p-4 rounded-lg shadow overflow-auto">
             <h1 className="text-3xl font-bold mb-6">Vinci Database Viewer</h1>

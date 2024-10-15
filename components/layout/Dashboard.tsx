@@ -4,14 +4,7 @@
 import { useState } from "react";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
-import Main from "./Main";
 import { useAppContext } from "@/context/AppProvider";
-import Businesses from "@/components/business";
-import Forms from "@/components/business/forms";
-import Submissions from "@/components/business/forms/submissions";
-import Notifications from "@/components/business/notifications";
-import Leo from "@/components/leo";
-import Vinci from "@/components/vinci/Vinci";
 import { renderComponent } from "@/lib/renderComponent";
 
 export default function Dashboard() {
@@ -31,7 +24,7 @@ export default function Dashboard() {
                 <Header currentSection={currentSection}
                 // breadcrumbs={mockData.breadcrumbs} 
                 />
-                <div className="p-4">
+                <div className="px-4">
                     {renderComponent(currentSection)}
                 </div>
             </div>

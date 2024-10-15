@@ -115,14 +115,12 @@ export const authOptions: NextAuthOptions = {
         token.name = user.username;
         token.businessId = user.business_id;
 
-        // Add a check to ensure role exists and has an id and name
         if (user.role && user.role.id && user.role.name) {
           token.role = {
-            id: Number(user.role.id), // Ensure role.id is properly passed
-            name: user.role.name, // Ensure role.name is properly passed
+            id: Number(user.role.id),
+            name: user.role.name,
           };
         } else {
-          // Default to role ID 1 (assuming it's a regular user) and name "Unknown"
           token.role = {
             id: 1,
             name: "Unknown",
@@ -156,7 +154,7 @@ export const authOptions: NextAuthOptions = {
         businessId: token.businessId,
         role: {
           id: Number(token.role?.id ?? 1),
-          name: String(token.role?.name ?? "Unknown"), // Use proper role name
+          name: String(token.role?.name ?? "Unknown"),
         },
       };
       if (token.error) {

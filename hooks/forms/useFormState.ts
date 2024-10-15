@@ -252,7 +252,6 @@ export const useFormState = (initialForm?: Form) => {
       setLoading(true);
       setError(null);
       if (session?.user.businessId) {
-        console.log("session.user.businessId", session.user.businessId);
         try {
           const response = await fetch(
             `/api/forms/${
@@ -264,11 +263,10 @@ export const useFormState = (initialForm?: Form) => {
             throw new Error(errorData.message || "Failed to fetch form");
           }
           const formData = await response.json();
-          console.log("Fetched Form Data:", formData); // Debug log
           setFormState(formData);
           setElements(formData.fields || []);
         } catch (err: any) {
-          console.error("Error in fetchFormByShareUrlPublic:", err); // Debug log
+          console.error("Error in fetchFormByShareUrlPublic:", err);
           setError(err.message);
         } finally {
           setLoading(false);

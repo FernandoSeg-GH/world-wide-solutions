@@ -24,11 +24,9 @@ const FormDetailPage = ({ params }: { params: { id: string } }) => {
                 try {
 
                     const formId = Number(id);
-                    console.log('formId', formId)
                     const formDataResponse = await fetch(`/api/forms/${formId}`);
                     const formData = await formDataResponse.json();
                     setForm(formData);
-                    console.log('formData', formData)
 
                     await fetchSubmissions(formData.shareURL);
                 } catch (err: any) {

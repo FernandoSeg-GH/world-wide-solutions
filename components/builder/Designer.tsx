@@ -1,5 +1,3 @@
-// components/builder/Designer.tsx
-
 "use client";
 
 import React from "react";
@@ -34,10 +32,9 @@ function Designer() {
     },
   });
 
-  // Handle drag end event
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    console.log("Drag Ended:", event);
 
     if (!active || !over) return;
 
@@ -52,7 +49,6 @@ function Designer() {
       const newElement = FormElements[type as ElementsType].construct(idGenerator());
 
       formActions.addElement(elements.length, newElement);
-      console.log("Added new element at the end:", newElement);
       return;
     }
 
@@ -81,7 +77,6 @@ function Designer() {
       }
 
       formActions.addElement(indexForNewElement, newElement);
-      console.log(`Added new element at index ${indexForNewElement}:`, newElement);
       return;
     }
 
@@ -103,7 +98,6 @@ function Designer() {
 
       const activeElement = { ...elements[activeElementIndex] };
       formActions.removeElement(activeId);
-      console.log("Removed element for reordering:", activeId);
 
       let indexForNewElement = overElementIndex;
       if (isDroppingOverDesignerElementBottomHalf) {
@@ -111,7 +105,6 @@ function Designer() {
       }
 
       formActions.addElement(indexForNewElement, activeElement);
-      console.log(`Reordered element to index ${indexForNewElement}:`, activeElement);
     }
   };
 
@@ -190,7 +183,7 @@ function DesignerElementWrapper({ element }: DesignerElementWrapperProps) {
     },
   });
 
-  // Make only the drag handle draggable
+
   const dragHandle = useDraggable({
     id: element.id + "-drag-handler",
     data: {
@@ -206,7 +199,6 @@ function DesignerElementWrapper({ element }: DesignerElementWrapperProps) {
   const handleMouseLeave = () => setMouseIsOver(false);
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log("Element clicked:", element);
     setSelectedElement(element);
   };
 

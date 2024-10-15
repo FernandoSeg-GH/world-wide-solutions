@@ -31,7 +31,6 @@ function SubmissionsTable({ submissions, form, admin }: { submissions: Submissio
     const fields = Array.isArray(form.fields) ? form.fields : [];
 
     const rows = submissions.map((submission) => {
-        // Use submission.content directly as it's already an object
         const parsedContent: Record<string, any> = submission.content || {};
 
         const row: { [key: string]: any } = {

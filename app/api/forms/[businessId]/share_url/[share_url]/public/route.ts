@@ -20,7 +20,7 @@ export async function GET(
       }/forms/share_url/${encodeURIComponent(share_url)}/public`,
       {
         headers: {
-          Authorization: `Bearer ${session.accessToken}`, // Ensure accessToken is included
+          Authorization: `Bearer ${session.accessToken}`,
         },
       }
     );
