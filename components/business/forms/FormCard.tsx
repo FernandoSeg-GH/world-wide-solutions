@@ -57,7 +57,6 @@ export function FormCard({ form }: FormCardProps) {
 
     // Convertir role.id a número
     const userRoleId = Number(session?.user.role.id);
-    console.log('userRoleId', userRoleId)
     const isAdminRole = [2, 3, 4].includes(userRoleId);
 
     const handlePublishToggle = async () => {
