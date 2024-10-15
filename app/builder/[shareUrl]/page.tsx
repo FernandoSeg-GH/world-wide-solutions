@@ -19,6 +19,7 @@ export default function BuilderPage({ params }: BuilderPageProps) {
 
   useEffect(() => {
     if (shareUrl) {
+      console.log("Fetching form with shareUrl:", shareUrl); // Add this line
       fetchFormByShareUrl(shareUrl);
     }
   }, [shareUrl, fetchFormByShareUrl]);

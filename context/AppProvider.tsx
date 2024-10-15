@@ -168,13 +168,10 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
     }), [formState]);
 
 
-    const { fetchFormByShareUrl, fetchFormByShareUrlPublic, fetchAllSubmissions } = submissionState;
-
-
     const actions = useMemo(() => ({
         formActions,
         fetchSubmissions: submissionState.fetchSubmissions,
-        fetchAllSubmissions,
+        fetchAllSubmissions: submissionState.fetchAllSubmissions,
         getFormSubmissionByCaseId: submissionState.getFormSubmissionByCaseId,
         getMissingFields: submissionState.getMissingFields,
         fetchClientSubmissions: submissionState.fetchClientSubmissions,
@@ -184,8 +181,8 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         getBusinessById: fetchBusinessById,
         editBusiness,
         deleteBusiness,
-        fetchFormByShareUrl,
-        fetchFormByShareUrlPublic,
+        fetchFormByShareUrl: formState.fetchFormByShareUrl,
+        fetchFormByShareUrlPublic: formState.fetchFormByShareUrlPublic,
         toggleGodMode,
         switchSection: layoutState.switchSection,
         fetchAllUsers
