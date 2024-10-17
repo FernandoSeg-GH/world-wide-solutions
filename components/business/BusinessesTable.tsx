@@ -29,6 +29,7 @@ export default function BusinessesTable() {
 
     useEffect(() => {
         getAllBusinesses();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleEdit = (businessId: number) => {

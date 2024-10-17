@@ -77,6 +77,7 @@ export default function Vinci() {
             // fetchAllLandingPages();
             // fetchAllSocialMediaPosts();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         godMode,
         fetchAllUsers,

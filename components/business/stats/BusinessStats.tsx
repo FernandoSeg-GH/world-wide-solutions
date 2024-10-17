@@ -29,13 +29,8 @@ const BusinessStats = () => {
                 }
             }).catch((error) => console.error("Error fetching users:", error))
         }
-    }, [
-        getAllBusinesses,
-        fetchSubscriptionPlans,
-        fetchAllUsers,
-        session?.user?.role?.id,
-        session?.user?.businessId
-    ])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [session?.user?.role?.id, session?.user?.businessId])
 
     return (
         <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">

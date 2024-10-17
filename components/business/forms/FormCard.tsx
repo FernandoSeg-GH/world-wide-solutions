@@ -250,7 +250,7 @@ export function FormCard({ form }: FormCardProps) {
                         </AlertDialogHeader>
                         <AlertDialogDescription>
                             <span>
-                                Please type "<span className="font-bold">DELETE_THE_FORM_AND_ALL_DATA</span>" below to confirm.
+                                Please type &quot;<span className="font-bold">DELETE_THE_FORM_AND_ALL_DATA</span>&quot; below to confirm.
                             </span>
                         </AlertDialogDescription>
                         <input

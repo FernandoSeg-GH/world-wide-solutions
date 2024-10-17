@@ -1,15 +1,24 @@
-// middleware.ts
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import type { NextRequest } from "next/server";
 
-// Define protected routes
+// Define public routes (those that don't require authentication)
+const publicRoutes = ["/", "/auth/sign-in", "/submit/url"];
+
+// Define protected routes (those that require authentication)
 const protectedPaths = [
-  "/dashboard",
+  // "/dashboard",
   "/forms",
   "/builder",
   // Add more protected routes as needed
 ];
+
+// Helper function to check if the path is public
+const isPublicPath = (pathname: string): boolean => {
+  return publicRoutes.some(
+    (path) => pathname === path || pathname.startsWith(`${path}/`)
+  );
+};
 
 // Helper function to check if the path is protected
 const isProtectedPath = (pathname: string): boolean => {
@@ -23,27 +32,33 @@ export default async function middleware(req: NextRequest) {
 
   console.log(`Middleware: Processing request for ${pathname}`);
 
+  // Allow access to public routes without authentication
+  if (isPublicPath(pathname)) {
+    console.log("Middleware: Public route, allowing access.");
+    return NextResponse.next();
+  }
+
   // Check if the requested path is protected
-  // if (isProtectedPath(pathname)) {
-  //   console.log("Middleware: Protected path, checking authentication.");
+  if (isProtectedPath(pathname)) {
+    console.log("Middleware: Protected path, checking authentication.");
 
-  //   // Retrieve the token using NextAuth's getToken
-  //   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    // Retrieve the token using NextAuth's getToken
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
-  //   if (token) {
-  //     console.log("Middleware: Authentication token found.", token);
-  //     // If token is valid, allow access
-  //     return NextResponse.next();
-  //   }
+    if (token) {
+      console.log("Middleware: Authentication token found.", token);
+      // If token is valid, allow access
+      return NextResponse.next();
+    }
 
-  //   // If no valid token, redirect to sign-in page with callbackUrl
-  //   console.log("Middleware: No valid token found, redirecting to sign-in.");
-  //   const signInUrl = new URL("/auth/sign-in", req.nextUrl.origin);
-  //   signInUrl.searchParams.set("callbackUrl", req.nextUrl.href);
-  //   return NextResponse.redirect(signInUrl);
-  // }
+    // If no valid token, redirect to sign-in page with callbackUrl
+    console.log("Middleware: No valid token found, redirecting to sign-in.");
+    const signInUrl = new URL("/auth/sign-in", req.nextUrl.origin);
+    signInUrl.searchParams.set("callbackUrl", req.nextUrl.href);
+    return NextResponse.redirect(signInUrl);
+  }
 
-  // For all other routes, allow access
+  // For all other routes, allow access by default (or return 404 if necessary)
   return NextResponse.next();
 }
 
@@ -52,6 +67,6 @@ export const config = {
     "/dashboard/:path*",
     "/forms/:path*",
     "/builder/:path*",
-    // Add more patterns as needed
+    // You can add more protected route patterns here
   ],
 };

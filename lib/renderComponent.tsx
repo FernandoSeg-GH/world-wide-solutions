@@ -7,17 +7,19 @@ import Notifications from "@/components/business/notifications";
 import Main from "@/components/layout/Main";
 import Leo from "@/components/leo";
 import Vinci from "@/components/vinci/Vinci";
+import { Suspense } from "react";
+import Spinner from "@/components/ui/spinner";
 
-export const renderComponent = (currentSection: string) => {
+export const RenderComponent = (currentSection: string) => {
     const url = usePathname();
 
     if (url === "/submit") {
         return (
-            <>
+            <Suspense fallback={<div><Spinner /></div>}>
                 <Forms />
                 <Submissions />
                 <Notifications />
-            </>
+            </Suspense>
         );
     }
 
@@ -41,3 +43,5 @@ export const renderComponent = (currentSection: string) => {
             return <Forms />;
     }
 };
+
+export default RenderComponent

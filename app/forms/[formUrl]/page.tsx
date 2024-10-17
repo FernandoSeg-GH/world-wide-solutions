@@ -63,6 +63,7 @@ const FormDetailPage = ({ params }: { params: { formUrl: string } }) => {
             setLoading(false);
             setError("User session not found.");
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [formUrl, session?.user?.businessId]);
 
     if (loading) return <Spinner />;

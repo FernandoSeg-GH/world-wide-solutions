@@ -30,7 +30,7 @@ function Forms({ }: Props) {
             // Fetch forms for the current business
             formActions.fetchFormsByBusinessId(session.user.businessId);
         }
-        // Add formActions and session.user properties as dependencies to avoid infinite loops
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [session?.user?.role?.id, session?.user?.businessId]);
 
 

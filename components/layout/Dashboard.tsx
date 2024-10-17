@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
 import { useAppContext } from "@/context/AppProvider";
-import { renderComponent } from "@/lib/renderComponent";
+import RenderComponent from "@/lib/renderComponent";
 
 export default function Dashboard() {
     const [isExpanded, setIsExpanded] = useState(false);
@@ -25,7 +25,7 @@ export default function Dashboard() {
                 // breadcrumbs={mockData.breadcrumbs} 
                 />
                 <div className="px-4">
-                    {renderComponent(currentSection)}
+                    {RenderComponent(currentSection)}
                 </div>
             </div>
         </div>

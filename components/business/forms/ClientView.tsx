@@ -119,7 +119,7 @@ export default function ClientView({ form, submissions }: ClientViewProps) {
                 ) : (
                     <div className="flex flex-col items-center justify-center h-64">
                         <LuAlertCircle className="text-gray-400 text-6xl mb-4" />
-                        <p className="text-gray-500 text-xl">You haven't submitted any forms yet.</p>
+                        <p className="text-gray-500 text-xl">You haven&apos;t submitted any forms yet.</p>
                     </div>
                 )}
             </Card>

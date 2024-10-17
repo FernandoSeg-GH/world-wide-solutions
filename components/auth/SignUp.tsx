@@ -1,7 +1,8 @@
+// components/auth/SignUp.tsx
 
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,8 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/use-toast";
 
-
-export function SignUp({ onToggle }: { onToggle: () => void }) {
+export default function SignUp({ onToggle }: { onToggle: () => void }) {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const [formData, setFormData] = useState({
@@ -172,5 +172,3 @@ export function SignUp({ onToggle }: { onToggle: () => void }) {
         </form>
     );
 }
-
-export default SignUp

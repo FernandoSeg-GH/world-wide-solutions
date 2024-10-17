@@ -1,21 +1,25 @@
+// components/auth/SignIn.tsx
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { signIn, useSession } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/use-toast";
 
-export default function SignIn({ onToggle }: { onToggle: () => void }) {
+interface SignInProps {
+    onToggle: () => void;
+    callbackUrl: string;
+}
+
+export default function SignIn({ onToggle, callbackUrl }: SignInProps) {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
-
-    const searchParams = useSearchParams();
-    const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+    const { data: session } = useSession();
 
     const [credentials, setCredentials] = useState({
         username: "",
@@ -50,13 +54,12 @@ export default function SignIn({ onToggle }: { onToggle: () => void }) {
         }
     };
 
-    const { data: session } = useSession();
-
-    useEffect(() => {
-        if (session?.user?.role?.id) {
-            router.push("/dashboard");
-        }
-    }, [session?.user?.role?.id]);
+    // useEffect(() => {
+    //     if (session?.user?.role?.id) {
+    //         router.push("/dashboard");
+    //     }
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [session?.user?.role?.id]);
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -89,7 +92,7 @@ export default function SignIn({ onToggle }: { onToggle: () => void }) {
             </Button>
             <Separator />
             <p className="text-sm text-center">
-                Don't have an account?{" "}
+                Don&apos;t have an account?{" "}
                 <Button variant="link" onClick={onToggle}>
                     Sign Up
                 </Button>
@@ -97,4 +100,3 @@ export default function SignIn({ onToggle }: { onToggle: () => void }) {
         </form>
     );
 }
-
