@@ -35,7 +35,7 @@ const FormDetailPage = ({ params }: { params: { formUrl: string } }) => {
                     throw new Error("Form data is undefined.");
                 }
 
-                if (!formData.shareUrl) { // Ensure using 'shareUrl'
+                if (!formData.shareUrl) {
                     throw new Error("Form shareUrl is undefined.");
                 }
 
@@ -64,6 +64,7 @@ const FormDetailPage = ({ params }: { params: { formUrl: string } }) => {
             setError("User session not found.");
         }
     }, [formUrl, session?.user?.businessId]);
+
 
     if (loading) return <Spinner />;
     if (error) return <div className="text-red-500 text-center mt-4">Error: {error}</div>;

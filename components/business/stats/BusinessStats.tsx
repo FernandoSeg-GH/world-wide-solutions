@@ -3,12 +3,18 @@ import { useAppContext } from '@/context/AppProvider'
 import { Users, Briefcase, FileText, DollarSign } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import StatCard from './StatCard'
+import { useSession } from 'next-auth/react'
+import { useUser } from '@/hooks/user/useUser'
+import { useGodMode } from '@/hooks/user/useGodMode'
 
 const BusinessStats = () => {
+    const { data: session } = useSession();
+    const { godMode } = useGodMode();
     const { data, actions } = useAppContext()
     const { businesses, subscriptionPlans, forms, loading } = data
     const { getAllBusinesses, fetchSubscriptionPlans, formActions } = actions
 
+    const { users, fetchAllUsers } = useUser();
     const [userCount, setUserCount] = useState<number>(0)
 
     useEffect(() => {
@@ -16,12 +22,20 @@ const BusinessStats = () => {
         fetchSubscriptionPlans()
         formActions.fetchAllForms()
 
-
-        fetch('/api/users')
-            .then((res) => res.json())
-            .then((data) => setUserCount(data.length))
-            .catch((error) => console.error(error))
-    }, [getAllBusinesses, fetchSubscriptionPlans, formActions.fetchAllForms])
+        if (session?.user?.role?.id && session?.user?.businessId) {
+            fetchAllUsers().then((data) => {
+                if (data) {
+                    setUserCount(data.length)
+                }
+            }).catch((error) => console.error("Error fetching users:", error))
+        }
+    }, [
+        getAllBusinesses,
+        fetchSubscriptionPlans,
+        fetchAllUsers,
+        session?.user?.role?.id,
+        session?.user?.businessId
+    ])
 
     return (
         <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">

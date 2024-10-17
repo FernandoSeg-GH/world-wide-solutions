@@ -4,9 +4,9 @@ import { authOptions } from "@/lib/auth";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { share_url: string } }
+  { params }: { params: { shareUrl: string } }
 ) {
-  const { share_url } = params;
+  const { shareUrl } = params;
   const session = await getServerSession(authOptions);
 
   if (!session) {
@@ -17,7 +17,7 @@ export async function GET(
     const response = await fetch(
       `${
         process.env.NEXT_PUBLIC_FLASK_BACKEND_URL
-      }/forms/share_url/${encodeURIComponent(share_url)}/public`,
+      }/forms/shareUrl/${encodeURIComponent(shareUrl)}/public`,
       {
         headers: {
           Authorization: `Bearer ${session.accessToken}`,

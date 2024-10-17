@@ -103,15 +103,9 @@ export function FormCard({ form }: FormCardProps) {
                 throw new Error(errorData.error || "Failed to delete form");
             }
 
-            toast({
-                title: "Form Deleted",
-                description:
-                    "The form and all associated data have been successfully deleted.",
-            });
-
             setIsDeleting(false);
             setIsAlertOpen(false);
-            router.refresh();
+            window.location.reload();
         } catch (error) {
             console.error("Error deleting form:", error);
             toast({
@@ -123,18 +117,15 @@ export function FormCard({ form }: FormCardProps) {
         }
     };
 
-    const handleNavigate = () => {
-
-        router.push(`/forms/${form.shareURL}`);
+    const handleNavigate = (shareUrl: string) => {
+        window.location.href = `/forms/${shareUrl}`;
     };
-
 
     const formattedDistance = form.createdAt
         ? formatDistance(new Date(form.createdAt), new Date(), {
             addSuffix: true,
         })
         : "Unknown time";
-
     return (
         <Card
             className={cn(
@@ -153,7 +144,7 @@ export function FormCard({ form }: FormCardProps) {
                                     variant={publishedStatus ? "default" : "outline"}
                                     className={publishedStatus ? "bg-blue-500" : ""}
                                 >
-                                    {publishedStatus ? "Published" : "Unpublished"}
+                                    <span>  {publishedStatus ? "Published" : "Unpublished"}</span>
                                 </Badge>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
@@ -227,7 +218,7 @@ export function FormCard({ form }: FormCardProps) {
                         {publishedStatus ? (
                             <Button
                                 className="w-full mt-2 text-md gap-4"
-                                onClick={handleNavigate}
+                                onClick={() => handleNavigate(form.shareUrl)}
                             >
                                 View submissions <BiRightArrowAlt />
                             </Button>
@@ -235,7 +226,7 @@ export function FormCard({ form }: FormCardProps) {
                             <Button
                                 variant="secondary"
                                 className="w-full mt-2 text-md gap-4"
-                                onClick={() => router.push(`/builder/${form.shareURL}`)}
+                                onClick={() => router.push(`/builder/${form.shareUrl}`)}
                             >
                                 Edit form <FaEdit />
                             </Button>

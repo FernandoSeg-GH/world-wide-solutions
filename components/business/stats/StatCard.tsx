@@ -12,7 +12,7 @@ const StatCard = ({ title, icon, value, description }: StatCardProps) => {
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{title}</CardTitle>
+                <CardTitle className="text-sm font-medium"><span>{title}</span></CardTitle>
                 {icon}
             </CardHeader>
             <CardContent>

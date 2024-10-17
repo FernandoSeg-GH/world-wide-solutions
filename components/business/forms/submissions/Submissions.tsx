@@ -6,10 +6,12 @@ import Spinner from '@/components/ui/spinner';
 import SubmissionCards from './SubmissionsCards';
 import { useAppContext } from '@/context/AppProvider';
 import { useSubmissions } from '@/hooks/forms/useSubmissions';
+import { useSession } from 'next-auth/react';
 
 type Props = {};
 
 function Submissions({ }: Props) {
+    const { data: session } = useSession();
     const { data, actions } = useAppContext();
     const { fetchSubmissionsByFormUrl } = useSubmissions();
     const {
@@ -36,11 +38,12 @@ function Submissions({ }: Props) {
             getAllBusinesses();
             fetchAllUsers();
             fetchSubscriptionPlans();
-        } else {
+        }
+        else {
             // Fetch forms by businessId when not in god mode
-            const businessId = data.currentUser?.business_id;
+            const businessId = session?.user.businessId;
             if (businessId) {
-                fetchFormsByBusinessId(businessId);
+                fetchFormsByBusinessId(businessId)
             }
         }
     }, [
@@ -50,25 +53,26 @@ function Submissions({ }: Props) {
         fetchAllSubmissions,
         fetchSubscriptionPlans,
         fetchFormsByBusinessId,
-        data.currentUser?.business_id,
+        session?.user.businessId
     ]);
 
     useEffect(() => {
-        if (!godMode && forms.length > 0) {
+        if (!godMode && forms.length > 0 && session?.user.businessId) {
             // Fetch submissions for each form when not in god mode
             forms.forEach((form) => {
-                fetchSubmissionsByFormUrl(form.shareURL);
+                fetchSubmissionsByFormUrl(form.shareUrl, Number(session?.user.businessId));
             });
         }
-    }, [godMode, forms, fetchSubmissionsByFormUrl]);
+    }, [godMode, forms, fetchSubmissionsByFormUrl, session?.user.businessId]);
 
-    if (!godMode && loading) {
+    useEffect(() => {
+        console.log("Submissions after fetching:", submissions);
+    }, [submissions]);
+
+    if (loading) {
         return <Spinner />;
     }
 
-    if (!godMode) {
-        return null;
-    }
 
     const handlePrevious = () => {
         if (currentPage as number > 1) {

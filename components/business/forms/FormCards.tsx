@@ -20,7 +20,7 @@ const FormCards = ({ forms }: { forms: Form[] }) => {
                 <CreateFormBtn /> : null
             }
             {loading ? <Skeleton className="border-2 border-primary-/20 h-[210px] w-full lg:max-w-[448px]" /> : null}
-            {forms ? forms.map((form) => (
+            {forms && forms.length > 0 ? forms.map((form) => (
                 <FormCard key={form.id} form={form} />
             )) : null}
         </div>

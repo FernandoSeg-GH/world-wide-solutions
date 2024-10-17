@@ -39,13 +39,20 @@ const SubmissionCards: React.FC<Props> = ({ submissions, forms }) => {
         setExpandedField(expandedField === fieldKey ? null : fieldKey);
     };
 
-
+    // Map field IDs to their corresponding labels
     const fieldMap = forms.reduce((acc, form) => {
-        form.fields.forEach(field => {
-            acc[field.id] = field.extraAttributes.label || field.id;
-        });
+        if (Array.isArray(form.fields)) { // Check if fields is a valid array
+            form.fields.forEach(field => {
+                acc[field.id] = field.extraAttributes?.label || field.id;
+            });
+        }
         return acc;
     }, {} as Record<string, string>);
+
+
+    if (forms.length === 0) {
+        return <div>No Submissions available</div>;
+    }
 
     return (
         <div className="grid grid-cols-1 gap-4">

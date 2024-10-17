@@ -1,3 +1,4 @@
+// useSubmissions
 "use client";
 
 import { useState, useCallback } from "react";
@@ -13,46 +14,37 @@ export const useSubmissions = () => {
   const [totalPages, setTotalPages] = useState<number>(1);
 
   const fetchSubmissions = useCallback(
-    async (shareUrl: string) => {
-      const businessId = session?.user.businessId;
-      if (!shareUrl) {
+    async (shareUrl: string, businessId: number): Promise<void> => {
+      if (!shareUrl || !businessId) {
+        console.error("Share URL or Business ID is undefined.");
         toast({
           title: "Error",
-          description: "Share URL is missing.",
+          description: "Share URL or Business ID is undefined.",
           variant: "destructive",
         });
         return;
       }
-      if (!businessId) {
-        toast({
-          title: "Error",
-          description: "BusinessId is missing.",
-          variant: "destructive",
-        });
-        return;
-      }
+
       try {
-        const encodedShareUrl = encodeURIComponent(shareUrl);
-        if (!businessId) {
-          console.warn("No submissions found");
-        }
         const response = await fetch(
-          `/api/forms/${businessId}/share_url/${encodedShareUrl}/submissions`
+          `/api/forms/${businessId}/shareUrl/${encodeURIComponent(
+            shareUrl
+          )}/submissions`,
+          {
+            headers: {
+              Authorization: `Bearer ${session?.accessToken}`,
+            },
+          }
         );
 
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Failed to fetch submissions.");
+          throw new Error("Failed to fetch submissions.");
         }
 
         const data = await response.json();
-        if (data?.submissions) {
-          setSubmissions(data.submissions);
-        } else {
-          console.warn("No submissions found");
-        }
-      } catch (error: any) {
-        console.error("Failed to fetch submissions", error);
+        setSubmissions(data.submissions as Submission[]);
+      } catch (error) {
+        console.error("Error fetching submissions:", error);
         toast({
           title: "Error",
           description: "Failed to fetch submissions.",
@@ -60,7 +52,7 @@ export const useSubmissions = () => {
         });
       }
     },
-    [session?.user.businessId]
+    [session?.accessToken]
   );
 
   const getFormSubmissionByCaseId = useCallback(
@@ -252,16 +244,25 @@ export const useSubmissions = () => {
   );
 
   const fetchSubmissionsByFormUrl = useCallback(
-    async (formUrl: string) => {
-      if (!session || !session.accessToken) return;
-
+    async (formUrl: string, businessId: number) => {
+      if (!formUrl || !businessId) {
+        console.error("Form URL or Business ID is undefined.");
+        toast({
+          title: "Error",
+          description: "Form URL or Business ID is undefined.",
+          variant: "destructive",
+        });
+        return;
+      }
       try {
         setLoading(true);
         const response = await fetch(
-          `/api/forms/share_url/${encodeURIComponent(formUrl)}/submissions`,
+          `/api/forms/${businessId}/shareUrl/${encodeURIComponent(
+            formUrl
+          )}/submissions`,
           {
             headers: {
-              Authorization: `Bearer ${session.accessToken}`,
+              Authorization: `Bearer ${session?.accessToken}`, // Ensure you pass the token if required
             },
           }
         );

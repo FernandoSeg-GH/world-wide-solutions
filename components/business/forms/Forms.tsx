@@ -22,15 +22,17 @@ function Forms({ }: Props) {
     const { formActions } = actions;
 
     useEffect(() => {
-        // Fetch all forms if in godMode
-        if (session?.user?.role.id === 4) {
-            // GodMode (Superadmin)
+        // Check if session and role are available before triggering fetches
+        if (session?.user?.role?.id === 4) {
+            // Fetch all forms in godMode (Superadmin)
             formActions.fetchAllForms();
-        } else if (session?.user?.businessId) {
-            // Regular user or business admin
+        } else if (session?.user?.businessId && session?.user?.role?.id === 3) {
+            // Fetch forms for the current business
             formActions.fetchFormsByBusinessId(session.user.businessId);
         }
-    }, [session?.user?.role.id, session?.user?.businessId, formActions]);
+        // Add formActions and session.user properties as dependencies to avoid infinite loops
+    }, [session?.user?.role?.id, session?.user?.businessId]);
+
 
     if (loading) {
         return <div><Spinner /></div>;

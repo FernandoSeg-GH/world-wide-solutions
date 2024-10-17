@@ -1,9 +1,11 @@
 "use client";
+
 import { useState, useCallback, useEffect, useRef } from "react";
 import { Form, FormElementInstance } from "@/types";
 import { toast } from "@/components/ui/use-toast";
 import { deepEqual } from "@/lib/utils";
 import { useSession } from "next-auth/react";
+import { useGodMode } from "../user/useGodMode";
 
 export const useFormState = (initialForm?: Form) => {
   const [forms, setForms] = useState<Form[]>([]);
@@ -11,19 +13,14 @@ export const useFormState = (initialForm?: Form) => {
   const [formName, setFormName] = useState<string>(initialForm?.name || "");
   const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
   const formInitializedRef = useRef<boolean>(false);
+  const { godMode } = useGodMode();
 
   const [elements, setElements] = useState<FormElementInstance[]>(
     initialForm?.fields || []
   );
-  // const [elements, setElements] = useState<FormField[]>(
-  //   initialForm?.fields || []
-  // );
 
   const [selectedElement, setSelectedElement] =
     useState<FormElementInstance | null>(null);
-  // const [selectedElement, setSelectedElement] = useState<FormField | null>(
-  //   null
-  // );
 
   const { data: session } = useSession();
   const [loading, setLoading] = useState<boolean>(false);
@@ -108,14 +105,15 @@ export const useFormState = (initialForm?: Form) => {
     }
     try {
       setLoading(true);
-      const response = await fetch("/api/forms/save-form", {
+      const response = await fetch("/api/forms/save_form", {
+        // Corrected endpoint
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           form_id: form.id,
           name: formName,
           fields: elements,
-          share_url: form.shareURL,
+          shareUrl: form.shareUrl,
           business_id: session?.user.businessId,
         }),
       });
@@ -146,13 +144,17 @@ export const useFormState = (initialForm?: Form) => {
     async (formId: number) => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/forms/delete?formId=${formId}`, {
+        const response = await fetch(`/api/forms/form/${formId}`, {
+          // Corrected endpoint
           method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${session?.accessToken}`,
+          },
         });
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.error || "Failed to delete form");
+          throw new Error(errorData.message || "Failed to delete form");
         }
 
         toast({
@@ -186,7 +188,7 @@ export const useFormState = (initialForm?: Form) => {
       }
       try {
         const response = await fetch(
-          `/api/forms/${businessId}/share_url/${shareUrl}`
+          `/api/forms/shareUrl/${encodeURIComponent(shareUrl)}/public` // Corrected endpoint
         );
         if (!response.ok) {
           throw new Error("Form not found");
@@ -214,7 +216,8 @@ export const useFormState = (initialForm?: Form) => {
       try {
         setLoading(true);
 
-        const response = await fetch("/api/forms/publish-unpublish", {
+        const response = await fetch("/api/forms/publish_unpublish_form", {
+          // Corrected endpoint
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ form_id: form.id, action }),
@@ -225,6 +228,7 @@ export const useFormState = (initialForm?: Form) => {
           throw new Error(errorText || `Error ${action}ing form.`);
         }
 
+        const updatedForm = await response.json();
         setForm({ ...form, published: action === "publish" });
 
         toast({
@@ -248,32 +252,35 @@ export const useFormState = (initialForm?: Form) => {
   );
 
   const fetchFormByShareUrlPublic = useCallback(
-    async (shareUrl: string) => {
+    async (shareUrl: string, businessId: number): Promise<Form | null> => {
       setLoading(true);
       setError(null);
       if (session?.user.businessId) {
         try {
           const response = await fetch(
-            `/api/forms/${
-              session.user.businessId
-            }/share_url/${encodeURIComponent(shareUrl)}/public`
+            `/api/forms/${businessId}/shareUrl/${encodeURIComponent(
+              shareUrl
+            )}/public`
           );
           if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.message || "Failed to fetch form");
           }
           const formData = await response.json();
-          setFormState(formData);
+          setForm(formData);
           setElements(formData.fields || []);
+          return formData as Form;
         } catch (err: any) {
           console.error("Error in fetchFormByShareUrlPublic:", err);
           setError(err.message);
+          return null;
         } finally {
           setLoading(false);
         }
       }
+      return null;
     },
-    [setLoading, setError, setFormState, setElements, session?.user.businessId]
+    [session?.user.businessId]
   );
 
   const fetchFormsByBusinessId = useCallback(
@@ -297,7 +304,6 @@ export const useFormState = (initialForm?: Form) => {
           });
           return;
         }
-
         setForms(data.forms);
       } catch (error) {
         console.error("Error fetching forms for business:", error);
@@ -315,37 +321,35 @@ export const useFormState = (initialForm?: Form) => {
   );
 
   const fetchAllForms = useCallback(async (): Promise<void> => {
-    if (!session?.user.businessId) {
-      alert("No user business");
-      return;
-    }
-    try {
-      setLoading(true);
-      const response =
-        session?.user.role.id === 4
-          ? await fetch(`/api/forms/all_forms`)
-          : await fetch(`/api/forms/${session?.user.businessId}`);
+    if (session?.user.businessId) {
+      try {
+        setLoading(true);
+        const response =
+          session?.user.role.id === 4
+            ? await fetch(`/api/forms/all_forms`)
+            : await fetch(`/api/forms/${session.user.businessId}`);
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (!response.ok) {
+        if (!response.ok) {
+          toast({
+            title: "Error",
+            description: data.message || "Failed to fetch all forms.",
+            variant: "destructive",
+          });
+          return;
+        }
+        setForms(data.forms);
+      } catch (error) {
+        console.error("Error fetching all forms:", error);
         toast({
           title: "Error",
-          description: data.message || "Failed to fetch all forms.",
+          description: "An error occurred while fetching all forms.",
           variant: "destructive",
         });
-        return;
+      } finally {
+        setLoading(false);
       }
-      setForms(data.forms);
-    } catch (error) {
-      console.error("Error fetching all forms:", error);
-      toast({
-        title: "Error",
-        description: "An error occurred while fetching all forms.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
     }
   }, [session?.user.businessId, session?.user.role.id]);
 
@@ -362,7 +366,8 @@ export const useFormState = (initialForm?: Form) => {
           business_id: session.user.businessId,
         };
 
-        const response = await fetch("/api/forms/create", {
+        const response = await fetch("/api/forms/create_form", {
+          // Corrected endpoint
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -379,7 +384,7 @@ export const useFormState = (initialForm?: Form) => {
         const result = await response.json();
         return {
           formId: result?.form_id,
-          shareURL: result?.share_url,
+          shareUrl: result?.shareUrl,
         };
       } catch (error: any) {
         toast({

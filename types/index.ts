@@ -78,7 +78,7 @@ export interface Form {
   id: number;
   name: string;
   fields: FormField[];
-  shareURL: string;
+  shareUrl: string;
   businessId: number;
   business_name?: string;
   description?: string;
@@ -318,7 +318,7 @@ export interface AppContextType {
       createForm: (newForm: {
         name: string;
         description: string;
-      }) => Promise<{ formId: number; shareURL: string } | null>;
+      }) => Promise<{ formId: number; shareUrl: string } | null>;
       saveForm: () => Promise<void>;
       publishForm: (action: "publish" | "unpublish") => Promise<void>;
       addElement: (index: number, element: FormElementInstance) => void;
@@ -329,7 +329,7 @@ export interface AppContextType {
       fetchAllForms: () => Promise<void>;
     };
     createBusiness: (businessData: any) => Promise<boolean>;
-    fetchSubmissions: (shareURL: string) => Promise<void>;
+    fetchSubmissions: (shareUrl: string, businessId: number) => Promise<void>;
     fetchAllSubmissions: (page?: number) => Promise<Submission[] | null>;
     getFormSubmissionByCaseId: (caseId: string) => Promise<Submission | null>;
     getMissingFields: (submission: Submission, form: Form) => Promise<string[]>;
@@ -343,13 +343,13 @@ export interface AppContextType {
     ) => Promise<boolean>;
     deleteBusiness: (businessId: number) => Promise<boolean>;
     fetchFormByShareUrl: (
-      shareURL: string,
+      shareUrl: string,
       businessId: number
     ) => Promise<Form | null>;
     fetchFormByShareUrlPublic: (
-      shareURL: string,
+      shareUrl: string,
       businessId: number
-    ) => Promise<void>;
+    ) => Promise<Form | null>;
     toggleGodMode: () => void;
     switchSection: (section: string) => void;
     fetchAllUsers: () => Promise<User[] | null>;

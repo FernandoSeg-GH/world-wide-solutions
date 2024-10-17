@@ -90,8 +90,8 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
 
 
     useEffect(() => {
-        if (formState.form) {
-            submissionState.fetchSubmissions(formState.form.shareURL);
+        if (formState.form && formState.form.businessId) {
+            submissionState.fetchSubmissions(formState.form.shareUrl, formState.form.businessId);
         }
     }, [formState.form, submissionState.fetchSubmissions]);
 

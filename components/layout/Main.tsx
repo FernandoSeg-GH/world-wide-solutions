@@ -12,17 +12,7 @@ import Forms from "@/components/business/forms";
 import { Separator } from "@/components/ui/separator";
 
 export default function Main() {
-    const { data: session } = useSession();
     const { godMode } = useGodMode();
-    const { data, actions } = useAppContext();
-    const { form, submissions, loading: formLoading, loading, forms } = data;
-    const { formActions } = actions;
-
-    useEffect(() => {
-        if (session?.user?.businessId) {
-            formActions.fetchFormsByBusinessId(session.user.businessId);
-        }
-    }, [session?.user.businessId]);
 
     return (
         <div className="flex h-full w-full flex-col bg-muted/40">

@@ -42,9 +42,9 @@ function CreateFormBtn() {
 
             });
 
-            if (result?.formId && result?.shareURL) {
+            if (result?.formId && result?.shareUrl) {
                 setTimeout(() => {
-                    router.push(`/builder/${result.shareURL}`);
+                    router.push(`/builder/${result.shareUrl}`);
                 }, 1000);
             } else {
                 throw new Error("Form creation failed.");

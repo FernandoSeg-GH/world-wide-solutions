@@ -356,9 +356,9 @@ export default function Vinci() {
                                             : "N/A"}
                                     </TableCell>
                                     <TableCell>
-                                        {form.shareURL ? (
-                                            <a href={`/forms/${form.shareURL}`} target="_blank" rel="noopener noreferrer" className="text-green-500">
-                                                {form.shareURL}
+                                        {form.shareUrl ? (
+                                            <a href={`/forms/${form.shareUrl}`} target="_blank" rel="noopener noreferrer" className="text-green-500">
+                                                {form.shareUrl}
                                             </a>
                                         ) : (
                                             "N/A"

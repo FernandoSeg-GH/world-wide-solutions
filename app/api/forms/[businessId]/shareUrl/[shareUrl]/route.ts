@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   req: Request,
-  { params }: { params: { share_url: string } }
+  { params }: { params: { shareUrl: string } }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -12,11 +12,11 @@ export async function GET(
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  const { share_url } = params;
+  const { shareUrl } = params;
 
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/forms/share_url/${share_url}/public`,
+      `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/forms/shareUrl/${shareUrl}/public`,
       {
         method: "GET",
         headers: {

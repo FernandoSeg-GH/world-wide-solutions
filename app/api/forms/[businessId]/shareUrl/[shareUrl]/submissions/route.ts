@@ -1,12 +1,14 @@
+// api/forms/[businessId]/share_url/[shareUrl]/submissions/route.ts
+
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { share_url: string } }
+  { params }: { params: { businessId: number; shareUrl: string } }
 ) {
-  const { share_url } = params;
+  const { businessId, shareUrl } = params;
   const session = await getServerSession(authOptions);
   if (!session || !session.accessToken) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -14,9 +16,9 @@ export async function GET(
 
   try {
     const response = await fetch(
-      `${
-        process.env.NEXT_PUBLIC_FLASK_BACKEND_URL
-      }/forms/share_url/${encodeURIComponent(share_url)}/submissions`,
+      `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/forms/${encodeURIComponent(
+        businessId
+      )}/share_url/${encodeURIComponent(shareUrl)}/submissions`,
       {
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
