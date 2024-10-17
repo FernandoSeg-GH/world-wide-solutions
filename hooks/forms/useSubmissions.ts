@@ -251,6 +251,45 @@ export const useSubmissions = () => {
     [session]
   );
 
+  const fetchSubmissionsByFormUrl = useCallback(
+    async (formUrl: string) => {
+      if (!session || !session.accessToken) return;
+
+      try {
+        setLoading(true);
+        const response = await fetch(
+          `/api/forms/share_url/${encodeURIComponent(formUrl)}/submissions`,
+          {
+            headers: {
+              Authorization: `Bearer ${session.accessToken}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to fetch submissions.");
+        }
+
+        const data = await response.json();
+        setSubmissions(data.submissions || []);
+        setTotalPages(data.pages || 1);
+        setCurrentPage(data.page || 1);
+      } catch (error: any) {
+        console.error("Error fetching submissions by form URL:", error);
+        toast({
+          title: "Error",
+          description:
+            "An error occurred while fetching submissions by form URL.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    },
+    [session]
+  );
+
   return {
     submissions,
     loading,
@@ -260,6 +299,7 @@ export const useSubmissions = () => {
     fetchAllSubmissions,
     setSubmissions,
     getFormSubmissionByCaseId,
+    fetchSubmissionsByFormUrl,
     getMissingFields,
     fetchClientSubmissions,
     setLoading,

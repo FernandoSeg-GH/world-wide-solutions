@@ -280,7 +280,7 @@ export const useFormState = (initialForm?: Form) => {
     async (businessId: number) => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/forms/${businessId}`, {
+        const response = await fetch(`/api/business/${businessId}`, {
           headers: {
             Authorization: `Bearer ${session?.accessToken}`,
           },
@@ -315,6 +315,10 @@ export const useFormState = (initialForm?: Form) => {
   );
 
   const fetchAllForms = useCallback(async (): Promise<void> => {
+    if (!session?.user.businessId) {
+      alert("No user business");
+      return;
+    }
     try {
       setLoading(true);
       const response =

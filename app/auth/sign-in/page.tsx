@@ -1,9 +1,9 @@
 
 "use client";
 
-import { useState } from "react";
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { signIn, useSession } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +13,14 @@ import { toast } from "@/components/ui/use-toast";
 
 export default function AuthPage() {
   const [isRegistering, setIsRegistering] = useState(false);
+  // const { data: session } = useSession()
+  // const router = useRouter()
+  // useEffect(() => {
+  //   if (session?.user.role.id) {
+  //     console.log('session?.user.role.id', session?.user.role.id)
+  //     router.push("/dashboard")
+  //   }
+  // }, [session?.user.role.id])
 
   return (
     <div className="flex items-center justify-center min-h-screen w-screen p-4">
@@ -32,9 +40,14 @@ export default function AuthPage() {
   );
 }
 
+
+
 function SignInForm({ onToggle }: { onToggle: () => void }) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
 
   const [credentials, setCredentials] = useState({
     username: "",
@@ -46,14 +59,14 @@ function SignInForm({ onToggle }: { onToggle: () => void }) {
     setLoading(true);
 
     const res = await signIn("credentials", {
+      redirect: false,
       username: credentials.username,
       password: credentials.password,
-      redirect: false,
-      callbackUrl: "/dashboard",
+      callbackUrl,
     });
 
-
     if (res?.error) {
+      console.log("SignInForm Error:", res.error);
       toast({
         title: "Error",
         description: res.error,
@@ -61,15 +74,24 @@ function SignInForm({ onToggle }: { onToggle: () => void }) {
       });
       setLoading(false);
     } else {
+      console.log("SignInForm Success");
       toast({
         title: "Success",
         description: "You have successfully signed in.",
       });
-
       setLoading(false);
-      router.push("/dashboard");
+      router.push(callbackUrl);
     }
   };
+
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    console.log("Session data: ", session); // Debugging session data
+    if (session?.user?.role?.id) {
+      router.push("/dashboard");
+    }
+  }, [session?.user?.role?.id]);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -110,6 +132,7 @@ function SignInForm({ onToggle }: { onToggle: () => void }) {
     </form>
   );
 }
+
 
 function SignUpForm({ onToggle }: { onToggle: () => void }) {
   const [loading, setLoading] = useState(false);

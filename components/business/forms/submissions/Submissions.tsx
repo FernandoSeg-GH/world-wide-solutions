@@ -1,89 +1,75 @@
-"use client"
-import React, { useEffect } from 'react'
+"use client";
+import React, { useEffect } from 'react';
 import SubmissionFormCard from './SubmissionFormCard';
 import SubmissionsTable from './SubmissionTable';
-import ClientView from '../ClientView';
-import { useSession } from 'next-auth/react';
-import { useGodMode } from '@/hooks/user/useGodMode';
-import { useAppContext } from '@/context/AppProvider';
 import Spinner from '@/components/ui/spinner';
 import SubmissionCards from './SubmissionsCards';
+import { useAppContext } from '@/context/AppProvider';
+import { useSubmissions } from '@/hooks/forms/useSubmissions';
 
-type Props = {}
+type Props = {};
 
 function Submissions({ }: Props) {
     const { data, actions } = useAppContext();
+    const { fetchSubmissionsByFormUrl } = useSubmissions();
     const {
         godMode,
         loading,
         businesses,
-        users,
         forms,
         submissions,
-        subscriptionPlans,
         currentPage,
         totalPages,
-        roles,
-        tasks,
-        messages,
-        chats,
-        aiCharacters,
-        landingPages,
-        socialMediaPosts,
     } = data;
     const {
         getAllBusinesses,
         fetchAllUsers,
-        formActions: { fetchAllForms },
+        formActions: { fetchFormsByBusinessId },
         fetchAllSubmissions,
         fetchSubscriptionPlans,
-        // fetchAllRoles,
-        // fetchAllTasks,
-        // fetchAllMessages,
-        // fetchAllChats,
-        // fetchAllAICharacters,
-        // fetchAllLandingPages,
-        // fetchAllSocialMediaPosts,
     } = actions;
 
     useEffect(() => {
         if (godMode) {
-            actions.fetchAllSubmissions();
-            fetchAllForms();
+            // Fetch everything in god mode
+            fetchAllSubmissions();
             getAllBusinesses();
             fetchAllUsers();
             fetchSubscriptionPlans();
-            // fetchAllRoles();
-            // fetchAllTasks();
-            // fetchAllMessages();
-            // fetchAllChats();
-            // fetchAllAICharacters();
-            // fetchAllLandingPages();
-            // fetchAllSocialMediaPosts();
+        } else {
+            // Fetch forms by businessId when not in god mode
+            const businessId = data.currentUser?.business_id;
+            if (businessId) {
+                fetchFormsByBusinessId(businessId);
+            }
         }
     }, [
         godMode,
         fetchAllUsers,
         getAllBusinesses,
-        fetchAllForms,
         fetchAllSubmissions,
         fetchSubscriptionPlans,
-        // fetchAllRoles,
-        // fetchAllTasks,
-        // fetchAllMessages,
-        // fetchAllChats,
-        // fetchAllAICharacters,
-        // fetchAllLandingPages,
-        // fetchAllSocialMediaPosts,
+        fetchFormsByBusinessId,
+        data.currentUser?.business_id,
     ]);
+
+    useEffect(() => {
+        if (!godMode && forms.length > 0) {
+            // Fetch submissions for each form when not in god mode
+            forms.forEach((form) => {
+                fetchSubmissionsByFormUrl(form.shareURL);
+            });
+        }
+    }, [godMode, forms, fetchSubmissionsByFormUrl]);
+
+    if (!godMode && loading) {
+        return <Spinner />;
+    }
 
     if (!godMode) {
         return null;
     }
 
-    if (loading) {
-        return <Spinner />;
-    }
     const handlePrevious = () => {
         if (currentPage as number > 1) {
             actions.fetchAllSubmissions(currentPage as number - 1);
@@ -96,10 +82,10 @@ function Submissions({ }: Props) {
         }
     };
 
+
     return (
         <div>
             <div className="mb-12">
-
                 <SubmissionCards submissions={submissions} forms={forms} />
                 <div className="flex justify-between items-center mt-4">
                     <button
@@ -121,30 +107,8 @@ function Submissions({ }: Props) {
                     </button>
                 </div>
             </div>
-            {/* <div className="w-full flex flex-col gap-6">
-                {forms && forms.length > 0 ?
-                    <SubmissionFormCard forms={forms} />
-
-                    : <p>No Submissions Form Card Available.</p>}
-
-                {forms && forms.length > 0 ?
-                    forms.map((form, index) =>
-                        <SubmissionsTable key={index} form={form} submissions={submissions} admin />
-                    )
-
-                    : <p> No SubmissionsTable Available.</p>}
-
-                {forms ?
-                    forms.map((form, index) =>
-                        <ClientView key={index} form={form} submissions={submissions ?? []} />
-                    )
-
-                    : <p> No ClientView Available.</p>}
-
-            </div> */}
         </div>
-    )
+    );
 }
 
-
-export default Submissions
+export default Submissions;

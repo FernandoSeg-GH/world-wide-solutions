@@ -10,6 +10,7 @@ import FormCards from "@/components/business/forms/FormCards";
 import SubmissionFormCard from "@/components/business/forms/submissions/SubmissionFormCard";
 import SubmissionsTable from "@/components/business/forms/submissions/SubmissionTable";
 import ClientView from './ClientView';
+import Spinner from '@/components/ui/spinner';
 
 type Props = {}
 
@@ -21,19 +22,27 @@ function Forms({ }: Props) {
     const { formActions } = actions;
 
     useEffect(() => {
-        if (godMode) {
+        // Fetch all forms if in godMode
+        if (session?.user?.role.id === 4) {
+            // GodMode (Superadmin)
             formActions.fetchAllForms();
         } else if (session?.user?.businessId) {
+            // Regular user or business admin
             formActions.fetchFormsByBusinessId(session.user.businessId);
         }
-    }, [godMode, session?.user.businessId, formActions.fetchAllForms, formActions.fetchFormsByBusinessId]);
+    }, [session?.user?.role.id, session?.user?.businessId, formActions]);
 
+    if (loading) {
+        return <div><Spinner /></div>;
+    }
     return (
         <div>
             <div className="w-full flex flex-col gap-6">
-                {forms && forms.length > 0 ?
-                    <FormCards forms={forms} />
-                    : <p>No Forms Available.</p>}
+                {
+                    forms && forms.length > 0 ?
+                        <FormCards forms={forms} />
+                        : forms.length === 0 ? <p>No Forms Available.</p> : null
+                }
 
                 {/* {forms && forms.length > 0 && session?.user.role.id === 1 ?
                     <SubmissionFormCard forms={forms} />

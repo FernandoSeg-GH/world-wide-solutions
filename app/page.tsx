@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { signIn, useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,10 +40,14 @@ export default function Home() {
     );
 }
 
+
 function SignInForm({ onToggle }: { onToggle: () => void }) {
     const [loading, setLoading] = useState(false);
-    const [push, setPush] = useState(false);
     const router = useRouter();
+
+    const searchParams = useSearchParams();
+    const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+
     const [credentials, setCredentials] = useState({
         username: "",
         password: "",
@@ -54,29 +58,39 @@ function SignInForm({ onToggle }: { onToggle: () => void }) {
         setLoading(true);
 
         const res = await signIn("credentials", {
+            redirect: false,
             username: credentials.username,
             password: credentials.password,
-            redirect: true,
-            callbackUrl: "/dashboard",
+            callbackUrl,
         });
 
-        setLoading(false);
-
         if (res?.error) {
+            console.log("SignInForm Error:", res.error);
             toast({
                 title: "Error",
                 description: res.error,
                 variant: "destructive",
             });
+            setLoading(false);
         } else {
+            console.log("SignInForm Success");
             toast({
                 title: "Success",
                 description: "You have successfully signed in.",
             });
-            setPush(!push)
-            router.push('/dashboard')
+            setLoading(false);
+            router.push(callbackUrl);
         }
     };
+
+    const { data: session } = useSession();
+
+    useEffect(() => {
+        console.log("Session data: ", session); // Debugging session data
+        if (session?.user?.role?.id) {
+            router.push("/dashboard");
+        }
+    }, [session?.user?.role?.id]);
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">

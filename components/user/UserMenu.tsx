@@ -22,7 +22,6 @@ import { cn } from "@/lib/utils"
 export default function UserMenu() {
 
     const { data: session, status } = useSession();
-    const { data: godMode } = useAppContext()
     const router = useRouter()
     if (status === "loading") return <Skeleton className="w-24 h-10" />
 

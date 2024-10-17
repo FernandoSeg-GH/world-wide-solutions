@@ -5,16 +5,19 @@ import FormCard from './FormCard';
 import { useAppContext } from '@/context/AppProvider';
 import { Form } from '@/types';
 import CreateFormBtn from './CreateFormButton';
+import { useSession } from 'next-auth/react';
+import { Separator } from '@/components/ui/separator';
 
 const FormCards = ({ forms }: { forms: Form[] }) => {
-
+    const { data: session } = useSession()
     const { data } = useAppContext();
     const { loading, error } = data;
 
+
     return (
         <div className='w-full  grid grid-cols-1 sm:grid-cols-2  gap-2 md:gap-3 lg:flex lg:flex-row lg:flex-wrap'>
-            {loading ? null :
-                <CreateFormBtn />
+            {!loading && session?.user.role.id !== 1 ?
+                <CreateFormBtn /> : null
             }
             {loading ? <Skeleton className="border-2 border-primary-/20 h-[210px] w-full lg:max-w-[448px]" /> : null}
             {forms ? forms.map((form) => (

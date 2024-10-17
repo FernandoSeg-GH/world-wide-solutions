@@ -5,12 +5,13 @@ import VisitBtn from '@/components/VisitBtn';
 import { useAppContext } from '@/context/AppProvider';
 import SubmissionsTable from '@/components/business/forms/submissions/SubmissionTable';
 import { useSession } from 'next-auth/react';
+import SubmissionCards from '@/components/business/forms/submissions/SubmissionsCards';
 
 const FormDetailPage = ({ params }: { params: { formUrl: string } }) => {
     const { data: session } = useSession();
     const { formUrl } = params;
     const { data, actions: formActions } = useAppContext();
-    const { form, submissions, loading, error } = data;
+    const { form, forms, submissions, loading, error } = data;
 
     useEffect(() => {
         if (formUrl && session?.user.businessId) {
@@ -48,10 +49,12 @@ const FormDetailPage = ({ params }: { params: { formUrl: string } }) => {
                     <FormLinkShare shareUrl={String(formUrl)} />
                 </div>
             </div>
+            {submissions && forms &&
+                <div className="container pt-10">
 
-            <div className="container pt-10">
-                <SubmissionsTable submissions={submissions} form={form} />
-            </div>
+                    <SubmissionCards submissions={submissions} forms={forms} />
+                </div>
+            }
         </>
     );
 };
