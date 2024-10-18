@@ -1,11 +1,20 @@
-import React from 'react'
+"use client"
+import { useState } from 'react';
+import ToggleView from './ToggleView';
+import AdminNotifications from './AdminNotifications';
+import UserNotifications from './UserNotifications';
 
-type Props = {}
+const Notifications: React.FC = () => {
+    const [isAdmin, setIsAdmin] = useState(false);
 
-function Notifications({ }: Props) {
     return (
-        <div>Notifications</div>
-    )
-}
+        <div className="container mx-auto p-4">
+            <ToggleView onToggle={setIsAdmin} />
+            <div className="mt-6">
+                {isAdmin ? <AdminNotifications /> : <UserNotifications />}
+            </div>
+        </div>
+    );
+};
 
-export default Notifications
+export default Notifications;

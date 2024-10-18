@@ -7,6 +7,8 @@ import SubmissionCards from './SubmissionsCards';
 import { useAppContext } from '@/context/AppProvider';
 import { useSubmissions } from '@/hooks/forms/useSubmissions';
 import { useSession } from 'next-auth/react';
+import { Separator } from '@/components/ui/separator';
+import SectionHeader from '@/components/layout/SectionHeader';
 
 type Props = {};
 
@@ -33,14 +35,14 @@ function Submissions({ }: Props) {
 
     useEffect(() => {
         if (godMode) {
-            // Fetch everything in god mode
+
             fetchAllSubmissions();
             getAllBusinesses();
             fetchAllUsers();
             fetchSubscriptionPlans();
         }
         else {
-            // Fetch forms by businessId when not in god mode
+
             const businessId = session?.user.businessId;
             if (businessId) {
                 fetchFormsByBusinessId(businessId)
@@ -58,7 +60,6 @@ function Submissions({ }: Props) {
 
     useEffect(() => {
         if (!godMode && forms.length > 0 && session?.user.businessId) {
-            // Fetch submissions for each form when not in god mode
             forms.forEach((form) => {
                 fetchSubmissionsByFormUrl(form.shareUrl, Number(session?.user.businessId));
             });
@@ -88,7 +89,12 @@ function Submissions({ }: Props) {
 
 
     return (
-        <div>
+        <div className='px-4'>
+            <SectionHeader
+                title={`Submissions`}
+                subtitle="View form submissions."
+            />
+            <Separator className="border-gray-400 my-2 mb-6" />
             <div className="mb-12">
                 <SubmissionCards submissions={submissions} forms={forms} />
                 <div className="flex justify-between items-center mt-4">

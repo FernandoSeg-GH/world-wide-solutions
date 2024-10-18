@@ -5,7 +5,7 @@ import { Sidebar } from "./Sidebar";
 import { MobileNavbar } from "./MobileNavbar";
 import { Header } from "./Header";
 import { useAppContext } from "@/context/AppProvider";
-import RenderComponent from "@/lib/renderComponent";
+import RenderComponent from "@/components/RenderComponent";
 import { cn } from "@/lib/utils";
 
 export default function Dashboard() {
@@ -15,12 +15,12 @@ export default function Dashboard() {
 
     const [isMobile, setIsMobile] = useState(false);
 
-    // Effect to update isMobile state based on window width
+
     useEffect(() => {
         const handleResize = () => {
-            setIsMobile(window.innerWidth <= 768); // Adjust the breakpoint as needed
+            setIsMobile(window.innerWidth <= 768);
         };
-        handleResize(); // Check on mount
+        handleResize();
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
     }, []);
@@ -34,9 +34,9 @@ export default function Dashboard() {
 
             <div
                 className={cn(
-                    "flex flex-col gap-6 transition-all duration-300 w-full",
+                    "flex flex-col gap-6 transition-all duration-300 w-full p-4",
                     isMobile ? "m-0 p-0 px-4 mt-16 " : "",
-                    isExpanded && !isMobile ? " p-4 pl-64" : "p-4 pl-16"
+                    isExpanded && !isMobile ? "pl-64" : "pl-16"
                 )}
             >
                 <Header
@@ -44,7 +44,7 @@ export default function Dashboard() {
                     isExpanded={isExpanded}
                 // breadcrumbs={mockData.breadcrumbs}
                 />
-                <div className="">{RenderComponent(currentSection)}</div>
+                <div className="pl-4">{RenderComponent(currentSection)}</div>
             </div>
         </div>
     );

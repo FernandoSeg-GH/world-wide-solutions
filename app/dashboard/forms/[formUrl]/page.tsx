@@ -12,7 +12,7 @@ import { toast } from '@/components/ui/use-toast';
 const FormDetailPage = ({ params }: { params: { formUrl: string } }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const { formUrl } = params; // Correct extraction
+    const { formUrl } = params;
     const { data: session } = useSession();
     const { selectors, data, actions } = useAppContext();
     const { setForm } = selectors;
@@ -28,7 +28,7 @@ const FormDetailPage = ({ params }: { params: { formUrl: string } }) => {
             }
 
             try {
-                // Fetch form details by share URL
+
                 const formData = await fetchFormByShareUrlPublic(formUrl, session.user.businessId);
 
                 if (!formData) {
@@ -41,9 +41,9 @@ const FormDetailPage = ({ params }: { params: { formUrl: string } }) => {
 
                 setForm(formData);
 
-                // Fetch submissions related to the form
+
                 await fetchSubmissions(formData.shareUrl, session.user.businessId);
-                console.log('submissionsData', submissions); // Now managed by context
+                console.log('submissionsData', submissions);
             } catch (err: any) {
                 console.error("Error fetching form details:", err);
                 setError(err.message || "Failed to fetch form details.");

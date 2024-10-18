@@ -39,9 +39,8 @@ const SubmissionCards: React.FC<Props> = ({ submissions, forms }) => {
         setExpandedField(expandedField === fieldKey ? null : fieldKey);
     };
 
-    // Map field IDs to their corresponding labels
     const fieldMap = forms.reduce((acc, form) => {
-        if (Array.isArray(form.fields)) { // Check if fields is a valid array
+        if (Array.isArray(form.fields)) {
             form.fields.forEach(field => {
                 acc[field.id] = field.extraAttributes?.label || field.id;
             });

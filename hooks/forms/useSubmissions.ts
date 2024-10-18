@@ -1,4 +1,3 @@
-// useSubmissions
 "use client";
 
 import { useState, useCallback } from "react";
@@ -262,7 +261,7 @@ export const useSubmissions = () => {
           )}/submissions`,
           {
             headers: {
-              Authorization: `Bearer ${session?.accessToken}`, // Ensure you pass the token if required
+              Authorization: `Bearer ${session?.accessToken}`,
             },
           }
         );

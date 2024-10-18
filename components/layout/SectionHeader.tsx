@@ -17,7 +17,7 @@ function SectionHeader({ title, subtitle }: Props) {
     if (!session) return <div>You are not logged in</div>;
 
     return (
-        <div className='w-full px-4'>
+        <div className='w-full'>
             {status === "authenticated" && session.user && (
                 <div>
                     <h1 className="text-2xl font-bold">

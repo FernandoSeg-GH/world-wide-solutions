@@ -12,7 +12,10 @@ import SubmissionsTable from "@/components/business/forms/submissions/Submission
 import ClientView from './ClientView';
 import Spinner from '@/components/ui/spinner';
 import SectionHeader from '@/components/layout/SectionHeader';
-import { Separator } from '@radix-ui/react-select';
+import CreateFormBtn from './CreateFormButton';
+import { Skeleton } from '@/components/ui/skeleton';
+import FormCard from './FormCard';
+import { Separator } from '@/components/ui/separator';
 
 type Props = {}
 
@@ -24,12 +27,9 @@ function Forms({ }: Props) {
     const { formActions } = actions;
 
     useEffect(() => {
-        // Check if session and role are available before triggering fetches
         if (session?.user?.role?.id === 4) {
-            // Fetch all forms in godMode (Superadmin)
             formActions.fetchAllForms();
         } else if (session?.user?.businessId && session?.user?.role?.id === 3) {
-            // Fetch forms for the current business
             formActions.fetchFormsByBusinessId(session.user.businessId);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -40,19 +40,25 @@ function Forms({ }: Props) {
         return <div><Spinner /></div>;
     }
     return (
-        <div className='px-4'>
+        <div className=''>
             <SectionHeader
                 title={` Forms`}
                 subtitle="Create and Manage your business forms to collect data."
             />
-            <Separator className='my-2 mb-6' />
+            <Separator className="border-gray-400 my-2 mb-6" />
             <div className="w-full flex flex-col gap-6">
-                {
+                {/* {
                     forms && forms.length > 0 ?
                         <FormCards forms={forms} />
                         : forms.length === 0 ? <p>No Forms Available.</p> : null
+                } */}
+                {!loading && session?.user.role.id !== 1 ?
+                    <CreateFormBtn /> : null
                 }
-
+                {loading ? <Skeleton className="border-2 border-primary-/20 h-[210px] w-full lg:max-w-[380px]" /> : null}
+                {forms && forms.length > 0 ? forms.map((form) => (
+                    <FormCard key={form.id} form={form} />
+                )) : null}
                 {/* {forms && forms.length > 0 && session?.user.role.id === 1 ?
                     <SubmissionFormCard forms={forms} />
 

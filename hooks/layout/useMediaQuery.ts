@@ -8,7 +8,6 @@ export function useMediaQuery(query: string): boolean {
     const mediaQueryList = window.matchMedia(query);
     const documentChangeHandler = () => setMatches(mediaQueryList.matches);
 
-    // Set the initial value
     setMatches(mediaQueryList.matches);
 
     mediaQueryList.addEventListener("change", documentChangeHandler);

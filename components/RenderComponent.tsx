@@ -9,10 +9,12 @@ import Leo from "@/components/leo";
 import Vinci from "@/components/vinci/Vinci";
 import { Suspense } from "react";
 import Spinner from "@/components/ui/spinner";
+import { useSession } from "next-auth/react";
+import AdminNotifications from "./business/notifications/AdminNotifications";
 
 export const RenderComponent = (currentSection: string) => {
     const url = usePathname();
-
+    const { data: session } = useSession()
     if (url === "/submit") {
         return (
             <Suspense fallback={<div><Spinner /></div>}>

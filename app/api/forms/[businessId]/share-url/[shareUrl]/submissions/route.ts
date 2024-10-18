@@ -1,5 +1,3 @@
-// api/forms/[businessId]/share_url/[shareUrl]/submissions/route.ts
-
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";

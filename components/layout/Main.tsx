@@ -14,7 +14,7 @@ export default function Main() {
 
     return (
         <div className="flex h-full w-full flex-col bg-muted/40">
-            <Separator className="border-gray-400 my-2 mb-6" />
+
             <SectionHeader
                 title={<p>Welcome <span className="capitalize">{session?.user.name}</span>!</p>}
                 subtitle="This is your personal dashboard. Follow up and check on your activity."
