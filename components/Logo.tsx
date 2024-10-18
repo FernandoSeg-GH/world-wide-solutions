@@ -16,12 +16,15 @@ type LogoProps = {
 function Logo({ isExpanded }: LogoProps) {
   const { data: session } = useSession();
   const router = useRouter();
-  const [title, setTitle] = useState<string>("Vinci Suite");
+  const [title, setTitle] = useState<string>("");
   const { data: currentBusiness } = useAppContext()
 
   useEffect(() => {
     if (currentBusiness.businesses[0]) {
+      console.log('currentBusiness.businesses', currentBusiness.businesses)
       setTitle(currentBusiness.businesses[0].name)
+    } else {
+      setTitle("Vinci Suite")
     }
   }, [currentBusiness.businesses])
 
@@ -57,7 +60,7 @@ function Logo({ isExpanded }: LogoProps) {
         <h1
 
           className={cn(
-            "text-auto font-semibold whitespace-wrap hidden cursor-pointer m-auto",
+            "text-left font-semibold whitespace-wrap hidden cursor-pointer",
             isExpanded && "block"
           )}
         >

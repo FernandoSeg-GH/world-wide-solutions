@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useEffect, useState } from "react";
 import { formatDistance } from "date-fns";
 import { Button } from "@/components/ui/button";
@@ -52,10 +52,9 @@ export function FormCard({ form }: FormCardProps) {
         data: { loading: isPublishing },
     } = useAppContext();
 
-    // useEffect(() => {
-    //     setPublishedStatus(form.published);
-    // }, [form.published]);
-
+    useEffect(() => {
+        setPublishedStatus(form.published);
+    }, [form.published]);
 
     const userRoleId = Number(session?.user.role.id);
     const isAdminRole = [2, 3, 4].includes(userRoleId);
@@ -121,21 +120,23 @@ export function FormCard({ form }: FormCardProps) {
         window.location.href = `/forms/${shareUrl}`;
     };
 
-    const formattedDistance = form.createdAt
+    const formattedDate = form.createdAt
         ? formatDistance(new Date(form.createdAt), new Date(), {
             addSuffix: true,
         })
         : "Unknown time";
+
     return (
         <Card
             className={cn(
-                "lg:max-w-[400px] w-full",
+                "xl:max-w-[380px] w-full",
                 isAdminRole ? "h-auto" : "h-[210px]"
             )}
         >
             <CardHeader>
                 <CardTitle className="flex items-center gap-2 justify-between">
                     <div className="flex items-center justify-between gap-2 w-full">
+
                         <span className="truncate text-ellipsis font-bold">{form.name}</span>
 
                         {isAdminRole && (
@@ -144,7 +145,7 @@ export function FormCard({ form }: FormCardProps) {
                                     variant={publishedStatus ? "default" : "outline"}
                                     className={publishedStatus ? "bg-blue-500" : ""}
                                 >
-                                    <span>  {publishedStatus ? "Published" : "Unpublished"}</span>
+                                    <span>{publishedStatus ? "Published" : "Unpublished"}</span>
                                 </Badge>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
@@ -183,34 +184,28 @@ export function FormCard({ form }: FormCardProps) {
                         )}
                     </div>
                 </CardTitle>
-                <CardDescription className="flex items-center justify-between text-muted-foreground text-sm">
-                    <div>
-                        {isAdminRole && (
-                            <div>
-                                <span>{formattedDistance}</span>
-                                {publishedStatus && (
-                                    <div className="flex items-center gap-2 mt-1">
-                                        {form.visits !== undefined && (
-                                            <div className="flex items-center gap-1">
-                                                <LuView className="text-muted-foreground" />
-                                                <span>{form.visits.toLocaleString()}</span>
-                                            </div>
-                                        )}
-                                        {form.FormSubmissions && form.FormSubmissions.length > 0 && (
-                                            <div className="flex items-center gap-1">
-                                                <FaWpforms className="text-muted-foreground" />
-                                                <span>{form.FormSubmissions.length + 1}</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                </CardDescription>
             </CardHeader>
-            <CardContent className="h-[20px] truncate text-sm text-muted-foreground">
-                {form.description || ""}
+            <CardContent className="truncate text-sm text-muted-foreground flex flex-col justify-between h-auto">
+                <div className="flex items-center justify-between text-muted-foreground text-sm">
+                    <span>{formattedDate}</span>
+                    {publishedStatus && (
+                        <div className="flex items-center gap-2 mt-1">
+                            {form.visits !== undefined && (
+                                <div className="flex items-center gap-1">
+                                    <LuView className="text-muted-foreground" />
+                                    <span>{form.visits.toLocaleString()}</span>
+                                </div>
+                            )}
+                            {form.FormSubmissions && form.FormSubmissions.length > 0 && (
+                                <div className="flex items-center gap-1">
+                                    <FaWpforms className="text-muted-foreground" />
+                                    <span>{form.FormSubmissions.length + 1}</span>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+                <p>{form.description || ""}</p>
             </CardContent>
             <CardFooter>
                 {isAdminRole ? (
@@ -238,7 +233,6 @@ export function FormCard({ form }: FormCardProps) {
                     </div>
                 )}
             </CardFooter>
-            {/* Alert Dialog for Deletion Confirmation */}
             {isAdminRole && (
                 <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
                     <AlertDialogContent>
@@ -250,7 +244,11 @@ export function FormCard({ form }: FormCardProps) {
                         </AlertDialogHeader>
                         <AlertDialogDescription>
                             <span>
-                                Please type &quot;<span className="font-bold">DELETE_THE_FORM_AND_ALL_DATA</span>&quot; below to confirm.
+                                Please type &quot;
+                                <span className="font-bold">
+                                    DELETE_THE_FORM_AND_ALL_DATA
+                                </span>
+                                &quot; below to confirm.
                             </span>
                         </AlertDialogDescription>
                         <input
@@ -276,7 +274,7 @@ export function FormCard({ form }: FormCardProps) {
                                     isDeleting || deleteInputValue !== "DELETE_THE_FORM_AND_ALL_DATA"
                                 }
                             >
-                                <span>{isDeleting ? "Deleting..." : "Delete"}</span>
+                                {isDeleting ? "Deleting..." : "Delete"}
                             </Button>
                         </AlertDialogFooter>
                     </AlertDialogContent>

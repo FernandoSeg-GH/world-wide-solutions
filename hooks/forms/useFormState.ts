@@ -298,7 +298,6 @@ export const useFormState = (initialForm?: Form) => {
         });
 
         const data = await response.json();
-
         if (!response.ok) {
           toast({
             title: "Error",

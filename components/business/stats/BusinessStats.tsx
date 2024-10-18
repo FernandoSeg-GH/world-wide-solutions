@@ -18,11 +18,13 @@ const BusinessStats = () => {
     const [userCount, setUserCount] = useState<number>(0)
 
     useEffect(() => {
-        getAllBusinesses()
-        fetchSubscriptionPlans()
-        formActions.fetchAllForms()
-
-        if (session?.user?.role?.id && session?.user?.businessId) {
+        if (session?.user.role.id === 4) {
+            getAllBusinesses()
+            fetchSubscriptionPlans()
+            formActions.fetchAllForms()
+        }
+        /* TODO: This should be by businessId */
+        if (session?.user?.role?.id === 4) {
             fetchAllUsers().then((data) => {
                 if (data) {
                     setUserCount(data.length)

@@ -44,7 +44,7 @@ export default function Dashboard() {
                     isExpanded={isExpanded}
                 // breadcrumbs={mockData.breadcrumbs}
                 />
-                <div className="px-4">{RenderComponent(currentSection)}</div>
+                <div className="">{RenderComponent(currentSection)}</div>
             </div>
         </div>
     );

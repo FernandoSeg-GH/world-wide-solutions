@@ -40,7 +40,7 @@ export default function UserMenu() {
             </DropdownMenuTrigger>
             {session ? <DropdownMenuContent className="w-56" align="end" forceMount>
                 <h2 className="border-b mb-1 p-2 text-sm">
-                    Welcome <span className="capitalize">{session.user.username}</span>!
+                    Welcome <span className="capitalize">{session.user.name}</span>!
                 </h2>
                 <DropdownMenuItem>
                     <a href="/dashboard" className="flex w-full items-center">

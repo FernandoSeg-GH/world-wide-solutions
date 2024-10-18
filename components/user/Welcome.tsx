@@ -18,7 +18,7 @@ function Welcome({ }: Props) {
             {status === "authenticated" && session.user && (
                 <div>
                     <h1 className="text-2xl font-bold">
-                        Welcome <span className="capitalize">{session.user.username}</span>!
+                        Welcome <span className="capitalize">{session.user.name}</span>!
                     </h1>
                     <p className='text-lg 2xl:text-xl leading-7'>This is your personal dashboard. Follow up and check on your activity.</p>
                 </div>
