@@ -11,6 +11,8 @@ import SubmissionFormCard from "@/components/business/forms/submissions/Submissi
 import SubmissionsTable from "@/components/business/forms/submissions/SubmissionTable";
 import ClientView from './ClientView';
 import Spinner from '@/components/ui/spinner';
+import SectionHeader from '@/components/layout/SectionHeader';
+import { Separator } from '@radix-ui/react-select';
 
 type Props = {}
 
@@ -38,7 +40,12 @@ function Forms({ }: Props) {
         return <div><Spinner /></div>;
     }
     return (
-        <div>
+        <div className='px-4'>
+            <SectionHeader
+                title={` Forms`}
+                subtitle="Create and Manage your business forms to collect data."
+            />
+            <Separator className='my-2 mb-6' />
             <div className="w-full flex flex-col gap-6">
                 {
                     forms && forms.length > 0 ?

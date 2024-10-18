@@ -30,26 +30,19 @@ export async function GET(
         },
       }
     );
-
+    console.log("response", response);
     if (!response.ok) {
-      let errorData;
-      const contentType = response.headers.get("content-type");
-      if (contentType && contentType.includes("application/json")) {
-        errorData = await response.json();
-      } else {
-        errorData = { message: "Failed to fetch forms" };
-      }
       return NextResponse.json(
-        { message: errorData.message || "Failed to fetch forms" },
+        { message: "Failed to fetch forms by share-url" },
         { status: response.status }
       );
     }
 
     const data = await response.json();
-
+    console.log("data", data);
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
-    console.error("Error fetching forms:", error);
+    console.error("Error fetching forms by share-url:", error);
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }

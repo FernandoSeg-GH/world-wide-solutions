@@ -8,6 +8,7 @@ import BaseImage from "./BaseImage";
 import { getBlurData } from "@/lib/getBlurData";
 import Image from "next/image";
 import { useAppContext } from "@/context/AppProvider";
+import { useBusiness } from "@/hooks/business/useBusiness";
 
 type LogoProps = {
   isExpanded: boolean;
@@ -15,9 +16,9 @@ type LogoProps = {
 
 function Logo({ isExpanded }: LogoProps) {
   const { data: session } = useSession();
-  const router = useRouter();
   const [title, setTitle] = useState<string>("");
   const { data: currentBusiness } = useAppContext()
+  const { fetchBusinessById } = useBusiness()
 
   useEffect(() => {
     if (currentBusiness.businesses[0]) {
@@ -27,6 +28,14 @@ function Logo({ isExpanded }: LogoProps) {
       setTitle("Vinci Suite")
     }
   }, [currentBusiness.businesses])
+
+  useEffect(() => {
+    if (session?.user.businessId) {
+      console.log('session?.user.businessId', session?.user.businessId)
+      fetchBusinessById(session.user.businessId)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.user.businessId])
 
   return (
     <div className={cn(

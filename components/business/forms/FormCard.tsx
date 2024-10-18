@@ -205,7 +205,7 @@ export function FormCard({ form }: FormCardProps) {
                         </div>
                     )}
                 </div>
-                <p>{form.description || ""}</p>
+                <p className="min-h-[20px]">{form.description}</p>
             </CardContent>
             <CardFooter>
                 {isAdminRole ? (

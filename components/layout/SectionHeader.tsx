@@ -3,9 +3,12 @@ import { useSession } from 'next-auth/react';
 import React from 'react'
 import Spinner from '../ui/spinner';
 
-type Props = {}
+type Props = {
+    title: string | React.ReactNode
+    subtitle?: string | React.ReactNode
+}
 
-function Welcome({ }: Props) {
+function SectionHeader({ title, subtitle }: Props) {
 
     const { data: session, status } = useSession();
 
@@ -18,9 +21,9 @@ function Welcome({ }: Props) {
             {status === "authenticated" && session.user && (
                 <div>
                     <h1 className="text-2xl font-bold">
-                        Welcome <span className="capitalize">{session.user.name}</span>!
+                        {title}
                     </h1>
-                    <p className='text-lg 2xl:text-xl leading-7'>This is your personal dashboard. Follow up and check on your activity.</p>
+                    <p className='text-lg 2xl:text-xl leading-7'>{subtitle}</p>
                 </div>
             )}
             {status !== "authenticated" && (
@@ -30,4 +33,4 @@ function Welcome({ }: Props) {
     )
 }
 
-export default Welcome
+export default SectionHeader

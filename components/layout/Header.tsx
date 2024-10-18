@@ -60,7 +60,7 @@ export function Header({ currentSection, isExpanded }: HeaderProps) {
                     </BreadcrumbList>
                 </Breadcrumb>
             } */}
-            <h2 className="font-bold text-2xl">{currentSection}</h2>
+            <h2 className="font-bold text-2xl sr-only">{currentSection}</h2>
             <div className="relative ml-auto flex-1 md:grow-0">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
