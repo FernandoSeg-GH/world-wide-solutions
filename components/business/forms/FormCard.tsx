@@ -95,7 +95,7 @@ export function FormCard({ form }: FormCardProps) {
         setIsDeleting(true);
 
         try {
-            const response = await fetch(`/api/forms/delete?formId=${form.id}`, {
+            const response = await fetch(`/api/forms/${session?.user.businessId}/share-url/delete?formId=${form.id}`, {
                 method: "DELETE",
             });
             if (!response.ok) {
@@ -129,7 +129,7 @@ export function FormCard({ form }: FormCardProps) {
     return (
         <Card
             className={cn(
-                "lg:max-w-[450px] w-full",
+                "lg:max-w-[400px] w-full",
                 isAdminRole ? "h-auto" : "h-[210px]"
             )}
         >

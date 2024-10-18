@@ -15,7 +15,7 @@ const FormCards = ({ forms }: { forms: Form[] }) => {
 
 
     return (
-        <div className='w-full  grid grid-cols-1 sm:grid-cols-2  gap-2 md:gap-3 lg:flex lg:flex-row lg:flex-wrap'>
+        <div className='w-full gap-2 flex flex-row flex-wrap'>
             {!loading && session?.user.role.id !== 1 ?
                 <CreateFormBtn /> : null
             }

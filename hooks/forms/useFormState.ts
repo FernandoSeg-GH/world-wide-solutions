@@ -105,18 +105,21 @@ export const useFormState = (initialForm?: Form) => {
     }
     try {
       setLoading(true);
-      const response = await fetch("/api/forms/save_form", {
-        // Corrected endpoint
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          form_id: form.id,
-          name: formName,
-          fields: elements,
-          shareUrl: form.shareUrl,
-          business_id: session?.user.businessId,
-        }),
-      });
+      const response = await fetch(
+        `/api/forms/${session?.user.businessId}/share-url/save-form`,
+        {
+          // Corrected endpoint
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            form_id: form.id,
+            name: formName,
+            fields: elements,
+            shareUrl: form.shareUrl,
+            business_id: session?.user.businessId,
+          }),
+        }
+      );
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -188,7 +191,7 @@ export const useFormState = (initialForm?: Form) => {
       }
       try {
         const response = await fetch(
-          `/api/forms/shareUrl/${encodeURIComponent(shareUrl)}/public` // Corrected endpoint
+          `/api/forms/share-url/${encodeURIComponent(shareUrl)}/public` // Corrected endpoint
         );
         if (!response.ok) {
           throw new Error("Form not found");
@@ -216,7 +219,7 @@ export const useFormState = (initialForm?: Form) => {
       try {
         setLoading(true);
 
-        const response = await fetch("/api/forms/publish_unpublish_form", {
+        const response = await fetch("/api/forms/publish", {
           // Corrected endpoint
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -258,7 +261,7 @@ export const useFormState = (initialForm?: Form) => {
       if (session?.user.businessId) {
         try {
           const response = await fetch(
-            `/api/forms/${businessId}/shareUrl/${encodeURIComponent(
+            `/api/forms/${businessId}/share-url/${encodeURIComponent(
               shareUrl
             )}/public`
           );
@@ -327,7 +330,7 @@ export const useFormState = (initialForm?: Form) => {
         setLoading(true);
         const response =
           session?.user.role.id === 4
-            ? await fetch(`/api/forms/all_forms`)
+            ? await fetch(`/api/admin/forms`)
             : await fetch(`/api/forms/${session.user.businessId}`);
 
         const data = await response.json();
@@ -367,15 +370,17 @@ export const useFormState = (initialForm?: Form) => {
           business_id: session.user.businessId,
         };
 
-        const response = await fetch("/api/forms/create_form", {
-          // Corrected endpoint
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session.accessToken}`,
-          },
-          body: JSON.stringify(formData),
-        });
+        const response = await fetch(
+          `/api/forms/${session.user.businessId}/shar-url/create`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${session.accessToken}`,
+            },
+            body: JSON.stringify(formData),
+          }
+        );
 
         if (!response.ok) {
           const errorData = await response.json();

@@ -7,6 +7,7 @@ import { useAppContext } from "@/context/AppProvider";
 import React from 'react';
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import Logo from "../Logo";
 
 interface SidebarProps {
     isExpanded: boolean;
@@ -65,11 +66,9 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
     const sidebarItems = getSidebarItems(godMode);
     const router = useRouter()
     return (
-        <aside className={`fixed inset-y-0 left-0 z-10 flex flex-col border-r bg-background transition-all duration-300 ${isExpanded ? "w-64" : "w-14"}`} >
-            <div className="flex h-14 items-center justify-between px-2">
-
-                <h1 className={cn("text-lg font-semibold whitespace-nowrap hidden cursor-pointer ml-4", isExpanded && "block")} onClick={() => router.push("/dashboard")}>Vinci Suite</h1>
-
+        <aside className={`fixed inset-y-0 left-0 z-10 flex flex-col border-r bg-background transition-all duration-300 ${isExpanded ? "min-w-64" : "w-14"}`} >
+            <div className="flex h-auto items-center justify-between px-2">
+                <div></div>
                 <Button
                     variant="ghost"
                     size="icon"
@@ -78,6 +77,9 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
                 >
                     <Menu className="h-4 w-4" />
                 </Button>
+            </div>
+            <div className="flex h-auto items-center justify-between px-2">
+                <Logo isExpanded={isExpanded} />
             </div>
             <nav className="flex flex-col gap-4 px-2 py-4">
                 <TooltipProvider>

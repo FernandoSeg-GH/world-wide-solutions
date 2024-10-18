@@ -27,9 +27,9 @@ export const useSubmissions = () => {
 
       try {
         const response = await fetch(
-          `/api/forms/${businessId}/shareUrl/${encodeURIComponent(
-            shareUrl
-          )}/submissions`,
+          `/api/forms/${
+            session?.user.businessId
+          }/share-url/${encodeURIComponent(shareUrl)}/submissions`,
           {
             headers: {
               Authorization: `Bearer ${session?.accessToken}`,
@@ -257,7 +257,7 @@ export const useSubmissions = () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `/api/forms/${businessId}/shareUrl/${encodeURIComponent(
+          `/api/forms/${businessId}/share-url/${encodeURIComponent(
             formUrl
           )}/submissions`,
           {

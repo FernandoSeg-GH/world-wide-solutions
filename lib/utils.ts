@@ -40,3 +40,15 @@ export function transformKeys(obj: any): any {
   }
   return obj;
 }
+
+export const getLogoForDomain = (businessId: number) => {
+  switch (businessId) {
+    case 1:
+      return "logo.png";
+    case 2:
+      return "vws.png";
+
+    default:
+      return "logo.png";
+  }
+};

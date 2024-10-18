@@ -147,7 +147,6 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         currentBusiness,
         godMode,
         error,
-        layoutState.currentSection,
         submissionState.currentPage,
         submissionState.totalPages,
         currentUser,
