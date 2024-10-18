@@ -16,11 +16,12 @@ export default function Main() {
 
     return (
         <div className="flex h-full w-full flex-col bg-muted/40">
+            <Separator className="border-gray-400 my-2 mb-6" />
             <Welcome />
             <div className="w-full flex flex-col gap-6 p-4">
                 <BusinessStats />
                 {/* <Stats />  */}
-                <Separator className="border-gray-400 my-2" />
+                <Separator className="border-gray-400 my-3" />
 
                 <Forms />
 

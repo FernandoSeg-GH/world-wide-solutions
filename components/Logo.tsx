@@ -27,7 +27,7 @@ function Logo({ isExpanded }: LogoProps) {
 
   return (
     <div className={cn(
-      "w-full h-auto flex flex-col ",
+      "w-full h-auto flex flex-col px-4 ",
       isExpanded ? "justify-start items-start py-2" : "justify-center items-center mt-2")}
     >
       {isExpanded && session?.user.businessId && <Image
@@ -42,29 +42,27 @@ function Logo({ isExpanded }: LogoProps) {
       />}
       <div className={cn(
         "w-full h-auto flex flex-col ",
-        isExpanded ? "justify-start items-start py-2" : "justify-center items-center mt-2")}
+        isExpanded ? "justify-start items-start py-2" : "justify-start items-start")}
       >
-        {!isExpanded && session?.user.businessId && <Image
-          width={25}
-          height={25}
-          // blurData={blurData}
-          src={`/assets/${getLogoForDomain(session?.user.businessId)}`}
-          alt={title}
-          priority
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 30vw"
-          className="object-cover rounded-t-xl mb-2"
-        />}
-        <div className="flex items-center">
-          <h1
+        {/* {!isExpanded && session?.user.businessId && <Image
+            width={25}
+            height={25}
+            // blurData={blurData}
+            src={`/assets/${getLogoForDomain(session?.user.businessId)}`}
+            alt={title}
+            priority
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 30vw"
+            className="object-cover rounded-t-xl mb-2"
+          />} */}
+        <h1
 
-            className={cn(
-              "text-auto font-semibold whitespace-wrap hidden cursor-pointer",
-              isExpanded && "block"
-            )}
-          >
-            {title}
-          </h1>
-        </div>
+          className={cn(
+            "text-auto font-semibold whitespace-wrap hidden cursor-pointer m-auto",
+            isExpanded && "block"
+          )}
+        >
+          {title}
+        </h1>
       </div>
     </div>
   );

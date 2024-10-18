@@ -1,13 +1,28 @@
-'use client';
+// Sidebar.tsx
+"use client";
 import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { BookText, DnaIcon, Menu, NotebookPen } from "lucide-react";
-import { FaHome, FaBusinessTime, FaRobot, FaListAlt, FaClipboardList, FaBell } from 'react-icons/fa';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+    BookText,
+    DnaIcon,
+    Menu,
+    NotebookPen,
+} from "lucide-react";
+import {
+    FaHome,
+    FaBusinessTime,
+    FaRobot,
+    FaBell,
+} from "react-icons/fa";
 import { useAppContext } from "@/context/AppProvider";
-import React from 'react';
+import React from "react";
 import { cn } from "@/lib/utils";
-import { useRouter } from "next/navigation";
-import Logo from "../Logo";
+import Logo from "@/components/Logo";
 
 interface SidebarProps {
     isExpanded: boolean;
@@ -52,7 +67,7 @@ export const getSidebarItems = (godMode: boolean): SidebarItem[] => {
             {
                 icon: DnaIcon,
                 label: "Vinci",
-            },
+            }
         );
     }
 
@@ -64,22 +79,24 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
     const { switchSection } = layoutState;
     const { currentSection, godMode } = data;
     const sidebarItems = getSidebarItems(godMode);
-    const router = useRouter()
+
     return (
-        <aside className={`fixed inset-y-0 left-0 z-10 flex flex-col border-r bg-background transition-all duration-300 ${isExpanded ? "min-w-64" : "w-14"}`} >
-            <div className="flex h-auto items-center justify-between px-2">
-                <div></div>
+        <aside
+            className={cn(
+                "fixed inset-y-0 left-0 z-10 flex flex-col border-r bg-background transition-all duration-300",
+                isExpanded ? "w-64" : "w-14"
+            )}
+        >
+            <Logo isExpanded={isExpanded} />
+            <div className={cn("flex items-center justify-end px-2 py-2", isExpanded && " absolute top-1 right-1")}>
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-10"
+                    className="h-8 w-8"
                     onClick={() => setIsExpanded(!isExpanded)}
                 >
-                    <Menu className="h-4 w-4" />
+                    <Menu className="h-6 w-6" />
                 </Button>
-            </div>
-            <div className="flex h-auto items-center justify-between px-2">
-                <Logo isExpanded={isExpanded} />
             </div>
             <nav className="flex flex-col gap-4 px-2 py-4">
                 <TooltipProvider>
@@ -89,17 +106,29 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
                                 <button
                                     onClick={() => switchSection(item.label)}
                                     className={cn(
-                                        "flex h-9 items-center rounded-lg transition-colors hover:text-foreground trasition-all ease-out",
-                                        currentSection === item.label ? "bg-accent text-accent-foreground" : "text-muted-foreground",
-                                        isExpanded ? "px-3" : "justify-center"
+                                        "flex items-center rounded-lg transition-colors hover:text-foreground",
+                                        currentSection === item.label
+                                            ? "bg-accent text-accent-foreground"
+                                            : "text-muted-foreground",
+                                        isExpanded ? "px-3 py-2" : "justify-center py-2"
                                     )}
                                 >
-                                    {/* Correct icon rendering */}
-                                    {item.icon && React.createElement(item.icon, { className: "h-5 w-5" })}
-                                    <span className={cn("ml-2 whitespace-nowrap hidden", isExpanded && "block")}>{item.label}</span>
+                                    {item.icon &&
+                                        React.createElement(item.icon, {
+                                            className: "h-5 w-5",
+                                        })}
+                                    {isExpanded && (
+                                        <span className="ml-2 whitespace-nowrap">
+                                            {item.label}
+                                        </span>
+                                    )}
                                 </button>
                             </TooltipTrigger>
-                            <TooltipContent side="right">{item.label}</TooltipContent>
+                            {!isExpanded && (
+                                <TooltipContent side="right">
+                                    {item.label}
+                                </TooltipContent>
+                            )}
                         </Tooltip>
                     ))}
                 </TooltipProvider>
