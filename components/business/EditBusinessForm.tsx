@@ -18,7 +18,7 @@ export default function EditBusinessForm({ businessId }: { businessId: number | 
     const [businessData, setBusinessData] = useState({
         name: "",
         domain: "",
-        subscription_plan_id: "",
+        subscriptionPlanId: "",
         description: "",
         phone: "",
         url_linkedin: "",
@@ -28,9 +28,9 @@ export default function EditBusinessForm({ businessId }: { businessId: number | 
         url_tiktok: "",
         url_youtube: "",
         seo_description: "",
-        business_email: "",
-        profile_image_url: "",
-        background_image_url: "",
+        businessEmail: "",
+        profileImageUrl: "",
+        backgroundImageUrl: "",
     });
 
 
@@ -51,7 +51,7 @@ export default function EditBusinessForm({ businessId }: { businessId: number | 
             setBusinessData({
                 name: business.name || "",
                 domain: business.domain || "",
-                subscription_plan_id: business.subscription_plan_id?.toString() || "",
+                subscriptionPlanId: business.subscriptionPlanId?.toString() || "",
                 description: business.description || "",
                 phone: business.phone || "",
                 url_linkedin: business.url_linkedin || "",
@@ -61,9 +61,9 @@ export default function EditBusinessForm({ businessId }: { businessId: number | 
                 url_tiktok: business.url_tiktok || "",
                 url_youtube: business.url_youtube || "",
                 seo_description: business.seo_description || "",
-                business_email: business.business_email || "",
-                profile_image_url: business.profile_image_url || "",
-                background_image_url: business.background_image_url || "",
+                businessEmail: business.businessEmail || "",
+                profileImageUrl: business.profileImageUrl || "",
+                backgroundImageUrl: business.backgroundImageUrl || "",
             });
         }
     }, [business]);
@@ -78,7 +78,7 @@ export default function EditBusinessForm({ businessId }: { businessId: number | 
 
         const success = await editBusiness(Number(businessId), {
             ...businessData,
-            subscription_plan_id: businessData.subscription_plan_id ? Number(businessData.subscription_plan_id) : undefined,
+            subscriptionPlanId: businessData.subscriptionPlanId ? Number(businessData.subscriptionPlanId) : undefined,
         });
 
         if (success) {
@@ -130,10 +130,10 @@ export default function EditBusinessForm({ businessId }: { businessId: number | 
                             />
                         </div>
                         <div>
-                            <Label htmlFor="subscription_plan_id">Subscription Plan</Label>
+                            <Label htmlFor="subscriptionPlanId">Subscription Plan</Label>
                             <select
-                                id="subscription_plan_id"
-                                value={businessData.subscription_plan_id}
+                                id="subscriptionPlanId"
+                                value={businessData.subscriptionPlanId}
                                 onChange={handleChange}
                                 required
                                 className="w-full px-3 py-2 border rounded-md"
@@ -166,11 +166,11 @@ export default function EditBusinessForm({ businessId }: { businessId: number | 
                             />
                         </div>
                         <div>
-                            <Label htmlFor="business_email">Business Email</Label>
+                            <Label htmlFor="businessEmail">Business Email</Label>
                             <Input
-                                id="business_email"
+                                id="businessEmail"
                                 type="email"
-                                value={businessData.business_email}
+                                value={businessData.businessEmail}
                                 onChange={handleChange}
                             />
                         </div>

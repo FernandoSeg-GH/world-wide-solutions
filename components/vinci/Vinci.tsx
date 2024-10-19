@@ -141,15 +141,15 @@ export default function Vinci() {
                                 <TableCell>{user.id}</TableCell>
                                 <TableCell>{user.username}</TableCell>
                                 <TableCell>{user.email}</TableCell>
-                                <TableCell>{user.role_name || "N/A"}</TableCell>
-                                <TableCell>{user.business_id || "N/A"}</TableCell>
-                                <TableCell>{user.business_name || "N/A"}</TableCell>
+                                <TableCell>{user.roleName || "N/A"}</TableCell>
+                                <TableCell>{user.businessId || "N/A"}</TableCell>
+                                <TableCell>{user.businessName || "N/A"}</TableCell>
                                 <TableCell>
-                                    {user.last_login_at
-                                        ? new Date(user.last_login_at).toLocaleString()
+                                    {user.lastLoginAt
+                                        ? new Date(user.lastLoginAt).toLocaleString()
                                         : "Never"}
                                 </TableCell>
-                                <TableCell>{user.is_active ? "Yes" : "No"}</TableCell>
+                                <TableCell>{user.isActive ? "Yes" : "No"}</TableCell>
                                 <TableCell>{user.onboarded ? "Yes" : "No"}</TableCell>
                                 {/* Add other user fields as needed */}
                             </TableRow>
@@ -212,7 +212,7 @@ export default function Vinci() {
                                 <TableCell>{business.id}</TableCell>
                                 <TableCell>{business.name}</TableCell>
                                 <TableCell>{business.domain || "N/A"}</TableCell>
-                                <TableCell>{business.subscription_plan_name || "N/A"}</TableCell>
+                                <TableCell>{business.subscriptionPlanName || "N/A"}</TableCell>
                                 <TableCell>{business.description || "N/A"}</TableCell>
                                 <TableCell>{business.phone || "N/A"}</TableCell>
                                 <TableCell>
@@ -270,10 +270,10 @@ export default function Vinci() {
                                     )}
                                 </TableCell>
                                 <TableCell>{business.seo_description || "N/A"}</TableCell>
-                                <TableCell>{business.business_email || "N/A"}</TableCell>
+                                <TableCell>{business.businessEmail || "N/A"}</TableCell>
                                 <TableCell>
-                                    {business.profile_image_url ? (
-                                        <a href={business.profile_image_url} target="_blank" rel="noopener noreferrer" className="text-blue-500">
+                                    {business.profileImageUrl ? (
+                                        <a href={business.profileImageUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500">
                                             View Image
                                         </a>
                                     ) : (
@@ -281,8 +281,8 @@ export default function Vinci() {
                                     )}
                                 </TableCell>
                                 <TableCell>
-                                    {business.background_image_url ? (
-                                        <a href={business.background_image_url} target="_blank" rel="noopener noreferrer" className="text-blue-500">
+                                    {business.backgroundImageUrl ? (
+                                        <a href={business.backgroundImageUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500">
                                             View Image
                                         </a>
                                     ) : (
@@ -337,11 +337,11 @@ export default function Vinci() {
                                         </pre>
                                     </TableCell>
                                     <TableCell>{form.businessId}</TableCell>
-                                    <TableCell>{form.business_name || "N/A"}</TableCell>
-                                    <TableCell>{form.landing_page_id || "N/A"}</TableCell>
+                                    <TableCell>{form.businessName || "N/A"}</TableCell>
+                                    <TableCell>{form.landingPageId || "N/A"}</TableCell>
                                     <TableCell>
-                                        {form.landing_page_url ? (
-                                            <a href={form.landing_page_url} target="_blank" rel="noopener noreferrer" className="text-blue-500">
+                                        {form.landingPageUrl ? (
+                                            <a href={form.landingPageUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500">
                                                 Landing Page
                                             </a>
                                         ) : (

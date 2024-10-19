@@ -23,27 +23,27 @@ export interface User {
   id: number;
   username: string;
   email: string;
-  role_id: number;
-  role_name?: string;
-  business_id?: number;
-  business_name?: string;
-  last_login_at?: string;
-  is_active: boolean;
+  roleId: number;
+  roleName?: string;
+  businessId?: number;
+  businessName?: string;
+  lastLoginAt?: string;
+  isActive: boolean;
   onboarded: boolean;
 
-  sent_messages?: Message[];
-  received_messages?: MessageRecipient[];
+  sentMessages?: Message[];
+  receivedMessages?: MessageRecipient[];
   tasks?: Task[];
   chats?: Chat[];
-  ai_characters?: UserAICharacter[];
+  aiCharacters?: UserAICharacter[];
 }
 
 export interface Business {
   id: number;
   name: string;
   domain?: string;
-  subscription_plan_id?: number;
-  subscription_plan_name?: string;
+  subscriptionPlanId?: number;
+  subscriptionPlanName?: string;
   description?: string;
   phone?: string;
   url_linkedin?: string;
@@ -53,16 +53,16 @@ export interface Business {
   url_tiktok?: string;
   url_youtube?: string;
   seo_description?: string;
-  business_email?: string;
-  profile_image_url?: string;
-  background_image_url?: string;
+  businessEmail?: string;
+  profileImageUrl?: string;
+  backgroundImageUrl?: string;
 
   users?: User[];
   forms?: Form[];
   tasks?: Task[];
-  ai_characters?: AICharacter[];
-  landing_pages?: LandingPage[];
-  social_media_posts?: SocialMediaPost[];
+  aiCharacters?: AICharacter[];
+  landingPages?: LandingPage[];
+  socialMediaPosts?: SocialMediaPost[];
 }
 
 export interface SubscriptionPlan {
@@ -80,7 +80,7 @@ export interface Form {
   fields: FormField[];
   shareUrl: string;
   businessId: number;
-  business_name?: string;
+  businessName?: string;
   description?: string;
   extraAttributes?: Record<string, any>;
   createdAt: string;
@@ -88,16 +88,16 @@ export interface Form {
   visits: number;
   submissionsCount?: number;
 
-  landing_page_id?: number;
-  landing_page_url?: string;
+  landingPageId?: number;
+  landingPageUrl?: string;
   FormSubmissions?: Submission[];
 }
 
 export interface Submission {
   id: number;
   formId: number;
-  form_name?: string;
-  user_id: number;
+  formName?: string;
+  userId: number;
   username?: string;
   formUrl: string;
   content?: Record<string, any>;
@@ -108,7 +108,7 @@ export interface LandingPage {
   id: number;
   url: string;
   content?: string;
-  business_id: number;
+  businessId: number;
 
   forms?: Form[];
 }
@@ -116,33 +116,33 @@ export interface LandingPage {
 export interface SocialMediaPost {
   id: number;
   content: string;
-  image_url?: string;
-  posted_at: string;
+  imageUrl?: string;
+  postedAt: string;
   platform: string;
   metrics?: Record<string, any>;
-  business_id: number;
+  businessId: number;
 }
 
 export interface Task {
   id: number;
   name: string;
   description?: string;
-  assigned_to_id?: number;
-  assigned_to_username?: string;
-  ai_character_id?: number;
-  ai_character_name?: string;
-  business_id: number;
+  assignedToId?: number;
+  assignedToUsername?: string;
+  aiCharacterId?: number;
+  aiCharacterName?: string;
+  businessId: number;
   status: string;
   priority: string;
-  due_date?: string;
-  created_at: string;
-  updated_at: string;
+  dueCate?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface AICharacter {
   id: number;
   name: string;
-  business_id: number;
+  businessId: number;
 
   tasks?: Task[];
   users?: UserAICharacter[];
@@ -150,18 +150,18 @@ export interface AICharacter {
 
 export interface Chat {
   id: number;
-  user_id: number;
+  userId: number;
   message: string;
-  ai_response?: string;
+  aiResponse?: string;
   timestamp: string;
-  chat_type: string;
+  chatType: string;
 
   user?: User;
 }
 
 export interface Message {
   id: number;
-  sender_id: number;
+  senderId: number;
   content: string;
   timestamp: string;
 
@@ -170,22 +170,22 @@ export interface Message {
 }
 
 export interface MessageRecipient {
-  message_id: number;
-  user_id: number;
+  messageId: number;
+  userId: number;
   read: boolean;
-  read_at?: string;
+  readAt?: string;
 
   user?: User;
   message?: Message;
 }
 
 export interface UserAICharacter {
-  user_id: number;
-  ai_character_id: number;
+  userId: number;
+  aiCharacterId: number;
   permissions: string;
 
   user?: User;
-  ai_character?: AICharacter;
+  aiCharacter?: AICharacter;
 }
 
 export interface FormField {
@@ -428,7 +428,7 @@ export interface LandingPage {
 export interface SocialMediaPost {
   id: number;
   platform: string;
-  posted_at: string;
+  postedAt: string;
 }
 
 export interface SubscriptionPlan {
@@ -442,8 +442,8 @@ export interface Business {
   id: number;
   name: string;
   domain?: string;
-  subscription_plan_id?: number;
-  subscription_plan_name?: string;
+  subscriptionPlanId?: number;
+  subscriptionPlanName?: string;
   description?: string;
   phone?: string;
   url_linkedin?: string;
@@ -453,13 +453,13 @@ export interface Business {
   url_tiktok?: string;
   url_youtube?: string;
   seo_description?: string;
-  business_email?: string;
-  profile_image_url?: string;
-  background_image_url?: string;
+  businessEmail?: string;
+  profileImageUrl?: string;
+  backgroundImageUrl?: string;
   users?: User[];
   forms?: Form[];
   tasks?: Task[];
-  ai_characters?: AICharacter[];
-  landing_pages?: LandingPage[];
-  social_media_posts?: SocialMediaPost[];
+  aiCharacters?: AICharacter[];
+  landingPages?: LandingPage[];
+  socialMediaPosts?: SocialMediaPost[];
 }

@@ -19,7 +19,7 @@ export default function CreateBusinessForm() {
     const [businessData, setBusinessData] = useState({
         name: "",
         domain: "",
-        subscription_plan_id: "",
+        subscriptionPlanId: "",
         description: "",
         phone: "",
         url_linkedin: "",
@@ -29,9 +29,9 @@ export default function CreateBusinessForm() {
         url_tiktok: "",
         url_youtube: "",
         seo_description: "",
-        business_email: "",
-        profile_image_url: "",
-        background_image_url: "",
+        businessEmail: "",
+        profileImageUrl: "",
+        backgroundImageUrl: "",
     });
 
     useEffect(() => {
@@ -43,7 +43,7 @@ export default function CreateBusinessForm() {
 
         const dataToSend = {
             ...businessData,
-            subscription_plan_id: Number(businessData.subscription_plan_id),
+            subscriptionPlanId: Number(businessData.subscriptionPlanId),
         };
 
         const success = await createBusiness(dataToSend);
@@ -87,14 +87,14 @@ export default function CreateBusinessForm() {
                             />
                         </div>
                         <div>
-                            <Label htmlFor="subscription_plan_id">Subscription Plan</Label>
+                            <Label htmlFor="subscriptionPlanId">Subscription Plan</Label>
                             <select
-                                id="subscription_plan_id"
-                                value={businessData.subscription_plan_id}
+                                id="subscriptionPlanId"
+                                value={businessData.subscriptionPlanId}
                                 onChange={(e) =>
                                     setBusinessData({
                                         ...businessData,
-                                        subscription_plan_id: e.target.value,
+                                        subscriptionPlanId: e.target.value,
                                     })
                                 }
                                 required

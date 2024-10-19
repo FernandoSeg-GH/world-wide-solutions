@@ -7,8 +7,8 @@ interface User {
     id: number;
     username: string;
     email: string;
-    last_login_at: string;
-    is_active: boolean;
+    lastLoginAt: string;
+    isActive: boolean;
 }
 
 const UsersList = () => {
@@ -50,8 +50,8 @@ const UsersList = () => {
                     <li key={user.id}>
                         <p>Username: {user.username}</p>
                         <p>Email: {user.email}</p>
-                        <p>Last Login: {new Date(user.last_login_at).toLocaleString()}</p>
-                        <p>Status: {user.is_active ? 'Active' : 'Inactive'}</p>
+                        <p>Last Login: {new Date(user.lastLoginAt).toLocaleString()}</p>
+                        <p>Status: {user.isActive ? 'Active' : 'Inactive'}</p>
                     </li>
                 ))}
             </ul>

@@ -81,7 +81,7 @@ export const authOptions: NextAuthOptions = {
               id: data.user.id,
               email: data.user.email,
               username: data.user.username,
-              business_id: data.user.business_id,
+              businessId: data.user.business_id,
               role: data.user.role,
             };
           }
@@ -113,7 +113,7 @@ export const authOptions: NextAuthOptions = {
         token.email = user.email;
         token.username = user.username;
         token.name = user.username;
-        token.businessId = user.business_id;
+        token.business_id = user.businessId;
 
         if (user.role && user.role.id && user.role.name) {
           token.role = {
@@ -151,7 +151,7 @@ export const authOptions: NextAuthOptions = {
         email: String(token.email),
         username: String(token.username),
         name: String(token.username),
-        businessId: token.businessId,
+        businessId: token.business_id,
         role: {
           id: Number(token.role?.id ?? 1),
           name: String(token.role?.name ?? "Unknown"),

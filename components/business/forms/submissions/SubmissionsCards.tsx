@@ -77,7 +77,7 @@ const SubmissionCards: React.FC<Props> = ({ submissions, forms }) => {
                                 </Button>
                             </CardTitle>
                             <p className="text-sm text-muted-foreground">
-                                Form ID: {submission.formId || 'N/A'} - User ID: {submission.user_id || 'N/A'}
+                                Form ID: {submission.formId || 'N/A'} - User ID: {submission.userId || 'N/A'}
                             </p>
                         </CardHeader>
                         {isExpanded && (

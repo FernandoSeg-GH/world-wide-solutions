@@ -77,9 +77,9 @@ export default function BusinessesTable() {
                             <TableCell className="text-center whitespace-nowrap">{business.id}</TableCell>
                             <TableCell className="whitespace-nowrap">{business.name}</TableCell>
                             <TableCell className="whitespace-nowrap">{business.domain}</TableCell>
-                            <TableCell className="whitespace-nowrap text-center">{business.subscription_plan_name}</TableCell>
+                            <TableCell className="whitespace-nowrap text-center">{business.subscriptionPlanName}</TableCell>
                             <TableCell className="whitespace-nowrap">{business.phone}</TableCell>
-                            <TableCell className="whitespace-nowrap text-center">{business.business_email}</TableCell>
+                            <TableCell className="whitespace-nowrap text-center">{business.businessEmail}</TableCell>
                             <TableCell className="whitespace-nowrap max-w-[320px] truncate">{business.description}</TableCell>
                             <TableCell className="whitespace-nowrap">
                                 <div className="flex space-x-2">

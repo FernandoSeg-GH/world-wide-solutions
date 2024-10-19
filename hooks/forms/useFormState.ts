@@ -115,7 +115,7 @@ export const useFormState = (initialForm?: Form) => {
             name: formName,
             fields: elements,
             shareUrl: form.shareUrl,
-            business_id: session?.user.businessId,
+            businessId: session?.user.businessId,
           }),
         }
       );
@@ -363,7 +363,7 @@ export const useFormState = (initialForm?: Form) => {
         const formData = {
           name,
           description,
-          business_id: session.user.businessId,
+          businessId: session.user.businessId,
         };
 
         const response = await fetch(

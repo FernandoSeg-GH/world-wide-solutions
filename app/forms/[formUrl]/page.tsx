@@ -43,7 +43,6 @@ const FormDetailPage = ({ params }: { params: { formUrl: string } }) => {
 
 
                 await fetchSubmissions(formData.shareUrl, session.user.businessId);
-                console.log('submissionsData', submissions);
             } catch (err: any) {
                 console.error("Error fetching form details:", err);
                 setError(err.message || "Failed to fetch form details.");

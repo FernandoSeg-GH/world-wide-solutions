@@ -40,7 +40,6 @@ function Logo({ }: LogoProps) {
     } else {
       setTitle("Vinci Suite")
     }
-    if (business) console.log('business', business?.name)
   }, [business])
 
   return (

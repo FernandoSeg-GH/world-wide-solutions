@@ -30,7 +30,6 @@ export async function GET(
         },
       }
     );
-    console.log("response", response);
     if (!response.ok) {
       return NextResponse.json(
         { message: "Failed to fetch forms by share-url" },
@@ -39,7 +38,6 @@ export async function GET(
     }
 
     const data = await response.json();
-    console.log("data", data);
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
     console.error("Error fetching forms by share-url:", error);
