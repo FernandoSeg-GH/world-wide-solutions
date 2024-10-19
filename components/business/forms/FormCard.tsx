@@ -133,18 +133,16 @@ export function FormCard({ form }: FormCardProps) {
     return (
         <Card
             className={cn(
-                "xl:max-w-[380px] w-full",
+                "w-full",
                 isAdminRole ? "h-auto" : "h-[210px]"
             )}
         >
             <CardHeader>
                 <CardTitle className="flex items-center gap-2 justify-between">
-                    <div className="flex items-center justify-between gap-2 w-full">
-
-                        <span className="truncate text-ellipsis font-bold">{form.name}</span>
+                    <div className="flex flex-col items-start justify-start gap-2 w-full">
 
                         {isAdminRole && (
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center justify-between w-full gap-2">
                                 <Badge
                                     variant={publishedStatus ? "default" : "outline"}
                                     className={publishedStatus ? "bg-blue-500" : ""}
@@ -186,6 +184,10 @@ export function FormCard({ form }: FormCardProps) {
                                 </DropdownMenu>
                             </div>
                         )}
+
+
+                        <h2 className="truncate leading-6 text-ellipsis font-bold">{form.name}</h2>
+
                     </div>
                 </CardTitle>
             </CardHeader>

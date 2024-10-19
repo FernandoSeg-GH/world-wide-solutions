@@ -47,18 +47,22 @@ function Forms({ }: Props) {
             />
             <Separator className="border-gray-400 my-2 mb-6" />
             <div className="w-full flex flex-col gap-6">
-                {/* {
-                    forms && forms.length > 0 ?
-                        <FormCards forms={forms} />
-                        : forms.length === 0 ? <p>No Forms Available.</p> : null
-                } */}
-                {!loading && session?.user.role.id !== 1 ?
-                    <CreateFormBtn /> : null
-                }
-                {loading ? <Skeleton className="border-2 border-primary-/20 h-[210px] w-full lg:max-w-[380px]" /> : null}
-                {forms && forms.length > 0 ? forms.map((form) => (
-                    <FormCard key={form.id} form={form} />
-                )) : null}
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {!loading && session?.user.role.id !== 1 ? (
+                        <CreateFormBtn />
+                    ) : null}
+
+                    {loading ? (
+                        <Skeleton className="border-2 border-primary/20 h-[210px] w-full lg:max-w-[380px]" />
+                    ) : null}
+
+                    {forms && forms.length > 0 ? (
+                        forms.map((form) => <FormCard key={form.id} form={form} />)
+                    ) : null}
+                </div>
+
+
+
                 {/* {forms && forms.length > 0 && session?.user.role.id === 1 ?
                     <SubmissionFormCard forms={forms} />
 
