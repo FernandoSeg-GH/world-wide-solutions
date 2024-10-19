@@ -6,7 +6,6 @@ import { useSession } from "next-auth/react";
 import { useAppContext } from "@/context/AppProvider";
 import { useEffect, useState } from "react";
 import { useGodMode } from "@/hooks/user/useGodMode";
-import FormCards from "@/components/business/forms/FormCards";
 import SubmissionFormCard from "@/components/business/forms/submissions/SubmissionFormCard";
 import SubmissionsTable from "@/components/business/forms/submissions/SubmissionTable";
 import ClientView from './ClientView';
@@ -81,16 +80,6 @@ function Forms({ }: Props) {
                     ) : null}
 
 
-                {/* <div className="w-full">
-                    {forms && session?.user.role.id !== 1 ? (
-                        <div className="">
-                            <h2 className="text-2xl font-semibold col-span-2 mb-2">Your forms</h2>
-
-                            <FormCards forms={forms} />
-                        </div>
-                    ) : <SubmissionFormCard forms={forms} />
-                    }
-                </div> */}
                 {/* <div className="flex flex-col gap-6 w-full">
                     <div>
                         {form && session?.user.role.id !== 1 && forms && submissions ?

@@ -329,6 +329,14 @@ export interface AppContextType {
       deleteForm: (formId: number) => Promise<void>;
       fetchFormsByBusinessId: (businessId: number) => Promise<void>;
       fetchAllForms: () => Promise<void>;
+      fetchFormByShareUrl: (
+        shareUrl: string,
+        businessId: number
+      ) => Promise<Form | null>;
+      fetchFormByShareUrlPublic: (
+        shareUrl: string,
+        businessId: number
+      ) => Promise<Form | null>;
     };
     createBusiness: (businessData: any) => Promise<boolean>;
     fetchSubmissions: (shareUrl: string, businessId: number) => Promise<void>;
@@ -344,14 +352,6 @@ export interface AppContextType {
       businessData: Partial<Business>
     ) => Promise<boolean>;
     deleteBusiness: (businessId: number) => Promise<boolean>;
-    fetchFormByShareUrl: (
-      shareUrl: string,
-      businessId: number
-    ) => Promise<Form | null>;
-    fetchFormByShareUrlPublic: (
-      shareUrl: string,
-      businessId: number
-    ) => Promise<Form | null>;
     toggleGodMode: () => void;
     switchSection: (section: string) => void;
     fetchAllUsers: () => Promise<User[] | null>;

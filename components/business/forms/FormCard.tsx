@@ -121,7 +121,7 @@ export function FormCard({ form }: FormCardProps) {
     };
 
     const handleNavigate = (shareUrl: string) => {
-        window.location.href = `/forms/${shareUrl}`;
+        router.push(`/form/${shareUrl}`);
     };
 
     const formattedDate = form.createdAt
@@ -219,7 +219,7 @@ export function FormCard({ form }: FormCardProps) {
                         {publishedStatus ? (
                             <Button
                                 className="w-full mt-2 text-md gap-4"
-                                onClick={() => handleNavigate(`/forms/${form.shareUrl}`)}
+                                onClick={() => handleNavigate(form.shareUrl)}
                             >
                                 View submissions <BiRightArrowAlt />
                             </Button>

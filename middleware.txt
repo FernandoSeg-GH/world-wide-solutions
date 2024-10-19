@@ -1,3 +1,5 @@
+// src/middleware.ts
+
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import type { NextRequest } from "next/server";
@@ -7,7 +9,6 @@ const publicRoutes = ["/", "/auth/sign-in", "/submit"];
 
 // Define protected routes (those that require authentication)
 const protectedPaths = [
-  // "/dashboard",
   "/forms",
   "/builder",
   // Add more protected routes as needed
@@ -59,6 +60,7 @@ export default async function middleware(req: NextRequest) {
   }
 
   // For all other routes, allow access by default (or return 404 if necessary)
+  console.log("Middleware: Non-protected route, allowing access.");
   return NextResponse.next();
 }
 

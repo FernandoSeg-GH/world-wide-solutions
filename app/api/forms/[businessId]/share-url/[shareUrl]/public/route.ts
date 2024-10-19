@@ -17,7 +17,7 @@ export async function GET(
     const response = await fetch(
       `${
         process.env.NEXT_PUBLIC_FLASK_BACKEND_URL
-      }/forms/shareUrl/${encodeURIComponent(shareUrl)}/public`,
+      }/forms/share_url/${encodeURIComponent(shareUrl)}/public`,
       {
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
@@ -34,6 +34,7 @@ export async function GET(
     }
 
     const data = await response.json();
+    console.log("data", data);
     return NextResponse.json(data);
   } catch (error) {
     console.error("Error fetching public form by share URL:", error);

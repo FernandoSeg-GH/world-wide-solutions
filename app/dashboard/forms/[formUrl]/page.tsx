@@ -9,15 +9,15 @@ import Spinner from '@/components/ui/spinner';
 import { useSession } from 'next-auth/react';
 import { toast } from '@/components/ui/use-toast';
 
-const FormDetailPage = ({ params }: { params: { formUrl: string } }) => {
+const FormDetailPage = ({ params }: { params: { shareUrl: string } }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const { formUrl } = params;
+    const { shareUrl } = params;
     const { data: session } = useSession();
     const { selectors, data, actions } = useAppContext();
     const { setForm } = selectors;
     const { form, submissions } = data;
-    const { fetchSubmissions, fetchFormByShareUrlPublic } = actions;
+    const { fetchSubmissions } = actions;
 
     useEffect(() => {
         const fetchFormDetails = async () => {
@@ -29,7 +29,7 @@ const FormDetailPage = ({ params }: { params: { formUrl: string } }) => {
 
             try {
 
-                const formData = await fetchFormByShareUrlPublic(formUrl, session.user.businessId);
+                const formData = await actions.formActions.fetchFormByShareUrl(shareUrl, session.user.businessId);
 
                 if (!formData) {
                     throw new Error("Form data is undefined.");
@@ -56,14 +56,14 @@ const FormDetailPage = ({ params }: { params: { formUrl: string } }) => {
             }
         };
 
-        if (session?.user && formUrl) {
+        if (session?.user && shareUrl) {
             fetchFormDetails();
         } else {
             setLoading(false);
             setError("User session not found.");
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [formUrl, session?.user?.businessId]);
+    }, [shareUrl, session?.user?.businessId]);
 
 
     if (loading) return <Spinner />;
