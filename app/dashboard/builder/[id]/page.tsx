@@ -6,15 +6,17 @@ import { useAppContext } from '@/context/AppProvider';
 import { Form } from '@/types';
 import Spinner from '@/components/ui/spinner';
 import { useSession } from 'next-auth/react';
+import { useFormState } from '@/hooks/forms/useFormState';
 
 const BuilderPage = ({ params }: { params: { shareUrl: string } }) => {
   const {
-    actions: { fetchFormByShareUrl },
+    actions,
     data: { form, loading, error },
     selectors: { setForm, setLoading, setError },
   } = useAppContext();
   const { data: session } = useSession();
   const { shareUrl } = params;
+  const { fetchFormByShareUrl } = useFormState()
 
   useEffect(() => {
     const fetchFormData = async () => {

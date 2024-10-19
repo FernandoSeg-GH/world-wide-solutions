@@ -23,7 +23,6 @@ function SubmissionsTable({ form, admin }: { form: Form, admin?: boolean }) {
             fetchSubmissions(form.shareUrl, form.businessId);
         }
     }, [form]);
-
     if (loading || !form) {
         return <Spinner />;
     }
@@ -92,7 +91,7 @@ function SubmissionsTable({ form, admin }: { form: Form, admin?: boolean }) {
         })
         : "Unknown time";
 
-    console.log('form', form)
+
     return (
         <div className="w-full flex flex-col items-start justify-start">
             <div className='mb-3 w-full flex items-center justify-end'>

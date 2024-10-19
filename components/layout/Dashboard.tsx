@@ -6,8 +6,6 @@ import { MobileNavbar } from "./MobileNavbar";
 import { Header } from "./Header";
 import { useAppContext } from "@/context/AppProvider";
 import { cn } from "@/lib/utils";
-import AppSidebar from "./sidebar/AppSidebar";
-import { SidebarProvider, SidebarTrigger } from "../ui/sidebar";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Spinner from "../ui/spinner";
@@ -20,7 +18,42 @@ import Leo from "../leo";
 import Vinci from "../vinci/Vinci";
 import FormDetails from "../business/forms/FormDetails";
 
-export default function Dashboard() {
+export const RenderComponent = (currentSection: string) => {
+    const url = usePathname();
+    if (url === "/submit") {
+        return (
+            <Suspense fallback={<div><Spinner /></div>}>
+                <Forms />
+                <Submissions />
+                <Notifications />
+            </Suspense>
+        );
+    }
+
+
+    switch (currentSection) {
+        case "Dashboard":
+            return <Main />;
+        case "Forms":
+            return <Forms />;
+        case "FormDetail":
+            return <FormDetails />;
+        case "Submissions":
+            return <Submissions />;
+        case "Notifications":
+            return <Notifications />;
+        case "Businesses":
+            return <Businesses />;
+        case "AI Characters":
+            return <Leo />;
+        case "Vinci":
+            return <Vinci />;
+        default:
+            return <Forms />;
+    }
+};
+
+export function Dashboard() {
     const [isExpanded, setIsExpanded] = useState(true);
     const { data } = useAppContext();
     const { currentSection } = data;
@@ -28,40 +61,6 @@ export default function Dashboard() {
     const [isMobile, setIsMobile] = useState(false);
     const { data: session } = useSession()
 
-    const renderComponent = (currentSection: string) => {
-        const url = usePathname();
-        if (url === "/submit") {
-            return (
-                <Suspense fallback={<div><Spinner /></div>}>
-                    <Forms />
-                    <Submissions />
-                    <Notifications />
-                </Suspense>
-            );
-        }
-
-
-        switch (currentSection) {
-            case "Dashboard":
-                return <Main />;
-            case "Forms":
-                return <Forms />;
-            case "FormDetail":
-                return <FormDetails />;
-            case "Submissions":
-                return <Submissions />;
-            case "Notifications":
-                return <Notifications />;
-            case "Businesses":
-                return <Businesses />;
-            case "AI Characters":
-                return <Leo />;
-            case "Vinci":
-                return <Vinci />;
-            default:
-                return <Forms />;
-        }
-    };
     useEffect(() => {
         const handleResize = () => {
             setIsMobile(window.innerWidth <= 768);
@@ -96,8 +95,10 @@ export default function Dashboard() {
                     isExpanded={isExpanded}
                 // breadcrumbs={mockData.breadcrumbs}
                 />
-                <div className="pl-4">{renderComponent(currentSection)}</div>
+                <div className="pl-4">{RenderComponent(currentSection)}</div>
             </div>
         </div>
     );
 }
+
+export default Dashboard

@@ -135,7 +135,7 @@ export const useSubmissions = () => {
 
         const missing: string[] = [];
 
-        form.fields.forEach((field) => {
+        form?.fields?.forEach((field) => {
           const value = parsedContent[field.id];
           const isRequired = field.extraAttributes?.required;
 

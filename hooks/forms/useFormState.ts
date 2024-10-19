@@ -39,7 +39,7 @@ export const useFormState = (initialForm?: Form) => {
 
       if (newForm) {
         setFormName(newForm.name);
-        setElements(newForm.fields);
+        setElements(newForm.fields!);
         setUnsavedChanges(true);
       } else {
         setFormName("");

@@ -379,7 +379,7 @@ export default function Vinci() {
             {/* Submissions Table */}
             <div className="mb-12">
                 <h2 className="text-2xl font-semibold mb-4">Submissions</h2>
-                <SubmissionCards submissions={submissions} forms={forms} />
+                {/* <SubmissionCards  submissions={submissions} forms={forms} /> */}
                 <div className="flex justify-between items-center mt-4">
                     <button
                         onClick={handlePrevious}

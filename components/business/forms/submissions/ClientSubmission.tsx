@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useRef, useState, useTransition } from "react";
-import { FormElements } from "@/types";
+import { FormElements, Form } from "@/types";
 import { Button } from "@/components/ui/button";
 import { HiCursorClick } from "react-icons/hi";
 import { ImSpinner2 } from "react-icons/im";
@@ -9,12 +9,13 @@ import { useAppContext } from "@/context/AppProvider";
 import { toast } from "@/components/ui/use-toast";
 import Spinner from "@/components/ui/spinner";
 import { useSession } from "next-auth/react";
+import { useFormState } from "@/hooks/forms/useFormState";
 
 function ClientSubmission({ formUrl }: { formUrl: string }) {
     const { data, actions: formActions } = useAppContext();
     const { data: session } = useSession();
     const { form } = data;
-    const { fetchFormByShareUrlPublic } = formActions;
+    const { fetchFormByShareUrlPublic } = useFormState();
 
     useEffect(() => {
         if (session?.user.businessId) {
@@ -32,7 +33,7 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
     const [pending, startTransition] = useTransition();
 
     const validateForm = useCallback(() => {
-        if (!form) {
+        if (!form || !form.fields) {
             toast({
                 title: "Error",
                 description: "Form data is missing.",
@@ -41,11 +42,13 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
             return false;
         }
 
+        formErrors.current = {}; // Clear previous errors
+
         for (const field of form.fields) {
             const actualValue = formValues.current[field.id] || "";
-            const valid = FormElements[field.type].validate(field, actualValue);
+            const validateFn = FormElements?.[field.type]?.validate;
 
-            if (!valid) {
+            if (validateFn && !validateFn(field, actualValue)) {
                 formErrors.current[field.id] = true;
             }
         }
@@ -68,7 +71,7 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
             setRenderKey(new Date().getTime());
             toast({
                 title: "Error",
-                description: "Please check the form for errors",
+                description: "Please check the form for errors.",
                 variant: "destructive",
             });
             return;
@@ -83,6 +86,7 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
                 },
                 body: JSON.stringify({ content: jsonContent }),
             });
+
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || "Failed to submit the form");
@@ -91,12 +95,12 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
             setSubmitted(true);
             toast({
                 title: "Success",
-                description: "Form submitted successfully",
+                description: "Form submitted successfully.",
             });
         } catch (error: any) {
             toast({
                 title: "Error",
-                description: "Something went wrong while submitting the form",
+                description: "Something went wrong while submitting the form.",
                 variant: "destructive",
             });
         }
@@ -108,7 +112,7 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
                 <div className="max-w-[620px] flex flex-col gap-4 flex-grow bg-background w-full p-8 overflow-y-auto border shadow-xl shadow-gray-200 rounded">
                     <h1 className="text-2xl font-bold">Form submitted</h1>
                     <p className="text-muted-foreground">
-                        Thank you for submitting the form, you can close this page now.
+                        Thank you for submitting the form. You can close this page now.
                     </p>
                 </div>
             </div>
@@ -122,16 +126,22 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
                 className="max-w-[620px] h-auto flex flex-col gap-4 bg-background w-full p-8 overflow-y-auto border shadow-xl shadow-gray-200 rounded mt-40"
             >
                 <div className="h-auto gap-8">
-                    {form ? form.fields.map((element) => {
-                        const FormElement = FormElements[element.type].formComponent;
+                    {form?.fields ? form.fields.map((element) => {
+                        const FormElement = FormElements[element.type]?.formComponent;
                         return (
-                            <FormElement
-                                key={element.id}
-                                elementInstance={element}
-                                submitValue={submitValue}
-                                isInvalid={formErrors.current[element.id]}
-                                defaultValue={formValues.current[element.id]}
-                            />
+                            FormElement ? (
+                                <FormElement
+                                    key={element.id}
+                                    elementInstance={element}
+                                    submitValue={submitValue}
+                                    isInvalid={formErrors.current[element.id]}
+                                    defaultValue={formValues.current[element.id] || ""}
+                                />
+                            ) : (
+                                <p key={element.id} className="text-red-500">
+                                    Unsupported field type: {element.type}
+                                </p>
+                            )
                         );
                     }) : <Spinner />}
                 </div>
