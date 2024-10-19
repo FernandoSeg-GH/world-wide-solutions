@@ -287,6 +287,7 @@ export interface AppContextType {
     setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>;
   };
   data: {
+    isExpanded: boolean;
     formName: string;
     elements: FormField[];
     selectedElement: FormField | null;
@@ -314,6 +315,7 @@ export interface AppContextType {
     socialMediaPosts?: SocialMediaPost[];
   };
   actions: {
+    setIsExpanded: React.Dispatch<React.SetStateAction<boolean>>;
     formActions: {
       createForm: (newForm: {
         name: string;

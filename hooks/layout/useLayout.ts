@@ -1,8 +1,17 @@
 "use client";
+
 import { useState, useCallback } from "react";
 
-export const useLayout = () => {
+interface UseLayoutReturn {
+  currentSection: string;
+  switchSection: (section: string) => void;
+  isExpanded: boolean;
+  setIsExpanded: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export const useLayout = (): UseLayoutReturn => {
   const [currentSection, setCurrentSection] = useState<string>("Dashboard");
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
   const switchSection = useCallback((section: string) => {
     setCurrentSection(section);
@@ -11,5 +20,7 @@ export const useLayout = () => {
   return {
     currentSection,
     switchSection,
+    isExpanded,
+    setIsExpanded,
   };
 };

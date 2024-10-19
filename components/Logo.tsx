@@ -10,72 +10,66 @@ import Image from "next/image";
 import { useAppContext } from "@/context/AppProvider";
 import { useBusiness } from "@/hooks/business/useBusiness";
 
-type LogoProps = {
-  isExpanded: boolean;
-};
+type LogoProps = {};
 
-function Logo({ isExpanded }: LogoProps) {
+function Logo({ }: LogoProps) {
   const { data: session } = useSession();
   const [title, setTitle] = useState<string>("");
-  const { data: currentBusiness } = useAppContext()
+  const { data } = useAppContext()
+  const { isExpanded, business } = data
+
+
   const { fetchBusinessById } = useBusiness()
 
+
+  const [isMobile, setIsMobile] = useState(false);
+
+
   useEffect(() => {
-    if (currentBusiness.businesses[0]) {
-      console.log('currentBusiness.businesses', currentBusiness.businesses)
-      setTitle(currentBusiness.businesses[0].name)
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (business?.name) {
+      setTitle(business?.name)
     } else {
       setTitle("Vinci Suite")
     }
-  }, [currentBusiness.businesses])
-
-  useEffect(() => {
-    if (session?.user.businessId) {
-      console.log('session?.user.businessId', session?.user.businessId)
-      fetchBusinessById(session.user.businessId)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session?.user.businessId])
+    if (business) console.log('business', business?.name)
+  }, [business])
 
   return (
     <div className={cn(
-      "w-full h-auto flex flex-col px-4 ",
-      isExpanded ? "justify-start items-start py-2" : "justify-center items-center mt-2")}
+      isExpanded && "w-full h-auto flex flex-col items-start justify-start",
+      // isMobile && "flex-row"
+    )}
     >
-      {isExpanded && session?.user.businessId && <Image
-        width={50}
-        height={50}
-        // blurData={blurData}
-        src={`/assets/${getLogoForDomain(session?.user.businessId)}`}
-        alt={title}
-        priority
-        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 30vw"
-        className="object-cover rounded-t-xl"
-      />}
-      <div className={cn(
-        "w-full h-auto flex flex-col ",
-        isExpanded ? "justify-start items-start py-2" : "justify-start items-start")}
-      >
-        {/* {!isExpanded && session?.user.businessId && <Image
-            width={25}
-            height={25}
-            // blurData={blurData}
-            src={`/assets/${getLogoForDomain(session?.user.businessId)}`}
-            alt={title}
-            priority
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 30vw"
-            className="object-cover rounded-t-xl mb-2"
-          />} */}
-        <h1
+      {isExpanded && session?.user.businessId &&
+        <Image
+          width={50}
+          height={50}
+          // blurData={blurData}
+          src={`/assets/${getLogoForDomain(session?.user.businessId)}`}
+          alt={title}
+          priority
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 30vw"
+          className="object-cover rounded-t-xl"
+        />
+      }
+      <h1
+        className={cn(
+          "text-left font-semibold whitespace-wrap hidden cursor-pointer mt-1",
+          isExpanded && "block",
 
-          className={cn(
-            "text-left font-semibold whitespace-wrap hidden cursor-pointer",
-            isExpanded && "block"
-          )}
-        >
-          {title}
-        </h1>
-      </div>
+        )}
+      >
+        {title}
+      </h1>
     </div>
   );
 }

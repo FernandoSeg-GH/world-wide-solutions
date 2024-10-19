@@ -73,7 +73,7 @@ export function MobileNavbar() {
         <div>
             {/* Mobile Header */}
             <header className="fixed top-0 left-0 right-0 z-20 flex items-center justify-between bg-background p-4 shadow-md">
-                <Logo isExpanded={true} />
+                <Logo />
                 <Button
                     variant="ghost"
                     size="icon"
@@ -99,16 +99,8 @@ export function MobileNavbar() {
                     mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
                 )}
             >
-                <div className="flex items-center justify-between px-4 py-4">
-                    <Logo isExpanded={true} />
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-10"
-                        onClick={handleMenuToggle}
-                    >
-                        <Menu className="h-6 w-6" />
-                    </Button>
+                <div className="flex items-center justify-between px-4 py-4" onClick={handleMenuToggle}>
+                    <Logo />
                 </div>
                 <div className="flex flex-col gap-2 px-2 py-4">
                     {navbarItems.map((item) => (

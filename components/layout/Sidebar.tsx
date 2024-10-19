@@ -86,7 +86,7 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
                 isExpanded ? "w-64" : "w-14"
             )}
         >
-            <Logo isExpanded={isExpanded} />
+            <Logo />
             <div className={cn("flex items-center justify-end px-2 py-2", isExpanded && " absolute top-1 right-1")}>
                 <Button
                     variant="ghost"

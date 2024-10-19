@@ -52,9 +52,6 @@ export function FormCard({ form }: FormCardProps) {
         data: { loading: isPublishing },
     } = useAppContext();
 
-    useEffect(() => {
-        setPublishedStatus(form.published);
-    }, [form.published]);
 
     const userRoleId = Number(session?.user.role.id);
     const isAdminRole = [2, 3, 4].includes(userRoleId);
@@ -63,13 +60,19 @@ export function FormCard({ form }: FormCardProps) {
         const action = publishedStatus ? "unpublish" : "publish";
 
         try {
-            await formActions.publishForm(action);
-            const updatedStatus = publishedStatus ? "Unpublished" : "Published";
-            toast({
-                title: `Form ${updatedStatus}`,
-                description: `The form has been ${updatedStatus.toLowerCase()}.`,
-            });
+            // Make the API call to publish/unpublish
+            const updatedForm = await formActions.publishForm(action);
+
+            // Update the component state to reflect the new published status
             setPublishedStatus(!publishedStatus);
+
+            // Optionally, update the parent or context if necessary
+            // updateForm(updatedForm);
+
+            toast({
+                title: `Form ${!publishedStatus ? "Published" : "Unpublished"}`,
+                description: `The form has been ${!publishedStatus ? "published" : "unpublished"}.`,
+            });
         } catch (error) {
             console.error(`Error ${action}ing form:`, error);
             toast({
@@ -79,6 +82,7 @@ export function FormCard({ form }: FormCardProps) {
             });
         }
     };
+
 
     const handleDelete = async () => {
         if (deleteInputValue !== "DELETE_THE_FORM_AND_ALL_DATA") {

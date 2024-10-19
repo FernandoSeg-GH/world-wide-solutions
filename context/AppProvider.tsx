@@ -114,6 +114,7 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
 
     const data = useMemo(() => ({
         ...layoutState,
+        isExpanded: layoutState.isExpanded,
         formName: formState.formName,
         elements: formState.elements,
         selectedElement: formState.selectedElement,
@@ -168,6 +169,7 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
 
 
     const actions = useMemo(() => ({
+        setIsExpanded: layoutState.setIsExpanded,
         formActions,
         fetchSubmissions: submissionState.fetchSubmissions,
         fetchAllSubmissions: submissionState.fetchAllSubmissions,
