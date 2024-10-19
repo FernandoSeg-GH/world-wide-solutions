@@ -21,7 +21,7 @@ import Vinci from "../vinci/Vinci";
 import FormDetails from "../business/forms/FormDetails";
 
 export default function Dashboard() {
-    const [isExpanded, setIsExpanded] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(true);
     const { data } = useAppContext();
     const { currentSection } = data;
 

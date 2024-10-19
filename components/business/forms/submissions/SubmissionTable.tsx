@@ -1,20 +1,36 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Submission, Form, ElementsType } from '@/types';
 import { cn } from '@/lib/utils';
+import { useSubmissions } from '@/hooks/forms/useSubmissions';
+import Spinner from '@/components/ui/spinner';
+import { useFormState } from '@/hooks/forms/useFormState';
+import { formatDistance } from 'date-fns';
 
 interface Row {
     submittedAt: string;
     [key: string]: any;
 }
 
-function SubmissionsTable({ submissions, form, admin }: { submissions: Submission[]; form: Form; admin?: boolean }) {
+function SubmissionsTable({ form, admin }: { form: Form, admin?: boolean }) {
+    const { submissions, fetchSubmissions, loading } = useSubmissions();
 
-    if (!Array.isArray(submissions) || submissions.length === 0) {
-        return <p className="text-muted-foreground">No submissionssssss available.</p>;
+    useEffect(() => {
+        if (form) {
+            console.log('form', form)
+            fetchSubmissions(form.shareUrl, form.businessId);
+        }
+    }, [form]);
+
+    if (loading || !form) {
+        return <Spinner />;
     }
+
+    // if (!Array.isArray(submissions) || submissions.length === 0) {
+    //     return <p className="text-muted-foreground">No submissionssssss available.</p>;
+    // }
 
     const isInputField = (fieldType: ElementsType): boolean => {
         const inputFieldTypes: ElementsType[] = [
@@ -70,11 +86,20 @@ function SubmissionsTable({ submissions, form, admin }: { submissions: Submissio
 
         return date.toLocaleDateString('en-US', options);
     }
+    const formattedDate = form.createdAt
+        ? formatDistance(new Date(form.createdAt), new Date(), {
+            addSuffix: true,
+        })
+        : "Unknown time";
 
+    console.log('form', form)
     return (
-        <div className="w-full flex flex-col items-start justify-start my-10">
-            <h1 className="text-3xl font-bold my-6">Submissions</h1>
-            <h2 className="text-2xl font-semibold mb-6">Form: <span className='font-normal'>{form.name}</span></h2>
+        <div className="w-full flex flex-col items-start justify-start">
+
+            <div>
+                <h3>Created At: <span>{formattedDate}</span></h3>
+                <p>{form.published}</p>
+            </div>
             <div className="rounded-lg border shadow-sm w-full overflow-x-auto">
                 <Table className={cn("w-full table-auto")}>
                     <TableHeader>

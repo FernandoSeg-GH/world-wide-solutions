@@ -9,7 +9,11 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
+    ArrowBigRightDash,
     BookText,
+    ChevronLeft,
+    ChevronRight,
+    ChevronsRight,
     DnaIcon,
     NotebookPen,
 } from "lucide-react";
@@ -138,6 +142,7 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
                     ))}
                 </TooltipProvider>
             </nav>
+            {isExpanded ? <ChevronLeft className="absolute bottom-2 right-4" /> : <ChevronsRight className="absolute bottom-2 right-4" />}
         </aside>
     );
 }

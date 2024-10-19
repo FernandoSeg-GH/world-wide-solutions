@@ -15,7 +15,7 @@ const FormDetails = () => {
     if (!form) {
         return <div>No form selected.</div>;
     }
-
+    const admin = session?.user.role.id === 4 || session?.user.role.id === 3
     return (
         <div className="flex flex-col gap-6">
             <SectionHeader
@@ -25,7 +25,7 @@ const FormDetails = () => {
             <Separator className="border-gray-400 my-2 mb-6" />
             {/* You can add any additional form details or actions here */}
             {/* For example, display submissions related to this form */}
-            {form && <SubmissionsTable form={form} submissions={submissions} admin={session?.user.role.id === 4} />}
+            <SubmissionsTable admin={admin} form={form} />
             {/* Or display a client view */}
             <ClientView form={form} submissions={submissions ?? []} />
         </div>

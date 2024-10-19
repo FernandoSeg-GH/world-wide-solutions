@@ -8,6 +8,7 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import React, { useEffect } from 'react';
 import { useSession, signIn } from "next-auth/react";
 import { Card } from "@/components/ui/card";
+import { useFormState } from "@/hooks/forms/useFormState";
 
 interface ClientViewProps {
     form: Form;
@@ -24,20 +25,25 @@ const fillableFieldTypes = [
     "TextAreaField",
 ];
 
-export default function ClientView({ form, submissions }: ClientViewProps) {
+export default function ClientView({ submissions }: ClientViewProps) {
     const { data: session, status } = useSession();
-
+    const { form } = useFormState()
     useEffect(() => {
         if (session?.error === "RefreshAccessTokenError") {
             signIn();
         }
     }, [session]);
-
-    if (!form || !form.fields) return <Skeleton className="min-w-80 min-h-20" />;
-
+    useEffect(() => {
+        if (form) {
+            console.log('form', form)
+        }
+    }, [form])
+    if (!form || !form.fields) {
+        <p>No Forms</p>
+    }
     return (
         <div>
-            <h2 className="text-3xl font-semibold mt-6">Your Submissions</h2>
+            <h2 className="text-3xl font-semibold mt-6">Submissions</h2>
             <p className="italic mb-3">Esta sección será editable, y los usuarios podrán actualizar su información:</p>
             <Card className="p-4">
                 {submissions.length > 0 ? (
@@ -57,7 +63,7 @@ export default function ClientView({ form, submissions }: ClientViewProps) {
                                 }
                             }
 
-                            const missingFields = form.fields
+                            const missingFields = form?.fields
                                 ?.filter((field: FormElementInstance) =>
                                     fillableFieldTypes.includes(field.type) &&
                                     (!parsedContent[field.id] || parsedContent[field.id] === '')
@@ -74,7 +80,7 @@ export default function ClientView({ form, submissions }: ClientViewProps) {
                                     </div>
 
                                     <div className="space-y-4">
-                                        {form.fields
+                                        {form?.fields
                                             ?.filter((field: FormElementInstance) =>
                                                 fillableFieldTypes.includes(field.type)
                                             )
