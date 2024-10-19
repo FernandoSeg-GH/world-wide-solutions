@@ -2,7 +2,7 @@
 
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import {
     Sidebar,
     SidebarContent,
@@ -23,14 +23,19 @@ import { cn } from "@/lib/utils";
 import { useAppContext } from "@/context/AppProvider";
 import Logo from "@/components/Logo";
 import Image from "next/image";
+import { useLayout } from "@/hooks/layout/useLayout";
+import { useFormState } from "@/hooks/forms/useFormState";
+import { useSession } from "next-auth/react";
 
 interface AppSidebarProps { }
 
 export function AppSidebar({ }: AppSidebarProps) {
-    const { actions: layoutState, data } = useAppContext();
-    const { switchSection } = layoutState;
-    const { currentSection, godMode, isExpanded } = data;
+    const { actions, data } = useAppContext();
+    const { switchSection } = actions
+    const { currentSection, godMode, isExpanded, forms } = data;
     const sidebarItems: SidebarItem[] = getSidebarItems(godMode);
+    const { data: session } = useSession()
+    const { fetchAllForms, fetchFormsByBusinessId } = useFormState()
 
     return (
         <Sidebar collapsible="icon">
@@ -80,8 +85,8 @@ export function AppSidebar({ }: AppSidebarProps) {
                 </SidebarGroup>
                 {/* Add more SidebarGroups if needed */}
             </SidebarContent>
-            <SidebarFooter>
-                {/* Add footer content, e.g., user profile, settings */}
+            <SidebarFooter className="p-4">
+                <p>Welcome <span className="capitalize">{session?.user.name}</span></p>
             </SidebarFooter>
         </Sidebar>
     );

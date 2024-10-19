@@ -1,3 +1,5 @@
+// Sidebar.tsx
+
 "use client";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,7 +11,6 @@ import {
 import {
     BookText,
     DnaIcon,
-    Menu,
     NotebookPen,
 } from "lucide-react";
 import {
@@ -81,29 +82,34 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
 
     return (
         <aside
+            onClick={() => setIsExpanded(!isExpanded)}
             className={cn(
                 "fixed inset-y-0 left-0 z-10 flex flex-col border-r bg-background transition-all duration-300",
                 isExpanded ? "w-64" : "w-14"
             )}
         >
-            <Logo />
-            <div className={cn("flex items-center justify-end px-2 py-2", isExpanded && " absolute top-1 right-1")}>
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => setIsExpanded(!isExpanded)}
-                >
-                    <Menu className="h-6 w-6" />
-                </Button>
-            </div>
+            <Logo onClick={(event: React.MouseEvent<HTMLDivElement>) => event.stopPropagation()} />
+            {/* Remove the menu button if no longer needed */}
+            {/* <div className={cn("flex items-center justify-end px-2 py-2", isExpanded && " absolute top-1 right-1")}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          <Menu className="h-6 w-6" />
+        </Button>
+      </div> */}
             <nav className="flex flex-col gap-4 px-2 py-4">
                 <TooltipProvider>
                     {sidebarItems.map((item) => (
                         <Tooltip key={item.label}>
                             <TooltipTrigger asChild>
                                 <button
-                                    onClick={() => switchSection(item.label)}
+                                    onClick={(event) => {
+                                        event.stopPropagation();
+                                        switchSection(item.label);
+                                    }}
                                     className={cn(
                                         "flex items-center rounded-lg transition-colors hover:text-foreground",
                                         currentSection === item.label

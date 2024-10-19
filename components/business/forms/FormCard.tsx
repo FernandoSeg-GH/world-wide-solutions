@@ -45,6 +45,11 @@ export function FormCard({ form }: FormCardProps) {
     const [isDeleting, setIsDeleting] = useState(false);
     const [publishedStatus, setPublishedStatus] = useState(form.published);
     const [deleteInputValue, setDeleteInputValue] = useState("");
+
+    const { actions, selectors } = useAppContext();
+    const { switchSection } = actions;
+    const { setForm } = selectors;
+
     const router = useRouter();
     const { toast } = useToast();
     const {
@@ -120,10 +125,10 @@ export function FormCard({ form }: FormCardProps) {
         }
     };
 
-    const handleNavigate = (shareUrl: string) => {
-        router.push(`/form/${shareUrl}`);
+    const handleNavigate = () => {
+        setForm(form); // Set the selected form in context
+        switchSection("FormDetail"); // Switch to the 'FormDetail' section
     };
-
     const formattedDate = form.createdAt
         ? formatDistance(new Date(form.createdAt), new Date(), {
             addSuffix: true,
@@ -219,9 +224,9 @@ export function FormCard({ form }: FormCardProps) {
                         {publishedStatus ? (
                             <Button
                                 className="w-full mt-2 text-md gap-4"
-                                onClick={() => handleNavigate(form.shareUrl)}
+                                onClick={handleNavigate}
                             >
-                                View submissions <BiRightArrowAlt />
+                                Manage <BiRightArrowAlt />
                             </Button>
                         ) : (
                             <Button

@@ -13,9 +13,12 @@ export const useLayout = (): UseLayoutReturn => {
   const [currentSection, setCurrentSection] = useState<string>("Dashboard");
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
-  const switchSection = useCallback((section: string) => {
-    setCurrentSection(section);
-  }, []);
+  const switchSection = useCallback(
+    (section: string) => {
+      setCurrentSection(section);
+    },
+    [currentSection]
+  );
 
   return {
     currentSection,

@@ -10,13 +10,15 @@ import Image from "next/image";
 import { useAppContext } from "@/context/AppProvider";
 import { useBusiness } from "@/hooks/business/useBusiness";
 
-type LogoProps = {};
+type LogoProps = {
+  onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
+};
 
-function Logo({ }: LogoProps) {
+function Logo({ onClick }: LogoProps) {
   const { data: session } = useSession();
   const [title, setTitle] = useState<string>("");
   const { data } = useAppContext()
-  const { isExpanded, business } = data
+  const { isExpanded, currentUser } = data
 
 
   const { fetchBusinessById } = useBusiness()
@@ -35,29 +37,29 @@ function Logo({ }: LogoProps) {
   }, []);
 
   useEffect(() => {
-    if (business?.name) {
-      setTitle(business?.name)
+    if (currentUser?.businessName) {
+      setTitle(currentUser?.businessName)
     } else {
       setTitle("Vinci Suite")
     }
-  }, [business])
+  }, [currentUser])
 
   return (
     <div className={cn(
-      isExpanded && "w-full h-auto flex flex-col items-start justify-start",
+      "w-full h-auto flex flex-col items-start justify-start p-4  ",
       // isMobile && "flex-row"
     )}
     >
-      {isExpanded && session?.user.businessId &&
+      {session?.user.businessId &&
         <Image
-          width={50}
-          height={50}
+          width={isExpanded ? 50 : 25}
+          height={isExpanded ? 50 : 25}
           // blurData={blurData}
           src={`/assets/${getLogoForDomain(session?.user.businessId)}`}
           alt={title}
           priority
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 30vw"
-          className="object-cover rounded-t-xl"
+          className={cn(isExpanded ? "w-14" : "w-12")}
         />
       }
       <h1

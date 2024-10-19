@@ -10,7 +10,6 @@ type Props = {
 const DashboardLayout = ({ children }: Props) => {
     return (
         <SidebarProvider>
-            <AppSidebar />
             <SidebarInset>
                 <main>{children}</main>
             </SidebarInset>

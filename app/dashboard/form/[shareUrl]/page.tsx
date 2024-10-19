@@ -8,6 +8,7 @@ import FormCard from "@/components/business/forms/FormCard";
 import Spinner from "@/components/ui/spinner";
 import { Form } from "@/types";
 import { useParams } from "next/navigation";
+import { Header } from "@/components/layout/Header";
 
 export default function FormPage() {
     const params = useParams();

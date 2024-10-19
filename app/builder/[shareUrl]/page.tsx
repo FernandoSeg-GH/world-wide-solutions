@@ -16,7 +16,7 @@ export default function BuilderPage({ params }: BuilderPageProps) {
   const { data, selectors, actions } = useAppContext();
   const { form, loading, error } = data;
   const { setForm, setElements } = selectors;
-  const { fetchFormByShareUrl } = actions;
+  const { fetchFormByShareUrl } = actions.formActions;
   const { data: session } = useSession();
 
   useEffect(() => {

@@ -11,8 +11,9 @@ interface Row {
 }
 
 function SubmissionsTable({ submissions, form, admin }: { submissions: Submission[]; form: Form; admin?: boolean }) {
+
     if (!Array.isArray(submissions) || submissions.length === 0) {
-        return <p className="text-muted-foreground">No submissions available.</p>;
+        return <p className="text-muted-foreground">No submissionssssss available.</p>;
     }
 
     const isInputField = (fieldType: ElementsType): boolean => {
