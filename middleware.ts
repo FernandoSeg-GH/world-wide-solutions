@@ -5,7 +5,7 @@ import { getToken } from "next-auth/jwt";
 import type { NextRequest } from "next/server";
 
 // Define public routes (those that don't require authentication)
-const publicRoutes = ["/", "/auth/sign-in", "/submit"];
+const publicRoutes = ["/", "/auth/sign-in", "/submit", "/form"];
 
 // Define protected routes (those that require authentication)
 const protectedPaths = [
