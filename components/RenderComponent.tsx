@@ -11,6 +11,7 @@ import { Suspense } from "react";
 import Spinner from "@/components/ui/spinner";
 import { useSession } from "next-auth/react";
 import AdminNotifications from "./business/notifications/AdminNotifications";
+import FormDetails from "./business/forms/FormDetails";
 
 export const RenderComponent = (currentSection: string) => {
     const url = usePathname();
@@ -29,8 +30,10 @@ export const RenderComponent = (currentSection: string) => {
     switch (currentSection) {
         case "Dashboard":
             return <Main />;
-        case "Forms":
+        case "All Forms":
             return <Forms />;
+        case "Form":
+            return <FormDetails />;
         case "Submissions":
             return <Submissions />;
         case "Notifications":

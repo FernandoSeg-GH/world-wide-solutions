@@ -33,7 +33,7 @@ export default function UserMenu() {
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <Avatar className="h-8 w-8">
                         <AvatarFallback>
-                            <BiUserCircle className="h-6 w-6" />
+                            <BiUserCircle className="h-8 w-8" />
                         </AvatarFallback>
                     </Avatar>
                 </Button>

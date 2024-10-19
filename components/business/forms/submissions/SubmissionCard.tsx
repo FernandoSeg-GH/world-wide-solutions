@@ -10,7 +10,7 @@ import SubmissionDetail from './SubmissionDetail';
 interface SubmissionCardProps {
     submission: Submission;
     contentParsed: Record<string, any>;
-    form: Form;
+    form: Form
 }
 
 const SubmissionCard: React.FC<SubmissionCardProps> = ({ form, submission, contentParsed }) => {
@@ -20,11 +20,10 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ form, submission, conte
         setIsExpanded(!isExpanded);
     };
 
-    // Create a fieldMap for form fields
-    const fieldMap = form.fields?.reduce((acc, field) => {
+    const fieldMap: Record<string, string> = form.fields?.reduce((acc, field) => {
         acc[field.id] = field.extraAttributes?.label || field.id;
         return acc;
-    }, {} as Record<string, string>) || {}; // Fallback to an empty object if fields are undefined
+    }, {} as Record<string, string>) || {};
 
     return (
         <Card key={submission.id} className="overflow-hidden shadow-md">

@@ -95,9 +95,8 @@ function SubmissionsTable({ form, admin }: { form: Form, admin?: boolean }) {
     console.log('form', form)
     return (
         <div className="w-full flex flex-col items-start justify-start">
-
-            <div>
-                <h3>Created At: <span>{formattedDate}</span></h3>
+            <div className='mb-3 w-full flex items-center justify-end'>
+                <h3 className='font-semibold'>Created At: <span className='italic'>{formattedDate}</span></h3>
                 <p>{form.published}</p>
             </div>
             <div className="rounded-lg border shadow-sm w-full overflow-x-auto">

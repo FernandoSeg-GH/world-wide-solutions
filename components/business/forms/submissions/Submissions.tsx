@@ -1,9 +1,8 @@
 "use client";
+
 import React, { useEffect } from 'react';
-import SubmissionFormCard from './SubmissionFormCard';
-import SubmissionsTable from './SubmissionTable';
-import Spinner from '@/components/ui/spinner';
 import SubmissionCards from './SubmissionsCards';
+import Spinner from '@/components/ui/spinner';
 import { useAppContext } from '@/context/AppProvider';
 import { useSubmissions } from '@/hooks/forms/useSubmissions';
 import { useSession } from 'next-auth/react';
@@ -35,17 +34,14 @@ function Submissions({ }: Props) {
 
     useEffect(() => {
         if (godMode) {
-
             fetchAllSubmissions();
             getAllBusinesses();
             fetchAllUsers();
             fetchSubscriptionPlans();
-        }
-        else {
-
+        } else {
             const businessId = session?.user.businessId;
             if (businessId) {
-                fetchFormsByBusinessId(businessId)
+                fetchFormsByBusinessId(businessId);
             }
         }
     }, [
@@ -74,7 +70,6 @@ function Submissions({ }: Props) {
         return <Spinner />;
     }
 
-
     const handlePrevious = () => {
         if (currentPage as number > 1) {
             actions.fetchAllSubmissions(currentPage as number - 1);
@@ -87,16 +82,16 @@ function Submissions({ }: Props) {
         }
     };
 
-
     return (
         <div className='px-4'>
             <SectionHeader
-                title={`Submissions`}
+                title="Submissions"
                 subtitle="View form submissions."
             />
             <Separator className="border-gray-400 my-2 mb-6" />
             <div className="mb-12">
-                <SubmissionCards submissions={submissions} forms={forms} />
+                {/* Pass the forms and submissions correctly to the SubmissionCards */}
+                {/* <SubmissionCards submissions={submissions} forms={forms} /> */}
                 <div className="flex justify-between items-center mt-4">
                     <button
                         onClick={handlePrevious}

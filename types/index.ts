@@ -77,7 +77,7 @@ export interface SubscriptionPlan {
 export interface Form {
   id: number;
   name: string;
-  fields: FormField[];
+  fields?: FormField[];
   shareUrl: string;
   businessId: number;
   businessName?: string;
@@ -85,7 +85,7 @@ export interface Form {
   extraAttributes?: Record<string, any>;
   createdAt: string;
   published: boolean;
-  visits: number;
+  visits?: number;
   submissionsCount?: number;
 
   landingPageId?: number;
