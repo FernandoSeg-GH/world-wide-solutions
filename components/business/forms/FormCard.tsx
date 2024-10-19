@@ -217,7 +217,7 @@ export function FormCard({ form }: FormCardProps) {
                         {publishedStatus ? (
                             <Button
                                 className="w-full mt-2 text-md gap-4"
-                                onClick={() => handleNavigate(form.shareUrl)}
+                                onClick={() => handleNavigate(`/forms/${form.shareUrl}`)}
                             >
                                 View submissions <BiRightArrowAlt />
                             </Button>
