@@ -349,6 +349,7 @@ export interface AppContextType {
       ) => Promise<Form | null>;
     };
     createBusiness: (businessData: any) => Promise<boolean>;
+    createUser: (userData: any) => Promise<any>;
     fetchSubmissions: (shareUrl: string, businessId: number) => Promise<void>;
     fetchAllSubmissions: (page?: number) => Promise<Submission[] | null>;
     getFormSubmissionByCaseId: (caseId: string) => Promise<Submission | null>;

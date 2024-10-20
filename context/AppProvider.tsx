@@ -64,7 +64,7 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
     } = useBusiness();
 
     /* USER */
-    const { users, currentUser, loading: userLoading, fetchAllUsers, setCurrentUser } = useUser();
+    const { users, currentUser, loading: userLoading, fetchAllUsers, setCurrentUser, createUser } = useUser();
 
     const [loading, setLoadingState] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
@@ -93,6 +93,7 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         if (formState.form && formState.form.businessId) {
             submissionState.fetchSubmissions(formState.form.shareUrl, formState.form.businessId);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [formState.form, submissionState.fetchSubmissions]);
 
 
@@ -184,6 +185,7 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         editBusiness,
         deleteBusiness,
         fetchAllUsers,
+        createUser: createUser,
         getBusinessById: fetchBusinessById,
         getAllBusinesses: fetchAllBusinesses,
         setIsExpanded: layoutState.setIsExpanded,
@@ -191,16 +193,24 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         switchSection: layoutState.switchSection,
     }), [
         formActions,
-        submissionState,
-        createBusiness,
+        submissionState.getFormSubmissionByCaseId,
+        submissionState.getMissingFields,
+        submissionState.fetchSubmissions,
+        submissionState.fetchAllSubmissions,
+        submissionState.fetchClientSubmissions,
+        formState.fetchFormByShareUrl,
+        formState.fetchFormByShareUrlPublic,
         fetchSubscriptionPlans,
-        fetchAllBusinesses,
-        fetchBusinessById,
+        createBusiness,
         editBusiness,
         deleteBusiness,
-        toggleGodMode,
+        fetchAllUsers,
+        createUser,
+        fetchBusinessById,
+        fetchAllBusinesses,
+        layoutState.setIsExpanded,
         layoutState.switchSection,
-        fetchAllUsers
+        toggleGodMode
     ]);
 
 

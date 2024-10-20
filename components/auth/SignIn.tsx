@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,7 @@ interface SignInProps {
 
 export default function SignIn({ onToggle, callbackUrl }: SignInProps) {
     const [loading, setLoading] = useState(false);
+    const [isRouting, setIsRouting] = useState(false);
     const router = useRouter();
     const { data: session } = useSession();
 
@@ -48,16 +49,10 @@ export default function SignIn({ onToggle, callbackUrl }: SignInProps) {
                 description: "You have successfully signed in.",
             });
             setLoading(false);
+            setIsRouting(true);
             router.push(callbackUrl);
         }
     };
-
-    // useEffect(() => {
-    //     if (session?.user?.role?.id) {
-    //         router.push("/dashboard");
-    //     }
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [session?.user?.role?.id]);
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -87,8 +82,12 @@ export default function SignIn({ onToggle, callbackUrl }: SignInProps) {
                     required
                 />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Signing in..." : "Sign In"}
+            <Button
+                type="submit"
+                className="w-full"
+                disabled={loading || isRouting}
+            >
+                {loading ? "Signing in..." : isRouting ? "Redirecting..." : "Sign In"}
             </Button>
             <Separator />
             <p className="text-sm text-center">

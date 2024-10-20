@@ -39,7 +39,7 @@ function Forms({ }: Props) {
         return <div><Spinner /></div>;
     }
     return (
-        <div className=''>
+        <div className='text-black dark:text-white'>
             <SectionHeader
                 title={` Forms`}
                 subtitle="Create and Manage your business forms to collect data."

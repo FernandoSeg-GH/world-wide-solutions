@@ -14,7 +14,7 @@ function SectionHeader({ title, subtitle, buttons }: Props) {
 
 
     return (
-        <div className='flex items-center justify-between w-full'>
+        <div className='flex items-center justify-between w-full text-black dark:text-white'>
             <div className='w-full'>
                 <h1 className="text-2xl font-bold">
                     {title}

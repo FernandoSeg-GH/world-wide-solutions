@@ -10,7 +10,6 @@ export const useUser = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [users, setUsers] = useState<User[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-
   const fetchAllUsers = useCallback(async () => {
     if (
       !session ||
@@ -22,14 +21,11 @@ export const useUser = () => {
 
     try {
       setLoading(true);
-      const res = await fetch(
-        `/api/users?roleId=${session.user.role.id}&businessId=${session.user.businessId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${session.accessToken}`,
-          },
-        }
-      );
+      const res = await fetch(`/api/users`, {
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      });
 
       if (!res.ok) {
         const errorData = await res.json();
@@ -38,6 +34,7 @@ export const useUser = () => {
 
       const data = await res.json();
       setUsers(data);
+      console.log("users data", data);
       return data;
     } catch (error) {
       console.error("Failed to fetch users:", error);
@@ -83,13 +80,53 @@ export const useUser = () => {
     } finally {
       setLoading(false);
     }
-  }, [session?.accessToken]);
+  }, [session?.accessToken, session?.user?.id]);
 
-  // useEffect(() => {
-  //   if (session?.user?.role.id) {
-  //     fetchCurrentUser();
-  //   } else return;
-  // }, [session?.user?.role.id]);
+  const createUser = useCallback(
+    async (userData: any) => {
+      if (!session?.accessToken) return;
+
+      try {
+        setLoading(true);
+
+        const res = await fetch("/api/users", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.accessToken}`,
+          },
+          body: JSON.stringify({
+            ...userData,
+            role_id: userData.roleId,
+            business_id: userData.businessId,
+          }),
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.message || "Failed to create user");
+        }
+
+        const data = await res.json();
+        toast({
+          title: "Success",
+          description: "User created successfully",
+          variant: "default",
+        });
+        return data;
+      } catch (error) {
+        console.error("Failed to create user:", error);
+        toast({
+          title: "Error",
+          description: "An error occurred while creating the user.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    },
+    [session]
+  );
 
   return {
     users,
@@ -97,5 +134,6 @@ export const useUser = () => {
     loading,
     fetchAllUsers,
     setCurrentUser,
+    createUser,
   };
 };

@@ -29,7 +29,7 @@ const FormDetails = () => {
     }, {} as Record<string, string>);
 
     return (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 text-black dark:text-white">
             <div className='flex items-center justify-between'>
                 <SectionHeader
                     title={`Form: ${form.name}`}

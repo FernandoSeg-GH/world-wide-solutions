@@ -5,7 +5,8 @@ import jwt from "jsonwebtoken";
 
 async function refreshAccessToken(token: JWT) {
   try {
-    const response = await fetch(`/api/auth/refresh`, {
+    const baseUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
+    const response = await fetch(`${baseUrl}/api/auth/refresh`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token.refreshToken}`,

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { useAppContext } from "@/context/AppProvider";
 import { cn } from "@/lib/utils";
-import Logo from "../Logo";
+import Logo from "@/components/Logo";
 import {
     FaHome,
     FaBusinessTime,

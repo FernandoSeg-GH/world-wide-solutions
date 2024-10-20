@@ -73,7 +73,7 @@ export const brand = {
     primary: BrandColors.Cyan,
   },
   neutral: {
-    white: BrandColors.White,
-    black: BrandColors.Black,
+    white: "#FFFFFF",
+    black: "#000000",
   },
 };

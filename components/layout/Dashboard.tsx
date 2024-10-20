@@ -1,22 +1,23 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { Sidebar } from "./Sidebar";
-import { MobileNavbar } from "./MobileNavbar";
-import { Header } from "./Header";
+import { Sidebar } from "./sidebar/Sidebar";
+import { MobileNavbar } from "@/components/layout/navbar/MobileNavbar";
+import { Header } from "@/components/layout/navbar/Header";
 import { useAppContext } from "@/context/AppProvider";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import Spinner from "../ui/spinner";
-import Forms from "../business/forms";
-import Submissions from "../business/forms/submissions";
-import Notifications from "../business/notifications/Notifications";
+import Spinner from "@/components/ui/spinner";
+import Forms from "@/components/business/forms";
+import Submissions from "@/components/business/forms/submissions";
+import Notifications from "@/components/business/notifications/Notifications";
 import Main from "./Main";
-import Businesses from "../business";
-import Leo from "../leo";
-import Vinci from "../vinci/Vinci";
-import FormDetails from "../business/forms/FormDetails";
+import Businesses from "@/components/business";
+import Leo from "@/components/leo";
+import Vinci from "@/components/vinci/Vinci";
+import FormDetails from "@/components/business/forms/FormDetails";
+import Users from "@/components/users";
 
 export const RenderComponent = (currentSection: string) => {
     const url = usePathname();
@@ -42,6 +43,8 @@ export const RenderComponent = (currentSection: string) => {
             return <Submissions />;
         case "Notifications":
             return <Notifications />;
+        case "Users":
+            return <Users />;
         case "Businesses":
             return <Businesses />;
         case "AI Characters":

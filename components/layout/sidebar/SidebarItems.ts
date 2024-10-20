@@ -1,13 +1,22 @@
 import React from "react";
 import { FaHome, FaBusinessTime, FaRobot, FaBell } from "react-icons/fa";
-import { BookText, DnaIcon, NotebookPen } from "lucide-react";
+import {
+  BookText,
+  Briefcase,
+  DnaIcon,
+  NotebookPen,
+  Users2,
+} from "lucide-react";
 
 export interface SidebarItem {
   icon: React.ElementType;
   label: string;
 }
 
-export const getSidebarItems = (godMode: boolean): SidebarItem[] => {
+export const getSidebarItems = (
+  godMode?: boolean,
+  roleId?: number
+): SidebarItem[] => {
   const sidebarItems: SidebarItem[] = [
     {
       icon: FaHome,
@@ -25,7 +34,18 @@ export const getSidebarItems = (godMode: boolean): SidebarItem[] => {
       icon: FaBell,
       label: "Notifications",
     },
+    {
+      icon: FaBell,
+      label: "Notifications",
+    },
   ];
+
+  if (roleId === 3 || roleId === 4) {
+    sidebarItems.push({
+      icon: Users2,
+      label: "Users",
+    });
+  }
 
   if (godMode) {
     sidebarItems.push(

@@ -14,6 +14,7 @@ import {
     DnaIcon,
     CircleDashed,
     NotebookTabs,
+    Users2,
 } from "lucide-react";
 import {
     FaHome,
@@ -40,7 +41,7 @@ export interface SidebarItem {
     subItems?: SidebarItem[];
 }
 
-export const getSidebarItems = (godMode: boolean, forms: Form[]): SidebarItem[] => {
+export const getSidebarItems = (godMode: boolean, forms: Form[], roleId?: number): SidebarItem[] => {
     const sidebarItems: SidebarItem[] = [
         {
             icon: FaHome,
@@ -64,6 +65,14 @@ export const getSidebarItems = (godMode: boolean, forms: Form[]): SidebarItem[] 
         },
     ];
 
+    if (roleId === 3 || roleId === 4) {
+        sidebarItems.push(
+            {
+                icon: Users2,
+                label: "Users",
+            }
+        )
+    }
     if (godMode) {
         sidebarItems.push(
             {
@@ -99,7 +108,7 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
         }
     }, [session?.user.businessId, fetchFormsByBusinessId]);
 
-    const sidebarItems: SidebarItem[] = getSidebarItems(godMode, forms);
+    const sidebarItems: SidebarItem[] = getSidebarItems(godMode, forms, session?.user.role.id);
 
     const toggleSubmenu = (label: string) => {
         setOpenSubmenus((prev) => {

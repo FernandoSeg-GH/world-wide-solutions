@@ -9,10 +9,9 @@ import { Input } from "@/components/ui/input"
 //     BreadcrumbPage,
 //     BreadcrumbSeparator,
 // } from "@/components/ui/breadcrumb"
-import ThemeSwitcher from "../ThemeSwitcher"
-import UserMenu from "../user/UserMenu"
-import { useSession } from "next-auth/react"
-import { useAppContext } from "../../context/AppProvider"
+import ThemeSwitcher from "@/components/ThemeSwitcher"
+import UserMenu from "@/components/users/UserMenu"
+import { useAppContext } from "@/context/AppProvider"
 import { cn } from "@/lib/utils"
 
 // interface Breadcrumb {
