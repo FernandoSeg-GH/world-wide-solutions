@@ -189,14 +189,15 @@ export const useFormState = (initialForm?: Form) => {
       }
       try {
         const response = await fetch(
-          `/api/forms/${
-            session?.user.businessId
-          }/share-url/${encodeURIComponent(shareUrl)}/public`
+          `/api/forms/${businessId}/share-url/${encodeURIComponent(
+            shareUrl
+          )}/public`
         );
         if (!response.ok) {
           throw new Error("Form not found");
         }
         const formData = await response.json();
+        console.log("formData", formData);
         return formData as Form;
       } catch (error) {
         console.error("Error fetching form:", error);

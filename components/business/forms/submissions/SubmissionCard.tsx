@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,8 +9,8 @@ import SubmissionDetail from './SubmissionDetail';
 
 interface SubmissionCardProps {
     submission: Submission;
-    contentParsed: Record<string, any>;
-    form: Form
+    contentParsed: Record<string, { label: string, value: string }>;
+    form: Form;
 }
 
 const SubmissionCard: React.FC<SubmissionCardProps> = ({ form, submission, contentParsed }) => {
@@ -20,13 +20,14 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ form, submission, conte
         setIsExpanded(!isExpanded);
     };
 
+    // **1. Create a fieldMap for form fields**
     const fieldMap: Record<string, string> = form.fields?.reduce((acc, field) => {
         acc[field.id] = field.extraAttributes?.label || field.id;
         return acc;
-    }, {} as Record<string, string>) || {};
+    }, {} as Record<string, string>) || {}; // Fallback to an empty object if fields are undefined
 
     return (
-        <Card key={submission.id} className="overflow-hidden shadow-md">
+        <Card className="overflow-hidden shadow-md mb-4">
             <CardHeader className="flex flex-col bg-muted/50 p-4">
                 <CardTitle className="flex justify-between items-center text-lg font-semibold">
                     Submission ID: {submission.id}

@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -6,7 +6,7 @@ import { Separator } from '@/components/ui/separator';
 import { format } from 'date-fns';
 
 interface SubmissionDetailProps {
-    content: Record<string, any>;
+    content: Record<string, { label: string, value: string }>;
     fieldMap: Record<string, string>;
     createdAt: string | null;
 }
@@ -22,12 +22,10 @@ const SubmissionDetail: React.FC<SubmissionDetailProps> = ({ content, fieldMap, 
         <div className="grid gap-4">
             <h4 className="font-semibold">Submission Details</h4>
             <ul className="grid gap-2">
-                {Object.entries(content).map(([key, value], index) => {
-                    // Add a defensive check for the key
-                    const fieldName = fieldMap?.[key] ?? key; // Use key as fallback if fieldMap doesn't have the key
+                {Object.entries(content).map(([key, { label, value }], index) => {
                     return (
                         <li key={index} className="flex justify-between items-center">
-                            <span className="text-muted-foreground">{fieldName}</span>
+                            <span className="text-muted-foreground">{label}</span>
                             <span>
                                 {typeof value === 'string' && value.length > 50 ? (
                                     <>

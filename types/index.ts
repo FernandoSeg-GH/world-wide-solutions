@@ -100,7 +100,8 @@ export interface Submission {
   userId: number;
   username?: string;
   formUrl: string;
-  content?: Record<string, any>;
+
+  content?: Record<string, { label: string; value: string }>;
   createdAt: string;
 }
 
@@ -193,7 +194,7 @@ export interface FormField {
   type: ElementsType;
   label?: string;
   required?: boolean;
-  extraAttributes: {
+  extraAttributes?: {
     label?: string;
     required?: boolean;
     placeHolder?: string;

@@ -31,7 +31,7 @@ const FormDetails = () => {
         <div className="flex flex-col gap-6">
             <SectionHeader
                 title={`Form: ${form.name}`}
-                subtitle={form.description ? `Description: ${form.description}` : "-"}
+                subtitle={form.description ? `Description: ${form.description}` : "Description: N/A"}
             />
             <Separator className="border-gray-400 my-2 mb-6" />
             <SubmissionsTable form={form} admin={isAdmin} />
@@ -40,7 +40,7 @@ const FormDetails = () => {
             <div className="grid grid-cols-1 gap-4">
                 {submissions.map((submission) => {
                     let contentParsed: Record<string, any> = {};
-
+                    console.log('submission', submission)
                     // Parse submission content
                     if (submission.content) {
                         try {
