@@ -68,6 +68,7 @@ export default function SignIn({ onToggle, callbackUrl }: SignInProps) {
                 <Input
                     id="username"
                     type="text"
+                    className="dark:text-black dark:border-gray-300"
                     value={credentials.username}
                     onChange={(e) =>
                         setCredentials({ ...credentials, username: e.target.value })
@@ -80,6 +81,7 @@ export default function SignIn({ onToggle, callbackUrl }: SignInProps) {
                 <Input
                     id="password"
                     type="password"
+                    className="dark:text-black dark:border-gray-300"
                     value={credentials.password}
                     onChange={(e) =>
                         setCredentials({ ...credentials, password: e.target.value })

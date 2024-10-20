@@ -1,3 +1,4 @@
+import { BrandColors } from "@/types";
 import { type ClassValue, clsx } from "clsx";
 import { formatDistance } from "date-fns";
 import { twMerge } from "tailwind-merge";
@@ -52,4 +53,27 @@ export const getLogoForDomain = (businessId: number) => {
     default:
       return "logo.png";
   }
+};
+
+export const brand = {
+  blue: {
+    primary: BrandColors.BluePrimary,
+    secondary: BrandColors.BlueSecondary,
+  },
+  purple: {
+    primary: BrandColors.Purple,
+  },
+  lightBlue: {
+    primary: BrandColors.LightBlue,
+  },
+  navyBlue: {
+    primary: BrandColors.NavyBlue,
+  },
+  cyan: {
+    primary: BrandColors.Cyan,
+  },
+  neutral: {
+    white: BrandColors.White,
+    black: BrandColors.Black,
+  },
 };

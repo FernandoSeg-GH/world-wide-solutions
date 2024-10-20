@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,10 +12,7 @@ import {
     ChevronRight,
     BookText,
     DnaIcon,
-    NotebookPen,
     CircleDashed,
-    FormInput,
-    Notebook,
     NotebookTabs,
 } from "lucide-react";
 import {
@@ -63,10 +58,6 @@ export const getSidebarItems = (godMode: boolean, forms: Form[]): SidebarItem[] 
                 label: form.name,
             })),
         },
-        // {
-        //     icon: NotebookPen,
-        //     label: "Submissions",
-        // },
         {
             icon: FaBell,
             label: "Notifications",
@@ -99,8 +90,7 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
     const { currentSection, godMode } = data;
     const { forms, fetchFormsByBusinessId } = useFormState();
     const { data: session } = useSession();
-    const router = useRouter();
-    const { setForm } = selectors
+    const { setForm } = selectors;
     const [openSubmenus, setOpenSubmenus] = useState<Set<string>>(new Set());
 
     useEffect(() => {
@@ -146,12 +136,12 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
                                             if (item.subItems && item.subItems.length > 0) {
                                                 toggleSubmenu(item.label);
                                             } else {
-                                                switchSection(item.label); // Add this to switch sections on click
+                                                switchSection(item.label); // Switch section when clicked
                                             }
                                         }}
                                         className={cn(
                                             "flex items-center rounded-lg transition-colors hover:text-foreground w-full",
-                                            currentSection === item.label
+                                            currentSection === item.label || item.subItems?.some(sub => currentSection === sub.label)
                                                 ? "bg-accent text-accent-foreground"
                                                 : "text-muted-foreground",
                                             isExpanded ? "px-3 py-2" : "justify-center py-2"
@@ -196,12 +186,15 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
                                                                 isExpanded ? "px-3 py-2" : "justify-center py-2"
                                                             )}
                                                         >
-                                                            {subItem.icon &&
+                                                            {/* Set consistent size for CircleDashed icon */}
+                                                            {subItem.icon && (
                                                                 React.createElement(subItem.icon, {
-                                                                    className: "h-4 w-4",
-                                                                })}
+                                                                    className: "h-5 w-5", // Set all icons to the same size
+                                                                })
+                                                            )}
+                                                            {/* Adjust text truncation and ensure consistency */}
                                                             {isExpanded && (
-                                                                <span className="ml-2 whitespace-nowrap truncate text-ellipsis pr-2">
+                                                                <span className="ml-2 whitespace-nowrap truncate text-ellipsis pr-2 text-sm">
                                                                     {subItem.label}
                                                                 </span>
                                                             )}
@@ -245,7 +238,6 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
                 />
             )}
         </aside>
-    )
+    );
 }
-
-export default Sidebar;
+export default Sidebar

@@ -32,7 +32,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
 import { useSession } from "next-auth/react";
-import { cn } from "@/lib/utils";
+import { brand, cn } from "@/lib/utils";
 import { useAppContext } from "@/context/AppProvider";
 
 interface FormCardProps {
@@ -138,7 +138,7 @@ export function FormCard({ form }: FormCardProps) {
     return (
         <Card
             className={cn(
-                "w-full",
+                "w-full bg-muted/10 dark:text-gray-100",
                 isAdminRole ? "h-auto" : "h-[210px]"
             )}
         >
@@ -150,7 +150,7 @@ export function FormCard({ form }: FormCardProps) {
                             <div className="flex items-center justify-between w-full gap-2">
                                 <Badge
                                     variant={publishedStatus ? "default" : "outline"}
-                                    className={publishedStatus ? "bg-blue-500" : ""}
+                                    className={publishedStatus ? "" : "text-black dark:text-gray-200 dark:border-gray-400"}
                                 >
                                     <span>{publishedStatus ? "Published" : "Unpublished"}</span>
                                 </Badge>
@@ -196,8 +196,8 @@ export function FormCard({ form }: FormCardProps) {
                     </div>
                 </CardTitle>
             </CardHeader>
-            <CardContent className="truncate text-sm text-muted-foreground flex flex-col justify-between h-auto">
-                <div className="flex items-center justify-between text-muted-foreground text-sm">
+            <CardContent className="truncate text-sm text-muted-foreground dark:text-primary-foreground flex flex-col justify-between h-auto">
+                <div className="flex items-center justify-between text-muted-foreground dark:text-primary-foreground text-sm">
                     <span>{formattedDate}</span>
                     {publishedStatus && (
                         <div className="flex items-center gap-2 mt-1">
@@ -223,7 +223,7 @@ export function FormCard({ form }: FormCardProps) {
                     <div className="flex flex-col w-full">
                         {publishedStatus ? (
                             <Button
-                                className="w-full mt-2 text-md gap-4"
+                                className={`w-full mt-2 text-md gap-4 `}
                                 onClick={handleNavigate}
                             >
                                 Manage <BiRightArrowAlt />
@@ -231,7 +231,7 @@ export function FormCard({ form }: FormCardProps) {
                         ) : (
                             <Button
                                 variant="secondary"
-                                className="w-full mt-2 text-md gap-4"
+                                className="w-full mt-2 text-md gap-4 bg-transparent border text-black hover:bg-primary hover:text-white dark:text-gray-100"
                                 onClick={() => router.push(`/builder/${form.shareUrl}`)}
                             >
                                 Edit form <FaEdit />
@@ -244,54 +244,56 @@ export function FormCard({ form }: FormCardProps) {
                     </div>
                 )}
             </CardFooter>
-            {isAdminRole && (
-                <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>Delete Form</AlertDialogTitle>
+            {
+                isAdminRole && (
+                    <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Delete Form</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Are you sure you want to delete this form? This action will remove the form and all associated submissions permanently and cannot be undone.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
                             <AlertDialogDescription>
-                                Are you sure you want to delete this form? This action will remove the form and all associated submissions permanently and cannot be undone.
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogDescription>
-                            <span>
-                                Please type &quot;
-                                <span className="font-bold">
-                                    DELETE_THE_FORM_AND_ALL_DATA
+                                <span>
+                                    Please type &quot;
+                                    <span className="font-bold">
+                                        DELETE_THE_FORM_AND_ALL_DATA
+                                    </span>
+                                    &quot; below to confirm.
                                 </span>
-                                &quot; below to confirm.
-                            </span>
-                        </AlertDialogDescription>
-                        <input
-                            className="mt-2 w-full border p-2"
-                            type="text"
-                            placeholder="DELETE_THE_FORM_AND_ALL_DATA"
-                            value={deleteInputValue}
-                            onChange={(e) => setDeleteInputValue(e.target.value)}
-                            aria-label="Delete confirmation input"
-                        />
-                        <AlertDialogFooter>
-                            <Button
-                                variant="secondary"
-                                onClick={() => setIsAlertOpen(false)}
-                                className="mr-2"
-                            >
-                                Cancel
-                            </Button>
-                            <Button
-                                variant="destructive"
-                                onClick={handleDelete}
-                                disabled={
-                                    isDeleting || deleteInputValue !== "DELETE_THE_FORM_AND_ALL_DATA"
-                                }
-                            >
-                                {isDeleting ? "Deleting..." : "Delete"}
-                            </Button>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
-            )}
-        </Card>
+                            </AlertDialogDescription>
+                            <input
+                                className="mt-2 w-full border p-2"
+                                type="text"
+                                placeholder="DELETE_THE_FORM_AND_ALL_DATA"
+                                value={deleteInputValue}
+                                onChange={(e) => setDeleteInputValue(e.target.value)}
+                                aria-label="Delete confirmation input"
+                            />
+                            <AlertDialogFooter>
+                                <Button
+                                    variant="secondary"
+                                    onClick={() => setIsAlertOpen(false)}
+                                    className="mr-2"
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    variant="destructive"
+                                    onClick={handleDelete}
+                                    disabled={
+                                        isDeleting || deleteInputValue !== "DELETE_THE_FORM_AND_ALL_DATA"
+                                    }
+                                >
+                                    {isDeleting ? "Deleting..." : "Delete"}
+                                </Button>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                )
+            }
+        </Card >
     );
 }
 

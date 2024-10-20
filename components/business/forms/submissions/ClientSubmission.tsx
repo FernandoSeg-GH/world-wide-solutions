@@ -128,7 +128,7 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
                 className="max-w-[620px] h-auto flex flex-col gap-4 bg-background w-full p-8 overflow-y-auto border shadow-xl shadow-gray-200 rounded mt-20"
             >
                 <div className="flex items-center justify-between">
-                    <Logo />
+                    <Logo horizontal />
                     <div className="flex flex-col items-end justify-end">
                         <h1 className="whitespace-nowrap text-lg font-semibold">Victoria Worldwide Solutions</h1>
                         <p className="text-md">{formattedDate}</p>

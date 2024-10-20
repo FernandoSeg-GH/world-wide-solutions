@@ -12,6 +12,17 @@ import { TitleFieldFormElement } from "@/components/fields/TitleField";
 import { TelephoneFieldFormElement } from "@/components/fields/TelephoneField";
 import { Dispatch, SetStateAction } from "react";
 
+export enum BrandColors {
+  BluePrimary = "#151342", // Deep Blue
+  BlueSecondary = "#242262", // Dark Blue
+  Purple = "#5100B9", // Purple
+  LightBlue = "#5252C6", // Light Blue
+  NavyBlue = "#223499", // Navy Blue
+  Cyan = "#00D9EF", // Cyan
+  White = "#FFFFFF", // White
+  Black = "#000000", // Black
+}
+
 export interface Role {
   id: number;
   name: string;

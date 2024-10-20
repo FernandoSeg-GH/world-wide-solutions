@@ -14,7 +14,7 @@ export default function Main() {
     const { godMode } = useGodMode();
 
     return (
-        <div className="flex h-full w-full flex-col bg-muted/40">
+        <div className="flex h-full w-full flex-col text-black dark:text-white">
 
             <SectionHeader
                 title={<p className="capitalize">Welcome!</p>}

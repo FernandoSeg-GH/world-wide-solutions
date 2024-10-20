@@ -10,14 +10,14 @@ type StatCardProps = {
 
 const StatCard = ({ title, icon, value, description }: StatCardProps) => {
     return (
-        <Card>
+        <Card className='bg-muted/10 dark:text-gray-100'>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium"><span>{title}</span></CardTitle>
                 {icon}
             </CardHeader>
             <CardContent>
                 <div className="text-2xl font-bold">{value}</div>
-                {description && <p className="text-xs text-muted-foreground">{description}</p>}
+                {description && <p className="text-xs text-muted-foreground dark:text-gray-200">{description}</p>}
             </CardContent>
         </Card>
 

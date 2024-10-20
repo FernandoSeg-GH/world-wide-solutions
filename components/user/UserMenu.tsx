@@ -18,6 +18,7 @@ import { Skeleton } from "../ui/skeleton"
 import { useRouter } from "next/navigation"
 import { useAppContext } from "../../context/AppProvider"
 import { cn } from "@/lib/utils"
+import { User2 } from "lucide-react"
 
 export default function UserMenu() {
 
@@ -30,15 +31,15 @@ export default function UserMenu() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8">
-                        <AvatarFallback>
-                            <BiUserCircle className="h-8 w-8" />
+                <Button className="relative h-8 w-8 rounded-full">
+                    <Avatar className="">
+                        <AvatarFallback className="dark:bg-muted/10">
+                            <User2 className="w-40  text-primary dark:text-muted" width={50} height={50} />
                         </AvatarFallback>
                     </Avatar>
                 </Button>
             </DropdownMenuTrigger>
-            {session ? <DropdownMenuContent className="w-56" align="end" forceMount>
+            {session ? <DropdownMenuContent className="w-56 dark:bg-gray-700 dark:text-gray-100" align="end" forceMount>
                 <h2 className="border-b mb-1 p-2 text-sm">
                     Welcome <span className="capitalize">{session.user.name}</span>!
                 </h2>
@@ -54,8 +55,8 @@ export default function UserMenu() {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
-                    <Button variant="ghost" className="flex w-full justify-start p-1 items-center hover:bg-red-50" onClick={() => signOut({ callbackUrl: 'https://world-wide-solutions.vercel.app/auth/sign-in' })}>
-                        <MdClose className="mr-2" /> Logout
+                    <Button variant="ghost" className="flex w-full justify-start items-center px-1 " onClick={() => signOut({ callbackUrl: 'https://world-wide-solutions.vercel.app/auth/sign-in' })}>
+                        <MdClose className="" /> Logout
                     </Button>
                 </DropdownMenuItem>
             </DropdownMenuContent>

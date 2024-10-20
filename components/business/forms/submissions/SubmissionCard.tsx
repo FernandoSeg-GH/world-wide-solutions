@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { DoubleArrowDownIcon, DoubleArrowUpIcon } from '@radix-ui/react-icons';
 import { Form, Submission } from '@/types';
 import SubmissionDetail from './SubmissionDetail';
+import { cn } from '@/lib/utils';
 
 interface SubmissionCardProps {
     submission: Submission;
@@ -27,11 +28,11 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ form, submission, conte
     }, {} as Record<string, string>) || {}; // Fallback to an empty object if fields are undefined
 
     return (
-        <Card className="overflow-hidden shadow-md mb-4">
-            <CardHeader className="flex flex-col bg-muted/50 p-4">
+        <Card className="overflow-hidden shadow-md mb-4 dark:bg-muted/10">
+            <CardHeader className="flex flex-col p-4">
                 <CardTitle className="flex justify-between items-center text-lg font-semibold">
                     Submission ID: {submission.id}
-                    <Button onClick={toggleExpand} variant={isExpanded ? "outline" : "default"}>
+                    <Button onClick={toggleExpand} variant={isExpanded ? "outline" : "default"} className={cn("dark:bg-primary dark:text-white")}>
                         {isExpanded ? 'Collapse' : 'Details'}{' '}
                         {isExpanded ? <DoubleArrowUpIcon width={12} height={12} className='ml-2' /> : <DoubleArrowDownIcon width={12} height={12} className='ml-2' />}
                     </Button>
@@ -41,7 +42,7 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ form, submission, conte
                 </p>
             </CardHeader>
             {isExpanded && (
-                <CardContent className="p-4">
+                <CardContent className="p-4 dark:bg-gray-300">
                     <SubmissionDetail
                         content={contentParsed}
                         fieldMap={fieldMap}

@@ -93,26 +93,26 @@ function SubmissionsTable({ form, admin }: { form: Form, admin?: boolean }) {
 
 
     return (
-        <div className="w-full flex flex-col items-start justify-start">
+        <div className="w-full flex flex-col items-start justify-start ">
             <div className='mb-3 w-full flex items-center justify-end'>
                 <h3 className='font-semibold'>Created At: <span className='italic'>{formattedDate}</span></h3>
                 <p>{form.published}</p>
             </div>
-            <div className="rounded-lg border shadow-sm w-full overflow-x-auto">
+            <div className="rounded-lg border shadow-sm w-full overflow-x-auto dark:bg-muted/10">
                 <Table className={cn("w-full table-auto")}>
-                    <TableHeader>
-                        <TableRow className="bg-gray-100">
+                    <TableHeader className='dark:bg-gray-900'>
+                        <TableRow className="dark:bg-gray-900 ">
                             {fieldKeys.map((fieldKey) => (
-                                <TableHead key={fieldKey} className="uppercase text-sm font-semibold px-6 py-3">
+                                <TableHead key={fieldKey} className="uppercase text-sm font-semibold px-6 py-3 dark:text-gray-100">
                                     {fieldMap[fieldKey] || `Field ${fieldKey}`}
                                 </TableHead>
                             ))}
-                            <TableHead className="uppercase text-sm font-semibold px-6 py-3">Submitted At</TableHead>
+                            {/* <TableHead className="uppercase text-sm font-semibold px-6 py-3">Submitted At</TableHead> */}
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {rows.map((row, index) => (
-                            <TableRow key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                            <TableRow key={index} className={index % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-700'}>
                                 {fieldKeys.map((key) => (
                                     <TableCell key={key} className="px-6 py-4 text-sm text-gray-700">
                                         {row[key] || <span className="text-gray-400">N/A</span>}

@@ -61,10 +61,10 @@ function CreateFormBtn() {
             <DialogTrigger asChild>
                 <Button
                     variant={"outline"}
-                    className="group rounded-xl shadow border border-primary/20 h-[250px] min-w-[280px]  w-full xl:max-w-[380px] items-center justify-center flex flex-col hover:border-primary hover:cursor-pointer border-dashed gap-4"
+                    className="group rounded-xl shadow border border-primary/20 h-[250px] min-w-[280px]  w-full xl:max-w-[380px] items-center justify-center flex flex-col hover:border-primary hover:cursor-pointer hover:bg-muted border-dashed gap-4 hover:text-black dark:bg-primary/50 dark:border-gray-700  dark:hover:bg-primary cursor-pointer"
                 >
-                    <BsFileEarmarkPlus className="h-8 w-8 text-muted-foreground group-hover:text-primary" />
-                    <p className="font-bold text-xl text-muted-foreground group-hover:text-primary">Create new form</p>
+                    <BsFileEarmarkPlus className="h-8 w-8 text-muted-foreground group-hover:text-gray-300 dark:text-gray-300" />
+                    <p className="font-bold text-xl text-muted-foreground group-hover:text-gray-300 dark:text-gray-300">Create new form</p>
                 </Button>
             </DialogTrigger>
             <DialogContent className="w-[90%] md:w-full">
