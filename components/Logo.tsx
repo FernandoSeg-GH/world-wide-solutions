@@ -19,7 +19,6 @@ function Logo({ onClick, horizontal, url }: LogoProps) {
 
   const [isMobile, setIsMobile] = useState(false);
 
-  // Handle mobile responsiveness
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -29,7 +28,6 @@ function Logo({ onClick, horizontal, url }: LogoProps) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Set the title based on the business name or fallback to default
   useEffect(() => {
     if (currentUser?.businessName) {
       setTitle(currentUser.businessName);
@@ -38,7 +36,6 @@ function Logo({ onClick, horizontal, url }: LogoProps) {
     }
   }, [currentUser]);
 
-  // Choose the appropriate logo based on the theme (dark or light)
   const logoSrc = `/assets/${getLogoForDomain(session?.user?.businessId!)}`;
   const logoSrcDark = logoSrc.replace(".png", "-dark.png");
 

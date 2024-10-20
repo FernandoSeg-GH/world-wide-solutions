@@ -136,7 +136,7 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
                                             if (item.subItems && item.subItems.length > 0) {
                                                 toggleSubmenu(item.label);
                                             } else {
-                                                switchSection(item.label); // Switch section when clicked
+                                                switchSection(item.label);
                                             }
                                         }}
                                         className={cn(
@@ -174,8 +174,8 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
                                                                 event.stopPropagation();
                                                                 const selectedForm = forms.find((form) => form.name === subItem.label);
                                                                 if (selectedForm) {
-                                                                    setForm(selectedForm); // Set the selected form
-                                                                    switchSection('FormDetail'); // Switch to 'Forms' section
+                                                                    setForm(selectedForm);
+                                                                    switchSection('FormDetail');
                                                                 }
                                                             }}
                                                             className={cn(
@@ -189,7 +189,7 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
                                                             {/* Set consistent size for CircleDashed icon */}
                                                             {subItem.icon && (
                                                                 React.createElement(subItem.icon, {
-                                                                    className: "h-5 w-5", // Set all icons to the same size
+                                                                    className: "h-5 w-5",
                                                                 })
                                                             )}
                                                             {/* Adjust text truncation and ensure consistency */}

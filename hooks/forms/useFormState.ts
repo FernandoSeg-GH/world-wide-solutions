@@ -217,38 +217,43 @@ export const useFormState = (initialForm?: Form) => {
         });
         return;
       }
-      try {
-        setLoading(true);
+      if (session?.user.businessId) {
+        try {
+          setLoading(true);
 
-        const response = await fetch("/api/forms/publish", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ form_id: form.id, action }),
-        });
+          const response = await fetch(
+            `/api/${session?.user.businessId}/forms/publish`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ form_id: form.id, action }),
+            }
+          );
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(errorText || `Error ${action}ing form.`);
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || `Error ${action}ing form.`);
+          }
+
+          const updatedForm = await response.json();
+          setForm({ ...form, published: action === "publish" });
+
+          toast({
+            title: `Success`,
+            description: `Form has been ${
+              action === "publish" ? "published" : "unpublished"
+            }.`,
+          });
+        } catch (error: any) {
+          toast({
+            title: "Error",
+            description: `Something went wrong`,
+            variant: "destructive",
+          });
+          console.error(`${action} Form Error:`, error);
+        } finally {
+          setLoading(false);
         }
-
-        const updatedForm = await response.json();
-        setForm({ ...form, published: action === "publish" });
-
-        toast({
-          title: `Success`,
-          description: `Form has been ${
-            action === "publish" ? "published" : "unpublished"
-          }.`,
-        });
-      } catch (error: any) {
-        toast({
-          title: "Error",
-          description: `Something went wrong`,
-          variant: "destructive",
-        });
-        console.error(`${action} Form Error:`, error);
-      } finally {
-        setLoading(false);
       }
     },
     [form, setForm]

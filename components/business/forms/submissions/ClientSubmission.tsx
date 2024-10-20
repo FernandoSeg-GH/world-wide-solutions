@@ -45,7 +45,7 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
             return false;
         }
 
-        formErrors.current = {}; // Clear previous errors
+        formErrors.current = {};
 
         for (const field of form.fields) {
             const actualValue = formValues.current[field.id] || "";

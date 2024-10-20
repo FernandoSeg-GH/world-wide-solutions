@@ -1,5 +1,3 @@
-// components/auth/SignIn.tsx
-
 "use client";
 
 import { useState, useEffect } from "react";

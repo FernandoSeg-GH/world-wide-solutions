@@ -5,16 +5,12 @@ import jwt from "jsonwebtoken";
 
 async function refreshAccessToken(token: JWT) {
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/auth/refresh`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token.refreshToken}`,
-        },
-      }
-    );
+    const response = await fetch(`/api/auth/refresh`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token.refreshToken}`,
+      },
+    });
 
     if (!response.ok) {
       throw new Error("Failed to refresh access token");
@@ -23,7 +19,7 @@ async function refreshAccessToken(token: JWT) {
     const refreshedTokens = await response.json();
 
     const decodedAccessToken = jwt.decode(
-      refreshedTokens.access_token
+      refreshedTokens.accessToken
     ) as jwt.JwtPayload;
 
     if (!decodedAccessToken || !decodedAccessToken.exp) {
@@ -32,9 +28,9 @@ async function refreshAccessToken(token: JWT) {
 
     return {
       ...token,
-      accessToken: refreshedTokens.access_token,
+      accessToken: refreshedTokens.accessToken,
       accessTokenExpires: decodedAccessToken.exp * 1000,
-      refreshToken: refreshedTokens.refresh_token,
+      refreshToken: refreshedTokens.refreshToken ?? token.refreshToken,
       businessId: refreshedTokens.user.business_id,
       role: refreshedTokens.user.role,
     };
@@ -95,8 +91,9 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
+    async jwt({ token, user, account }) {
+      console.log("account", account);
+      if (account && user) {
         token.accessToken = user.access_token;
         token.refreshToken = user.refresh_token;
 

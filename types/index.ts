@@ -19,8 +19,6 @@ export enum BrandColors {
   LightBlue = "#5252C6", // Light Blue
   NavyBlue = "#223499", // Navy Blue
   Cyan = "#00D9EF", // Cyan
-  White = "#FFFFFF", // White
-  Black = "#000000", // Black
 }
 
 export interface Role {

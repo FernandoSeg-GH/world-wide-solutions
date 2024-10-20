@@ -7,7 +7,7 @@ import { useSubmissions } from '@/hooks/forms/useSubmissions';
 import { useSession } from 'next-auth/react';
 import { Separator } from '@/components/ui/separator';
 import SectionHeader from '@/components/layout/SectionHeader';
-import SubmissionCard from './SubmissionCard'; // Ensure correct path
+import SubmissionCard from './SubmissionCard';
 
 type Props = {};
 
@@ -32,7 +32,6 @@ function Submissions({ }: Props) {
         fetchSubscriptionPlans,
     } = actions;
 
-    // Fetch initial data based on user role
     useEffect(() => {
         if (godMode) {
             fetchAllSubmissions();
@@ -50,7 +49,6 @@ function Submissions({ }: Props) {
         session?.user.businessId
     ]);
 
-    // Fetch submissions for each form when forms are loaded
     useEffect(() => {
         if (!godMode && forms.length > 0 && session?.user.businessId) {
             forms.forEach((form) => {
@@ -59,7 +57,7 @@ function Submissions({ }: Props) {
         }
     }, [godMode, forms, fetchSubmissionsByFormUrl, session?.user.businessId]);
 
-    // Debugging: Log submissions after fetching
+
     useEffect(() => {
         console.log("Submissions after fetching:", submissions);
     }, [submissions]);
@@ -90,11 +88,10 @@ function Submissions({ }: Props) {
             <div className="mb-12">
                 {/* Iterate over submissions and associate each with its respective form */}
                 {submissions.map((submission) => {
-                    // **1. Find the form associated with this submission**
                     const form = forms.find(f => f.id === submission.formId)
 
                     if (!form) {
-                        // **2. Handle case where form is not found**
+
                         return (
                             <div key={submission.id} className="p-4 bg-red-100 text-red-700 rounded mb-4">
                                 Form not found for submission ID {submission.id}.
@@ -102,7 +99,6 @@ function Submissions({ }: Props) {
                         );
                     }
 
-                    // **3. Parse the content JSON**
                     let contentParsed: Record<string, any> = {};
                     try {
                         contentParsed = JSON.parse(String(submission.content));

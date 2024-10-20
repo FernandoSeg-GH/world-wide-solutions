@@ -21,10 +21,8 @@ const FormDetails = () => {
         return <div>No form selected.</div>;
     }
 
-    // Check if the user has admin rights
     const isAdmin = session?.user.role.id === 4 || session?.user.role.id === 3;
 
-    // Create a fieldMap for form fields
     const fieldMap = form.fields?.reduce((acc, field) => {
         acc[field.id] = field.extraAttributes?.label || field.id;
         return acc;
@@ -52,7 +50,7 @@ const FormDetails = () => {
                 {submissions.map((submission) => {
                     let contentParsed: Record<string, any> = {};
                     console.log('submission', submission)
-                    // Parse submission content
+
                     if (submission.content) {
                         try {
                             contentParsed = JSON.parse(String(submission.content));
@@ -61,7 +59,7 @@ const FormDetails = () => {
                         }
                     }
 
-                    // Render each submission using SubmissionCard
+
                     return (
                         <SubmissionCard
                             key={submission.id}

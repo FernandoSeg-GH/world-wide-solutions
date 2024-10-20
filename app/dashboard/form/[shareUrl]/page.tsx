@@ -1,4 +1,3 @@
-// app/forms/[shareUrl]/page.tsx
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
@@ -27,13 +26,11 @@ export default function FormPage() {
             let fetchedForm: Form | null = null;
 
             if (session?.user?.businessId) {
-                // Fetch form for authenticated users
                 fetchedForm = await formActions.fetchFormByShareUrl(
                     String(shareUrl),
                     session.user.businessId
                 );
             } else {
-                // Fetch public form for unauthenticated users
                 fetchedForm = await formActions.fetchFormByShareUrlPublic(
                     String(shareUrl),
                     Number(session?.user?.businessId || 0)

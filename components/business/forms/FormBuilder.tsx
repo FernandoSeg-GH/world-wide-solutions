@@ -32,13 +32,13 @@ function FormBuilder({ shareUrl }: FormBuilderProps) {
     const toast = useToast();
     const router = useRouter();
     const { data: session } = useSession();
-    const { fetchFormByShareUrl } = useFormState();  // Assuming you have this hook
+    const { fetchFormByShareUrl } = useFormState();
 
     const mouseSensor = useSensor(MouseSensor);
     const touchSensor = useSensor(TouchSensor);
     const sensors = useSensors(mouseSensor, touchSensor);
 
-    // Fetch form data and set it
+
     useEffect(() => {
         const fetchFormData = async () => {
             if (session?.user.businessId) {
@@ -46,12 +46,12 @@ function FormBuilder({ shareUrl }: FormBuilderProps) {
                     setLoading(true);
                     setError(null);
 
-                    // Fetch the form data
+
                     const formData = await fetchFormByShareUrl(shareUrl, session.user.businessId);
                     if (formData) {
                         console.log('formData', formData);
                         setForm(formData);
-                        setElements(formData.fields!);  // Set fields in the Designer
+                        setElements(formData.fields!);
                     } else {
                         setError('Form not found');
                     }
@@ -67,7 +67,7 @@ function FormBuilder({ shareUrl }: FormBuilderProps) {
         fetchFormData();
     }, [shareUrl, session?.user.businessId, fetchFormByShareUrl, setForm, setElements, setError, setLoading]);
 
-    // Handle form publish state
+
     useEffect(() => {
         if (form && form.published === false) {
             setIsPublished(false);
@@ -76,7 +76,7 @@ function FormBuilder({ shareUrl }: FormBuilderProps) {
         }
     }, [form]);
 
-    // Show loading spinner if data is being fetched
+
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center w-full h-full">
@@ -85,7 +85,7 @@ function FormBuilder({ shareUrl }: FormBuilderProps) {
         );
     }
 
-    // Handle case when no form is found
+
     if (!form) {
         return <div>Form not found</div>;
     }

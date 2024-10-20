@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { formatDistance } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { BiRightArrowAlt } from "react-icons/bi";
@@ -9,7 +9,6 @@ import { Badge } from "@/components/ui/badge";
 import {
     Card,
     CardContent,
-    CardDescription,
     CardFooter,
     CardHeader,
     CardTitle,
@@ -32,7 +31,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
 import { useSession } from "next-auth/react";
-import { brand, cn } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { useAppContext } from "@/context/AppProvider";
 
 interface FormCardProps {
@@ -43,7 +42,6 @@ export function FormCard({ form }: FormCardProps) {
     const { data: session } = useSession();
     const [isAlertOpen, setIsAlertOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
-    const [publishedStatus, setPublishedStatus] = useState(form.published);
     const [deleteInputValue, setDeleteInputValue] = useState("");
 
     const { actions, selectors } = useAppContext();
@@ -57,26 +55,20 @@ export function FormCard({ form }: FormCardProps) {
         data: { loading: isPublishing },
     } = useAppContext();
 
-
     const userRoleId = Number(session?.user.role.id);
     const isAdminRole = [2, 3, 4].includes(userRoleId);
 
     const handlePublishToggle = async () => {
-        const action = publishedStatus ? "unpublish" : "publish";
+        const action = form.published ? "unpublish" : "publish";
 
         try {
-            // Make the API call to publish/unpublish
-            const updatedForm = await formActions.publishForm(action);
+            await formActions.publishForm(action);
 
-            // Update the component state to reflect the new published status
-            setPublishedStatus(!publishedStatus);
-
-            // Optionally, update the parent or context if necessary
-            // updateForm(updatedForm);
+            setForm({ ...form, published: !form.published });
 
             toast({
-                title: `Form ${!publishedStatus ? "Published" : "Unpublished"}`,
-                description: `The form has been ${!publishedStatus ? "published" : "unpublished"}.`,
+                title: `Form ${!form.published ? "Published" : "Unpublished"}`,
+                description: `The form has been ${!form.published ? "published" : "unpublished"}.`,
             });
         } catch (error) {
             console.error(`Error ${action}ing form:`, error);
@@ -88,13 +80,11 @@ export function FormCard({ form }: FormCardProps) {
         }
     };
 
-
     const handleDelete = async () => {
         if (deleteInputValue !== "DELETE_THE_FORM_AND_ALL_DATA") {
             toast({
                 title: "Error",
-                description:
-                    "You must type the confirmation text exactly to proceed.",
+                description: "You must type the confirmation text exactly to proceed.",
                 variant: "destructive",
             });
             return;
@@ -126,9 +116,10 @@ export function FormCard({ form }: FormCardProps) {
     };
 
     const handleNavigate = () => {
-        setForm(form); // Set the selected form in context
-        switchSection("FormDetail"); // Switch to the 'FormDetail' section
+        setForm(form);
+        switchSection("FormDetail");
     };
+
     const formattedDate = form.createdAt
         ? formatDistance(new Date(form.createdAt), new Date(), {
             addSuffix: true,
@@ -149,10 +140,10 @@ export function FormCard({ form }: FormCardProps) {
                         {isAdminRole && (
                             <div className="flex items-center justify-between w-full gap-2">
                                 <Badge
-                                    variant={publishedStatus ? "default" : "outline"}
-                                    className={publishedStatus ? "" : "text-black dark:text-gray-200 dark:border-gray-400"}
+                                    variant={form.published ? "default" : "outline"}
+                                    className={form.published ? "" : "text-black dark:text-gray-200 dark:border-gray-400"}
                                 >
-                                    <span>{publishedStatus ? "Published" : "Unpublished"}</span>
+                                    <span>{form.published ? "Published" : "Unpublished"}</span>
                                 </Badge>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
@@ -175,21 +166,20 @@ export function FormCard({ form }: FormCardProps) {
                                         >
                                             {isPublishing
                                                 ? "Processing..."
-                                                : publishedStatus
+                                                : form.published
                                                     ? "Unpublish Form"
                                                     : "Publish Form"}
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
                                             onSelect={() => setIsAlertOpen(true)}
-                                            disabled={publishedStatus}
+                                            disabled={form.published}
                                         >
-                                            {publishedStatus ? "Unpublish to Delete" : "Delete Form"}
+                                            {form.published ? "Unpublish to Delete" : "Delete Form"}
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </div>
                         )}
-
 
                         <h2 className="truncate leading-6 text-ellipsis font-bold">{form.name}</h2>
 
@@ -199,7 +189,7 @@ export function FormCard({ form }: FormCardProps) {
             <CardContent className="truncate text-sm text-muted-foreground dark:text-primary-foreground flex flex-col justify-between h-auto">
                 <div className="flex items-center justify-between text-muted-foreground dark:text-primary-foreground text-sm">
                     <span>{formattedDate}</span>
-                    {publishedStatus && (
+                    {form.published && (
                         <div className="flex items-center gap-2 mt-1">
                             {form.visits !== undefined && (
                                 <div className="flex items-center gap-1">
@@ -221,7 +211,7 @@ export function FormCard({ form }: FormCardProps) {
             <CardFooter>
                 {isAdminRole ? (
                     <div className="flex flex-col w-full">
-                        {publishedStatus ? (
+                        {form.published ? (
                             <Button
                                 className={`w-full mt-2 text-md gap-4 `}
                                 onClick={handleNavigate}
@@ -244,56 +234,54 @@ export function FormCard({ form }: FormCardProps) {
                     </div>
                 )}
             </CardFooter>
-            {
-                isAdminRole && (
-                    <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>Delete Form</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    Are you sure you want to delete this form? This action will remove the form and all associated submissions permanently and cannot be undone.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
+            {isAdminRole && (
+                <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Form</AlertDialogTitle>
                             <AlertDialogDescription>
-                                <span>
-                                    Please type &quot;
-                                    <span className="font-bold">
-                                        DELETE_THE_FORM_AND_ALL_DATA
-                                    </span>
-                                    &quot; below to confirm.
-                                </span>
+                                Are you sure you want to delete this form? This action will remove the form and all associated submissions permanently and cannot be undone.
                             </AlertDialogDescription>
-                            <input
-                                className="mt-2 w-full border p-2"
-                                type="text"
-                                placeholder="DELETE_THE_FORM_AND_ALL_DATA"
-                                value={deleteInputValue}
-                                onChange={(e) => setDeleteInputValue(e.target.value)}
-                                aria-label="Delete confirmation input"
-                            />
-                            <AlertDialogFooter>
-                                <Button
-                                    variant="secondary"
-                                    onClick={() => setIsAlertOpen(false)}
-                                    className="mr-2"
-                                >
-                                    Cancel
-                                </Button>
-                                <Button
-                                    variant="destructive"
-                                    onClick={handleDelete}
-                                    disabled={
-                                        isDeleting || deleteInputValue !== "DELETE_THE_FORM_AND_ALL_DATA"
-                                    }
-                                >
-                                    {isDeleting ? "Deleting..." : "Delete"}
-                                </Button>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
-                )
-            }
-        </Card >
+                        </AlertDialogHeader>
+                        <AlertDialogDescription>
+                            <span>
+                                Please type &quot;
+                                <span className="font-bold">
+                                    DELETE_THE_FORM_AND_ALL_DATA
+                                </span>
+                                &quot; below to confirm.
+                            </span>
+                        </AlertDialogDescription>
+                        <input
+                            className="mt-2 w-full border p-2"
+                            type="text"
+                            placeholder="DELETE_THE_FORM_AND_ALL_DATA"
+                            value={deleteInputValue}
+                            onChange={(e) => setDeleteInputValue(e.target.value)}
+                            aria-label="Delete confirmation input"
+                        />
+                        <AlertDialogFooter>
+                            <Button
+                                variant="secondary"
+                                onClick={() => setIsAlertOpen(false)}
+                                className="mr-2"
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                variant="destructive"
+                                onClick={handleDelete}
+                                disabled={
+                                    isDeleting || deleteInputValue !== "DELETE_THE_FORM_AND_ALL_DATA"
+                                }
+                            >
+                                {isDeleting ? "Deleting..." : "Delete"}
+                            </Button>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            )}
+        </Card>
     );
 }
 

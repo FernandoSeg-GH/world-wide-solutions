@@ -21,11 +21,10 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ form, submission, conte
         setIsExpanded(!isExpanded);
     };
 
-    // **1. Create a fieldMap for form fields**
     const fieldMap: Record<string, string> = form.fields?.reduce((acc, field) => {
         acc[field.id] = field.extraAttributes?.label || field.id;
         return acc;
-    }, {} as Record<string, string>) || {}; // Fallback to an empty object if fields are undefined
+    }, {} as Record<string, string>) || {};
 
     return (
         <Card className="overflow-hidden shadow-md mb-4 dark:bg-muted/10">
