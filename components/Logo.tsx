@@ -46,7 +46,7 @@ function Logo({ onClick }: LogoProps) {
 
   return (
     <div className={cn(
-      "w-full h-auto flex flex-col items-start justify-start p-4  ",
+      "w-auto h-auto flex flex-col items-start justify-start p-4  ",
       // isMobile && "flex-row"
     )}
     >

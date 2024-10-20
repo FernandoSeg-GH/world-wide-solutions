@@ -224,7 +224,7 @@ function DesignerElementWrapper({ element }: DesignerElementWrapperProps) {
       {mouseIsOver && (
         <div className="absolute right-0 h-full ">
           <Button
-            className="flex justify-center h-full border rounded-md rounded-l-none bg-red-500"
+            className="flex justify-center h-full border rounded-md rounded-l-none bg-red-500/60"
             variant={"outline"}
             onClick={(e) => {
               e.stopPropagation();

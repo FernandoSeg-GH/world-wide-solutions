@@ -10,9 +10,12 @@ import { toast } from "@/components/ui/use-toast";
 import Spinner from "@/components/ui/spinner";
 import { useSession } from "next-auth/react";
 import { useFormState } from "@/hooks/forms/useFormState";
+import Logo from "@/components/Logo";
+import { Separator } from "@/components/ui/separator";
+import { format } from "date-fns";
 
 function ClientSubmission({ formUrl }: { formUrl: string }) {
-    const { data, actions: formActions } = useAppContext();
+    const { data } = useAppContext();
     const { data: session } = useSession();
     const { form } = data;
     const { fetchFormByShareUrlPublic } = useFormState();
@@ -53,11 +56,7 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
             }
         }
 
-        if (Object.keys(formErrors.current).length > 0) {
-            return false;
-        }
-
-        return true;
+        return Object.keys(formErrors.current).length === 0;
     }, [form]);
 
     const submitValue = useCallback((key: string, value: string) => {
@@ -67,6 +66,7 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
     const submitForm = async () => {
         formErrors.current = {};
         const validForm = validateForm();
+
         if (!validForm) {
             setRenderKey(new Date().getTime());
             toast({
@@ -106,6 +106,8 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
         }
     };
 
+    const formattedDate = format(new Date(), 'dd MMMM yyyy');
+
     if (submitted) {
         return (
             <div className="flex justify-center w-full h-full items-center p-8">
@@ -123,13 +125,21 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
         <div className="flex flex-col justify-start w-full min-h-screen items-center p-8">
             <div
                 key={renderKey}
-                className="max-w-[620px] h-auto flex flex-col gap-4 bg-background w-full p-8 overflow-y-auto border shadow-xl shadow-gray-200 rounded mt-40"
+                className="max-w-[620px] h-auto flex flex-col gap-4 bg-background w-full p-8 overflow-y-auto border shadow-xl shadow-gray-200 rounded mt-20"
             >
-                <div className="h-auto gap-8">
-                    {form?.fields ? form.fields.map((element) => {
-                        const FormElement = FormElements[element.type]?.formComponent;
-                        return (
-                            FormElement ? (
+                <div className="flex items-center justify-between">
+                    <Logo />
+                    <div className="flex flex-col items-end justify-end">
+                        <h1 className="whitespace-nowrap text-lg font-semibold">Victoria Worldwide Solutions</h1>
+                        <p className="text-md">{formattedDate}</p>
+                    </div>
+                </div>
+                <Separator />
+                <div className="flex flex-col h-auto gap-8">
+                    {form?.fields ? (
+                        form.fields.map((element) => {
+                            const FormElement = FormElements[element.type]?.formComponent;
+                            return FormElement ? (
                                 <FormElement
                                     key={element.id}
                                     elementInstance={element}
@@ -141,24 +151,25 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
                                 <p key={element.id} className="text-red-500">
                                     Unsupported field type: {element.type}
                                 </p>
-                            )
-                        );
-                    }) : <Spinner />}
+                            );
+                        })
+                    ) : (
+                        <Spinner />
+                    )}
                 </div>
                 <Button
                     className="mt-8"
-                    onClick={() => {
-                        startTransition(submitForm);
-                    }}
+                    onClick={() => startTransition(submitForm)}
                     disabled={pending}
                 >
-                    {!pending && (
+                    {!pending ? (
                         <>
                             <HiCursorClick className="mr-2" />
                             Submit
                         </>
+                    ) : (
+                        <ImSpinner2 className="animate-spin" />
                     )}
-                    {pending && <ImSpinner2 className="animate-spin" />}
                 </Button>
             </div>
         </div>

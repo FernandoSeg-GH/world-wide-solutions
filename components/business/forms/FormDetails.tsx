@@ -8,11 +8,14 @@ import { useSession } from 'next-auth/react';
 import SubmissionCard from './submissions/SubmissionCard';
 import SubmissionsTable from './submissions/SubmissionTable';
 import ClientView from './ClientView';
+import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 
 const FormDetails = () => {
     const { data } = useAppContext();
     const { form, submissions } = data;
     const { data: session } = useSession();
+    const router = useRouter()
 
     if (!form) {
         return <div>No form selected.</div>;
@@ -29,10 +32,18 @@ const FormDetails = () => {
 
     return (
         <div className="flex flex-col gap-6">
-            <SectionHeader
-                title={`Form: ${form.name}`}
-                subtitle={form.description ? `Description: ${form.description}` : "Description: N/A"}
-            />
+            <div className='flex items-center justify-between'>
+                <SectionHeader
+                    title={`Form: ${form.name}`}
+                    subtitle={form.description ? `Description: ${form.description}` : "Description: N/A"}
+                    buttons={
+                        <div className='flex items-center gap-2'>
+                            <Button variant="secondary" onClick={() => router.push(`${window.location.origin}/builder/${encodeURIComponent(form.shareUrl)}`)}>Edit Form</Button>
+                            <Button variant="default" onClick={() => router.push(`${window.location.origin}/submit/${encodeURIComponent(form.shareUrl)}`)}>View Form</Button>
+                        </div>
+                    }
+                />
+            </div>
             <Separator className="border-gray-400 my-2 mb-6" />
             <SubmissionsTable form={form} admin={isAdmin} />
             {/* <ClientView /> */}

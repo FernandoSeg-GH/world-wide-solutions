@@ -42,7 +42,7 @@ export default function ClientView({ submissions }: ClientViewProps) {
         <p>No Forms</p>
     }
     return (
-        <div>
+        <div className="">
             <h2 className="text-3xl font-semibold mt-6">Submissions</h2>
             <p className="italic mb-3">Esta sección será editable, y los usuarios podrán actualizar su información:</p>
             <Card className="p-4">

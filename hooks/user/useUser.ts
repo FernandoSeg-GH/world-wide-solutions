@@ -85,11 +85,11 @@ export const useUser = () => {
     }
   }, [session?.accessToken]);
 
-  useEffect(() => {
-    if (session?.user?.id) {
-      fetchCurrentUser();
-    }
-  }, [session?.user?.id, fetchCurrentUser]);
+  // useEffect(() => {
+  //   if (session?.user?.role.id) {
+  //     fetchCurrentUser();
+  //   } else return;
+  // }, [session?.user?.role.id]);
 
   return {
     users,
