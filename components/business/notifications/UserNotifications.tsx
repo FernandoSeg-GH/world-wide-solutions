@@ -1,6 +1,6 @@
 "use client"
 
-import SectionHeader from '@/components/layout/SectionHeader';
+import SectionHeader from '@/components/layout/navbar/SectionHeader';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useEffect, useState } from 'react';

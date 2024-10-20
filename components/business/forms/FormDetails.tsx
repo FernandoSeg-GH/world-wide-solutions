@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useAppContext } from '@/context/AppProvider';
-import SectionHeader from "@/components/layout/SectionHeader";
+import SectionHeader from "@/components/layout/navbar/SectionHeader";;
 import { Separator } from '@/components/ui/separator';
 import { useSession } from 'next-auth/react';
 import SubmissionCard from './submissions/SubmissionCard';

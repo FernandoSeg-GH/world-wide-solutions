@@ -131,7 +131,9 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
             )}
         >
             <div onClick={(event: React.MouseEvent<HTMLDivElement>) => event.stopPropagation()}>
-                <Logo />
+                {
+                    isExpanded ? <Logo url="/assets/vws-hor.png" width={160} className="" /> : <Logo url="/assets/vws.png" width={25} className="" />
+                }
             </div>
             <nav className="flex flex-col gap-4 px-2 py-4">
                 <TooltipProvider>

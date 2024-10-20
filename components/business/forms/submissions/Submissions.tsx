@@ -6,7 +6,7 @@ import { useAppContext } from '@/context/AppProvider';
 import { useSubmissions } from '@/hooks/forms/useSubmissions';
 import { useSession } from 'next-auth/react';
 import { Separator } from '@/components/ui/separator';
-import SectionHeader from '@/components/layout/SectionHeader';
+import SectionHeader from '@/components/layout/navbar/SectionHeader';
 import SubmissionCard from './SubmissionCard';
 
 type Props = {};

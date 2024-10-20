@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from "react";
-import SectionHeader from "../layout/SectionHeader";
+import SectionHeader from "@/components/layout/navbar/SectionHeader";
 import { useAppContext } from "@/context/AppProvider";
 import { useBusiness } from "@/hooks/business/useBusiness";
 import { useUser } from "@/hooks/user/useUser";

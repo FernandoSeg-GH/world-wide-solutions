@@ -10,7 +10,7 @@ import SubmissionFormCard from "@/components/business/forms/submissions/Submissi
 import SubmissionsTable from "@/components/business/forms/submissions/SubmissionTable";
 import ClientView from './ClientView';
 import Spinner from '@/components/ui/spinner';
-import SectionHeader from '@/components/layout/SectionHeader';
+import SectionHeader from '@/components/layout/navbar/SectionHeader';
 import CreateFormBtn from './CreateFormButton';
 import { Skeleton } from '@/components/ui/skeleton';
 import FormCard from './FormCard';

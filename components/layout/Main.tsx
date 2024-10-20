@@ -1,5 +1,5 @@
 'use client';
-import SectionHeader from "@/components/layout/SectionHeader";
+import SectionHeader from "@/components/layout/navbar/SectionHeader";;
 import CreateBusinessForm from "@/components/business/CreateBusinessForm";
 import BusinessesTable from "@/components/business/BusinessesTable";
 import { useGodMode } from "@/hooks/user/useGodMode";
