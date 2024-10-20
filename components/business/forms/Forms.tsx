@@ -60,42 +60,10 @@ function Forms({ }: Props) {
                     ) : null}
                 </div>
 
-
-
-                {/* {forms && forms.length > 0 && session?.user.role.id === 1 ?
-                    <SubmissionFormCard forms={forms} />
-
-                    : <p>No Submissions Form Card Available.</p>} */}
-
-                {/* {forms && forms.length > 0 ?
-                    forms.map((form, index) =>
-                        <SubmissionsTable key={index} form={form} submissions={submissions} admin />
-                    )
-
-                    : <p> No SubmissionsTable Available.</p>} */}
-
                 {forms && session?.user.role.id === 1 ?
                     forms.map((form, index) =>
                         <ClientView key={index} form={form} submissions={submissions ?? []} />
                     ) : null}
-
-
-                {/* <div className="flex flex-col gap-6 w-full">
-                    <div>
-                        {form && session?.user.role.id !== 1 && forms && submissions ?
-                            forms.map((form, index) =>
-                                <SubmissionsTable key={index} form={form} submissions={submissions} admin />
-                            )
-                            : null
-                        }
-                    </div>
-                    <div className="w-full">
-                        {form ?
-                            <ClientView form={form} submissions={submissions ?? []} />
-                            : null
-                        }
-                    </div>
-                </div> */}
             </div>
         </div>
     )

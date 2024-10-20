@@ -81,7 +81,6 @@ export function AppSidebar({ }: AppSidebarProps) {
                         </TooltipProvider>
                     </SidebarMenu>
                 </SidebarGroup>
-                {/* Add more SidebarGroups if needed */}
             </SidebarContent>
             <SidebarFooter className="p-4">
                 <p>Welcome <span className="capitalize">{session?.user.name}</span></p>

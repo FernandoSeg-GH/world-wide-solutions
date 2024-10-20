@@ -107,7 +107,6 @@ function SubmissionsTable({ form, admin }: { form: Form, admin?: boolean }) {
                                     {fieldMap[fieldKey] || `Field ${fieldKey}`}
                                 </TableHead>
                             ))}
-                            {/* <TableHead className="uppercase text-sm font-semibold px-6 py-3">Submitted At</TableHead> */}
                         </TableRow>
                     </TableHeader>
                     <TableBody>

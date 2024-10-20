@@ -74,10 +74,6 @@ export function Dashboard() {
     return (
 
         <div className="flex min-h-screen w-full flex-col bg-muted/10">
-            {/* {!isMobile && (
-                <AppSidebar />
-            )} */}
-            {/* <SidebarTrigger /> */}
             {!isMobile && (
                 <Sidebar isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
             )}

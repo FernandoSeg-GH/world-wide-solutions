@@ -117,7 +117,7 @@ export default function Vinci() {
         <div className="p-4 rounded-lg shadow overflow-auto">
             <h1 className="text-3xl font-bold mb-6">Vinci Database Viewer</h1>
 
-            {/* Users Table */}
+
             <div className="mb-12">
                 <h2 className="text-2xl font-semibold mb-4">Users</h2>
                 <Table className="min-w-full">
@@ -132,7 +132,7 @@ export default function Vinci() {
                             <TableHead>Last Login At</TableHead>
                             <TableHead>Is Active</TableHead>
                             <TableHead>Onboarded</TableHead>
-                            {/* Add other user fields as needed */}
+
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -151,14 +151,14 @@ export default function Vinci() {
                                 </TableCell>
                                 <TableCell>{user.isActive ? "Yes" : "No"}</TableCell>
                                 <TableCell>{user.onboarded ? "Yes" : "No"}</TableCell>
-                                {/* Add other user fields as needed */}
+
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
             </div>
 
-            {/* Roles Table */}
+
             <div className="mb-12">
                 <h2 className="text-2xl font-semibold mb-4">Roles</h2>
                 <Table className="min-w-full">
@@ -166,7 +166,7 @@ export default function Vinci() {
                         <TableRow>
                             <TableHead>ID</TableHead>
                             <TableHead>Name</TableHead>
-                            {/* Add other role fields as needed */}
+
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -174,14 +174,14 @@ export default function Vinci() {
                             <TableRow key={role.id}>
                                 <TableCell>{role.id}</TableCell>
                                 <TableCell>{role.name}</TableCell>
-                                {/* Add other role fields as needed */}
+
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
             </div>
 
-            {/* Businesses Table */}
+
             <div className="mb-12">
                 <h2 className="text-2xl font-semibold mb-4">Businesses</h2>
                 <Table className="min-w-full">
@@ -203,7 +203,7 @@ export default function Vinci() {
                             <TableHead>Business Email</TableHead>
                             <TableHead>Profile Image URL</TableHead>
                             <TableHead>Background Image URL</TableHead>
-                            {/* Add other business fields as needed */}
+
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -289,14 +289,14 @@ export default function Vinci() {
                                         "N/A"
                                     )}
                                 </TableCell>
-                                {/* Add other business fields as needed */}
+
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
             </div>
 
-            {/* Forms Table */}
+
             <div className="mb-12">
                 <h2 className="text-2xl font-semibold mb-4">Forms</h2>
                 {forms && forms.length > 0 ? (
@@ -316,7 +316,7 @@ export default function Vinci() {
                                 <TableHead>Published</TableHead>
                                 <TableHead>Created At</TableHead>
                                 <TableHead>Share URL</TableHead>
-                                {/* Add other form fields as needed */}
+
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -325,13 +325,13 @@ export default function Vinci() {
                                     <TableCell>{form.id}</TableCell>
                                     <TableCell>{form.name}</TableCell>
                                     <TableCell>
-                                        {/* Display fields as JSON string */}
+
                                         <pre className="whitespace-pre-wrap text-xs">
                                             {JSON.stringify(form.fields, null, 2)}
                                         </pre>
                                     </TableCell>
                                     <TableCell>
-                                        {/* Display extra attributes as JSON string */}
+
                                         <pre className="whitespace-pre-wrap text-xs">
                                             {JSON.stringify(form.extraAttributes, null, 2)}
                                         </pre>
@@ -365,7 +365,7 @@ export default function Vinci() {
                                             "N/A"
                                         )}
                                     </TableCell>
-                                    {/* Add other form fields as needed */}
+
                                 </TableRow>
                             ))}
                         </TableBody>
@@ -376,10 +376,10 @@ export default function Vinci() {
 
             </div>
 
-            {/* Submissions Table */}
+
             <div className="mb-12">
                 <h2 className="text-2xl font-semibold mb-4">Submissions</h2>
-                {/* <SubmissionCards  submissions={submissions} forms={forms} /> */}
+
                 <div className="flex justify-between items-center mt-4">
                     <button
                         onClick={handlePrevious}
@@ -401,7 +401,7 @@ export default function Vinci() {
                 </div>
             </div>
 
-            {/* Subscription Plans Table */}
+
             <div className="mb-12">
                 <h2 className="text-2xl font-semibold mb-4">Subscription Plans</h2>
                 <Table className="min-w-full">
@@ -411,7 +411,7 @@ export default function Vinci() {
                             <TableHead>Name</TableHead>
                             <TableHead>Price</TableHead>
                             <TableHead>Features</TableHead>
-                            {/* Add other subscription plan fields as needed */}
+
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -420,7 +420,8 @@ export default function Vinci() {
                                 <TableCell>{plan.id}</TableCell>
                                 <TableCell>{plan.name}</TableCell>
                                 <TableCell>${plan.price}</TableCell>
-                                {/* <TableCell>
+                                {/* </TableCell> 
+                                 
                                     {isStringArray(plan.features) ? (
                                         <ul className="list-disc list-inside">
                                             {plan.features.map((feature, index) => (
@@ -437,15 +438,15 @@ export default function Vinci() {
                                         "N/A"
                                     )}
                                 </TableCell> */}
-                                {/* Add other subscription plan fields as needed */}
+
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
             </div>
 
-            {/* Additional Tables */}
-            {/* You can add similar tables for Roles, Tasks, Messages, Chats, AI Characters, Landing Pages, Social Media Posts, etc., following the same pattern */}
+
+
         </div >
     );
 }

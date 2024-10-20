@@ -141,7 +141,6 @@ export default function SignUp({ onToggle }: { onToggle: () => void }) {
                 </select>
             </div>
 
-            {/* Show business ID field only if role is admin */}
             {formData.roleId === 1 && (
                 <div>
                     <Label htmlFor="businessId">Business ID</Label>

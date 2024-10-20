@@ -86,7 +86,6 @@ function Submissions({ }: Props) {
             />
             <Separator className="border-gray-400 my-2 mb-6" />
             <div className="mb-12">
-                {/* Iterate over submissions and associate each with its respective form */}
                 {submissions.map((submission) => {
                     const form = forms.find(f => f.id === submission.formId)
 

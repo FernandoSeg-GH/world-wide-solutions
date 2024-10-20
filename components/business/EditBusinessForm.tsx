@@ -174,7 +174,6 @@ export default function EditBusinessForm({ businessId }: { businessId: number | 
                                 onChange={handleChange}
                             />
                         </div>
-                        {/* Add more fields as necessary */}
                         <div className="flex space-x-4">
                             <Button type="submit" className="w-full" disabled={loading}>
                                 {loading ? "Saving..." : "Save Changes"}

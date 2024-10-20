@@ -241,14 +241,12 @@ function DesignerElementWrapper({ element }: DesignerElementWrapperProps) {
       )}
 
       <div className="group flex w-full h-[120px] items-center rounded-md bg-accent/40 px-4 py-2">
-        {/* Drag Handle */}
         <div
           ref={dragHandle.setNodeRef}
           {...dragHandle.listeners}
           {...dragHandle.attributes}
           className="mr-4 cursor-grab ease-out duration-300 transition-all opacity-100 group-hover:opacity-100 z-20 flex items-center justify-center p-2"
         >
-          {/* Use a more intuitive drag icon */}
           <GripVertical className="h-5 w-5 text-gray-500" />
         </div>
         <DesignerElement elementInstance={element} />

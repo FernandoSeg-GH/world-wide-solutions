@@ -71,7 +71,6 @@ export function MobileNavbar() {
 
     return (
         <div>
-            {/* Mobile Header */}
             <header className="fixed top-0 left-0 right-0 z-20 flex items-center justify-between bg-background p-4 shadow-md">
                 <Logo />
                 <Button
@@ -84,7 +83,6 @@ export function MobileNavbar() {
                 </Button>
             </header>
 
-            {/* Overlay */}
             {mobileMenuOpen && (
                 <div
                     className="fixed inset-0 z-10 bg-black opacity-50"
@@ -92,7 +90,6 @@ export function MobileNavbar() {
                 ></div>
             )}
 
-            {/* Mobile Navbar */}
             <nav
                 className={cn(
                     "fixed top-0 left-0 z-30 h-full w-64 bg-background transition-transform duration-300",

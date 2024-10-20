@@ -47,7 +47,7 @@ function Logo({ onClick, horizontal, url }: LogoProps) {
     >
       {session?.user.businessId && (
         <>
-          {/* Light Mode Logo */}
+          {/* Light Mode */}
           <Image
             width={isExpanded ? 50 : 25}
             height={isExpanded ? 50 : 25}
@@ -58,7 +58,7 @@ function Logo({ onClick, horizontal, url }: LogoProps) {
             className={cn("block dark:hidden", isExpanded && "w-24 h-24")}
           />
 
-          {/* Dark Mode Logo */}
+          {/* Dark Mode */}
           <Image
             width={isExpanded ? 50 : 25}
             height={isExpanded ? 50 : 25}

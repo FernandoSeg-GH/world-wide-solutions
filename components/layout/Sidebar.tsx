@@ -186,13 +186,11 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
                                                                 isExpanded ? "px-3 py-2" : "justify-center py-2"
                                                             )}
                                                         >
-                                                            {/* Set consistent size for CircleDashed icon */}
                                                             {subItem.icon && (
                                                                 React.createElement(subItem.icon, {
                                                                     className: "h-5 w-5",
                                                                 })
                                                             )}
-                                                            {/* Adjust text truncation and ensure consistency */}
                                                             {isExpanded && (
                                                                 <span className="ml-2 whitespace-nowrap truncate text-ellipsis pr-2 text-sm">
                                                                     {subItem.label}

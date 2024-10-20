@@ -42,10 +42,10 @@ const FormDetails = () => {
                     }
                 />
             </div>
+
             <Separator className="border-gray-400 my-2 mb-6" />
             <SubmissionsTable form={form} admin={isAdmin} />
-            {/* <ClientView /> */}
-            {/* Render submission cards */}
+
             <div className="grid grid-cols-1 gap-4">
                 {submissions.map((submission) => {
                     let contentParsed: Record<string, any> = {};
