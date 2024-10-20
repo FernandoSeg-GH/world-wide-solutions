@@ -10,13 +10,13 @@ type LogoProps = {
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
   horizontal?: boolean;
   url?: string;
-  width: number; // Width is mandatory to control size
+  width: number;
   className?: string;
 };
 
 function Logo({ onClick, horizontal, url, width, className = "" }: LogoProps) {
   const { data: session } = useSession();
-  const [title, setTitle] = useState<string>("Vinci Suite"); // Default title
+  const [title, setTitle] = useState<string>("Vinci Suite");
   const { data } = useAppContext();
   const { isExpanded, currentUser } = data;
   const [isMobile, setIsMobile] = useState(false);
@@ -33,7 +33,7 @@ function Logo({ onClick, horizontal, url, width, className = "" }: LogoProps) {
     handleDarkModeToggle();
 
     window.addEventListener("resize", handleResize);
-    window.addEventListener("change", handleDarkModeToggle); // Update on dark mode change
+    window.addEventListener("change", handleDarkModeToggle);
 
     return () => {
       window.removeEventListener("resize", handleResize);
@@ -47,9 +47,9 @@ function Logo({ onClick, horizontal, url, width, className = "" }: LogoProps) {
     }
   }, [currentUser]);
 
-  // Decide logo source based on the conditions
+
   const getLogoSrc = () => {
-    if (url) return url; // Custom logo URL takes priority
+    if (url) return url;
     return isDarkMode ? "/assets/vws-dark.png" : "/assets/vws.png";
   };
 
@@ -59,20 +59,20 @@ function Logo({ onClick, horizontal, url, width, className = "" }: LogoProps) {
     <div
       onClick={onClick}
       className={cn("w-auto h-auto max-h-[57px] flex flex-col items-start justify-start p-4", className)}
-      style={{ transition: "all 0.3s ease" }} // Smooth transition for container changes
+      style={{ transition: "all 0.3s ease" }}
     >
       {/* Display logo based on the dark mode/light mode */}
       <div
         style={{
-          width: `${width}px`, // Set width dynamically
-          height: `${width}px`, // Set height dynamically to match width
-          transition: "width 0.3s ease, height 0.3s ease", // Smooth transition for the logo size
+          width: `${width}px`,
+          height: `${width}px`,
+          transition: "width 0.3s ease, height 0.3s ease",
         }}
       >
         <Image
-          layout="fixed" // Prevent layout shift during size changes
-          width={width} // Apply dynamic width
-          height={width} // Apply dynamic height (matching the width)
+          layout="fixed"
+          width={width}
+          height={width}
           src={logoSrc}
           alt={title}
           priority
@@ -86,7 +86,7 @@ function Logo({ onClick, horizontal, url, width, className = "" }: LogoProps) {
           "text-left font-semibold whitespace-wrap cursor-pointer mt-1",
           isExpanded ? "block" : "hidden"
         )}
-        style={{ transition: "opacity 0.3s ease" }} // Smooth transition for the title appearance
+        style={{ transition: "opacity 0.3s ease" }}
       >
         {title}
       </h1>

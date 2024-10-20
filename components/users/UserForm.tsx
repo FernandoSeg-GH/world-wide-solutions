@@ -1,8 +1,10 @@
-'use client';
-
 import React, { useState } from "react";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/components/ui/use-toast";
+import { useSession } from "next-auth/react";
 
 type UserFormProps = {
     onSubmit: (userData: { username: string; email: string; password: string; roleId: number; businessId?: number }) => Promise<void>;
@@ -11,29 +13,55 @@ type UserFormProps = {
 };
 
 const UserForm: React.FC<UserFormProps> = ({ onSubmit, businesses, currentUserRole }) => {
-    const [newUser, setNewUser] = useState<{ username: string; email: string; password: string; roleId: number; businessId?: number }>({
+    const { data: session } = useSession();
+    const [formData, setFormData] = useState({
         username: "",
         email: "",
         password: "",
+        confirmPassword: "",
         roleId: 1,
-        businessId: undefined,
+        businessId: session?.user.businessId
     });
+    const [loading, setLoading] = useState(false);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
-        setNewUser((prev) => ({ ...prev, [name]: value }));
-    };
-
-    const handleCreateUser = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        try {
-            await onSubmit({
-                ...newUser,
-                businessId: currentUserRole === 3 ? newUser.businessId : newUser.businessId,
-            });
+        setLoading(true);
+
+
+        if (formData.password !== formData.confirmPassword) {
             toast({
-                title: "User Created",
-                description: `Successfully created user: ${newUser.username}`,
+                title: "Error",
+                description: "Passwords do not match.",
+                variant: "destructive",
+            });
+            setLoading(false);
+            return;
+        }
+
+        if (!session?.user.businessId) {
+            toast({
+                title: "Error",
+                description: "Contact your admin.",
+                variant: "destructive",
+            });
+            setLoading(false);
+            return;
+        }
+
+        try {
+            const payload = {
+                username: formData.username,
+                email: formData.email,
+                password: formData.password,
+                roleId: formData.roleId,
+                businessId: session.user.businessId,
+            };
+
+            await onSubmit(payload);
+            toast({
+                title: "Success",
+                description: "User created successfully.",
             });
         } catch (error) {
             toast({
@@ -42,81 +70,76 @@ const UserForm: React.FC<UserFormProps> = ({ onSubmit, businesses, currentUserRo
                 variant: "destructive",
             });
         }
+
+        setLoading(false);
     };
 
     return (
-        <form onSubmit={handleCreateUser}>
-            <div className="mb-4">
-                <label className="block text-sm font-medium">Username</label>
-                <input
+        <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+                <Label htmlFor="username">Username</Label>
+                <Input
+                    id="username"
                     type="text"
-                    name="username"
-                    className="mt-1 block w-full p-2 border rounded"
-                    value={newUser.username}
-                    onChange={handleChange}
+                    value={formData.username}
+                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                     required
                 />
             </div>
 
-            <div className="mb-4">
-                <label className="block text-sm font-medium">Email</label>
-                <input
+            <div>
+                <Label htmlFor="email">Email</Label>
+                <Input
+                    id="email"
                     type="email"
-                    name="email"
-                    className="mt-1 block w-full p-2 border rounded"
-                    value={newUser.email}
-                    onChange={handleChange}
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     required
                 />
             </div>
 
-            <div className="mb-4">
-                <label className="block text-sm font-medium">Password</label>
-                <input
+            <div>
+                <Label htmlFor="password">Password</Label>
+                <Input
+                    id="password"
                     type="password"
-                    name="password"
-                    className="mt-1 block w-full p-2 border rounded"
-                    value={newUser.password}
-                    onChange={handleChange}
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     required
                 />
             </div>
 
-            <div className="mb-4">
-                <label className="block text-sm font-medium">Role</label>
-                <select
-                    name="roleId"
-                    className="mt-1 block w-full p-2 border rounded"
-                    value={newUser.roleId}
-                    onChange={handleChange}
-                >
-                    <option value={1}>Regular User</option>
-                    <option value={2}>Moderator</option>
-                    <option value={3}>Business Admin</option>
-                </select>
+            <div>
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Input
+                    id="confirmPassword"
+                    type="password"
+                    value={formData.confirmPassword}
+                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                    required
+                />
             </div>
 
-            {currentUserRole === 4 && (
-                <div className="mb-4">
-                    <label className="block text-sm font-medium">Business</label>
-                    <select
-                        name="businessId"
-                        className="mt-1 block w-full p-2 border rounded"
-                        value={newUser.businessId || ""}
-                        onChange={handleChange}
-                        required
-                    >
-                        <option value="">Select a business</option>
-                        {businesses.map((business) => (
-                            <option key={business.id} value={business.id}>
-                                {business.name}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-            )}
+            <div>
+                <Label htmlFor="roleId">Role</Label>
+                <Select
+                    onValueChange={(value) => setFormData({ ...formData, roleId: Number(value) })}
+                    value={String(formData.roleId)}
+                >
+                    <SelectTrigger id="roleId">
+                        <SelectValue placeholder="Select role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="1">User</SelectItem>
+                        <SelectItem value="2">Manager</SelectItem>
+                        <SelectItem value="3">Admin</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
 
-            <Button type="submit">Create User</Button>
+            <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Creating User..." : "Create User"}
+            </Button>
         </form>
     );
 };

@@ -44,6 +44,7 @@ function Submissions({ }: Props) {
                 fetchFormsByBusinessId(businessId);
             }
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         godMode,
         session?.user.businessId

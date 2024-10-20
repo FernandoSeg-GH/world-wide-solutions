@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import SectionHeader from "@/components/layout/navbar/SectionHeader";
 import { useAppContext } from "@/context/AppProvider";
 import { useBusiness } from "@/hooks/business/useBusiness";
@@ -33,6 +33,10 @@ const Users: React.FC = () => {
         setSelectedBusiness(businessId);
     };
 
+    const handleUserCreated = useCallback(async () => {
+        await fetchAllUsers();
+    }, [fetchAllUsers]);
+
     if (userLoading || businessLoading) {
         return <Spinner />;
     }
@@ -43,7 +47,14 @@ const Users: React.FC = () => {
 
             <div className="card shadow-lg p-6 mb-8">
                 <h3 className="text-lg font-semibold mb-4">Create New User</h3>
-                <UserForm onSubmit={createUser} businesses={businesses} currentUserRole={Number(currentUser?.roleId)} />
+                <UserForm
+                    onSubmit={async (userData) => {
+                        await createUser(userData);
+                        handleUserCreated();
+                    }}
+                    businesses={businesses}
+                    currentUserRole={Number(currentUser?.roleId)}
+                />
             </div>
 
             <div className="card shadow-lg p-6">

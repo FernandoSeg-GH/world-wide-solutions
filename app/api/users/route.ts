@@ -53,11 +53,13 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+
   try {
     const { username, email, password, roleId, businessId } = await req.json();
 
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/auth/register`,
+      `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/users/create`,
       {
         method: "POST",
         headers: {
@@ -72,7 +74,16 @@ export async function POST(req: NextRequest) {
         }),
       }
     );
-
+    console.log(
+      "first",
+      JSON.stringify({
+        username,
+        email,
+        password,
+        role_id: roleId,
+        business_id: businessId,
+      })
+    );
     const data = await res.json();
 
     if (!res.ok) {

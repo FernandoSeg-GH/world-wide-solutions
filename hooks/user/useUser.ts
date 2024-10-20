@@ -95,11 +95,7 @@ export const useUser = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${session.accessToken}`,
           },
-          body: JSON.stringify({
-            ...userData,
-            role_id: userData.roleId,
-            business_id: userData.businessId,
-          }),
+          body: JSON.stringify({ ...userData }),
         });
 
         if (!res.ok) {

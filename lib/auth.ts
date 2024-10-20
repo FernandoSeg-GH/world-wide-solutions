@@ -33,7 +33,10 @@ async function refreshAccessToken(token: JWT) {
       accessTokenExpires: decodedAccessToken.exp * 1000,
       refreshToken: refreshedTokens.refreshToken ?? token.refreshToken,
       businessId: refreshedTokens.user.business_id,
-      role: refreshedTokens.user.role,
+      role: {
+        id: refreshedTokens.user.role.id,
+        name: refreshedTokens.user.role.name,
+      },
     };
   } catch (error) {
     console.error("Error refreshing access token:", error);
