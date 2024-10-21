@@ -161,6 +161,11 @@ export function FormCard({ form }: FormCardProps) {
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent>
                                         <DropdownMenuItem
+                                            onSelect={() => window.open(`/submit/${form.shareUrl}`, '_blank')}
+                                        >
+                                            View Form
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
                                             onSelect={handlePublishToggle}
                                             disabled={isPublishing}
                                         >

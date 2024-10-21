@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import React, { useEffect, useState, useCallback, useRef, useTransition } from "react";
 import { FormElements, Form } from "@/types";
 import { Button } from "@/components/ui/button";
 import { HiCursorClick } from "react-icons/hi";
@@ -15,25 +15,28 @@ import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 
 function ClientSubmission({ formUrl }: { formUrl: string }) {
-    const { data } = useAppContext();
-    const { data: session } = useSession();
+    const { data, actions, selectors: { setForm } } = useAppContext();
     const { form } = data;
+    const { data: session } = useSession();
     const { fetchFormByShareUrlPublic } = useFormState();
-
-    useEffect(() => {
-        if (session?.user.businessId) {
-            const fetchData = async () => {
-                await fetchFormByShareUrlPublic(formUrl, Number(session.user.businessId));
-            };
-            fetchData();
-        }
-    }, [formUrl, fetchFormByShareUrlPublic, session?.user.businessId]);
-
     const formValues = useRef<{ [key: string]: string }>({});
     const formErrors = useRef<{ [key: string]: boolean }>({});
     const [renderKey, setRenderKey] = useState(new Date().getTime());
     const [submitted, setSubmitted] = useState(false);
     const [pending, startTransition] = useTransition();
+
+    // Fetch form data
+    useEffect(() => {
+        const fetchData = async () => {
+            if (session?.user.businessId) {
+                const fetchedForm = await fetchFormByShareUrlPublic(formUrl, Number(session.user.businessId));
+                if (fetchedForm) {
+                    setForm(fetchedForm); // Ensure the form data is set properly
+                }
+            }
+        };
+        fetchData();
+    }, [formUrl, fetchFormByShareUrlPublic, session?.user.businessId, setForm]);
 
     const validateForm = useCallback(() => {
         if (!form || !form.fields) {
@@ -47,14 +50,14 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
 
         formErrors.current = {};
 
-        for (const field of form.fields) {
+        form.fields.forEach((field) => {
             const actualValue = formValues.current[field.id] || "";
             const validateFn = FormElements?.[field.type]?.validate;
 
             if (validateFn && !validateFn(field, actualValue)) {
                 formErrors.current[field.id] = true;
             }
-        }
+        });
 
         return Object.keys(formErrors.current).length === 0;
     }, [form]);
@@ -121,14 +124,19 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
         );
     }
 
+    // If form data is not available, show a spinner
+    if (!form) {
+        return <Spinner />;
+    }
+
     return (
-        <div className="flex flex-col justify-start w-full min-h-screen items-center p-8">
+        <div className="flex flex-col justify-start w-full min-h-screen items-center p-8 dark:bg-muted">
             <div
                 key={renderKey}
-                className="max-w-[620px] h-auto flex flex-col gap-4 bg-background w-full p-8 overflow-y-auto border shadow-xl shadow-gray-200 rounded mt-20"
+                className="max-w-[620px] h-auto flex flex-col gap-4 bg-background w-full p-8 overflow-y-auto border shadow-xl shadow-gray-200 rounded-md dark:border-gray-300 my-6 dark:bg-white dark:text-black"
             >
                 <div className="flex items-center justify-between">
-                    <Logo horizontal />
+                    <Logo url="/assets/vws-hor.png" width={160} className="" />
                     <div className="flex flex-col items-end justify-end">
                         <h1 className="whitespace-nowrap text-lg font-semibold">Victoria Worldwide Solutions</h1>
                         <p className="text-md">{formattedDate}</p>
@@ -136,26 +144,22 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
                 </div>
                 <Separator />
                 <div className="flex flex-col h-auto gap-8">
-                    {form?.fields ? (
-                        form.fields.map((element) => {
-                            const FormElement = FormElements[element.type]?.formComponent;
-                            return FormElement ? (
-                                <FormElement
-                                    key={element.id}
-                                    elementInstance={element}
-                                    submitValue={submitValue}
-                                    isInvalid={formErrors.current[element.id]}
-                                    defaultValue={formValues.current[element.id] || ""}
-                                />
-                            ) : (
-                                <p key={element.id} className="text-red-500">
-                                    Unsupported field type: {element.type}
-                                </p>
-                            );
-                        })
-                    ) : (
-                        <Spinner />
-                    )}
+                    {form?.fields?.map((element) => {
+                        const FormElement = FormElements[element.type]?.formComponent;
+                        return FormElement ? (
+                            <FormElement
+                                key={element.id}
+                                elementInstance={element}
+                                submitValue={submitValue}
+                                isInvalid={formErrors.current[element.id]}
+                                defaultValue={formValues.current[element.id] || ""}
+                            />
+                        ) : (
+                            <p key={element.id} className="text-red-500">
+                                Unsupported field type: {element.type}
+                            </p>
+                        );
+                    })}
                 </div>
                 <Button
                     className="mt-8"

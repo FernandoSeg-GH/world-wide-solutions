@@ -10,7 +10,7 @@ type LogoProps = {
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
   horizontal?: boolean;
   url?: string;
-  width: number;
+  width?: number;
   className?: string;
 };
 

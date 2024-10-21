@@ -11,8 +11,10 @@ export function AuthForm() {
 
     return (
         <div className="flex items-center justify-center min-h-screen w-screen p-4 bg-muted dark:bg-muted-dark">
-            <Card className="w-full max-w-md -mt-36 bg-white dark:bg-" >
-                <Logo url="/assets/vws-hor.png" width={200} className="m-auto mt-6" />
+            <Card className="w-full max-w-md -mt-36 bg-white" >
+                <div className="w-full flex items-center justify-center">
+                    <Logo url="/assets/vws-hor.png" width={200} className="m-auto mt-6" />
+                </div>
                 <CardHeader>
                     <CardTitle className="mx-auto text-lg">{isRegistering ? "Sign Up" : "Sign In"}</CardTitle>
                 </CardHeader>
