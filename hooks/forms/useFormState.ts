@@ -306,7 +306,6 @@ export const useFormState = (initialForm?: Form) => {
           return;
         }
         const data = await response.json();
-        console.log("fetching", data);
         setForms(data.forms);
       } catch (error) {
         console.error("Error fetching forms for business:", error);

@@ -41,7 +41,10 @@ export const useSubmissions = () => {
         }
 
         const data = await response.json();
-        setSubmissions(data.submissions as Submission[]);
+        setSubmissions((prev) => [
+          ...prev,
+          ...(data.submissions as Submission[]),
+        ]);
       } catch (error) {
         console.error("Error fetching submissions:", error);
         toast({
@@ -243,7 +246,8 @@ export const useSubmissions = () => {
   );
 
   const fetchSubmissionsByFormUrl = useCallback(
-    async (formUrl: string, businessId: number) => {
+    async (formUrl: string) => {
+      const businessId = session?.user.businessId;
       if (!formUrl || !businessId) {
         console.error("Form URL or Business ID is undefined.");
         toast({
@@ -272,7 +276,8 @@ export const useSubmissions = () => {
         }
 
         const data = await response.json();
-        setSubmissions(data.submissions || []);
+        console.log("Fetched submissions data:", data); // Debugging log
+        setSubmissions(data.submissions);
         setTotalPages(data.pages || 1);
         setCurrentPage(data.page || 1);
       } catch (error: any) {

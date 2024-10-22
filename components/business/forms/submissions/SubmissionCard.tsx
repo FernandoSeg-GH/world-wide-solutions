@@ -1,56 +1,58 @@
-'use client';
+'use client'
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { DoubleArrowDownIcon, DoubleArrowUpIcon } from '@radix-ui/react-icons';
-import { Form, Submission } from '@/types';
-import SubmissionDetail from './SubmissionDetail';
-import { cn } from '@/lib/utils';
+import React, { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { ChevronDown, ChevronUp } from 'lucide-react'
+import { Submission } from '@/types'
+import SubmissionDetail from './SubmissionDetail'
 
 interface SubmissionCardProps {
-    submission: Submission;
-    contentParsed: Record<string, { label: string, value: string }>;
-    form: Form;
+    submission: Submission
+    contentParsed: Record<string, { label: string; value: string | null }>
 }
 
-const SubmissionCard: React.FC<SubmissionCardProps> = ({ form, submission, contentParsed }) => {
-    const [isExpanded, setIsExpanded] = useState<boolean>(false);
+export default function SubmissionCard({ submission, contentParsed }: SubmissionCardProps) {
+    const [isExpanded, setIsExpanded] = useState(false)
 
-    const toggleExpand = () => {
-        setIsExpanded(!isExpanded);
-    };
+    const toggleExpand = () => setIsExpanded(!isExpanded)
 
-    const fieldMap: Record<string, string> = form.fields?.reduce((acc, field) => {
-        acc[field.id] = field.extraAttributes?.label || field.id;
-        return acc;
-    }, {} as Record<string, string>) || {};
+    const filteredContent = Object.entries(contentParsed).filter(
+        ([_, { value }]) => value !== null && value !== 'N/A' && value !== ''
+    )
 
     return (
-        <Card className="overflow-hidden shadow-md mb-4 dark:bg-muted/10">
-            <CardHeader className="flex flex-col p-4">
-                <CardTitle className="flex justify-between items-center text-lg font-semibold">
-                    Submission ID: {submission.id}
-                    <Button onClick={toggleExpand} variant={isExpanded ? "outline" : "default"} className={cn("dark:bg-primary dark:text-white")}>
-                        {isExpanded ? 'Collapse' : 'Details'}{' '}
-                        {isExpanded ? <DoubleArrowUpIcon width={12} height={12} className='ml-2' /> : <DoubleArrowDownIcon width={12} height={12} className='ml-2' />}
-                    </Button>
-                </CardTitle>
-                <p className="text-sm text-muted-foreground">
-                    Form ID: {submission.formId || 'N/A'} - User ID: {submission.userId || 'N/A'}
-                </p>
+        <Card className="mb-4 bg-white dark:bg-muted-dark dark:text-white">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-lg font-semibold">Submission {submission.formId}</CardTitle>
+                <Button onClick={toggleExpand} variant="ghost" size="sm">
+                    {isExpanded ? (
+                        <>
+                            Collapse <ChevronUp className="ml-2 h-4 w-4" />
+                        </>
+                    ) : (
+                        <>
+                            Details <ChevronDown className="ml-2 h-4 w-4" />
+                        </>
+                    )}
+                </Button>
             </CardHeader>
-            {isExpanded && (
-                <CardContent className="p-4 dark:bg-gray-300">
-                    <SubmissionDetail
-                        content={contentParsed}
-                        fieldMap={fieldMap}
-                        createdAt={submission.createdAt}
-                    />
-                </CardContent>
-            )}
+            <CardContent>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                        <span className="font-medium">User ID:</span> {submission.userId}
+                    </div>
+                    <div>
+                        <span className="font-medium">Created At:</span>{' '}
+                        {new Date(submission.createdAt).toLocaleString()}
+                    </div>
+                </div>
+                {isExpanded && (
+                    <div className="mt-4">
+                        <SubmissionDetail content={filteredContent} createdAt={submission.createdAt} />
+                    </div>
+                )}
+            </CardContent>
         </Card>
-    );
-};
-
-export default SubmissionCard;
+    )
+}

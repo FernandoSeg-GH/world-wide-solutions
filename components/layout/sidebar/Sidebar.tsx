@@ -15,6 +15,8 @@ import {
     CircleDashed,
     NotebookTabs,
     Users2,
+    CaptionsIcon,
+    Folders,
 } from "lucide-react";
 import {
     FaHome,
@@ -48,10 +50,6 @@ export const getSidebarItems = (godMode: boolean, forms: Form[], roleId?: number
             label: "Dashboard",
         },
         {
-            icon: NotebookTabs,
-            label: "All Forms",
-        },
-        {
             icon: BookText,
             label: "Forms",
             ...(roleId !== 1 && forms?.length > 0 ? {
@@ -62,13 +60,29 @@ export const getSidebarItems = (godMode: boolean, forms: Form[], roleId?: number
             } : {}),
         },
         {
+            icon: Folders,
+            label: "Submissions",
+        },
+        {
             icon: FaBell,
             label: "Notifications",
         },
     ];
 
+    // if (roleId === 1) {
+    //     sidebarItems.push(
+    //         {
+    //             icon: CaptionsIcon,
+    //             label: "My Submissions",
+    //         }
+    //     )
+    // }
     if (roleId === 2 || roleId === 3 || roleId === 4) {
         sidebarItems.push(
+            {
+                icon: NotebookTabs,
+                label: "All Forms",
+            },
             {
                 icon: Users2,
                 label: "Users",
