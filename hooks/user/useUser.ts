@@ -20,8 +20,6 @@ export const useUser = () => {
     )
       return null;
 
-    console.log("start");
-    console.log("session.accessToken", session.accessToken);
     try {
       setLoading(true);
       const res = await fetch(`/api/users`, {
@@ -29,7 +27,6 @@ export const useUser = () => {
           Authorization: `Bearer ${session.accessToken}`,
         },
       });
-      console.log("res", res);
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.message || "Failed to fetch users");
@@ -37,7 +34,6 @@ export const useUser = () => {
 
       const data = await res.json();
       setUsers(data);
-      console.log("users data", data);
       return data;
     } catch (error) {
       console.error("Failed to fetch users:", error);

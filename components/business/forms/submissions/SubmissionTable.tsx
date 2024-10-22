@@ -19,7 +19,6 @@ function SubmissionsTable({ form, admin }: { form: Form, admin?: boolean }) {
 
     useEffect(() => {
         if (form) {
-            console.log('form', form)
             fetchSubmissions(form.shareUrl, form.businessId);
         }
     }, [form]);

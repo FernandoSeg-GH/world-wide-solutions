@@ -30,8 +30,8 @@ function Forms({ }: Props) {
                     await formActions.fetchAllForms();
                 } else if (session?.user?.businessId && session?.user?.role?.id === 3) {
                     await formActions.fetchFormsByBusinessId(Number(session.user.businessId));
-                }
-                else if (session?.user?.role?.id === 1) {
+                } else if (session?.user?.role?.id === 1) {
+                    console.log("Fetching published forms for business ID:", session.user.businessId);  // Debugging log
                     await formActions.fetchPublishedFormsByBusinessId(Number(session.user.businessId));
                 }
             } catch (error) {
@@ -52,8 +52,13 @@ function Forms({ }: Props) {
         formActions.fetchPublishedFormsByBusinessId
     ]);
 
+    // Log to check the state
+    useEffect(() => {
+        console.log("Forms state:", forms);
+    }, [forms]);
+
     if (loading) {
-        return <div><Spinner /></div>;
+        return <Spinner />;
     }
 
     if (error) {
@@ -69,7 +74,7 @@ function Forms({ }: Props) {
             <Separator className="border-gray-400 my-2 mb-6" />
             <div className="w-full flex flex-col gap-6">
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 2xl:grid-cols-3 5xl:grid-cols-4">
-                    {session?.user.role.id !== 1 && (
+                    {!session?.user.role.id || session?.user.role.id === 1 ? null : (
                         <CreateFormBtn />
                     )}
 
@@ -82,18 +87,14 @@ function Forms({ }: Props) {
                     ) : (
                         <div className="text-center text-gray-500">
                             {session?.user.role.id !== 1
-                                ? "No forms available. Create a new form to get started!"
+                                ? "No forms available."
                                 : "You have no forms available. Please contact your administrator."
                             }
                         </div>
                     )}
                 </div>
 
-                {forms && session?.user.role.id === 1 && (
-                    forms.map((form) =>
-                        <ClientView key={form.id} form={form} submissions={submissions?.filter(sub => sub.formId === form.id) ?? []} />
-                    )
-                )}
+
             </div>
         </div>
     )

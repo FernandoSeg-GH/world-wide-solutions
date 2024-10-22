@@ -49,7 +49,6 @@ const FormDetails = () => {
             <div className="grid grid-cols-1 gap-4">
                 {submissions.map((submission) => {
                     let contentParsed: Record<string, any> = {};
-                    console.log('submission', submission)
 
                     if (submission.content) {
                         try {

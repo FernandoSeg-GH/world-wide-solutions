@@ -25,41 +25,38 @@ const fillableFieldTypes = [
     "TextAreaField",
 ];
 
-export default function ClientView({ submissions }: ClientViewProps) {
+export default function ClientView({ form, submissions }: ClientViewProps) {
     const { data: session, status } = useSession();
-    const { form } = useFormState()
+    const { form: selectedForm } = useFormState();
+
     useEffect(() => {
         if (session?.error === "RefreshAccessTokenError") {
             signIn();
         }
     }, [session]);
-    useEffect(() => {
-        if (form) {
-            console.log('form', form)
-        }
-    }, [form])
+
+
     if (!form || !form.fields) {
-        <p>No Forms</p>
+        return <p>No Forms</p>;
     }
+
     return (
         <div className="">
             <h2 className="text-3xl font-semibold mt-6">Submissions</h2>
-            <p className="italic mb-3">Esta sección será editable, y los usuarios podrán actualizar su información:</p>
+            <p className="italic mb-3">This section is editable, and users can update their information:</p>
             <Card className="p-4">
                 {submissions.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {submissions.map((submission, index) => {
                             let parsedContent: Record<string, any> = {};
                             if (submission.content) {
-                                if (typeof submission.content === 'string') {
-                                    try {
-                                        parsedContent = JSON.parse(submission.content);
-                                    } catch (e) {
-                                        console.error(`Error parsing submission.content for submission ${submission.id}:`, e);
-                                        parsedContent = {};
-                                    }
-                                } else {
-                                    parsedContent = submission.content;
+                                try {
+                                    parsedContent = typeof submission.content === 'string'
+                                        ? JSON.parse(submission.content)
+                                        : submission.content;
+                                } catch (e) {
+                                    console.error(`Error parsing submission.content for submission ${submission.id}:`, e);
+                                    parsedContent = {};
                                 }
                             }
 

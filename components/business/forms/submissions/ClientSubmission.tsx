@@ -82,14 +82,14 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
 
         try {
             const jsonContent = JSON.stringify(formValues.current);
-            const response = await fetch(`/api/forms/submit-form?formUrl=${formUrl}`, {
+            const response = await fetch(`/api/forms/${session?.user.businessId}/submit?formUrl=${formUrl}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({ content: jsonContent }),
             });
-
+            console.log('response', response)
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || "Failed to submit the form");
@@ -114,7 +114,7 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
     if (submitted) {
         return (
             <div className="flex justify-center w-full h-full items-center p-8">
-                <div className="max-w-[620px] flex flex-col gap-4 flex-grow bg-background w-full p-8 overflow-y-auto border shadow-xl shadow-gray-200 rounded">
+                <div className="max-w-[620px] flex flex-col gap-4 flex-grow bg-background w-full p-8 mt-20 lg:mt-40 2xl:mt-56 overflow-y-auto border shadow-xl shadow-gray-200 rounded">
                     <h1 className="text-2xl font-bold">Form submitted</h1>
                     <p className="text-muted-foreground">
                         Thank you for submitting the form. You can close this page now.

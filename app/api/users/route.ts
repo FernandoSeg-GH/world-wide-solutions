@@ -7,7 +7,6 @@ export async function GET(req: NextRequest) {
   if (!session || !session.accessToken) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
-  console.log("session", session);
 
   const roleId = session.user.role.id;
   const businessId = session.user.businessId;
@@ -73,16 +72,6 @@ export async function POST(req: NextRequest) {
           business_id: businessId,
         }),
       }
-    );
-    console.log(
-      "first",
-      JSON.stringify({
-        username,
-        email,
-        password,
-        role_id: roleId,
-        business_id: businessId,
-      })
     );
     const data = await res.json();
 

@@ -121,10 +121,8 @@ export function FormCard({ form }: FormCardProps) {
     };
 
     const formattedDate = form.createdAt
-        ? formatDistance(new Date(form.createdAt), new Date(), {
-            addSuffix: true,
-        })
-        : "Unknown time";
+        ? formatDistance(new Date(form.createdAt), new Date(), { addSuffix: true })
+        : "Unknown";
 
     return (
         <Card
@@ -233,11 +231,7 @@ export function FormCard({ form }: FormCardProps) {
                             </Button>
                         )}
                     </div>
-                ) : (
-                    <div>
-                        <span>You have already submitted this form.</span>
-                    </div>
-                )}
+                ) : null}
             </CardFooter>
             {isAdminRole && (
                 <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>

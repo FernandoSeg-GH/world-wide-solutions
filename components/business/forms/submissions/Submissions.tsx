@@ -59,10 +59,6 @@ function Submissions({ }: Props) {
     }, [godMode, forms, fetchSubmissionsByFormUrl, session?.user.businessId]);
 
 
-    useEffect(() => {
-        console.log("Submissions after fetching:", submissions);
-    }, [submissions]);
-
     if (loading) {
         return <Spinner />;
     }

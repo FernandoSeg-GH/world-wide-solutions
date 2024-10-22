@@ -407,6 +407,7 @@ export const useFormState = (initialForm?: Form) => {
     async (businessId: number): Promise<Form[] | null> => {
       try {
         setLoading(true);
+
         const response = await fetch(`/api/forms/${businessId}/published`, {
           headers: {
             Authorization: `Bearer ${session?.accessToken}`,
@@ -421,7 +422,18 @@ export const useFormState = (initialForm?: Form) => {
         }
 
         const data = await response.json();
-        setForms(data.forms || []); // Assuming the response contains an array of forms
+        console.log("Fetched published forms for role 1:", data); // Debugging log
+
+        // Ensure the data is correctly handled and set the forms state
+        if (data && Array.isArray(data)) {
+          setForms(data);
+        } else if (data?.forms) {
+          setForms(data.forms); // Assuming data contains { forms: [...] }
+        } else {
+          console.error("Unexpected data format:", data);
+          setForms([]); // If no forms found, set an empty array
+        }
+
         return data.forms || null;
       } catch (error) {
         console.error("Error fetching published forms:", error);

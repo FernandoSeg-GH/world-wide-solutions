@@ -126,7 +126,6 @@ function FormBuilder({ shareUrl }: FormBuilderProps) {
 
                     const formData = await fetchFormByShareUrl(shareUrl, session.user.businessId);
                     if (formData) {
-                        console.log('formData', formData);
                         setForm(formData);
                         setElements(formData.fields!);
                     } else {
