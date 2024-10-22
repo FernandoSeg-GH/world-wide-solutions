@@ -349,6 +349,9 @@ export interface AppContextType {
         shareUrl: string,
         businessId: number
       ) => Promise<Form | null>;
+      fetchPublishedFormsByBusinessId: (
+        businessId: number
+      ) => Promise<Form[] | null>;
     };
     createBusiness: (businessData: any) => Promise<boolean>;
     createUser: (userData: any) => Promise<any>;

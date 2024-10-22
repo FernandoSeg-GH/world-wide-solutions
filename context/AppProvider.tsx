@@ -168,6 +168,7 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         fetchAllForms: formState.fetchAllForms,
         fetchFormByShareUrl: formState.fetchFormByShareUrl,
         fetchFormByShareUrlPublic: formState.fetchFormByShareUrlPublic,
+        fetchPublishedFormsByBusinessId: formState.fetchPublishedFormsByBusinessId
     }), [formState]);
 
 

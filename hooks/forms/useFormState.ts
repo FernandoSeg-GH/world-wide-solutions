@@ -288,7 +288,6 @@ export const useFormState = (initialForm?: Form) => {
       }
       return null;
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [session?.user.businessId]
   );
 
@@ -296,22 +295,18 @@ export const useFormState = (initialForm?: Form) => {
     async (businessId: number) => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/business/${businessId}`, {
-          headers: {
-            Authorization: `Bearer ${session?.accessToken}`,
-          },
-        });
+        const response = await fetch(`/api/forms/${businessId}`);
 
-        const data = await response.json();
         if (!response.ok) {
           toast({
             title: "Error",
-            description:
-              data.message || "Failed to fetch forms for this business.",
+            description: "Failed to fetch forms for this business.",
             variant: "destructive",
           });
           return;
         }
+        const data = await response.json();
+        console.log("fetching", data);
         setForms(data.forms);
       } catch (error) {
         console.error("Error fetching forms for business:", error);
@@ -408,6 +403,37 @@ export const useFormState = (initialForm?: Form) => {
     [session]
   );
 
+  const fetchPublishedFormsByBusinessId = useCallback(
+    async (businessId: number): Promise<Form[] | null> => {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/forms/${businessId}/published`, {
+          headers: {
+            Authorization: `Bearer ${session?.accessToken}`,
+          },
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(
+            errorData.message || "Failed to fetch published forms"
+          );
+        }
+
+        const data = await response.json();
+        setForms(data.forms || []); // Assuming the response contains an array of forms
+        return data.forms || null;
+      } catch (error) {
+        console.error("Error fetching published forms:", error);
+        setError(String(error) || "An error occurred");
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [session?.accessToken]
+  );
+
   return {
     form,
     forms,
@@ -432,7 +458,7 @@ export const useFormState = (initialForm?: Form) => {
     saveForm,
     publishForm,
     deleteForm,
-
+    fetchPublishedFormsByBusinessId,
     fetchFormsByBusinessId,
     fetchAllForms,
     fetchFormByShareUrl,

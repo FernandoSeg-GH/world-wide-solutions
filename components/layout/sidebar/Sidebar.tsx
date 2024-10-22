@@ -54,10 +54,12 @@ export const getSidebarItems = (godMode: boolean, forms: Form[], roleId?: number
         {
             icon: BookText,
             label: "Forms",
-            subItems: forms.map((form) => ({
-                icon: CircleDashed,
-                label: form.name,
-            })),
+            ...(roleId !== 1 && forms?.length > 0 ? {
+                subItems: forms.map((form) => ({
+                    icon: CircleDashed,
+                    label: form.name,
+                }))
+            } : {}),
         },
         {
             icon: FaBell,
@@ -65,7 +67,7 @@ export const getSidebarItems = (godMode: boolean, forms: Form[], roleId?: number
         },
     ];
 
-    if (roleId === 3 || roleId === 4) {
+    if (roleId === 2 || roleId === 3 || roleId === 4) {
         sidebarItems.push(
             {
                 icon: Users2,
