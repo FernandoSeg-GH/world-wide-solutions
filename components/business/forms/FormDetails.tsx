@@ -64,7 +64,7 @@ const FormDetails = () => {
                             key={submission.id}
                             submission={submission}
                             contentParsed={contentParsed}
-                            form={form}
+                        // form={form}
                         />
                     );
                 })}

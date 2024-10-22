@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,7 +9,7 @@ import SubmissionDetail from './SubmissionDetail';
 
 interface SubmissionCardProps {
     submission: Submission;
-    contentParsed: Record<string, any>;
+    contentParsed: Record<string, { label: string; value: string | null }>;
     form: Form;
 }
 
@@ -24,6 +24,9 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ form, submission, conte
         acc[field.id] = field.extraAttributes?.label || field.id;
         return acc;
     }, {} as Record<string, string>) || {};
+
+    // Transform contentParsed from Record<string, { label: string; value: string | null }> to an array
+    const contentArray = Object.entries(contentParsed) as [string, { label: string; value: string | null }][];
 
     return (
         <Card key={submission.id} className="overflow-hidden shadow-md">
@@ -42,7 +45,7 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ form, submission, conte
             {isExpanded && (
                 <CardContent className="p-4">
                     <SubmissionDetail
-                        content={contentParsed}
+                        content={contentArray} // Pass the transformed array
                         fieldMap={fieldMap}
                         createdAt={submission.createdAt}
                     />

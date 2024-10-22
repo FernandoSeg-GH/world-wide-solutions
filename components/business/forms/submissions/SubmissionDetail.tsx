@@ -1,28 +1,28 @@
-'use client'
+'use client';
 
-import React from 'react'
-import { format } from 'date-fns'
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { format } from 'date-fns';
 
 interface SubmissionDetailProps {
-    content: Array<[string, { label: string; value: string | null }]>
-    createdAt: string | null
+    content: [string, { label: string; value: string | null }][];
+    fieldMap?: Record<string, string>; // Make fieldMap optional
+    createdAt: string | null;
 }
 
-export default function SubmissionDetail({ content, createdAt }: SubmissionDetailProps) {
+const SubmissionDetail: React.FC<SubmissionDetailProps> = ({ content, fieldMap, createdAt }) => {
     return (
-        <div className="space-y-2">
-            <p className="text-sm">
-                <span className="font-medium">Created At:</span>{' '}
-                {createdAt ? format(new Date(createdAt), 'PPpp') : 'N/A'}
-            </p>
-            <div className="grid gap-2">
+        <div>
+            <p><strong>Created At:</strong> {createdAt ? format(new Date(createdAt), 'PPpp') : 'N/A'}</p>
+            <div>
                 {content.map(([key, { label, value }]) => (
-                    <div key={key} className="grid grid-cols-2 gap-2 text-sm">
-                        <span className="font-medium">{label}:</span>
-                        <span>{value}</span>
+                    <div key={key} style={{ marginBottom: '5px' }}>
+                        <strong>{label}:</strong> {value ?? 'N/A'}
                     </div>
                 ))}
             </div>
         </div>
-    )
-}
+    );
+};
+
+export default SubmissionDetail;
