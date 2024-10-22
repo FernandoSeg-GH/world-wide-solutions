@@ -69,7 +69,7 @@ module.exports = {
           foreground: "#475569", // Muted text color
         },
         accent: {
-          DEFAULT: "#00D9EF", // Accent Cyan for light mode
+          DEFAULT: "#ffffff", // Accent Cyan for light mode
           dark: "#00b9cc", // Muted Cyan for dark mode
           foreground: "#000000", // Black for text in both modes
         },

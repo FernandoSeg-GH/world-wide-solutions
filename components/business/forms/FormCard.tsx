@@ -129,7 +129,7 @@ export function FormCard({ form }: FormCardProps) {
     return (
         <Card
             className={cn(
-                "w-full bg-muted/10 dark:text-gray-100",
+                "w-full bg-muted/10 dark:text-gray-100 min-w-[300px]",
                 isAdminRole ? "h-auto" : "h-[210px]"
             )}
         >
@@ -192,7 +192,7 @@ export function FormCard({ form }: FormCardProps) {
                 </CardTitle>
             </CardHeader>
             <CardContent className="truncate text-sm text-muted-foreground dark:text-primary-foreground flex flex-col justify-between h-auto">
-                <div className="flex items-center justify-between text-muted-foreground dark:text-primary-foreground text-sm">
+                <div className="flex items-center justify-between text-muted-foreground dark:text-primary-foreground text-sm ">
                     <span>{formattedDate}</span>
                     {form.published && (
                         <div className="flex items-center gap-2 mt-1">
@@ -211,7 +211,7 @@ export function FormCard({ form }: FormCardProps) {
                         </div>
                     )}
                 </div>
-                <p className="min-h-[20px]">{form.description}</p>
+                <p className="min-h-[20px] text-wrap line-clamp-2">{form.description}</p>
             </CardContent>
             <CardFooter>
                 {isAdminRole ? (

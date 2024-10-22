@@ -46,7 +46,7 @@ function Forms({ }: Props) {
             />
             <Separator className="border-gray-400 my-2 mb-6" />
             <div className="w-full flex flex-col gap-6">
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 2xl:grid-cols-3 5xl:grid-cols-4">
                     {!loading && session?.user.role.id !== 1 ? (
                         <CreateFormBtn />
                     ) : null}

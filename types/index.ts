@@ -1,15 +1,15 @@
-import { CheckboxFieldFormElement } from "@/components/fields/CheckboxField";
-import { DateFieldFormElement } from "@/components/fields/DateField";
-import { NumberFieldFormElement } from "@/components/fields/NumberField";
-import { ParagraphFieldFormElement } from "@/components/fields/ParagraphField";
-import { SelectFieldFormElement } from "@/components/fields/SelectField";
-import { SeparatorFieldFormElement } from "@/components/fields/SeparatorField";
-import { SpacerFieldFormElement } from "@/components/fields/SpacerField";
-import { SubTitleFieldFormElement } from "@/components/fields/SubTitleField";
-import { TextAreaFormElement } from "@/components/fields/TextAreaField";
-import { TextFieldFormElement } from "@/components/fields/TextField";
-import { TitleFieldFormElement } from "@/components/fields/TitleField";
-import { TelephoneFieldFormElement } from "@/components/fields/TelephoneField";
+import { CheckboxFieldFormElement } from "@/components/business/forms/fields/CheckboxField";
+import { DateFieldFormElement } from "@/components/business/forms/fields/DateField";
+import { NumberFieldFormElement } from "@/components/business/forms/fields/NumberField";
+import { ParagraphFieldFormElement } from "@/components/business/forms/fields/ParagraphField";
+import { SelectFieldFormElement } from "@/components/business/forms/fields/SelectField";
+import { SeparatorFieldFormElement } from "@/components/business/forms/fields/SeparatorField";
+import { SpacerFieldFormElement } from "@/components/business/forms/fields/SpacerField";
+import { SubTitleFieldFormElement } from "@/components/business/forms/fields/SubTitleField";
+import { TextAreaFormElement } from "@/components/business/forms/fields/TextAreaField";
+import { TextFieldFormElement } from "@/components/business/forms/fields/TextField";
+import { TitleFieldFormElement } from "@/components/business/forms/fields/TitleField";
+import { TelephoneFieldFormElement } from "@/components/business/forms/fields/TelephoneField";
 import { Dispatch, SetStateAction } from "react";
 
 export enum BrandColors {

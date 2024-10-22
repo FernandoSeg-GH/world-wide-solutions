@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useEffect, useState } from "react";
 import { useAppContext } from "@/context/AppProvider";
@@ -6,7 +6,7 @@ import PreviewDialogBtn from "./PreviewDialogBtn";
 import SaveFormBtn from "./SaveFormBtn";
 import Designer from "@/components/builder/Designer";
 import { Input } from "@/components/ui/input";
-import { DndContext, MouseSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { DndContext, DragEndEvent, MouseSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { ImSpinner2 } from "react-icons/im";
 import DragOverlayWrapper from "@/components/builder/DragOverlayWrapper";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,10 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
 import { useSession } from 'next-auth/react';
 import { useFormState } from '@/hooks/forms/useFormState';
-import { Form } from "@/types";
+import { ElementsType, Form, FormElements } from "@/types";
+import { idGenerator } from "@/lib/idGenerator";
+import { ChevronLeftCircle } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 type FormBuilderProps = {
     shareUrl: string,
@@ -23,7 +26,7 @@ type FormBuilderProps = {
 function FormBuilder({ shareUrl }: FormBuilderProps) {
     const {
         selectors: { handleFormNameChange, setSelectedElement, setElements, setLoading, setError, setForm },
-        data: { unsavedChanges, loading, form },
+        data: { unsavedChanges, loading, form, elements }, // Include elements here
         actions: { formActions },
     } = useAppContext();
 
@@ -38,6 +41,81 @@ function FormBuilder({ shareUrl }: FormBuilderProps) {
     const touchSensor = useSensor(TouchSensor);
     const sensors = useSensors(mouseSensor, touchSensor);
 
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+
+        if (!active || !over) return;
+
+        const isDesignerBtnElement = active.data?.current?.isDesignerBtnElement;
+        const isDroppingOverDesignerDropArea = over.data?.current?.isDesignerDropArea;
+
+        const droppingSidebarBtnOverDesignerDropArea =
+            isDesignerBtnElement && isDroppingOverDesignerDropArea;
+
+        if (droppingSidebarBtnOverDesignerDropArea) {
+            const type = active.data?.current?.type;
+            const newElement = FormElements[type as ElementsType].construct(idGenerator());
+
+            formActions.addElement(elements.length, newElement); // Use elements here
+            return;
+        }
+
+        const isDroppingOverDesignerElementTopHalf = over.data?.current?.isTopHalfDesignerElement;
+        const isDroppingOverDesignerElementBottomHalf = over.data?.current?.isBottomHalfDesignerElement;
+        const isDroppingOverDesignerElement =
+            isDroppingOverDesignerElementTopHalf || isDroppingOverDesignerElementBottomHalf;
+
+        const droppingSidebarBtnOverDesignerElement =
+            isDesignerBtnElement && isDroppingOverDesignerElement;
+
+        if (droppingSidebarBtnOverDesignerElement) {
+            const type = active.data?.current?.type;
+            const newElement = FormElements[type as ElementsType].construct(idGenerator());
+
+            const overId = over.data?.current?.elementId;
+            const overElementIndex = elements.findIndex((el) => el.id === overId); // Use elements here
+            if (overElementIndex === -1) {
+                console.error("Element not found for dropping:", overId);
+                return;
+            }
+
+            let indexForNewElement = overElementIndex;
+            if (isDroppingOverDesignerElementBottomHalf) {
+                indexForNewElement = overElementIndex + 1;
+            }
+
+            formActions.addElement(indexForNewElement, newElement);
+            return;
+        }
+
+        const isDraggingDesignerElement = active.data?.current?.isDesignerElement;
+        const draggingDesignerElementOverAnotherDesignerElement =
+            isDroppingOverDesignerElement && isDraggingDesignerElement;
+
+        if (draggingDesignerElementOverAnotherDesignerElement) {
+            const activeId = active.data?.current?.elementId;
+            const overId = over.data?.current?.elementId;
+
+            const activeElementIndex = elements.findIndex((el) => el.id === activeId); // Use elements here
+            const overElementIndex = elements.findIndex((el) => el.id === overId);
+
+            if (activeElementIndex === -1 || overElementIndex === -1) {
+                console.error("Element not found for reordering:", activeId, overId);
+                return;
+            }
+
+            const activeElement = { ...elements[activeElementIndex] };
+            formActions.removeElement(activeId);
+
+            let indexForNewElement = overElementIndex;
+            if (isDroppingOverDesignerElementBottomHalf) {
+                indexForNewElement = overElementIndex + 1;
+            }
+
+            formActions.addElement(indexForNewElement, activeElement);
+        }
+    };
+
 
     useEffect(() => {
         const fetchFormData = async () => {
@@ -45,7 +123,6 @@ function FormBuilder({ shareUrl }: FormBuilderProps) {
                 try {
                     setLoading(true);
                     setError(null);
-
 
                     const formData = await fetchFormByShareUrl(shareUrl, session.user.businessId);
                     if (formData) {
@@ -93,10 +170,22 @@ function FormBuilder({ shareUrl }: FormBuilderProps) {
     const shareUrlLink = `${window.location.origin}/submit/${encodeURIComponent(form.name)}`;
 
     return (
-        <DndContext sensors={sensors}>
+        <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
             <main className="flex flex-col w-full min-h-screen">
                 <nav className="flex justify-between border-b-2 p-4 gap-3 items-center">
                     <div className="flex items-center gap-2">
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button variant="outline" onClick={() => router.push("/dashboard")}>
+                                        <ChevronLeftCircle />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Back Home</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                         <span className="text-muted-foreground mr">Form:</span>
                         {isEditingName ? (
                             <Input
@@ -135,7 +224,7 @@ function FormBuilder({ shareUrl }: FormBuilderProps) {
                         ) : null}
                     </div>
                 </nav>
-                <div className="flex w-full flex-grow items-center justify-center relative overflow-y-auto h-[210px] bg-accent bg-[url(/paper.svg)] dark:bg-[url(/paper-dark.svg)]">
+                <div className="flex w-full flex-grow items-center justify-center relative overflow-y-auto h-[210px] bg-transparent bg-[url(/paper.svg)] dark:bg-[url(/paper-dark.svg)]">
                     <Designer />
                 </div>
             </main>

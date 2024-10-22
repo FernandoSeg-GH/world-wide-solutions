@@ -1,16 +1,16 @@
 "use client";
 
 import { ElementsType, FormElement, FormElementInstance } from "@/components/business/forms/FormElements";
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { LuHeading1 } from "react-icons/lu";
-import { useAppContext } from "../../context/AppProvider";
+import { useAppContext } from "@/context/AppProvider";
 
 const type: ElementsType = "TitleField";
 
@@ -97,7 +97,7 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
                 onSubmit={(e) => {
                     e.preventDefault();
                 }}
-                className="space-y-3"
+                className="space-y-3 "
             >
                 <FormField
                     control={form.control}

@@ -10,6 +10,7 @@ export const useUser = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [users, setUsers] = useState<User[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+
   const fetchAllUsers = useCallback(async () => {
     if (
       !session ||
@@ -19,6 +20,8 @@ export const useUser = () => {
     )
       return null;
 
+    console.log("start");
+    console.log("session.accessToken", session.accessToken);
     try {
       setLoading(true);
       const res = await fetch(`/api/users`, {
@@ -26,7 +29,7 @@ export const useUser = () => {
           Authorization: `Bearer ${session.accessToken}`,
         },
       });
-
+      console.log("res", res);
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.message || "Failed to fetch users");
@@ -85,7 +88,6 @@ export const useUser = () => {
   const createUser = useCallback(
     async (userData: any) => {
       if (!session?.accessToken) return;
-
       try {
         setLoading(true);
 

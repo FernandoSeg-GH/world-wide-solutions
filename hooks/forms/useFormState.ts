@@ -222,7 +222,7 @@ export const useFormState = (initialForm?: Form) => {
           setLoading(true);
 
           const response = await fetch(
-            `/api/${session?.user.businessId}/forms/publish`,
+            `/api/forms/${session?.user.businessId}/publish`,
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -375,7 +375,7 @@ export const useFormState = (initialForm?: Form) => {
         };
 
         const response = await fetch(
-          `/api/forms/${session.user.businessId}/shar-url/create`,
+          `/api/forms/${session.user.businessId}/share-url/create`,
           {
             method: "POST",
             headers: {

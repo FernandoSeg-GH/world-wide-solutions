@@ -1,10 +1,10 @@
 "use client";
 
 import { ElementsType, FormElement, FormElementInstance } from "@/components/business/forms/FormElements";
-import { Label } from "../ui/label";
+import { Label } from "@/components/ui/label";
 
 import { RiSeparator } from "react-icons/ri";
-import { Separator } from "../ui/separator";
+import { Separator } from "@/components/ui/separator";
 
 const type: ElementsType = "SeparatorField";
 

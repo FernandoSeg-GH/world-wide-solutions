@@ -42,7 +42,7 @@ function CreateFormBtn() {
 
             });
 
-            if (result?.formId && result?.shareUrl) {
+            if (result && result.formId && result.shareUrl) {
                 setTimeout(() => {
                     router.push(`/builder/${result.shareUrl}`);
                 }, 1000);
@@ -61,7 +61,7 @@ function CreateFormBtn() {
             <DialogTrigger asChild>
                 <Button
                     variant={"outline"}
-                    className="group rounded-xl shadow border border-primary/20 h-[250px] min-w-[280px]  w-full xl:max-w-[380px] items-center justify-center flex flex-col hover:border-primary hover:cursor-pointer hover:bg-muted border-dashed gap-4 hover:text-black dark:bg-primary/50 dark:border-gray-700  dark:hover:bg-primary cursor-pointer"
+                    className="group rounded-xl shadow border border-primary/20 min-h-[250px] h-full min-w-[300px]  w-full items-center justify-center flex flex-col hover:border-primary hover:cursor-pointer hover:bg-muted border-dashed gap-4 hover:text-black dark:bg-primary/50 dark:border-gray-700  dark:hover:bg-primary cursor-pointer"
                 >
                     <BsFileEarmarkPlus className="h-8 w-8 text-muted-foreground group-hover:text-gray-300 dark:text-gray-300" />
                     <p className="font-bold text-xl text-muted-foreground group-hover:text-gray-300 dark:text-gray-300">Create new form</p>

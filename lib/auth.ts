@@ -71,9 +71,12 @@ export const authOptions: NextAuthOptions = {
               body: JSON.stringify(credentials),
             }
           );
+          if (!res.ok) {
+            throw new Error("Failed to login");
+          }
 
           const data = await res.json();
-          if (res.ok && data.access_token) {
+          if (data.access_token) {
             return {
               access_token: data.access_token,
               refresh_token: data.refresh_token,
@@ -95,9 +98,8 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user, account }) {
-      console.log("account", account);
-      if (account && user) {
+    async jwt({ token, user }) {
+      if (user) {
         token.accessToken = user.access_token;
         token.refreshToken = user.refresh_token;
 

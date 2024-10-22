@@ -71,7 +71,7 @@ function Logo({ onClick, horizontal, url, width, className = "" }: LogoProps) {
       >
         <Image
           layout="fixed"
-          width={width}
+          width={width ?? 50}
           height={width}
           src={logoSrc}
           alt={title}

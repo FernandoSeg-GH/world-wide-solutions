@@ -4,10 +4,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
-
-  if (!session) {
+  if (!session || !session.accessToken) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
+  console.log("session", session);
 
   const roleId = session.user.role.id;
   const businessId = session.user.businessId;
