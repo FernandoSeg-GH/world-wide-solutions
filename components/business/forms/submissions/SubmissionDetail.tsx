@@ -6,7 +6,7 @@ import { format } from 'date-fns';
 
 interface SubmissionDetailProps {
     content: [string, { label: string; value: string | null }][];
-    fieldMap?: Record<string, string>; // Make fieldMap optional
+    fieldMap?: Record<string, string>;
     createdAt: string | null;
 }
 
