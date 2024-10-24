@@ -26,7 +26,7 @@ type FormBuilderProps = {
 function FormBuilder({ shareUrl }: FormBuilderProps) {
     const {
         selectors: { handleFormNameChange, setSelectedElement, setElements, setLoading, setError, setForm },
-        data: { unsavedChanges, loading, form, elements }, // Include elements here
+        data: { unsavedChanges, loading, form, elements },
         actions: { formActions },
     } = useAppContext();
 
@@ -56,7 +56,7 @@ function FormBuilder({ shareUrl }: FormBuilderProps) {
             const type = active.data?.current?.type;
             const newElement = FormElements[type as ElementsType].construct(idGenerator());
 
-            formActions.addElement(elements.length, newElement); // Use elements here
+            formActions.addElement(elements.length, newElement);
             return;
         }
 
@@ -73,7 +73,7 @@ function FormBuilder({ shareUrl }: FormBuilderProps) {
             const newElement = FormElements[type as ElementsType].construct(idGenerator());
 
             const overId = over.data?.current?.elementId;
-            const overElementIndex = elements.findIndex((el) => el.id === overId); // Use elements here
+            const overElementIndex = elements.findIndex((el) => el.id === overId);
             if (overElementIndex === -1) {
                 console.error("Element not found for dropping:", overId);
                 return;
@@ -96,7 +96,7 @@ function FormBuilder({ shareUrl }: FormBuilderProps) {
             const activeId = active.data?.current?.elementId;
             const overId = over.data?.current?.elementId;
 
-            const activeElementIndex = elements.findIndex((el) => el.id === activeId); // Use elements here
+            const activeElementIndex = elements.findIndex((el) => el.id === activeId);
             const overElementIndex = elements.findIndex((el) => el.id === overId);
 
             if (activeElementIndex === -1 || overElementIndex === -1) {

@@ -1,5 +1,3 @@
-// components/notifications/ToggleView.tsx
-
 "use client";
 import React from 'react';
 import { Switch } from '@/components/ui/switch'; // Adjust import as needed

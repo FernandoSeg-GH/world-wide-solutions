@@ -1,5 +1,3 @@
-// components/Submissions.tsx
-
 'use client';
 
 import React, { useEffect } from 'react';
@@ -18,8 +16,8 @@ function Submissions({ }: Props) {
 
     useEffect(() => {
         if (session?.user.businessId) {
-            // Replace with your actual shareUrl(s)
-            const shareUrls = ["patient-personal-information"]; // Example shareUrls
+
+            const shareUrls = ["patient-personal-information"];
 
             shareUrls.forEach((shareUrl) => {
                 console.log('Fetching submissions for form:', shareUrl);
@@ -44,14 +42,14 @@ function Submissions({ }: Props) {
 
     const handlePrevious = () => {
         if (currentPage > 1) {
-            // Implement your pagination logic here
+
             console.log("Handle previous page");
         }
     };
 
     const handleNext = () => {
         if (currentPage < Number(totalPages)) {
-            // Implement your pagination logic here
+
             console.log("Handle next page");
         }
     };
@@ -66,7 +64,7 @@ function Submissions({ }: Props) {
             <div className="mb-12">
                 {submissions.length > 0 ? (
                     submissions.map((submission) => {
-                        // Safely parse content if necessary
+
                         let contentParsed: Record<string, any> = typeof submission.content === 'string'
                             ? JSON.parse(submission.content)
                             : submission.content;

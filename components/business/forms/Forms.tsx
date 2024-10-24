@@ -31,7 +31,7 @@ function Forms({ }: Props) {
                 } else if (session?.user?.businessId && session?.user?.role?.id === 3) {
                     await formActions.fetchFormsByBusinessId(Number(session.user.businessId));
                 } else if (session?.user?.role?.id === 1) {
-                    console.log("Fetching published forms for business ID:", session.user.businessId);  // Debugging log
+                    console.log("Fetching published forms for business ID:", session.user.businessId);
                     await formActions.fetchPublishedFormsByBusinessId(Number(session.user.businessId));
                 }
             } catch (error) {
@@ -43,6 +43,7 @@ function Forms({ }: Props) {
         if (status === 'authenticated') {
             fetchData();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         session?.user?.role?.id,
         session?.user?.businessId,
@@ -52,7 +53,7 @@ function Forms({ }: Props) {
         formActions.fetchPublishedFormsByBusinessId
     ]);
 
-    // Log to check the state
+    // 
     useEffect(() => {
         console.log("Forms state:", forms);
     }, [forms]);

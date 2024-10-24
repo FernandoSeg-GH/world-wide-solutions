@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/messages/inbox`,
+      `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/messages/conversations`,
       {
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
-    console.error("Error fetching messages:", error);
+    console.error("Error fetching conversations:", error);
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }

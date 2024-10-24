@@ -1,100 +1,54 @@
-// components/notifications/Inbox.tsx
 
 "use client";
-import React, { useEffect, useState } from 'react';
-import { InboxMessage } from '@/types';
-import { useSession } from 'next-auth/react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import ReplyMessage from '../reply/message';
+
+import React, { useEffect } from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import ReplyMessage from "../reply/message";
+import { InboxMessage } from "@/types";
+import { useAppContext } from "@/context/AppProvider";
 
 const Inbox: React.FC = () => {
-    const { data: session } = useSession();
-    const [messages, setMessages] = useState<InboxMessage[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [replyingTo, setReplyingTo] = useState<number | null>(null);
+    const { data, actions } = useAppContext();
+    const { messages } = data;
+    const { messageActions } = actions;
+    const { fetchInboxMessages, markAsRead } = messageActions;
+
+    const [replyingTo, setReplyingTo] = React.useState<number | null>(null);
 
     useEffect(() => {
-        const fetchMessages = async () => {
-            if (!session?.accessToken) return;
+        fetchInboxMessages();
+    }, [fetchInboxMessages]);
 
-            try {
-                const response = await fetch('/api/messages/inbox', {
-                    headers: {
-                        Authorization: `Bearer ${session.accessToken}`,
-                    },
-                });
-                if (!response.ok) {
-                    throw new Error('Failed to fetch messages');
-                }
-                const data: InboxMessage[] = await response.json();
-                setMessages(data);
-            } catch (error) {
-                console.error('Error fetching messages:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchMessages();
-    }, [session]);
-
-    const handleReplySent = () => {
-        setReplyingTo(null);
-        // Optionally refetch messages to update read status
-        setLoading(true);
-        fetch('/api/messages/inbox', {
-            headers: {
-                Authorization: `Bearer ${session?.accessToken}`,
-            },
-        })
-            .then((response) => response.json())
-            .then((data: InboxMessage[]) => setMessages(data))
-            .catch((error) => console.error('Error refetching messages:', error))
-            .finally(() => setLoading(false));
-    };
-
-    const handleMarkAsRead = async (messageId: number) => {
-        try {
-            const response = await fetch('/api/messages/mark_read', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${session?.accessToken}`,
-                },
-                body: JSON.stringify({ message_id: messageId }),
-            });
-            if (!response.ok) {
-                throw new Error('Failed to mark message as read');
-            }
-            // Update the local state
-            setMessages((prevMessages) =>
-                prevMessages.map((msg) =>
-                    msg.messageId === messageId ? { ...msg, read: true } : msg
-                )
-            );
-        } catch (error) {
-            console.error('Error marking message as read:', error);
-        }
-    };
-
-    if (loading) {
+    if (!messages) {
         return <div>Loading messages...</div>;
     }
 
+    const handleMarkAsRead = async (messageId: number) => {
+        try {
+            await markAsRead(messageId);
+            await fetchInboxMessages();
+        } catch (error: any) {
+            console.error("Error marking message as read:", error);
+            alert(error.message || "Error marking message as read");
+        }
+    };
+
     return (
         <div>
-            <h2>Your Messages</h2>
+            <h2 className="text-2xl font-bold mb-6">Your Messages</h2>
             {messages.length === 0 ? (
                 <p>No messages found.</p>
             ) : (
-                messages.map((msg) => (
+                messages.map((msg: InboxMessage) => (
                     <Card key={msg.messageId} className="mb-4 p-4 shadow">
-                        <h3>From: {msg.senderUsername}</h3>
-                        <p>{msg.content}</p>
-                        <small>{new Date(msg.timestamp).toLocaleString()}</small>
+                        <h3 className="text-lg font-semibold">From: {msg.senderUsername}</h3>
+                        <p className="mt-2">{msg.content}</p>
+                        <small className="text-gray-500">
+                            {new Date(msg.timestamp).toLocaleString()}
+                        </small>
                         {!msg.read && <span className="text-red-500"> (Unread)</span>}
-                        <div className="mt-2">
+                        <div className="mt-4 flex space-x-2">
                             {!msg.read && (
                                 <Button
                                     variant="ghost"
@@ -115,7 +69,7 @@ const Inbox: React.FC = () => {
                         {replyingTo === msg.messageId && (
                             <ReplyMessage
                                 messageId={msg.messageId}
-                                onReplySent={handleReplySent}
+                                onReplySent={() => setReplyingTo(null)}
                             />
                         )}
                     </Card>

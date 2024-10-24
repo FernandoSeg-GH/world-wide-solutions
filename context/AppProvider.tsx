@@ -17,6 +17,7 @@ import { useGodMode } from '@/hooks/user/useGodMode';
 import { useBusiness } from '@/hooks/business/useBusiness';
 import { useUser } from '@/hooks/user/useUser';
 import { useLayout } from '@/hooks/layout/useLayout';
+import { useMessages } from '@/hooks/notifications/useMessages';
 
 export const AppContext = createContext<AppContextType | null>(null);
 
@@ -65,6 +66,9 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
 
     /* USER */
     const { users, currentUser, loading: userLoading, fetchAllUsers, setCurrentUser, createUser } = useUser();
+
+    /* MESSAGES */
+    const messageState = useMessages();
 
     const [loading, setLoadingState] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
@@ -133,7 +137,9 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         currentPage: submissionState.currentPage,
         totalPages: submissionState.totalPages,
         currentUser,
-        users
+        users,
+        messages: messageState.messages,
+        conversations: messageState.conversations,
     }), [
         layoutState,
         formState.formName,
@@ -152,7 +158,9 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         submissionState.currentPage,
         submissionState.totalPages,
         currentUser,
-        users
+        users,
+        messageState.messages,
+        messageState.conversations,
     ]);
 
 
@@ -192,6 +200,17 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         setIsExpanded: layoutState.setIsExpanded,
         toggleGodMode,
         switchSection: layoutState.switchSection,
+        messageActions: {
+            fetchConversations: messageState.fetchConversations,
+            fetchMessages: messageState.fetchMessages,
+            setConversations: messageState.setConversations,
+            setMessages: messageState.setMessages,
+            replyToMessage: messageState.replyToMessage,
+            sendMessageToUsers: messageState.sendMessageToUsers,
+            sendMessage: messageState.sendMessage,
+            markAsRead: messageState.markAsRead,
+            fetchInboxMessages: messageState.fetchInboxMessages,
+        },
     }), [
         formActions,
         submissionState.getFormSubmissionByCaseId,
@@ -211,7 +230,16 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         fetchAllBusinesses,
         layoutState.setIsExpanded,
         layoutState.switchSection,
-        toggleGodMode
+        toggleGodMode,
+        messageState.fetchConversations,
+        messageState.fetchMessages,
+        messageState.setConversations,
+        messageState.setMessages,
+        messageState.replyToMessage,
+        messageState.sendMessageToUsers,
+        messageState.sendMessage,
+        messageState.markAsRead,
+        messageState.fetchInboxMessages
     ]);
 
 

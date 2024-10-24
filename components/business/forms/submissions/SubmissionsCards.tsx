@@ -25,7 +25,6 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ form, submission, conte
         return acc;
     }, {} as Record<string, string>) || {};
 
-    // Transform contentParsed from Record<string, { label: string; value: string | null }> to an array
     const contentArray = Object.entries(contentParsed) as [string, { label: string; value: string | null }][];
 
     return (

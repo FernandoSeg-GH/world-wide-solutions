@@ -13,7 +13,6 @@ export async function middleware(req: NextRequest) {
   const accessTokenExpires = token.accessTokenExpires as number;
   const timeUntilExpiration = accessTokenExpires - Date.now();
 
-  // Check if the token is about to expire within 60 seconds
   if (timeUntilExpiration < 60 * 1000) {
     try {
       console.log("Refreshing token...");
@@ -38,14 +37,10 @@ export async function middleware(req: NextRequest) {
       token.accessToken = refreshedTokens.access_token;
       token.refreshToken = refreshedTokens.refresh_token ?? token.refreshToken;
 
-      // Decode the new access token to get the expiration time
       const decodedAccessToken = jwtDecode<{ exp: number }>(
         refreshedTokens.access_token
       );
       token.accessTokenExpires = decodedAccessToken.exp * 1000;
-
-      // Update session or token as necessary here
-      // You could store it in a cookie, session, or in-memory cache, depending on your approach
 
       return NextResponse.next();
     } catch (error) {

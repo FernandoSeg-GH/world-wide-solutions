@@ -421,16 +421,15 @@ export const useFormState = (initialForm?: Form) => {
         }
 
         const data = await response.json();
-        console.log("Fetched published forms for role 1:", data); // Debugging log
+        console.log("Fetched published forms for role 1:", data);
 
-        // Ensure the data is correctly handled and set the forms state
         if (data && Array.isArray(data)) {
           setForms(data);
         } else if (data?.forms) {
-          setForms(data.forms); // Assuming data contains { forms: [...] }
+          setForms(data.forms);
         } else {
           console.error("Unexpected data format:", data);
-          setForms([]); // If no forms found, set an empty array
+          setForms([]);
         }
 
         return data.forms || null;

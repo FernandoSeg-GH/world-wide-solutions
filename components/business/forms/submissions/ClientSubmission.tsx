@@ -25,13 +25,12 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
     const [submitted, setSubmitted] = useState(false);
     const [pending, startTransition] = useTransition();
 
-    // Fetch form data
     useEffect(() => {
         const fetchData = async () => {
             if (session?.user.businessId) {
                 const fetchedForm = await fetchFormByShareUrlPublic(formUrl, Number(session.user.businessId));
                 if (fetchedForm) {
-                    setForm(fetchedForm); // Ensure the form data is set properly
+                    setForm(fetchedForm);
                 }
             }
         };
@@ -124,7 +123,7 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
         );
     }
 
-    // If form data is not available, show a spinner
+
     if (!form) {
         return <Spinner />;
     }

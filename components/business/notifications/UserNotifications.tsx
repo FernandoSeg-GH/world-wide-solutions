@@ -39,7 +39,7 @@ const UserNotifications: React.FC = () => {
             <Separator className='my-2' />
             <div className='my-6'>
                 <Inbox />
-                <Separator className='my-2' />
+                {/* <Separator className='my-2' />
                 {notifications.map((notification) => (
                     <Card key={notification.id} className="mb-2 flex items-center justify-between p-4">
                         <div>
@@ -50,7 +50,7 @@ const UserNotifications: React.FC = () => {
                             <div className="w-3 h-3 rounded-full bg-blue-500"></div>
                         )}
                     </Card>
-                ))}
+                ))} */}
             </div>
         </div>
     );

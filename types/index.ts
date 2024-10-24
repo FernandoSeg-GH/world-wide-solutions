@@ -171,6 +171,15 @@ export interface Chat {
   user?: User;
 }
 
+export interface ConversationSummary {
+  conversationId: number;
+  lastMessage: InboxMessage | null;
+  participants: {
+    userId: number;
+    username: string;
+  }[];
+}
+
 export interface Message {
   id: number;
   senderId: number;
@@ -330,11 +339,13 @@ export interface AppContextType {
     totalPages?: number;
     roles?: Role[];
     tasks?: Task[];
-    messages?: Message[];
+    // messages?: Message[];
     chats?: Chat[];
     aiCharacters?: AICharacter[];
     landingPages?: LandingPage[];
     socialMediaPosts?: SocialMediaPost[];
+    messages?: InboxMessage[];
+    conversations?: ConversationSummary[];
   };
   actions: {
     setIsExpanded: React.Dispatch<React.SetStateAction<boolean>>;
@@ -388,6 +399,23 @@ export interface AppContextType {
     fetchAllAICharacters?: () => Promise<AICharacter[] | null>;
     fetchAllLandingPages?: () => Promise<LandingPage[] | null>;
     fetchAllSocialMediaPosts?: () => Promise<SocialMediaPost[] | null>;
+    messageActions: {
+      fetchConversations: () => Promise<void>;
+      fetchMessages: (conversationId: number) => Promise<void>;
+      setConversations: React.Dispatch<
+        React.SetStateAction<ConversationSummary[]>
+      >;
+      setMessages: React.Dispatch<React.SetStateAction<InboxMessage[]>>;
+      replyToMessage: (messageId: number, content: string) => Promise<void>;
+      sendMessageToUsers: (
+        recipientIds: number[],
+        content: string,
+        readOnly: boolean
+      ) => Promise<void>;
+      sendMessage: (conversationId: number, content: string) => Promise<void>;
+      markAsRead: (messageId: number) => Promise<void>;
+      fetchInboxMessages: () => Promise<void>;
+    };
   };
 }
 

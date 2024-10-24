@@ -276,7 +276,6 @@ export const useSubmissions = () => {
         }
 
         const data = await response.json();
-        console.log("Fetched submissions data:", data); // Debugging log
         setSubmissions(data.submissions);
         setTotalPages(data.pages || 1);
         setCurrentPage(data.page || 1);
