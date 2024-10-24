@@ -1,4 +1,5 @@
 "use client"
+import SendMessage from '@/components/notifications/send/message';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
@@ -14,6 +15,7 @@ const AdminNotifications: React.FC = () => {
     return (
         <div>
             <h2 className="text-xl font-bold mb-4">Send a Notification</h2>
+            <SendMessage />
             <Input
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}

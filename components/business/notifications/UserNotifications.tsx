@@ -1,6 +1,7 @@
 "use client"
 
 import SectionHeader from '@/components/layout/navbar/SectionHeader';
+import Inbox from '@/components/notifications/inbox/Inbox';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useEffect, useState } from 'react';
@@ -37,6 +38,8 @@ const UserNotifications: React.FC = () => {
             <SectionHeader title="Notification Center" subtitle="Stay up to date with your record and case." />
             <Separator className='my-2' />
             <div className='my-6'>
+                <Inbox />
+                <Separator className='my-2' />
                 {notifications.map((notification) => (
                     <Card key={notification.id} className="mb-2 flex items-center justify-between p-4">
                         <div>

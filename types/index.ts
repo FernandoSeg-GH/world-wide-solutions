@@ -186,9 +186,19 @@ export interface MessageRecipient {
   userId: number;
   read: boolean;
   readAt?: string;
-
+  readOnly: boolean;
   user?: User;
   message?: Message;
+}
+
+export interface InboxMessage {
+  messageId: number;
+  senderId: number;
+  senderUsername: string;
+  content: string;
+  timestamp: string;
+  read: boolean;
+  readOnly: boolean;
 }
 
 export interface UserAICharacter {
