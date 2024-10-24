@@ -44,7 +44,7 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ form, submission, conte
             {isExpanded && (
                 <CardContent className="p-4">
                     <SubmissionDetail
-                        content={contentArray} // Pass the transformed array
+                        content={contentArray}
                         fieldMap={fieldMap}
                         createdAt={submission.createdAt}
                     />

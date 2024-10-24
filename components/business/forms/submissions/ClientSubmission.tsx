@@ -88,7 +88,6 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
                 },
                 body: JSON.stringify({ content: jsonContent }),
             });
-            console.log('response', response)
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || "Failed to submit the form");

@@ -1,10 +1,10 @@
-
 "use client";
 
 import React, { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useAppContext } from "@/context/AppProvider";
+import { useToast } from "@/components/ui/use-toast";
 
 interface ReplyMessageProps {
     messageId: number;
@@ -16,24 +16,38 @@ const ReplyMessage: React.FC<ReplyMessageProps> = ({ messageId, onReplySent }) =
     const { messageActions } = actions;
     const { replyToMessage } = messageActions;
 
+    const { toast } = useToast();
+
     const [content, setContent] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
 
     const handleReply = async () => {
         if (!content.trim()) {
-            alert("Please enter a reply message.");
+            toast({
+                title: "Empty Reply",
+                description: "Please enter a reply message.",
+                variant: "destructive",
+            });
             return;
         }
 
         try {
             setLoading(true);
             await replyToMessage(messageId, content);
-            alert("Reply sent successfully");
+            toast({
+                title: "Reply Sent",
+                description: "Your reply has been sent successfully.",
+                variant: "default",
+            });
             setContent("");
             onReplySent();
         } catch (error: any) {
             console.error("Error sending reply:", error);
-            alert(error.message || "Error sending reply");
+            toast({
+                title: "Error",
+                description: error.message || "Error sending reply.",
+                variant: "destructive",
+            });
         } finally {
             setLoading(false);
         }
@@ -43,16 +57,17 @@ const ReplyMessage: React.FC<ReplyMessageProps> = ({ messageId, onReplySent }) =
         <div className="mt-4">
             <Textarea
                 value={content}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                    setContent(e.target.value)
-                }
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setContent(e.target.value)}
                 placeholder="Type your reply here..."
                 rows={3}
+                className="block w-full mt-1 border border-gray-300 rounded-md p-2"
+                aria-label="Type your reply"
             />
             <Button
                 onClick={handleReply}
                 disabled={loading || !content.trim()}
-                className="mt-2"
+                className="mt-2 bg-primary hover:bg-primary-dark text-white"
+                aria-label="Send Reply"
             >
                 {loading ? "Sending..." : "Send Reply"}
             </Button>

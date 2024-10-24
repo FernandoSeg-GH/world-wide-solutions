@@ -4,15 +4,18 @@ import React, { useState, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { useAppContext } from "@/context/AppProvider";
+import { useToast } from "@/components/ui/use-toast";
 
 const SendMessage: React.FC = () => {
     const { data, actions } = useAppContext();
     const { users, forms } = data;
     const { formActions, fetchAllUsers, messageActions } = actions;
     const { fetchAllForms } = formActions;
-
     const { sendMessageToUsers } = messageActions;
+
+    const { toast } = useToast();
 
     const [recipientIds, setRecipientIds] = useState<number[]>([]);
     const [content, setContent] = useState<string>("");
@@ -27,12 +30,20 @@ const SendMessage: React.FC = () => {
 
     const handleSendMessage = async () => {
         if (recipientIds.length === 0) {
-            alert("Please select at least one recipient.");
+            toast({
+                title: "No Recipients",
+                description: "Please select at least one recipient.",
+                variant: "destructive",
+            });
             return;
         }
 
         if (!content.trim()) {
-            alert("Please enter a message.");
+            toast({
+                title: "Empty Message",
+                description: "Please enter a message.",
+                variant: "destructive",
+            });
             return;
         }
 
@@ -47,7 +58,11 @@ const SendMessage: React.FC = () => {
         try {
             setLoading(true);
             await sendMessageToUsers(recipientIds, messageContent, readOnly);
-            alert("Message sent successfully");
+            toast({
+                title: "Success",
+                description: "Message sent successfully.",
+                variant: "default",
+            });
 
             setRecipientIds([]);
             setContent("");
@@ -55,77 +70,105 @@ const SendMessage: React.FC = () => {
             setSelectedFormId(null);
         } catch (error: any) {
             console.error("Error sending message:", error);
-            alert(error.message || "Error sending message");
+            toast({
+                title: "Error",
+                description: error.message || "Error sending message.",
+                variant: "destructive",
+            });
         } finally {
             setLoading(false);
         }
     };
 
+
     return (
-        <div>
-            <h2 className="text-xl font-bold mb-4">Send a Notification</h2>
-            <div className="mb-4">
-                <label className="block mb-2">Recipients:</label>
-                <select
-                    multiple
-                    value={recipientIds.map(String)}
-                    onChange={(e) => {
-                        const selectedOptions = Array.from(e.target.selectedOptions);
-                        setRecipientIds(selectedOptions.map((option) => Number(option.value)));
-                    }}
-                    className="block w-full"
+        <Card className="p-4 shadow-lg">
+            <CardHeader>
+                <h2 className="text-xl font-semibold text-primary">Send a Notification</h2>
+                <p className="text-sm text-muted">Notify users with custom messages</p>
+            </CardHeader>
+            <CardContent>
+                {/* Custom Multi-Select Recipients */}
+                <div className="mb-4">
+                    <label className="block text-sm font-medium">Recipients:</label>
+                    <div className="flex flex-wrap">
+                        {users?.map((user) => (
+                            <div key={user.id} className="mr-4 mb-2">
+                                <Checkbox
+                                    id={`user-${user.id}`}
+                                    checked={recipientIds.includes(user.id)}
+                                    onCheckedChange={(checked) => {
+                                        if (checked) {
+                                            setRecipientIds((prev) => [...prev, user.id]);
+                                        } else {
+                                            setRecipientIds((prev) => prev.filter((id) => id !== user.id));
+                                        }
+                                    }}
+                                />
+                                <label htmlFor={`user-${user.id}`} className="ml-2 text-sm">
+                                    {user.username} ({user.email})
+                                </label>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Form Selection */}
+                <div className="mb-4">
+                    <label className="block text-sm font-medium">Reference Form:</label>
+                    <select
+                        value={selectedFormId?.toString() || ""}
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedFormId(e.target.value ? Number(e.target.value) : null)}
+                        className="block w-full mt-1 border border-gray-300 rounded-md p-2"
+                        aria-label="Select a reference form"
+                    >
+                        <option value="">-- Select a form (optional) --</option>
+                        {forms?.map((form) => (
+                            <option key={form.id} value={form.id.toString()}>
+                                {form.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                {/* Content Textarea */}
+                <div className="mb-4">
+                    <label className="block text-sm font-medium">Content:</label>
+                    <Textarea
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        placeholder="Enter your notification message"
+                        rows={4}
+                        className="block w-full mt-1 border border-gray-300 rounded-md p-2"
+                        aria-label="Notification message content"
+                    />
+                </div>
+
+                {/* Read-Only Checkbox */}
+                <div className="mb-4 flex items-center">
+                    <Checkbox
+                        id="readOnlyCheckbox"
+                        checked={readOnly}
+                        onCheckedChange={(checked: boolean) => setReadOnly(checked)}
+                    />
+                    <label htmlFor="readOnlyCheckbox" className="ml-2 text-sm">
+                        Read-Only
+                    </label>
+                </div>
+
+                {/* Submit Button */}
+                <Button
+                    onClick={handleSendMessage}
+                    disabled={loading || recipientIds.length === 0 || !content.trim()}
+                    className="w-full bg-primary hover:bg-primary-dark text-white"
+                    aria-label="Send Notification"
                 >
-                    {users?.map((user) => (
-                        <option key={user.id} value={user.id}>
-                            {user.username} ({user.email})
-                        </option>
-                    ))}
-                </select>
-            </div>
-            <div className="mb-4">
-                <label className="block mb-2">Reference Form:</label>
-                <select
-                    value={selectedFormId?.toString() || ""}
-                    onChange={(e) =>
-                        setSelectedFormId(e.target.value ? Number(e.target.value) : null)
-                    }
-                    className="block w-full"
-                >
-                    <option value="">-- Select a form (optional) --</option>
-                    {forms?.map((form) => (
-                        <option key={form.id} value={form.id}>
-                            {form.name}
-                        </option>
-                    ))}
-                </select>
-            </div>
-            <div className="mb-4">
-                <label className="block mb-2">Content:</label>
-                <Textarea
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    placeholder="Enter your notification message"
-                    rows={4}
-                />
-            </div>
-            <div className="mb-4 flex items-center">
-                <Checkbox
-                    id="readOnlyCheckbox"
-                    checked={readOnly}
-                    onCheckedChange={(checked: boolean) => setReadOnly(checked)}
-                />
-                <label htmlFor="readOnlyCheckbox" className="ml-2">
-                    Read-Only
-                </label>
-            </div>
-            <Button
-                onClick={handleSendMessage}
-                disabled={loading || recipientIds.length === 0 || !content.trim()}
-            >
-                {loading ? "Sending..." : "Send Notification"}
-            </Button>
-        </div>
+                    {loading ? "Sending..." : "Send Notification"}
+                </Button>
+            </CardContent>
+        </Card>
     );
+
 };
 
 export default SendMessage;

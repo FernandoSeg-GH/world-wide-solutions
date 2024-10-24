@@ -1,11 +1,8 @@
-// app/api/messages/mark_read/route.ts
-
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 
 export async function POST(req: NextRequest) {
-  // Retrieve the session to get the access token
   const session = await getServerSession(authOptions);
 
   if (!session) {
@@ -23,7 +20,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Proxy the request to the Flask backend
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/messages/mark_read`,
       {
@@ -38,7 +34,6 @@ export async function POST(req: NextRequest) {
       }
     );
 
-    // Handle non-JSON responses gracefully
     const contentType = response.headers.get("Content-Type");
     let data;
     if (contentType && contentType.includes("application/json")) {

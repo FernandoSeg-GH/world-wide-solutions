@@ -20,7 +20,6 @@ function Submissions({ }: Props) {
             const shareUrls = ["patient-personal-information"];
 
             shareUrls.forEach((shareUrl) => {
-                console.log('Fetching submissions for form:', shareUrl);
                 fetchSubmissionsByFormUrl(shareUrl)
                     .then(() => {
                         console.log(`Successfully fetched submissions for form: ${shareUrl}`);
@@ -32,9 +31,6 @@ function Submissions({ }: Props) {
         }
     }, [session, fetchSubmissionsByFormUrl]);
 
-    useEffect(() => {
-        console.log("Current submissions state:", submissions);
-    }, [submissions]);
 
     if (loading) {
         return <Spinner />;

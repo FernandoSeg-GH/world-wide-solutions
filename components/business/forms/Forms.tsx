@@ -31,7 +31,6 @@ function Forms({ }: Props) {
                 } else if (session?.user?.businessId && session?.user?.role?.id === 3) {
                     await formActions.fetchFormsByBusinessId(Number(session.user.businessId));
                 } else if (session?.user?.role?.id === 1) {
-                    console.log("Fetching published forms for business ID:", session.user.businessId);
                     await formActions.fetchPublishedFormsByBusinessId(Number(session.user.businessId));
                 }
             } catch (error) {
@@ -52,11 +51,6 @@ function Forms({ }: Props) {
         formActions.fetchFormsByBusinessId,
         formActions.fetchPublishedFormsByBusinessId
     ]);
-
-    // 
-    useEffect(() => {
-        console.log("Forms state:", forms);
-    }, [forms]);
 
     if (loading) {
         return <Spinner />;

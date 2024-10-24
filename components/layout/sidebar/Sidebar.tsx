@@ -17,6 +17,7 @@ import {
     Users2,
     CaptionsIcon,
     Folders,
+    MailCheck,
 } from "lucide-react";
 import {
     FaHome,
@@ -66,6 +67,10 @@ export const getSidebarItems = (godMode: boolean, forms: Form[], roleId?: number
         {
             icon: FaBell,
             label: "Notifications",
+        },
+        {
+            icon: MailCheck,
+            label: "Messages",
         },
     ];
 

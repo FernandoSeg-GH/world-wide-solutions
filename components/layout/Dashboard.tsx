@@ -18,6 +18,7 @@ import Leo from "@/components/leo";
 import Vinci from "@/components/vinci/Vinci";
 import FormDetails from "@/components/business/forms/FormDetails";
 import Users from "@/components/users";
+import MessagingLayout from "../notifications/MessagingLayout";
 
 export const RenderComponent = (currentSection: string) => {
     const url = usePathname();
@@ -43,6 +44,8 @@ export const RenderComponent = (currentSection: string) => {
             return <Submissions />;
         case "Notifications":
             return <Notifications />;
+        case "Messages":
+            return <MessagingLayout />;
         case "Users":
             return <Users />;
         case "Businesses":
@@ -76,7 +79,7 @@ export function Dashboard() {
 
     return (
 
-        <div className="flex min-h-screen w-full flex-col bg-muted/10">
+        <div className="flex h-screen w-full flex-col bg-muted/10">
             {!isMobile && (
                 <Sidebar isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
             )}
@@ -84,7 +87,7 @@ export function Dashboard() {
 
             <div
                 className={cn(
-                    "flex flex-col gap-6 transition-all duration-300 max-w-screen p-4",
+                    "flex flex-col gap-6 transition-all duration-300 max-w-screen p-4 h-[100%]",
                     isMobile ? "m-0 p-0 px-4 mt-16 " : "",
                     isExpanded && !isMobile ? "pl-64" : "pl-14"
                 )}
@@ -94,7 +97,7 @@ export function Dashboard() {
                     isExpanded={isExpanded}
                 // breadcrumbs={mockData.breadcrumbs}
                 />
-                <div className="pl-4">{RenderComponent(currentSection)}</div>
+                <div className="pl-4 h-full flex flex-col items-start justify-start flex-grow w-full overflow-auto">{RenderComponent(currentSection)}</div>
             </div>
         </div>
     );

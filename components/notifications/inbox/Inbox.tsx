@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import ReplyMessage from "../reply/message";
 import { InboxMessage } from "@/types";
 import { useAppContext } from "@/context/AppProvider";
+import MessagingLayout from "../MessagingLayout";
 
 const Inbox: React.FC = () => {
     const { data, actions } = useAppContext();
@@ -35,9 +36,9 @@ const Inbox: React.FC = () => {
     };
 
     return (
-        <div>
+        <div className="h-full">
             <h2 className="text-2xl font-bold mb-6">Your Messages</h2>
-            {messages.length === 0 ? (
+            {/* {messages.length === 0 ? (
                 <p>No messages found.</p>
             ) : (
                 messages.map((msg: InboxMessage) => (
@@ -74,7 +75,8 @@ const Inbox: React.FC = () => {
                         )}
                     </Card>
                 ))
-            )}
+            )} */}
+            <MessagingLayout />
         </div>
     );
 };

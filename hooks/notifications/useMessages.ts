@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useCallback } from "react";
 import { InboxMessage, ConversationSummary } from "@/types";
 import { useSession } from "next-auth/react";
@@ -114,30 +115,29 @@ export const useMessages = () => {
   const sendMessage = useCallback(
     async (conversationId: number, content: string) => {
       if (!session?.accessToken) return;
+
+      const conversation = conversations.find(
+        (conv) => conv.conversationId === conversationId
+      );
+      if (!conversation) {
+        throw new Error("Conversation not found");
+      }
+
+      const recipientIds = conversation.participants
+        .filter((participant) => participant.userId !== session.user.id)
+        .map((participant) => participant.userId);
+
+      if (recipientIds.length === 0) {
+        throw new Error("No recipients found in the conversation");
+      }
+
       try {
-        const response = await fetch("/api/messages/send", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session.accessToken}`,
-          },
-          body: JSON.stringify({
-            recipient_ids: [],
-            content,
-            read_only: false,
-            conversation_id: conversationId,
-          }),
-        });
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Failed to send message");
-        }
+        await sendMessageToUsers(recipientIds, content, false);
       } catch (error) {
-        console.error("Error sending message:", error);
         throw error;
       }
     },
-    [session]
+    [session, conversations, sendMessageToUsers]
   );
 
   const markAsRead = useCallback(

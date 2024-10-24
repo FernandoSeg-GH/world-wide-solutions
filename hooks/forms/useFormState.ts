@@ -197,7 +197,6 @@ export const useFormState = (initialForm?: Form) => {
           throw new Error("Form not found");
         }
         const formData = await response.json();
-        console.log("formData", formData);
         return formData as Form;
       } catch (error) {
         console.error("Error fetching form:", error);
@@ -421,7 +420,6 @@ export const useFormState = (initialForm?: Form) => {
         }
 
         const data = await response.json();
-        console.log("Fetched published forms for role 1:", data);
 
         if (data && Array.isArray(data)) {
           setForms(data);

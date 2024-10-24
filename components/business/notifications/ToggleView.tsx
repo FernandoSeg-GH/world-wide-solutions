@@ -1,6 +1,8 @@
 "use client";
+
 import React from 'react';
-import { Switch } from '@/components/ui/switch'; // Adjust import as needed
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 interface ToggleViewProps {
     onToggle: (isAdmin: boolean) => void;
@@ -9,18 +11,20 @@ interface ToggleViewProps {
 const ToggleView: React.FC<ToggleViewProps> = ({ onToggle }) => {
     const [isAdmin, setIsAdmin] = React.useState(false);
 
-    const handleToggle = () => {
-        setIsAdmin((prev) => {
-            onToggle(!prev);
-            return !prev;
-        });
+    const handleToggle = (checked: boolean) => {
+        setIsAdmin(checked);
+        onToggle(checked);
     };
 
     return (
-        <div className="flex items-center">
-            <span className="mr-2">User View</span>
-            <Switch checked={isAdmin} onCheckedChange={handleToggle} />
-            <span className="ml-2">Admin View</span>
+        <div className="flex items-center space-x-2">
+            <Label htmlFor="toggle-admin" className="text-sm font-medium">
+                User View
+            </Label>
+            <Switch id="toggle-admin" checked={isAdmin} onCheckedChange={handleToggle} />
+            <Label htmlFor="toggle-admin" className="text-sm font-medium">
+                Admin View
+            </Label>
         </div>
     );
 };

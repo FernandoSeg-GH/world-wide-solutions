@@ -11,7 +11,7 @@ const DashboardLayout = ({ children }: Props) => {
     return (
         <SidebarProvider>
             <SidebarInset>
-                <main>{children}</main>
+                <main className='h-full'>{children}</main>
             </SidebarInset>
         </SidebarProvider>
 
