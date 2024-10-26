@@ -9,7 +9,7 @@ import { useGodMode } from "../user/useGodMode";
 
 export const useFormState = (initialForm?: Form) => {
   const [forms, setForms] = useState<Form[]>([]);
-  const [form, setFormState] = useState<Form | null>(initialForm ?? null);
+  const [form, setFormState] = useState<Form | null>(null);
   const [formName, setFormName] = useState<string>(initialForm?.name || "");
   const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
   const formInitializedRef = useRef<boolean>(false);
@@ -179,7 +179,7 @@ export const useFormState = (initialForm?: Form) => {
         setLoading(false);
       }
     },
-    [form?.id, session?.accessToken, setForm]
+    [form?.id, session?.accessToken]
   );
 
   const fetchFormByShareUrl = useCallback(
@@ -255,7 +255,7 @@ export const useFormState = (initialForm?: Form) => {
         }
       }
     },
-    [form, session?.user.businessId, setForm]
+    [form, session?.user.businessId]
   );
 
   const fetchFormByShareUrlPublic = useCallback(
@@ -287,7 +287,7 @@ export const useFormState = (initialForm?: Form) => {
       }
       return null;
     },
-    [session?.user.businessId, setForm]
+    [session?.user.businessId]
   );
 
   const fetchFormsByBusinessId = useCallback(async (businessId: number) => {
@@ -304,6 +304,8 @@ export const useFormState = (initialForm?: Form) => {
         return;
       }
       const data = await response.json();
+      console.log("hook data", data.forms);
+      // TODO: Agregarr paginación
       setForms(data.forms);
     } catch (error) {
       console.error("Error fetching forms for business:", error);
@@ -417,7 +419,7 @@ export const useFormState = (initialForm?: Form) => {
         }
 
         const data = await response.json();
-
+        console.log("data", data);
         if (data && Array.isArray(data)) {
           setForms(data);
         } else if (data?.forms) {
@@ -426,8 +428,8 @@ export const useFormState = (initialForm?: Form) => {
           console.error("Unexpected data format:", data);
           setForms([]);
         }
-
-        return data.forms || null;
+        console.log(" data.forms", data.forms);
+        return data.forms;
       } catch (error) {
         console.error("Error fetching published forms:", error);
         setError(String(error) || "An error occurred");

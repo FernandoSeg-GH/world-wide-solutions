@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
+import camelcaseKeys from "camelcase-keys";
 
 export async function GET(
   req: NextRequest,
@@ -39,7 +40,13 @@ export async function GET(
     }
 
     const data = await response.json();
-    return NextResponse.json(data, { status: 200 });
+    console.log("data", data);
+
+    // Transform data to camelCase
+    const camelCaseData = camelcaseKeys(data, { deep: true });
+    console.log("camelCaseData", camelCaseData);
+
+    return NextResponse.json(camelCaseData, { status: 200 });
   } catch (error) {
     console.error("Error fetching business forms:", error);
     return NextResponse.json(

@@ -49,22 +49,26 @@ function Submissions({ }: Props) {
         }
     };
 
+    if (!form) return <p>No form found.</p>
     return (
-        <div className="px-4 text-black dark:text-white">
+        <div className="px-4 text-black dark:text-white w-full">
             <SectionHeader title="Submissions" subtitle="View form submissions." />
             <Separator className="border-gray-400 my-2 mb-6" />
-            <div className="mb-12">
-                {form && submissions.length > 0 ? (
-                    submissions.map((submission) => (
-                        <SubmissionCard
-                            key={submission.id}
-                            submission={submission}
-                            form={form}
-                        />
-                    ))
-                ) : (
-                    <p>No submissions found</p>
-                )}
+            <div className="mb-12 w-full">
+                <div className='flex flex-col gap-4'>
+
+                    {submissions.length > 0 ? (
+                        submissions.map((submission) => (
+                            <SubmissionCard
+                                key={submission.id}
+                                submission={submission}
+                                form={form}
+                            />
+                        ))
+                    ) : (
+                        <p>No submissions found</p>
+                    )}
+                </div>
 
                 {totalPages > 1 && (
                     <div className="flex justify-between items-center mt-4">

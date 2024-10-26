@@ -1,6 +1,9 @@
+// nextjs api/forms/[businessId]/published/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
+import camelcaseKeys from "camelcase-keys";
 
 export async function GET(
   request: NextRequest,
@@ -39,7 +42,11 @@ export async function GET(
     }
 
     const data = await response.json();
-    return NextResponse.json(data, { status: 200 });
+
+    // Transform data to camelCase
+    const camelCaseData = camelcaseKeys(data, { deep: true });
+
+    return NextResponse.json(camelCaseData, { status: 200 });
   } catch (error) {
     console.error("Error fetching published forms:", error);
     return NextResponse.json(

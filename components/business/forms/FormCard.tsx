@@ -1,10 +1,7 @@
-"use client";
 import React, { useState } from "react";
 import { formatDistance } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { BiRightArrowAlt } from "react-icons/bi";
-import { FaEdit, FaWpforms } from "react-icons/fa";
-import { LuView } from "react-icons/lu";
 import { Badge } from "@/components/ui/badge";
 import {
     Card,
@@ -33,6 +30,9 @@ import { useToast } from "@/components/ui/use-toast";
 import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import { useAppContext } from "@/context/AppProvider";
+import { FaEdit, FaWpforms } from "react-icons/fa";
+import { LuView } from "react-icons/lu";
+import Spinner from "@/components/ui/spinner";
 
 interface FormCardProps {
     form: Form;
@@ -57,6 +57,7 @@ export function FormCard({ form }: FormCardProps) {
 
     const userRoleId = Number(session?.user.role.id);
     const isAdminRole = [2, 3, 4].includes(userRoleId);
+    const isRole1User = userRoleId === 1;
 
     const handlePublishToggle = async () => {
         const action = form.published ? "unpublish" : "publish";
@@ -70,7 +71,7 @@ export function FormCard({ form }: FormCardProps) {
                 title: `Form ${!form.published ? "Published" : "Unpublished"}`,
                 description: `The form has been ${!form.published ? "published" : "unpublished"}.`,
             });
-        } catch (error) {
+        } catch (error: any) {
             console.error(`Error ${action}ing form:`, error);
             toast({
                 title: "Error",
@@ -104,7 +105,7 @@ export function FormCard({ form }: FormCardProps) {
             setIsDeleting(false);
             setIsAlertOpen(false);
             window.location.reload();
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error deleting form:", error);
             toast({
                 title: "Error",
@@ -124,6 +125,9 @@ export function FormCard({ form }: FormCardProps) {
         ? formatDistance(new Date(form.createdAt), new Date(), { addSuffix: true })
         : "Unknown";
 
+    if (!form) return <Spinner />
+
+    console.log('form', form)
     return (
         <Card
             className={cn(
@@ -134,7 +138,6 @@ export function FormCard({ form }: FormCardProps) {
             <CardHeader>
                 <CardTitle className="flex items-center gap-2 justify-between">
                     <div className="flex flex-col items-start justify-start gap-2 w-full">
-
                         {isAdminRole && (
                             <div className="flex items-center justify-between w-full gap-2">
                                 <Badge
@@ -185,7 +188,6 @@ export function FormCard({ form }: FormCardProps) {
                         )}
 
                         <h2 className="truncate leading-6 text-ellipsis font-bold">{form.name}</h2>
-
                     </div>
                 </CardTitle>
             </CardHeader>
@@ -231,6 +233,25 @@ export function FormCard({ form }: FormCardProps) {
                             </Button>
                         )}
                     </div>
+                ) : form.shareUrl !== undefined && session?.user.role.id === 1 ? (
+                    <Button
+                        className={`w-full mt-2 text-md gap-4 `}
+                        onClick={() => {
+
+                            console.log(`/submit/${form.shareUrl}`)
+                            router.push(`/submit/${form.shareUrl}`);
+
+                            // else {
+                            //     toast({
+                            //         title: "Error",
+                            //         description: "Form share URL is missing.",
+                            //         variant: "destructive",
+                            //     });
+                            // }
+                        }}
+                    >
+                        New Submission <BiRightArrowAlt />
+                    </Button>
                 ) : null}
             </CardFooter>
             {isAdminRole && (

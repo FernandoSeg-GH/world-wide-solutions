@@ -60,6 +60,8 @@ function Forms({ }: Props) {
         return <div className="text-red-500">{error}</div>;
     }
 
+    if (!form) return <p>No form found.</p>
+
     return (
         <div className='text-black dark:text-white'>
             {!session?.user.role.id || session?.user.role.id === 1 ? null : (
