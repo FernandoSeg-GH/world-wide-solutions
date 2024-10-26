@@ -62,11 +62,15 @@ function Forms({ }: Props) {
 
     return (
         <div className='text-black dark:text-white'>
-            <SectionHeader
-                title={` Forms`}
-                subtitle="Create and Manage your business forms to collect data."
-            />
-            <Separator className="border-gray-400 my-2 mb-6" />
+            {!session?.user.role.id || session?.user.role.id === 1 ? null : (
+                <div className='mb-6'>
+                    <Separator className="border-gray-400 my-2 mb-6" />
+                    <SectionHeader
+                        title={` Forms`}
+                        subtitle="Create and Manage your business forms to collect data."
+                    />
+                </div>
+            )}
             <div className="w-full flex flex-col gap-6">
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 2xl:grid-cols-3 5xl:grid-cols-4">
                     {!session?.user.role.id || session?.user.role.id === 1 ? null : (
