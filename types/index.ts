@@ -111,9 +111,19 @@ export interface Submission {
   userId: number;
   username?: string;
   formUrl: string;
-
+  status: string;
   content?: Record<string, { label: string; value: string }>;
   createdAt: string;
+}
+
+export enum SubmissionStatusEnum {
+  PENDING = "PENDING",
+  RECEIVED = "RECEIVED",
+  PROCESSING = "PROCESSING",
+  REVIEWING = "REVIEWING",
+  STARTED = "STARTED",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
 }
 
 export interface LandingPage {
@@ -378,6 +388,10 @@ export interface AppContextType {
     createUser: (userData: any) => Promise<any>;
     fetchSubmissions: (shareUrl: string) => Promise<void>;
     fetchAllSubmissions: (page?: number) => Promise<Submission[] | null>;
+    updateSubmissionStatus: (
+      submissionId: number,
+      newStatus: string
+    ) => Promise<void>;
     getFormSubmissionByCaseId: (caseId: string) => Promise<Submission | null>;
     getMissingFields: (submission: Submission, form: Form) => Promise<string[]>;
     fetchClientSubmissions: () => Promise<void>;

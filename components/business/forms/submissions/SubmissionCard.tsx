@@ -1,62 +1,117 @@
-// src/components/submissions/SubmissionCard.tsx
+'use client';
 
-'use client'
-
-import React, { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ChevronDown, ChevronUp } from 'lucide-react'
-import { Form, Submission } from '@/types'
-import SubmissionDetail from './SubmissionDetail'
-import { useFieldMapping } from '@/hooks/forms/useFieldMapping'
+import React, { useCallback, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import { Form, Submission, SubmissionStatusEnum } from '@/types';
+import SubmissionDetail from './SubmissionDetail';
+import { useFieldMapping } from '@/hooks/forms/useFieldMapping';
+import { useSubmissions } from '@/hooks/forms/useSubmissions';
+import { useSession } from 'next-auth/react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 
 interface SubmissionCardProps {
-    submission: Submission
-    form: Form
+    submission: Submission;
+    form: Form;
 }
 
 const SubmissionCard: React.FC<SubmissionCardProps> = ({ form, submission }) => {
-    const [isExpanded, setIsExpanded] = useState<boolean>(false)
+    const [isExpanded, setIsExpanded] = useState<boolean>(false);
+    const { updateSubmissionStatus } = useSubmissions();
+    const { data: session } = useSession();
 
     const toggleExpand = () => {
-        setIsExpanded(!isExpanded)
-    }
+        setIsExpanded(!isExpanded);
+    };
 
-    const { fieldKeys, fieldMap } = useFieldMapping(form)
+    const { fieldKeys, fieldMap } = useFieldMapping(form);
 
     // Parse submission content
-    let contentParsed: Record<string, { label: string; value: string | null }> = {}
+    let contentParsed: Record<string, { label: string; value: string | null }> = {};
 
     if (submission.content) {
         try {
             contentParsed =
-                typeof submission.content === 'string' ? JSON.parse(submission.content) : submission.content
+                typeof submission.content === 'string' ? JSON.parse(submission.content) : submission.content;
         } catch (error) {
-            console.error(`Error parsing content for submission ID ${submission.id}:`, error)
+            console.error(`Error parsing content for submission ID ${submission.id}:`, error);
         }
     }
 
     // Construct row data similar to SubmissionsTable
-    const row: { [key: string]: any } = {}
+    const row: { [key: string]: any } = {};
 
     fieldKeys.forEach((key) => {
-        const fieldValue = contentParsed[key]
+        const fieldValue = contentParsed[key];
         if (fieldValue && typeof fieldValue === 'object' && 'value' in fieldValue) {
-            row[key] = fieldValue.value
+            row[key] = fieldValue.value;
         } else {
-            row[key] = fieldValue
+            row[key] = fieldValue;
         }
-    })
+    });
+
+    const handleStatusChange = (newStatus: string) => {
+        updateSubmissionStatus(submission.id, newStatus);
+    };
+
+    const userRoleId = Number(session?.user?.role?.id) || 0;
+    const isBusinessUser = [2, 3, 4].includes(userRoleId);
+    const submissionStatus = submission.status || 'STATUS UNKNOWN';
+
+    const statusColor = useCallback((status: string) => {
+        switch (status) {
+            case "APPROVED":
+                return "bg-green-500";
+            case "REJECTED":
+                return "bg-red-500";
+            case "PENDING":
+            case "RECEIVED":
+                return "bg-gray-500";
+            case "REVIEWING":
+            case "PROCESSING":
+            case "STARTED":
+                return "bg-yellow-500";
+            default:
+                return "bg-gray-300";
+        }
+    }, []);
 
     return (
         <Card key={submission.id} className="overflow-hidden shadow-md">
-            <CardHeader className="flex flex-col bg-muted/50 p-4">
+            <CardHeader className="flex flex-col bg-muted/50 p-4" onClick={toggleExpand} >
                 <CardTitle className="flex justify-between items-center text-lg font-semibold">
-                    Submission ID: {submission.id}
-                    <Button onClick={toggleExpand} variant={isExpanded ? "outline" : "default"}>
-                        {isExpanded ? 'Collapse' : 'Details'}{' '}
+                    <div className="flex items-center">
+                        <span className={`inline-block w-3 h-3 mr-2 rounded-full ${statusColor(submissionStatus)}`} />
+                        Submission ID: {submission.id}
+                    </div>
+                    <div className="flex items-center gap-2">
+                        {submissionStatus ? (
+                            isBusinessUser ? (
+                                <Select value={submissionStatus} onValueChange={handleStatusChange}>
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Select status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {Object.values(SubmissionStatusEnum).map((status) => (
+                                            <SelectItem key={status} value={status}>
+                                                {status}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            ) : (
+                                <Badge variant="outline" className={`status-${submissionStatus}`}>
+                                    {submissionStatus}
+                                </Badge>
+                            )
+                        ) : null}
+                        {/* <Button onClick={toggleExpand} variant={isExpanded ? 'outline' : 'default'}>
+                            {isExpanded ? 'Collapse' : 'Details'}{' '}
+                        </Button> */}
                         {isExpanded ? <ChevronUp className="ml-2 h-4 w-4" /> : <ChevronDown className="ml-2 h-4 w-4" />}
-                    </Button>
+                    </div>
                 </CardTitle>
                 <p className="text-sm text-muted-foreground">
                     Form ID: {submission.formId || 'N/A'} - User ID: {submission.userId || 'N/A'}
@@ -73,7 +128,7 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ form, submission }) => 
                 </CardContent>
             )}
         </Card>
-    )
-}
+    );
+};
 
-export default SubmissionCard
+export default SubmissionCard;

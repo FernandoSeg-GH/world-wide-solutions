@@ -294,6 +294,60 @@ export const useSubmissions = () => {
     [session]
   );
 
+  const updateSubmissionStatus = useCallback(
+    async (submissionId: number, newStatus: string) => {
+      if (!session) return;
+
+      try {
+        setLoading(true);
+        const response = await fetch(
+          `/api/forms/submissions/status/${submissionId}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${session.accessToken}`,
+            },
+            body: JSON.stringify({ status: newStatus }),
+          }
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(
+            errorData.message || "Failed to update submission status."
+          );
+        }
+
+        const data = await response.json();
+
+        // Update the submission in the state
+        setSubmissions((prevSubmissions) =>
+          prevSubmissions.map((submission) =>
+            submission.id === submissionId
+              ? { ...submission, status: data.status }
+              : submission
+          )
+        );
+
+        toast({
+          title: "Success",
+          description: "Submission status updated successfully.",
+        });
+      } catch (error: any) {
+        console.error("Error updating submission status:", error);
+        toast({
+          title: "Error",
+          description: error.message || "Failed to update submission status.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    },
+    [session]
+  );
+
   return {
     submissions,
     loading,
@@ -306,6 +360,7 @@ export const useSubmissions = () => {
     fetchSubmissionsByFormUrl,
     getMissingFields,
     fetchClientSubmissions,
+    updateSubmissionStatus,
     setLoading,
   };
 };
