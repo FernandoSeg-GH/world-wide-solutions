@@ -95,7 +95,7 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
 
     useEffect(() => {
         if (formState.form && formState.form.businessId) {
-            submissionState.fetchSubmissions(formState.form.shareUrl, formState.form.businessId);
+            submissionState.fetchSubmissions(formState.form.shareUrl);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [formState.form, submissionState.fetchSubmissions]);

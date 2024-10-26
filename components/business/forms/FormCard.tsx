@@ -117,7 +117,7 @@ export function FormCard({ form }: FormCardProps) {
 
     const handleNavigate = () => {
         setForm(form);
-        switchSection("FormDetail");
+        switchSection("Form");
     };
 
     const formattedDate = form.createdAt

@@ -1,3 +1,5 @@
+// src/components/submissions/SubmissionsTable.tsx
+
 'use client';
 
 import React, { useEffect } from 'react';
@@ -6,68 +8,48 @@ import { Submission, Form, ElementsType } from '@/types';
 import { cn } from '@/lib/utils';
 import { useSubmissions } from '@/hooks/forms/useSubmissions';
 import Spinner from '@/components/ui/spinner';
-import { useFormState } from '@/hooks/forms/useFormState';
 import { formatDistance } from 'date-fns';
+import { useFieldMapping } from '@/hooks/forms/useFieldMapping';
 
 interface Row {
     submittedAt: string;
     [key: string]: any;
 }
 
-function SubmissionsTable({ form, admin }: { form: Form, admin?: boolean }) {
+function SubmissionsTable({ form, admin }: { form: Form; admin?: boolean }) {
     const { submissions, fetchSubmissions, loading } = useSubmissions();
+    const { fieldKeys, fieldMap } = useFieldMapping(form);
 
     useEffect(() => {
-        if (form) {
-            fetchSubmissions(form.shareUrl, form.businessId);
+        if (form.shareUrl) {
+            fetchSubmissions(form.shareUrl);
         }
-    }, [form]);
+    }, [form.shareUrl, fetchSubmissions]);
+
     if (loading || !form) {
         return <Spinner />;
     }
 
-    // if (!Array.isArray(submissions) || submissions.length === 0) {
-    //     return <p className="text-muted-foreground">No submissionssssss available.</p>;
-    // }
-
-    const isInputField = (fieldType: ElementsType): boolean => {
-        const inputFieldTypes: ElementsType[] = [
-            "TextField",
-            "NumberField",
-            "TextAreaField",
-            "DateField",
-            "SelectField",
-            "TelephoneField",
-            "CheckboxField"
-        ];
-        return inputFieldTypes.includes(fieldType);
-    };
-
-    const fields = Array.isArray(form.fields) ? form.fields : [];
 
     const rows = submissions.map((submission) => {
-        const parsedContent: Record<string, any> = submission.content || {};
+        const parsedContent: Record<string, any> =
+            typeof submission.content === 'string' ? JSON.parse(submission.content) : submission.content || {};
 
         const row: { [key: string]: any } = {
             submittedAt: submission.createdAt,
         };
 
-        fields.forEach((field) => {
-            if (isInputField(field.type) && parsedContent[field.id] !== undefined) {
-                row[field.id] = parsedContent[field.id];
+        fieldKeys.forEach((key) => {
+            const fieldValue = parsedContent[key];
+            if (fieldValue && typeof fieldValue === 'object' && 'value' in fieldValue) {
+                row[key] = fieldValue.value;
+            } else {
+                row[key] = fieldValue;
             }
         });
+
         return row;
     });
-
-    const fieldMap = fields.reduce((acc: { [key: string]: string }, field) => {
-        if (isInputField(field.type)) {
-            acc[field.id] = field.extraAttributes?.label || `Field ${field.id}`;
-        }
-        return acc;
-    }, {});
-
-    const fieldKeys = Object.keys(fieldMap);
 
     function formatDate(dateString: string): string {
         const date = new Date(dateString);
@@ -84,45 +66,82 @@ function SubmissionsTable({ form, admin }: { form: Form, admin?: boolean }) {
 
         return date.toLocaleDateString('en-US', options);
     }
+
     const formattedDate = form.createdAt
         ? formatDistance(new Date(form.createdAt), new Date(), {
             addSuffix: true,
         })
-        : "Unknown time";
+        : 'Unknown time';
 
+    function renderCellValue(key: string, value: any) {
+        const field = fieldMap[key];
+        const fieldType = field?.type;
+
+        if (value === null || value === undefined || value === '') {
+            return <span className="text-gray-400">N/A</span>;
+        }
+
+        if (fieldType === 'SelectField' && typeof value === 'string') {
+            const options = field.extraAttributes?.options || [];
+            const selectedOption = options.find((option: any) => option.value === value);
+            return selectedOption ? selectedOption.label : value;
+        }
+
+        if (fieldType === 'CheckboxField' && typeof value === 'boolean') {
+            return value ? 'Yes' : 'No';
+        }
+
+        if (fieldType === 'DateField' && typeof value === 'string') {
+            const date = new Date(value);
+            return isNaN(date.getTime()) ? value : date.toLocaleDateString();
+        }
+
+        if (typeof value === 'object' && value !== null) {
+            return JSON.stringify(value);
+        }
+
+        return value;
+    }
 
     return (
-        <div className="w-full flex flex-col items-start justify-start ">
-            <div className='mb-3 w-full flex items-center justify-end'>
-                <h3 className='font-semibold'>Created At: <span className='italic'>{formattedDate}</span></h3>
-                <p>{form.published}</p>
-            </div>
-            <div className="rounded-lg border shadow-sm w-full overflow-x-auto dark:bg-muted/10">
-                <Table className={cn("w-full table-auto")}>
-                    <TableHeader className='dark:bg-gray-900'>
-                        <TableRow className="dark:bg-gray-900 ">
-                            {fieldKeys.map((fieldKey) => (
-                                <TableHead key={fieldKey} className="uppercase text-sm font-semibold px-6 py-3 dark:text-gray-100">
-                                    {fieldMap[fieldKey] || `Field ${fieldKey}`}
-                                </TableHead>
-                            ))}
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {rows.map((row, index) => (
-                            <TableRow key={index} className={index % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-700'}>
-                                {fieldKeys.map((key) => (
-                                    <TableCell key={key} className="px-6 py-4 text-sm text-gray-700">
-                                        {row[key] || <span className="text-gray-400">N/A</span>}
-                                    </TableCell>
+        <div className="w-full overflow-x-auto">
+            <div className="inline-block min-w-full align-middle">
+                <div className="overflow-hidden border rounded-lg">
+                    <Table className="min-w-full divide-y divide-gray-200">
+                        <TableHeader className="bg-gray-50">
+                            <TableRow>
+                                {fieldKeys.map((fieldKey) => (
+                                    <TableHead
+                                        key={fieldKey}
+                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                                    >
+                                        {fieldMap[fieldKey]?.label || `Field ${fieldKey}`}
+                                    </TableHead>
                                 ))}
-                                <TableCell className="px-6 py-4 text-sm text-gray-600 text-right">
-                                    {formatDate(row.submittedAt)}
-                                </TableCell>
+                                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                                    Submitted At
+                                </TableHead>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
+                        </TableHeader>
+                        <TableBody className="bg-white divide-y divide-gray-200">
+                            {rows.map((row, index) => (
+                                <TableRow key={index}>
+                                    {fieldKeys.map((key) => (
+                                        <TableCell
+                                            key={key}
+                                            className="px-6 py-4 whitespace-nowrap text-sm text-gray-700"
+                                        >
+                                            {renderCellValue(key, row[key])}
+                                        </TableCell>
+                                    ))}
+                                    <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                        {formatDate(row.submittedAt)}
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
             </div>
         </div>
     );

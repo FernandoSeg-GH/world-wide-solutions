@@ -376,7 +376,7 @@ export interface AppContextType {
     };
     createBusiness: (businessData: any) => Promise<boolean>;
     createUser: (userData: any) => Promise<any>;
-    fetchSubmissions: (shareUrl: string, businessId: number) => Promise<void>;
+    fetchSubmissions: (shareUrl: string) => Promise<void>;
     fetchAllSubmissions: (page?: number) => Promise<Submission[] | null>;
     getFormSubmissionByCaseId: (caseId: string) => Promise<Submission | null>;
     getMissingFields: (submission: Submission, form: Form) => Promise<string[]>;

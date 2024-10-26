@@ -22,7 +22,6 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
     const formValues = useRef<{ [key: string]: string }>({});
     const formErrors = useRef<{ [key: string]: boolean }>({});
     const [renderKey, setRenderKey] = useState(new Date().getTime());
-    const [submitted, setSubmitted] = useState(false);
     const [pending, startTransition] = useTransition();
 
     useEffect(() => {
@@ -65,6 +64,12 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
         formValues.current[key] = value;
     }, []);
 
+    const resetForm = () => {
+        formValues.current = {};
+        formErrors.current = {};
+        setRenderKey(new Date().getTime());
+    };
+
     const submitForm = async () => {
         formErrors.current = {};
         const validForm = validateForm();
@@ -93,7 +98,7 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
                 throw new Error(errorData.message || "Failed to submit the form");
             }
 
-            setSubmitted(true);
+            resetForm();
             toast({
                 title: "Success",
                 description: "Form submitted successfully.",
@@ -108,20 +113,6 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
     };
 
     const formattedDate = format(new Date(), 'dd MMMM yyyy');
-
-    if (submitted) {
-        return (
-            <div className="flex justify-center w-full h-full items-center p-8">
-                <div className="max-w-[620px] flex flex-col gap-4 flex-grow bg-background w-full p-8 mt-20 lg:mt-40 2xl:mt-56 overflow-y-auto border shadow-xl shadow-gray-200 rounded">
-                    <h1 className="text-2xl font-bold">Form submitted</h1>
-                    <p className="text-muted-foreground">
-                        Thank you for submitting the form. You can close this page now.
-                    </p>
-                </div>
-            </div>
-        );
-    }
-
 
     if (!form) {
         return <Spinner />;

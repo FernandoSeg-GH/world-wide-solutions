@@ -179,7 +179,7 @@ export const useFormState = (initialForm?: Form) => {
         setLoading(false);
       }
     },
-    [form, setForm, setForms]
+    [form?.id, session?.accessToken, setForm]
   );
 
   const fetchFormByShareUrl = useCallback(
@@ -255,7 +255,7 @@ export const useFormState = (initialForm?: Form) => {
         }
       }
     },
-    [form, setForm]
+    [form, session?.user.businessId, setForm]
   );
 
   const fetchFormByShareUrlPublic = useCallback(
@@ -287,39 +287,36 @@ export const useFormState = (initialForm?: Form) => {
       }
       return null;
     },
-    [session?.user.businessId]
+    [session?.user.businessId, setForm]
   );
 
-  const fetchFormsByBusinessId = useCallback(
-    async (businessId: number) => {
-      try {
-        setLoading(true);
-        const response = await fetch(`/api/forms/${businessId}`);
+  const fetchFormsByBusinessId = useCallback(async (businessId: number) => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/forms/${businessId}`);
 
-        if (!response.ok) {
-          toast({
-            title: "Error",
-            description: "Failed to fetch forms for this business.",
-            variant: "destructive",
-          });
-          return;
-        }
-        const data = await response.json();
-        setForms(data.forms);
-      } catch (error) {
-        console.error("Error fetching forms for business:", error);
+      if (!response.ok) {
         toast({
           title: "Error",
-          description:
-            "An error occurred while fetching forms for this business.",
+          description: "Failed to fetch forms for this business.",
           variant: "destructive",
         });
-      } finally {
-        setLoading(false);
+        return;
       }
-    },
-    [session?.accessToken]
-  );
+      const data = await response.json();
+      setForms(data.forms);
+    } catch (error) {
+      console.error("Error fetching forms for business:", error);
+      toast({
+        title: "Error",
+        description:
+          "An error occurred while fetching forms for this business.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const fetchAllForms = useCallback(async (): Promise<void> => {
     if (session?.user.businessId) {

@@ -13,8 +13,8 @@ export const useSubmissions = () => {
   const [totalPages, setTotalPages] = useState<number>(1);
 
   const fetchSubmissions = useCallback(
-    async (shareUrl: string, businessId: number): Promise<void> => {
-      if (!shareUrl || !businessId) {
+    async (shareUrl: string): Promise<void> => {
+      if (!shareUrl) {
         console.error("Share URL or Business ID is undefined.");
         toast({
           title: "Error",
@@ -54,7 +54,7 @@ export const useSubmissions = () => {
         });
       }
     },
-    [session?.accessToken]
+    [session?.accessToken, session?.user.businessId]
   );
 
   const getFormSubmissionByCaseId = useCallback(

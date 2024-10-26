@@ -207,7 +207,7 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
                                                                 const selectedForm = forms.find((form) => form.name === subItem.label);
                                                                 if (selectedForm) {
                                                                     setForm(selectedForm);
-                                                                    switchSection('FormDetail');
+                                                                    switchSection('Form');
                                                                 }
                                                             }}
                                                             className={cn(

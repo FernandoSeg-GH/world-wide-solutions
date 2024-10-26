@@ -13,7 +13,6 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { SubscriptionPlan } from "@/types";
-import SubmissionCards from "../business/forms/submissions/SubmissionsCards";
 
 function isStringArray(features: any): features is string[] {
     return Array.isArray(features) && features.every(item => typeof item === 'string');
