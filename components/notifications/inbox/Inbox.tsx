@@ -8,6 +8,7 @@ import ReplyMessage from "../reply/message";
 import { InboxMessage } from "@/types";
 import { useAppContext } from "@/context/AppProvider";
 import MessagingLayout from "../MessagingLayout";
+import SectionHeader from "@/components/layout/navbar/SectionHeader";
 
 const Inbox: React.FC = () => {
     const { data, actions } = useAppContext();
@@ -37,7 +38,11 @@ const Inbox: React.FC = () => {
 
     return (
         <div className="h-full">
-            <h2 className="text-2xl font-bold mb-6">Your Messages</h2>
+            <SectionHeader
+                title={` Notification Center`}
+                subtitle="Stay up to date with your submissions."
+            />
+            {/* <h2 className="text-2xl font-bold mb-6">Your Messages</h2> */}
             {/* {messages.length === 0 ? (
                 <p>No messages found.</p>
             ) : (

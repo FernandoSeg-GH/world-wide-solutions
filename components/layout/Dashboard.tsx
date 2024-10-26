@@ -42,8 +42,8 @@ export const RenderComponent = (currentSection: string) => {
             return <FormDetails />;
         case "Submissions":
             return <Submissions />;
-        case "Notifications":
-            return <Notifications />;
+        // case "Notifications":
+        //     return <Notifications />;
         case "Messages":
             return <MessagingLayout />;
         case "Users":

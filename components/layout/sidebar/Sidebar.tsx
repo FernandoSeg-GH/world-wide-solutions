@@ -64,10 +64,10 @@ export const getSidebarItems = (godMode: boolean, forms: Form[], roleId?: number
             icon: Folders,
             label: "Submissions",
         },
-        {
-            icon: FaBell,
-            label: "Notifications",
-        },
+        // {
+        //     icon: FaBell,
+        //     label: "Notifications",
+        // },
         {
             icon: MailCheck,
             label: "Messages",
