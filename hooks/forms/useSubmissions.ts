@@ -360,7 +360,7 @@ export const useSubmissions = () => {
     fetchSubmissionsByFormUrl,
     getMissingFields,
     fetchClientSubmissions,
-    updateSubmissionStatus,
     setLoading,
+    updateSubmissionStatus,
   };
 };

@@ -1,4 +1,4 @@
-// /app/api/forms/submission/[submissionId]/status/route.ts
+// /app/api/forms/submissions/status/[submissionId]/route.ts
 
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
