@@ -119,7 +119,7 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
     }
 
     return (
-        <div className="flex flex-col justify-start w-full min-h-screen items-center p-8 dark:bg-muted">
+        <div className="flex flex-col justify-start w-full min-h-screen items-center p-8 bg-muted/40 dark:bg-muted">
             <div
                 key={renderKey}
                 className="max-w-[620px] h-auto flex flex-col gap-4 bg-background w-full p-8 overflow-y-auto border shadow-xl shadow-gray-200 rounded-md dark:border-gray-300 my-6 dark:bg-white dark:text-black"
