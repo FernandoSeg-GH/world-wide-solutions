@@ -1,4 +1,3 @@
-// components/notifications/UserNotifications.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -41,7 +40,6 @@ const UserNotifications: React.FC = () => {
             <Separator className='my-2' />
             <div className='my-6'>
                 <Inbox />
-                {/* Optional: Display notifications if needed */}
                 {/* <Separator className='my-2' />
                 {notifications.map((notification) => (
                     <Card key={notification.id} className="mb-2 flex items-center justify-between p-4">

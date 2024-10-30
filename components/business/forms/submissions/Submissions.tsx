@@ -19,34 +19,16 @@ function Submissions({ }: Props) {
     const { data } = useAppContext();
     const { form } = data;
 
-    useEffect(() => {
-        if (session?.user.businessId && form?.shareUrl) {
-            fetchSubmissionsByFormUrl(form.shareUrl)
-                .then(() => {
-                    console.log(`Successfully fetched submissions for form: ${form.shareUrl}`);
-                })
-                .catch((error) => {
-                    console.error(`Error fetching submissions for form: ${form.shareUrl}`, error);
-                });
-        }
-    }, [session, fetchSubmissionsByFormUrl, form]);
-
     if (loading) {
         return <Spinner />;
     }
 
     const handlePrevious = () => {
-        if (currentPage > 1) {
-            // Implement pagination logic
-            console.log('Handle previous page');
-        }
+        if (currentPage > 1) { }
     };
 
     const handleNext = () => {
-        if (currentPage < Number(totalPages)) {
-            // Implement pagination logic
-            console.log('Handle next page');
-        }
+        if (currentPage < Number(totalPages)) { }
     };
 
     if (!form) return <p>No form found.</p>

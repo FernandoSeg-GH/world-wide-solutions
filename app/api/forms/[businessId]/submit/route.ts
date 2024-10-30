@@ -19,20 +19,20 @@ export async function POST(request: Request) {
     );
   }
 
-  const { content } = await request.json();
-
-  const API_URL =
-    process.env.NEXT_PUBLIC_FLASK_BACKEND_URL || "http://localhost:5000";
-
   try {
-    const response = await fetch(`${API_URL}/forms/submit/${formUrl}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session.accessToken}`,
-      },
-      body: JSON.stringify({ content }),
-    });
+    const formData = await request.formData();
+
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SPACE_URL}/form-submissions/submit?formUrl=${formUrl}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+        body: formData,
+        ...({ duplex: "half" } as any),
+      }
+    );
 
     if (!response.ok) {
       const errorText = await response.text();

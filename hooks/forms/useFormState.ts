@@ -304,7 +304,7 @@ export const useFormState = (initialForm?: Form) => {
         return;
       }
       const data = await response.json();
-      console.log("hook data", data.forms);
+
       // TODO: Agregarr paginación
       setForms(data.forms);
     } catch (error) {
@@ -419,7 +419,6 @@ export const useFormState = (initialForm?: Form) => {
         }
 
         const data = await response.json();
-        console.log("data", data);
         if (data && Array.isArray(data)) {
           setForms(data);
         } else if (data?.forms) {
@@ -428,7 +427,7 @@ export const useFormState = (initialForm?: Form) => {
           console.error("Unexpected data format:", data);
           setForms([]);
         }
-        console.log(" data.forms", data.forms);
+
         return data.forms;
       } catch (error) {
         console.error("Error fetching published forms:", error);

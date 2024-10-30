@@ -1,5 +1,3 @@
-// src/components/submissions/SubmissionDetail.tsx
-
 'use client';
 
 import React from 'react';

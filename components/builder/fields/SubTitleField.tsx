@@ -1,28 +1,29 @@
 "use client";
 
-import { ElementsType, FormElement, FormElementInstance } from "@/components/business/forms/FormElements";
-import { Label } from "@/components/ui/label";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { ElementsType, FormElement, FormElementInstance } from "@/types";
 
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+import { LuHeading2 } from "react-icons/lu";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { BsTextParagraph } from "react-icons/bs";
-import { Textarea } from "@/components/ui/textarea";
 import { useAppContext } from "@/context/AppProvider";
 
-const type: ElementsType = "ParagraphField";
+const type: ElementsType = "SubTitleField";
 
 const extraAttributes = {
-    text: "Text here",
+    title: "SubTitle field",
 };
 
 const propertiesSchema = z.object({
-    text: z.string().min(2).max(500),
+    title: z.string().min(2).max(50),
 });
 
-export const ParagraphFieldFormElement: FormElement = {
+export const SubTitleFieldFormElement: FormElement = {
     type,
     construct: (id: string) => ({
         id,
@@ -30,8 +31,8 @@ export const ParagraphFieldFormElement: FormElement = {
         extraAttributes,
     }),
     designerBtnElement: {
-        icon: BsTextParagraph,
-        label: "Paragraph field",
+        icon: LuHeading2,
+        label: "SubTitle field",
     },
     designerComponent: DesignerComponent,
     formComponent: FormComponent,
@@ -46,11 +47,11 @@ type CustomInstance = FormElementInstance & {
 
 function DesignerComponent({ elementInstance }: { elementInstance: FormElementInstance }) {
     const element = elementInstance as CustomInstance;
-    const { text } = element.extraAttributes;
+    const { title } = element.extraAttributes;
     return (
-        <div className="flex flex-col gap-2 w-full overflow-hidden">
-            <Label className="text-muted-foreground">Paragraph field</Label>
-            <p className="truncate text-ellipsis">{text}</p>
+        <div className="flex flex-col gap-2 w-full">
+            <Label className="text-muted-foreground">SubTitle field</Label>
+            <p className="text-lg">{title}</p>
         </div>
     );
 }
@@ -58,8 +59,8 @@ function DesignerComponent({ elementInstance }: { elementInstance: FormElementIn
 function FormComponent({ elementInstance }: { elementInstance: FormElementInstance }) {
     const element = elementInstance as CustomInstance;
 
-    const { text } = element.extraAttributes;
-    return <p className="text-muted-foreground">{text}</p>;
+    const { title } = element.extraAttributes;
+    return <p className="text-lg">{title}</p>;
 }
 
 type propertiesFormSchemaType = z.infer<typeof propertiesSchema>;
@@ -72,7 +73,7 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
         resolver: zodResolver(propertiesSchema),
         mode: "onBlur",
         defaultValues: {
-            text: element.extraAttributes.text,
+            title: element.extraAttributes.title,
         },
     });
 
@@ -81,11 +82,11 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
     }, [element, form]);
 
     function applyChanges(values: propertiesFormSchemaType) {
-        const { text } = values;
+        const { title } = values;
         formActions.updateElement(element.id, {
             ...element,
             extraAttributes: {
-                text,
+                title,
             },
         });
     }
@@ -101,13 +102,12 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
             >
                 <FormField
                     control={form.control}
-                    name="text"
+                    name="title"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Text</FormLabel>
+                            <FormLabel>Title</FormLabel>
                             <FormControl>
-                                <Textarea
-                                    rows={5}
+                                <Input
                                     {...field}
                                     onKeyDown={(e) => {
                                         if (e.key === "Enter") e.currentTarget.blur();

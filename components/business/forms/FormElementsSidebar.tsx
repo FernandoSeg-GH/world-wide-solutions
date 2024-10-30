@@ -1,7 +1,7 @@
 import React from "react";
 import SidebarBtnElement from "@/components/builder/SidebarBtnElement";
-import { FormElements } from "@/components/business/forms/FormElements";
 import { Separator } from "@/components/ui/separator";
+import { FormElements } from "@/types";
 
 function FormElementsSidebar() {
     return (
@@ -24,6 +24,7 @@ function FormElementsSidebar() {
                 <SidebarBtnElement formElement={FormElements.DateField} />
                 <SidebarBtnElement formElement={FormElements.SelectField} />
                 <SidebarBtnElement formElement={FormElements.CheckboxField} />
+                <SidebarBtnElement formElement={FormElements.FileUploadField} />
             </div>
         </div>
     );

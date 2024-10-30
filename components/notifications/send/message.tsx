@@ -88,7 +88,6 @@ const SendMessage: React.FC = () => {
                 <p className="text-sm text-muted">Notify users with custom messages</p>
             </CardHeader>
             <CardContent>
-                {/* Custom Multi-Select Recipients */}
                 <div className="mb-4">
                     <label className="block text-sm font-medium">Recipients:</label>
                     <div className="flex flex-wrap">
@@ -113,7 +112,6 @@ const SendMessage: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Form Selection */}
                 <div className="mb-4">
                     <label className="block text-sm font-medium">Reference Form:</label>
                     <select
@@ -131,7 +129,6 @@ const SendMessage: React.FC = () => {
                     </select>
                 </div>
 
-                {/* Content Textarea */}
                 <div className="mb-4">
                     <label className="block text-sm font-medium">Content:</label>
                     <Textarea
@@ -144,7 +141,6 @@ const SendMessage: React.FC = () => {
                     />
                 </div>
 
-                {/* Read-Only Checkbox */}
                 <div className="mb-4 flex items-center">
                     <Checkbox
                         id="readOnlyCheckbox"
@@ -156,7 +152,6 @@ const SendMessage: React.FC = () => {
                     </label>
                 </div>
 
-                {/* Submit Button */}
                 <Button
                     onClick={handleSendMessage}
                     disabled={loading || recipientIds.length === 0 || !content.trim()}

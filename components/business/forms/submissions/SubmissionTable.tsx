@@ -1,5 +1,3 @@
-// src/components/submissions/SubmissionsTable.tsx
-
 'use client';
 
 import React, { useEffect } from 'react';

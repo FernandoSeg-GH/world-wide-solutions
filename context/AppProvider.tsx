@@ -89,7 +89,7 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
             formState.setForm(formState.forms[0]);
             formState.formInitializedRef.current = true;
         }
-    }, [formState.forms, initialForm, formState.setForm]);
+    }, [formState.forms, initialForm, formState.setForm, formState]);
 
 
 

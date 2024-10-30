@@ -24,6 +24,12 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
     const [renderKey, setRenderKey] = useState(new Date().getTime());
     const [pending, startTransition] = useTransition();
 
+    const filesRef = useRef<{ [key: string]: File | File[] }>({});
+
+    const handleFileChange = useCallback((fieldId: string, files: File | File[]) => {
+        filesRef.current[fieldId] = files;
+    }, []);
+
     useEffect(() => {
         const fetchData = async () => {
             if (session?.user.businessId) {
@@ -67,6 +73,7 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
     const resetForm = () => {
         formValues.current = {};
         formErrors.current = {};
+        filesRef.current = {};
         setRenderKey(new Date().getTime());
     };
 
@@ -85,29 +92,51 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
         }
 
         try {
-            const jsonContent = JSON.stringify(formValues.current);
-            const response = await fetch(`/api/forms/${session?.user.businessId}/submit?formUrl=${formUrl}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ content: jsonContent }),
+            const formData = new FormData();
+
+
+            formData.append('content', JSON.stringify(formValues.current));
+
+
+            Object.entries(filesRef.current).forEach(([fieldId, files]) => {
+                if (Array.isArray(files)) {
+                    files.forEach(file => formData.append('files', file));
+                } else {
+                    formData.append('files', files);
+                }
             });
+
+
+            formData.append('userId', String(session?.user.businessId || 1));
+
+
+            const response = await fetch(`/api/forms/${session?.user.businessId}/submit?formUrl=${formUrl}`, {
+                method: 'POST',
+                body: formData,
+
+            });
+
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || "Failed to submit the form");
+                const errorData = await response.text();
+                toast({
+                    title: "Error",
+                    description: `Failed to submit form: ${errorData}`,
+                    variant: "destructive",
+                });
+                return;
             }
 
+            const result = await response.json();
             resetForm();
             toast({
-                title: "Success",
-                description: "Form submitted successfully.",
+                title: 'Success',
+                description: 'Form submitted successfully.',
             });
         } catch (error: any) {
             toast({
-                title: "Error",
-                description: "Something went wrong while submitting the form.",
-                variant: "destructive",
+                title: 'Error',
+                description: String(error),
+                variant: 'destructive',
             });
         }
     };
@@ -140,8 +169,9 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
                                 key={element.id}
                                 elementInstance={element}
                                 submitValue={submitValue}
-                                isInvalid={formErrors.current[element.id]}
+                                isInvalid={!!formErrors.current[element.id]}
                                 defaultValue={formValues.current[element.id] || ""}
+                                handleFileChange={handleFileChange}
                             />
                         ) : (
                             <p key={element.id} className="text-red-500">

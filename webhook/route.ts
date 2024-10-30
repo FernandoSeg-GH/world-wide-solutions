@@ -14,7 +14,7 @@
 //   }
 
 //   if (!process.env.STRIPE_WEBHOOK_SECRET) {
-//     console.log("⚠️ Stripe webhook secret is not set.");
+//     console.log("Stripe webhook secret is not set.");
 //     return new NextResponse("Stripe webhook secret is not set", {
 //       status: 400,
 //     });

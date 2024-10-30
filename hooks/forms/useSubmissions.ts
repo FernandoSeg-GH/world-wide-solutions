@@ -321,7 +321,6 @@ export const useSubmissions = () => {
 
         const data = await response.json();
 
-        // Update the submission in the state
         setSubmissions((prevSubmissions) =>
           prevSubmissions.map((submission) =>
             submission.id === submissionId

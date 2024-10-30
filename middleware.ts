@@ -15,8 +15,6 @@ export async function middleware(req: NextRequest) {
 
   if (timeUntilExpiration < 60 * 1000) {
     try {
-      console.log("Refreshing token...");
-
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/auth/refresh`,
         {

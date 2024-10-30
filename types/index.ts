@@ -1,16 +1,17 @@
-import { CheckboxFieldFormElement } from "@/components/business/forms/fields/CheckboxField";
-import { DateFieldFormElement } from "@/components/business/forms/fields/DateField";
-import { NumberFieldFormElement } from "@/components/business/forms/fields/NumberField";
-import { ParagraphFieldFormElement } from "@/components/business/forms/fields/ParagraphField";
-import { SelectFieldFormElement } from "@/components/business/forms/fields/SelectField";
-import { SeparatorFieldFormElement } from "@/components/business/forms/fields/SeparatorField";
-import { SpacerFieldFormElement } from "@/components/business/forms/fields/SpacerField";
-import { SubTitleFieldFormElement } from "@/components/business/forms/fields/SubTitleField";
-import { TextAreaFormElement } from "@/components/business/forms/fields/TextAreaField";
-import { TextFieldFormElement } from "@/components/business/forms/fields/TextField";
-import { TitleFieldFormElement } from "@/components/business/forms/fields/TitleField";
-import { TelephoneFieldFormElement } from "@/components/business/forms/fields/TelephoneField";
+import { CheckboxFieldFormElement } from "@/components/builder/fields/CheckboxField";
+import { DateFieldFormElement } from "@/components/builder/fields/DateField";
+import { NumberFieldFormElement } from "@/components/builder/fields/NumberField";
+import { ParagraphFieldFormElement } from "@/components/builder/fields/ParagraphField";
+import { SelectFieldFormElement } from "@/components/builder/fields/SelectField";
+import { SeparatorFieldFormElement } from "@/components/builder/fields/SeparatorField";
+import { SpacerFieldFormElement } from "@/components/builder/fields/SpacerField";
+import { SubTitleFieldFormElement } from "@/components/builder/fields/SubTitleField";
+import { TextAreaFormElement } from "@/components/builder/fields/TextAreaField";
+import { TextFieldFormElement } from "@/components/builder/fields/TextField";
+import { TitleFieldFormElement } from "@/components/builder/fields/TitleField";
+import { TelephoneFieldFormElement } from "@/components/builder/fields/TelephoneField";
 import { Dispatch, SetStateAction } from "react";
+import { FileUploadFieldFormElement } from "@/components/builder/fields/FileUploadField";
 
 export enum BrandColors {
   BluePrimary = "#151342",
@@ -257,7 +258,8 @@ export type ElementsType =
   | "DateField"
   | "SelectField"
   | "TelephoneField"
-  | "CheckboxField";
+  | "CheckboxField"
+  | "FileUploadField";
 
 export type SubmitFunction = (key: string, value: string) => void;
 
@@ -274,12 +276,15 @@ export type FormElement = {
   designerComponent: React.FC<{
     elementInstance: FormElementInstance;
   }>;
+
   formComponent: React.FC<{
     elementInstance: FormElementInstance;
     submitValue?: SubmitFunction;
     isInvalid?: boolean;
     defaultValue?: string;
+    handleFileChange?: (fieldId: string, files: File | File[]) => void;
   }>;
+
   propertiesComponent: React.FC<{
     elementInstance: FormElementInstance;
   }>;
@@ -305,7 +310,14 @@ export const FormElements: FormElementsType = {
   SelectField: SelectFieldFormElement,
   CheckboxField: CheckboxFieldFormElement,
   TelephoneField: TelephoneFieldFormElement,
+  FileUploadField: FileUploadFieldFormElement,
 };
+
+export interface UploadResponse {
+  message: string;
+  filename: string;
+  path: string;
+}
 
 export interface FetchError {
   message: string;

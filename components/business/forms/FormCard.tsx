@@ -127,7 +127,6 @@ export function FormCard({ form }: FormCardProps) {
 
     if (!form) return <Spinner />
 
-    console.log('form', form)
     return (
         <Card
             className={cn(
@@ -237,8 +236,6 @@ export function FormCard({ form }: FormCardProps) {
                     <Button
                         className={`w-full mt-2 text-md gap-4 `}
                         onClick={() => {
-
-                            console.log(`/submit/${form.shareUrl}`)
                             router.push(`/submit/${form.shareUrl}`);
 
                             // else {

@@ -1,5 +1,3 @@
-// nextjs api/forms/[businessId]/published/route.ts
-
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
@@ -43,7 +41,6 @@ export async function GET(
 
     const data = await response.json();
 
-    // Transform data to camelCase
     const camelCaseData = camelcaseKeys(data, { deep: true });
 
     return NextResponse.json(camelCaseData, { status: 200 });

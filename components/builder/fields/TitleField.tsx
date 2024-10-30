@@ -1,6 +1,6 @@
 "use client";
 
-import { ElementsType, FormElement, FormElementInstance } from "@/components/business/forms/FormElements";
+import { ElementsType, FormElement, FormElementInstance } from "@/types";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { z } from "zod";

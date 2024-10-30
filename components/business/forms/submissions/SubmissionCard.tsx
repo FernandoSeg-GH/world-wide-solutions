@@ -30,7 +30,6 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ form, submission }) => 
 
     const { fieldKeys, fieldMap } = useFieldMapping(form);
 
-    // Parse submission content
     let contentParsed: Record<string, { label: string; value: string | null }> = {};
 
     if (submission.content) {
@@ -42,7 +41,6 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ form, submission }) => 
         }
     }
 
-    // Construct row data similar to SubmissionsTable
     const row: { [key: string]: any } = {};
 
     fieldKeys.forEach((key) => {
@@ -59,7 +57,6 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ form, submission }) => 
         try {
             await updateSubmissionStatus(submission.id, newStatus);
             setLocalStatus(newStatus);
-            // Optionally, you can trigger a re-fetch if needed
             // await fetchSubmissions(form.share_url);
         } catch (error) {
             console.error("Error updating submission status:", error);
@@ -68,16 +65,10 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ form, submission }) => 
         }
     };
 
-    // useEffect(() => {
-    //     // Sync localStatus with the submission prop in case it changes from the parent
-    //     setLocalStatus(submission.status);
-    // }, [submission.status]);
-
     const userRoleId = Number(session?.user?.role?.id) || 0;
     const isBusinessUser = [2, 3, 4].includes(userRoleId);
     const submissionStatus = localStatus || 'STATUS UNKNOWN';
 
-    // Function to determine the color of the status indicator
     const statusColor = useCallback((status: string) => {
         switch (status) {
             case "APPROVED":
@@ -139,7 +130,7 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ form, submission }) => 
             {isExpanded && (
                 <CardContent className="p-4">
                     {isUpdating ? (
-                        <Skeleton className="h-10 w-full" /> // Display skeleton while updating
+                        <Skeleton className="h-10 w-full" />
                     ) : (
                         <SubmissionDetail
                             row={row}

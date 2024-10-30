@@ -1,12 +1,5 @@
-// src/utils/useFieldMapping.ts
-
 import { Form, ElementsType } from "@/types";
 
-/**
- * Utility function to map form fields to fieldKeys and fieldMap.
- * @param form - The form object containing fields.
- * @returns An object containing ordered fieldKeys and fieldMap.
- */
 export function useFieldMapping(form: Form) {
   const isInputField = (fieldType: ElementsType): boolean => {
     const inputFieldTypes: ElementsType[] = [
@@ -17,6 +10,7 @@ export function useFieldMapping(form: Form) {
       "SelectField",
       "TelephoneField",
       "CheckboxField",
+      "FileUploadField",
     ];
     return inputFieldTypes.includes(fieldType);
   };
@@ -35,7 +29,7 @@ export function useFieldMapping(form: Form) {
         type: field.type,
         extraAttributes: field.extraAttributes,
       };
-      fieldKeys.push(field.id); // Maintain the order
+      fieldKeys.push(field.id);
     }
   });
 

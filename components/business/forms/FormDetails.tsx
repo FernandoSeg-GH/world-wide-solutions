@@ -1,5 +1,3 @@
-// src/components/FormDetails.tsx
-
 'use client';
 
 import React from 'react';
@@ -67,12 +65,10 @@ const FormDetails = () => {
 
             <Separator className="border-gray-400 my-2 mb-6" />
 
-            {/* Submissions Table */}
             <div className="w-full overflow-x-auto">
                 <SubmissionsTable form={form} admin={isAdmin} />
             </div>
 
-            {/* Submission Cards */}
             <div className="grid grid-cols-1 gap-4">
                 {submissions.map((submission) => (
                     <SubmissionCard

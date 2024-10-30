@@ -1,7 +1,7 @@
 "use client";
 
 import { MdTextFields } from "react-icons/md";
-import { ElementsType, FormElement, FormElementInstance, SubmitFunction } from "@/components/business/forms/FormElements";
+import { ElementsType, FormElement, FormElementInstance, SubmitFunction } from "@/types";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { z } from "zod";

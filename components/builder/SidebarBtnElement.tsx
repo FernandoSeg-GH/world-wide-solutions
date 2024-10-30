@@ -1,8 +1,8 @@
 import React from "react";
-import { FormElement } from "@/components/business/forms/FormElements";
 import { Button } from "@/components/ui/button";
 import { useDraggable } from "@dnd-kit/core";
 import { cn } from "@/lib/utils";
+import { FormElement } from "@/types";
 
 function SidebarBtnElement({ formElement }: { formElement: FormElement }) {
     const { label, icon: Icon } = formElement.designerBtnElement;

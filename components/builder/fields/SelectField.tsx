@@ -1,6 +1,6 @@
 "use client";
 
-import { ElementsType, FormElement, FormElementInstance, SubmitFunction } from "@/components/business/forms/FormElements";
+import { ElementsType, FormElement, FormElementInstance, SubmitFunction } from "@/types";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
@@ -8,12 +8,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { RxDropdownMenu } from "react-icons/rx";
-
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Switch } from "@/components/ui/switch";
+import { Form, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { AiOutlineClose, AiOutlinePlus } from "react-icons/ai";
 import { toast } from "@/components/ui/use-toast";
@@ -171,7 +168,7 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
                 helperText,
                 placeHolder,
                 required,
-                options, // Use the updated options from the form
+                options,
             },
         });
 
@@ -186,7 +183,6 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(applyChanges)} className="space-y-3">
-                {/* ... other form fields ... */}
                 <FormField
                     control={form.control}
                     name="options"
@@ -250,7 +246,6 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
                         </FormItem>
                     )}
                 />
-                {/* ... other form fields ... */}
                 <Button className="w-full" type="submit">
                     Save
                 </Button>

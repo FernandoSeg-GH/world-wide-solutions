@@ -1,30 +1,25 @@
 "use client";
 
+import { ElementsType, FormElement, FormElementInstance, SubmitFunction } from "@/types";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { ElementsType, FormElement, FormElementInstance, SubmitFunction } from "@/components/business/forms/FormElements";
+import { IoMdCheckbox } from "react-icons/io";
 
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-
-import { cn } from "@/lib/utils";
-import { CalendarIcon } from "@radix-ui/react-icons";
-import { format } from "date-fns";
-import { BsFillCalendarDateFill } from "react-icons/bs";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useAppContext } from "@/context/AppProvider";
 
-const type: ElementsType = "DateField";
+const type: ElementsType = "CheckboxField";
 
 const extraAttributes = {
-    label: "Date field",
-    helperText: "Pick a date",
+    label: "Checkbox field",
+    helperText: "Helper text",
     required: false,
 };
 
@@ -34,7 +29,7 @@ const propertiesSchema = z.object({
     required: z.boolean().default(false),
 });
 
-export const DateFieldFormElement: FormElement = {
+export const CheckboxFieldFormElement: FormElement = {
     type,
     construct: (id: string) => ({
         id,
@@ -42,8 +37,8 @@ export const DateFieldFormElement: FormElement = {
         extraAttributes,
     }),
     designerBtnElement: {
-        icon: BsFillCalendarDateFill,
-        label: "Date Field",
+        icon: IoMdCheckbox,
+        label: "CheckBox Field",
     },
     designerComponent: DesignerComponent,
     formComponent: FormComponent,
@@ -52,7 +47,7 @@ export const DateFieldFormElement: FormElement = {
     validate: (formElement: FormElementInstance, currentValue: string): boolean => {
         const element = formElement as CustomInstance;
         if (element.extraAttributes.required) {
-            return currentValue.length > 0;
+            return currentValue === "true";
         }
 
         return true;
@@ -65,18 +60,18 @@ type CustomInstance = FormElementInstance & {
 
 function DesignerComponent({ elementInstance }: { elementInstance: FormElementInstance }) {
     const element = elementInstance as CustomInstance;
-    const { label, required, placeHolder, helperText } = element.extraAttributes;
+    const { label, required, helperText } = element.extraAttributes;
+    const id = `checkbox-${element.id}`;
     return (
-        <div className="flex flex-col gap-2 w-full">
-            <Label>
-                {label}
-                {required && "*"}
-            </Label>
-            <Button variant={"outline"} className="w-full justify-start text-left font-normal">
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                <span>Pick a date</span>
-            </Button>
-            {helperText && <p className="text-muted-foreground text-[0.8rem]">{helperText}</p>}
+        <div className="flex items-top space-x-2">
+            <Checkbox id={id} />
+            <div className="grid gap-1.5 leading-none">
+                <Label htmlFor={id}>
+                    {label}
+                    {required && "*"}
+                </Label>
+                {helperText && <p className="text-muted-foreground text-[0.8rem]">{helperText}</p>}
+            </div>
         </div>
     );
 }
@@ -94,8 +89,7 @@ function FormComponent({
 }) {
     const element = elementInstance as CustomInstance;
 
-    const [date, setDate] = useState<Date | undefined>(defaultValue ? new Date(defaultValue) : undefined);
-
+    const [value, setValue] = useState<boolean>(defaultValue === "true" ? true : false);
     const [error, setError] = useState(false);
 
     useEffect(() => {
@@ -103,44 +97,34 @@ function FormComponent({
     }, [isInvalid]);
 
     const { label, required, placeHolder, helperText } = element.extraAttributes;
+    const id = `checkbox-${element.id}`;
     return (
-        <div className="flex flex-col gap-2 w-full">
-            <Label className={cn(error && "text-red-500")}>
-                {label}
-                {required && "*"}
-            </Label>
-            <Popover>
-                <PopoverTrigger asChild>
-                    <Button
-                        variant={"outline"}
-                        className={cn(
-                            "w-full justify-start text-left font-normal",
-                            !date && "text-muted-foreground",
-                            error && "border-red-500",
-                        )}
-                    >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {date ? format(date, "PPP") : <span>Pick a date</span>}
-                    </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                        mode="single"
-                        selected={date}
-                        onSelect={(date) => {
-                            setDate(date);
+        <div className="flex items-top space-x-2">
+            <Checkbox
+                id={id}
+                checked={value}
+                className={cn(error && "border-red-500")}
+                onCheckedChange={(checked) => {
+                    let value = false;
+                    if (checked === true) value = true;
 
-                            if (!submitValue) return;
-                            const value = date?.toUTCString() || "";
-                            const valid = DateFieldFormElement.validate(element, value);
-                            setError(!valid);
-                            submitValue(element.id, value);
-                        }}
-                        initialFocus
-                    />
-                </PopoverContent>
-            </Popover>
-            {helperText && <p className={cn("text-muted-foreground text-[0.8rem]", error && "text-red-500")}>{helperText}</p>}
+                    setValue(value);
+                    if (!submitValue) return;
+                    const stringValue = value ? "true" : "false";
+                    const valid = CheckboxFieldFormElement.validate(element, stringValue);
+                    setError(!valid);
+                    submitValue(element.id, stringValue);
+                }}
+            />
+            <div className="grid gap-1.5 leading-none">
+                <Label htmlFor={id} className={cn(error && "text-red-500")}>
+                    {label}
+                    {required && "*"}
+                </Label>
+                {helperText && (
+                    <p className={cn("text-muted-foreground text-[0.8rem]", error && "text-red-500")}>{helperText}</p>
+                )}
+            </div>
         </div>
     );
 }
@@ -150,6 +134,7 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
     const element = elementInstance as CustomInstance;
     const { actions } = useAppContext();
     const { formActions } = actions;
+
     const form = useForm<propertiesFormSchemaType>({
         resolver: zodResolver(propertiesSchema),
         mode: "onBlur",
@@ -183,7 +168,7 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
                 onSubmit={(e) => {
                     e.preventDefault();
                 }}
-                className="space-y-3"
+                className="space-y-3 bg-white"
             >
                 <FormField
                     control={form.control}

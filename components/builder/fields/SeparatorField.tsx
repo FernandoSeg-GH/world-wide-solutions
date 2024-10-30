@@ -1,6 +1,6 @@
 "use client";
 
-import { ElementsType, FormElement, FormElementInstance } from "@/components/business/forms/FormElements";
+import { ElementsType, FormElement, FormElementInstance } from "@/types";
 import { Label } from "@/components/ui/label";
 
 import { RiSeparator } from "react-icons/ri";

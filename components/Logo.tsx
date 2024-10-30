@@ -61,7 +61,6 @@ function Logo({ onClick, horizontal, url, width, className = "" }: LogoProps) {
       className={cn("w-auto h-auto max-h-[57px] flex flex-col items-start justify-start p-4", className)}
       style={{ transition: "all 0.3s ease" }}
     >
-      {/* Display logo based on the dark mode/light mode */}
       <div
         style={{
           width: `${width}px`,
@@ -80,7 +79,6 @@ function Logo({ onClick, horizontal, url, width, className = "" }: LogoProps) {
         />
       </div>
 
-      {/* Render the title if the sidebar is expanded */}
       <h1
         className={cn(
           "text-left font-semibold whitespace-wrap cursor-pointer mt-1",

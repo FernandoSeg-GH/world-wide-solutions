@@ -40,11 +40,7 @@ export async function GET(
     }
 
     const data = await response.json();
-    console.log("data", data);
-
-    // Transform data to camelCase
     const camelCaseData = camelcaseKeys(data, { deep: true });
-    console.log("camelCaseData", camelCaseData);
 
     return NextResponse.json(camelCaseData, { status: 200 });
   } catch (error) {
