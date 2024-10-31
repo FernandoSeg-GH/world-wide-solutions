@@ -13,7 +13,7 @@ export const useSubmissions = () => {
   const [totalPages, setTotalPages] = useState<number>(1);
 
   const fetchSubmissions = useCallback(
-    async (shareUrl: string): Promise<void> => {
+    async (shareUrl: string, page = 1): Promise<void> => {
       setSubmissions([]);
       if (!shareUrl) {
         console.error("Share URL is undefined.");
@@ -26,21 +26,9 @@ export const useSubmissions = () => {
       }
 
       let endpoint = "";
-      let isAdminOrSuperadmin = false;
+      const roleId = session?.user.role?.id;
 
-      if (session?.user.role?.id) {
-        if (session.user.role.id === 1 || session.user.role.id === 3) {
-          endpoint = `/api/forms/submissions`;
-          isAdminOrSuperadmin = true;
-        } else if (session.user.role.id === 4) {
-          endpoint = `/api/forms/submissions`;
-          isAdminOrSuperadmin = true;
-        } else {
-          endpoint = `/api/forms/${
-            session?.user.businessId
-          }/share-url/${encodeURIComponent(shareUrl)}/submissions`;
-        }
-      } else {
+      if (!roleId) {
         console.error("User role ID is undefined in session.");
         toast({
           title: "Error",
@@ -50,7 +38,31 @@ export const useSubmissions = () => {
         return;
       }
 
+      switch (roleId) {
+        case 1: // End User
+          endpoint = `/api/forms/${
+            session?.user.businessId
+          }/share-url/${encodeURIComponent(shareUrl)}/submissions?page=${page}`;
+          break;
+        case 2:
+        case 3: // Business User
+          endpoint = `/api/forms/submissions?page=${page}`;
+          break;
+        case 4: // Superadmin
+          endpoint = `/api/forms/submissions?page=${page}`;
+          break;
+        default:
+          console.error("Invalid role ID");
+          toast({
+            title: "Error",
+            description: "User role is invalid.",
+            variant: "destructive",
+          });
+          return;
+      }
+
       try {
+        setLoading(true);
         const response = await fetch(endpoint, {
           headers: {
             Authorization: `Bearer ${session?.accessToken}`,
@@ -64,9 +76,10 @@ export const useSubmissions = () => {
         }
 
         const data = await response.json();
-
         if (data && Array.isArray(data.submissions)) {
           setSubmissions(data.submissions);
+          setTotalPages(data.pages || 1);
+          setCurrentPage(data.page || 1);
         } else {
           console.warn("Submissions data is not an array:", data);
           setSubmissions([]);
@@ -78,6 +91,8 @@ export const useSubmissions = () => {
           description: "Failed to fetch submissions.",
           variant: "destructive",
         });
+      } finally {
+        setLoading(false);
       }
     },
     [session?.accessToken, session?.user.businessId, session?.user.role?.id]

@@ -138,8 +138,7 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ form, submission }) => 
                         fieldKeys={fieldKeys}
                         fieldMap={fieldMap}
                         createdAt={submission.createdAt}
-                        fileUrls={submission.fileUrls}
-                    />
+                        fileUrls={submission.fileUrls} businessId={Number(session?.user.businessId)} userId={Number(session?.user.id)} />
                 </CardContent>
             )}
         </Card>

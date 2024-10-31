@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useEffect } from 'react';
 import Spinner from '@/components/ui/spinner';
 import { useSubmissions } from '@/hooks/forms/useSubmissions';
@@ -9,9 +7,7 @@ import SectionHeader from '@/components/layout/navbar/SectionHeader';
 import { useAppContext } from '@/context/AppProvider';
 import SubmissionCard from './SubmissionCard';
 
-type Props = {};
-
-function Submissions({ }: Props) {
+function Submissions() {
     const { data: session } = useSession();
     const { submissions, loading, currentPage, totalPages, fetchSubmissions } = useSubmissions();
     const { data } = useAppContext();
@@ -27,14 +23,6 @@ function Submissions({ }: Props) {
         return <Spinner />;
     }
 
-    const handlePrevious = () => {
-        if (currentPage > 1) { }
-    };
-
-    const handleNext = () => {
-        if (currentPage < Number(totalPages)) { }
-    };
-
     if (!form) return <p>No form found.</p>;
 
     return (
@@ -42,8 +30,7 @@ function Submissions({ }: Props) {
             <SectionHeader title="Submissions" subtitle="View form submissions." />
             <Separator className="border-gray-400 my-2 mb-6" />
             <div className="mb-12 w-full">
-                <div className='flex flex-col gap-4'>
-
+                <div className="flex flex-col gap-4">
                     {submissions.length > 0 ? (
                         submissions.map((submission) => (
                             <SubmissionCard
@@ -57,7 +44,7 @@ function Submissions({ }: Props) {
                     )}
                 </div>
 
-                {totalPages > 1 && (
+                {/* {totalPages > 1 && (
                     <div className="flex justify-between items-center mt-4">
                         <button
                             onClick={handlePrevious}
@@ -77,7 +64,7 @@ function Submissions({ }: Props) {
                             Next
                         </button>
                     </div>
-                )}
+                )} */}
             </div>
         </div>
     );
