@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Download } from 'lucide-react';
 import { Form, Submission, SubmissionStatusEnum } from '@/types';
 import SubmissionDetail from './SubmissionDetail';
 import { useFieldMapping } from '@/hooks/forms/useFieldMapping';
@@ -21,7 +21,7 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ form, submission }) => 
     const [isExpanded, setIsExpanded] = useState<boolean>(false);
     const [localStatus, setLocalStatus] = useState<string>(submission.status);
     const [isUpdating, setIsUpdating] = useState<boolean>(false);
-    const { updateSubmissionStatus, fetchSubmissions } = useSubmissions();
+    const { updateSubmissionStatus } = useSubmissions();
     const { data: session } = useSession();
 
     const toggleExpand = () => {
@@ -44,11 +44,14 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ form, submission }) => 
     const row: { [key: string]: any } = {};
 
     fieldKeys.forEach((key) => {
+
         const fieldValue = contentParsed[key];
-        if (fieldValue && typeof fieldValue === 'object' && 'value' in fieldValue) {
-            row[key] = fieldValue.value;
-        } else {
+        if (fieldValue) {
             row[key] = fieldValue;
+        } else {
+
+            const numericKey = Object.keys(contentParsed).find(k => Number(k) === Number(key));
+            row[key] = numericKey ? contentParsed[numericKey] : 'N/A';
         }
     });
 
@@ -57,7 +60,6 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ form, submission }) => 
         try {
             await updateSubmissionStatus(submission.id, newStatus);
             setLocalStatus(newStatus);
-            // await fetchSubmissions(form.share_url);
         } catch (error) {
             console.error("Error updating submission status:", error);
         } finally {
@@ -87,9 +89,11 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ form, submission }) => 
         }
     }, []);
 
+    console.log('submission', submission)
+
     return (
-        <Card key={submission.id} className="overflow-hidden shadow-md">
-            <CardHeader className="flex flex-col bg-muted/50 p-4" onClick={toggleExpand}>
+        <Card key={submission.id} className="overflow-hidden shadow-md text-black dark:text-white">
+            <CardHeader className="flex flex-col bg-white dark:bg-muted-dark p-4 cursor-pointer" onClick={toggleExpand}>
                 <CardTitle className="flex justify-between items-center text-lg font-semibold">
                     <div className="flex items-center">
                         <span className={`inline-block w-3 h-3 mr-2 rounded-full ${statusColor(submissionStatus)}`} />
@@ -123,22 +127,19 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ form, submission }) => 
                         {isExpanded ? <ChevronUp className="ml-2 h-4 w-4" /> : <ChevronDown className="ml-2 h-4 w-4" />}
                     </div>
                 </CardTitle>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground dark:text-white">
                     Form ID: {submission.formId || 'N/A'} - User ID: {submission.userId || 'N/A'}
                 </p>
             </CardHeader>
             {isExpanded && (
-                <CardContent className="p-4">
-                    {isUpdating ? (
-                        <Skeleton className="h-10 w-full" />
-                    ) : (
-                        <SubmissionDetail
-                            row={row}
-                            fieldKeys={fieldKeys}
-                            fieldMap={fieldMap}
-                            createdAt={submission.createdAt}
-                        />
-                    )}
+                <CardContent className="p-4 bg-white dark:bg-muted-dark">
+                    <SubmissionDetail
+                        row={row}
+                        fieldKeys={fieldKeys}
+                        fieldMap={fieldMap}
+                        createdAt={submission.createdAt}
+                        fileUrls={submission.fileUrls}
+                    />
                 </CardContent>
             )}
         </Card>

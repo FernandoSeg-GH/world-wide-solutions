@@ -38,7 +38,7 @@ function Submissions({ }: Props) {
     if (!form) return <p>No form found.</p>;
 
     return (
-        <div className="px-4 text-black dark:text-white w-full">
+        <div className="text-black dark:text-white w-full">
             <SectionHeader title="Submissions" subtitle="View form submissions." />
             <Separator className="border-gray-400 my-2 mb-6" />
             <div className="mb-12 w-full">

@@ -1,4 +1,4 @@
-import { Form, ElementsType } from "@/types";
+import { Form, ElementsType, FormField } from "@/types";
 
 export function useFieldMapping(form: Form) {
   const isInputField = (fieldType: ElementsType): boolean => {
@@ -18,13 +18,12 @@ export function useFieldMapping(form: Form) {
   const fields = Array.isArray(form.fields) ? form.fields : [];
 
   const fieldKeys: string[] = [];
-  const fieldMap: {
-    [key: string]: { label: string; type: ElementsType; extraAttributes?: any };
-  } = {};
+  const fieldMap: { [key: string]: FormField } = {};
 
   fields.forEach((field) => {
     if (isInputField(field.type)) {
       fieldMap[field.id] = {
+        id: field.id, // add this line
         label: field.extraAttributes?.label || `Field ${field.id}`,
         type: field.type,
         extraAttributes: field.extraAttributes,

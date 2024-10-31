@@ -113,8 +113,9 @@ export interface Submission {
   username?: string;
   formUrl: string;
   status: string;
-  content?: Record<string, { label: string; value: string }>;
+  content?: Record<string, { label: string; value: string | null }>;
   createdAt: string;
+  fileUrls?: string[];
 }
 
 export enum SubmissionStatusEnum {
@@ -240,7 +241,7 @@ export interface FormField {
     required?: boolean;
     placeHolder?: string;
     helperText?: string;
-    options?: { label: string; value: string }[];
+    options?: Array<{ label: string; value: string }>;
     rows?: number;
     [key: string]: any;
   };

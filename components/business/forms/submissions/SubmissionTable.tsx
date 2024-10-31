@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Submission, Form, ElementsType } from '@/types';
+import { Submission, Form, } from '@/types';
 import { cn } from '@/lib/utils';
 import { useSubmissions } from '@/hooks/forms/useSubmissions';
 import Spinner from '@/components/ui/spinner';
@@ -28,7 +28,6 @@ function SubmissionsTable({ form, admin }: { form: Form; admin?: boolean }) {
         return <Spinner />;
     }
 
-
     const rows = submissions.map((submission) => {
         const parsedContent: Record<string, any> =
             typeof submission.content === 'string' ? JSON.parse(submission.content) : submission.content || {};
@@ -39,11 +38,7 @@ function SubmissionsTable({ form, admin }: { form: Form; admin?: boolean }) {
 
         fieldKeys.forEach((key) => {
             const fieldValue = parsedContent[key];
-            if (fieldValue && typeof fieldValue === 'object' && 'value' in fieldValue) {
-                row[key] = fieldValue.value;
-            } else {
-                row[key] = fieldValue;
-            }
+            row[key] = fieldValue?.value || 'N/A';
         });
 
         return row;
@@ -64,12 +59,6 @@ function SubmissionsTable({ form, admin }: { form: Form; admin?: boolean }) {
 
         return date.toLocaleDateString('en-US', options);
     }
-
-    const formattedDate = form.createdAt
-        ? formatDistance(new Date(form.createdAt), new Date(), {
-            addSuffix: true,
-        })
-        : 'Unknown time';
 
     function renderCellValue(key: string, value: any) {
         const field = fieldMap[key];
@@ -94,6 +83,12 @@ function SubmissionsTable({ form, admin }: { form: Form; admin?: boolean }) {
             return isNaN(date.getTime()) ? value : date.toLocaleDateString();
         }
 
+        if (fieldType === 'FileUploadField' && typeof value === 'string') {
+
+
+            return value;
+        }
+
         if (typeof value === 'object' && value !== null) {
             return JSON.stringify(value);
         }
@@ -113,7 +108,7 @@ function SubmissionsTable({ form, admin }: { form: Form; admin?: boolean }) {
                                         key={fieldKey}
                                         className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
                                     >
-                                        {fieldMap[fieldKey]?.label || `Field ${fieldKey}`}
+                                        {fieldMap[fieldKey]?.extraAttributes?.label || `Field ${fieldKey}`}
                                     </TableHead>
                                 ))}
                                 <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
