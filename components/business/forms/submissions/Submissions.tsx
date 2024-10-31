@@ -1,5 +1,3 @@
-// src/components/Submissions.tsx
-
 'use client';
 
 import React, { useEffect } from 'react';
@@ -15,9 +13,15 @@ type Props = {};
 
 function Submissions({ }: Props) {
     const { data: session } = useSession();
-    const { submissions, loading, currentPage, totalPages, fetchSubmissionsByFormUrl } = useSubmissions();
+    const { submissions, loading, currentPage, totalPages, fetchSubmissions } = useSubmissions();
     const { data } = useAppContext();
     const { form } = data;
+
+    useEffect(() => {
+        if (form && session?.user.role?.id) {
+            fetchSubmissions(form.shareUrl);
+        }
+    }, [form, session?.user.role?.id, fetchSubmissions]);
 
     if (loading) {
         return <Spinner />;
@@ -31,7 +35,8 @@ function Submissions({ }: Props) {
         if (currentPage < Number(totalPages)) { }
     };
 
-    if (!form) return <p>No form found.</p>
+    if (!form) return <p>No form found.</p>;
+
     return (
         <div className="px-4 text-black dark:text-white w-full">
             <SectionHeader title="Submissions" subtitle="View form submissions." />

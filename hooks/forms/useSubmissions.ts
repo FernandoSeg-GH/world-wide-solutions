@@ -14,38 +14,64 @@ export const useSubmissions = () => {
 
   const fetchSubmissions = useCallback(
     async (shareUrl: string): Promise<void> => {
+      setSubmissions([]);
       if (!shareUrl) {
-        console.error("Share URL or Business ID is undefined.");
+        console.error("Share URL is undefined.");
         toast({
           title: "Error",
-          description: "Share URL or Business ID is undefined.",
+          description: "Share URL is undefined.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      let endpoint = "";
+      let isAdminOrSuperadmin = false;
+
+      if (session?.user.role?.id) {
+        if (session.user.role.id === 1 || session.user.role.id === 3) {
+          endpoint = `/api/forms/submissions`;
+          isAdminOrSuperadmin = true;
+        } else if (session.user.role.id === 4) {
+          endpoint = `/api/forms/submissions`;
+          isAdminOrSuperadmin = true;
+        } else {
+          endpoint = `/api/forms/${
+            session?.user.businessId
+          }/share-url/${encodeURIComponent(shareUrl)}/submissions`;
+        }
+      } else {
+        console.error("User role ID is undefined in session.");
+        toast({
+          title: "Error",
+          description: "User role information is missing.",
           variant: "destructive",
         });
         return;
       }
 
       try {
-        const response = await fetch(
-          `/api/forms/${
-            session?.user.businessId
-          }/share-url/${encodeURIComponent(shareUrl)}/submissions`,
-          {
-            headers: {
-              Authorization: `Bearer ${session?.accessToken}`,
-            },
-          }
-        );
+        const response = await fetch(endpoint, {
+          headers: {
+            Authorization: `Bearer ${session?.accessToken}`,
+          },
+        });
 
         if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`Failed to fetch submissions: ${errorText}`);
           throw new Error("Failed to fetch submissions.");
         }
 
         const data = await response.json();
-        setSubmissions((prev) => [
-          ...prev,
-          ...(data.submissions as Submission[]),
-        ]);
-      } catch (error) {
+
+        if (data && Array.isArray(data.submissions)) {
+          setSubmissions(data.submissions);
+        } else {
+          console.warn("Submissions data is not an array:", data);
+          setSubmissions([]);
+        }
+      } catch (error: any) {
         console.error("Error fetching submissions:", error);
         toast({
           title: "Error",
@@ -54,7 +80,7 @@ export const useSubmissions = () => {
         });
       }
     },
-    [session?.accessToken, session?.user.businessId]
+    [session?.accessToken, session?.user.businessId, session?.user.role?.id]
   );
 
   const getFormSubmissionByCaseId = useCallback(

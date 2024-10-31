@@ -13,6 +13,7 @@ import { useFormState } from "@/hooks/forms/useFormState";
 import Logo from "@/components/Logo";
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
+import { useRouter } from "next/navigation";
 
 function ClientSubmission({ formUrl }: { formUrl: string }) {
     const { data, actions, selectors: { setForm } } = useAppContext();
@@ -23,6 +24,8 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
     const formErrors = useRef<{ [key: string]: boolean }>({});
     const [renderKey, setRenderKey] = useState(new Date().getTime());
     const [pending, startTransition] = useTransition();
+    const [isSubmitted, setIsSubmitted] = useState(false);
+    const router = useRouter();
 
     const filesRef = useRef<{ [key: string]: File | File[] }>({});
 
@@ -41,6 +44,12 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
         };
         fetchData();
     }, [formUrl, fetchFormByShareUrlPublic, session?.user.businessId, setForm]);
+
+    useEffect(() => {
+        if (isSubmitted) {
+            router.push('/dashboard');
+        }
+    }, [isSubmitted, router]);
 
     const validateForm = useCallback(() => {
         if (!form || !form.fields) {
@@ -93,11 +102,7 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
 
         try {
             const formData = new FormData();
-
-
             formData.append('content', JSON.stringify(formValues.current));
-
-
             Object.entries(filesRef.current).forEach(([fieldId, files]) => {
                 if (Array.isArray(files)) {
                     files.forEach(file => formData.append('files', file));
@@ -106,14 +111,11 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
                 }
             });
 
-
             formData.append('userId', String(session?.user.businessId || 1));
-
 
             const response = await fetch(`/api/forms/${session?.user.businessId}/submit?formUrl=${formUrl}`, {
                 method: 'POST',
                 body: formData,
-
             });
 
             if (!response.ok) {
@@ -128,11 +130,14 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
 
             const result = await response.json();
             resetForm();
+            setIsSubmitted(true);
+            console.log("Submission successful!!");
             toast({
                 title: 'Success',
                 description: 'Form submitted successfully.',
             });
         } catch (error: any) {
+            console.error("Submission error:", error);
             toast({
                 title: 'Error',
                 description: String(error),
