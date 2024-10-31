@@ -65,8 +65,10 @@ const FormDetails = () => {
 
             <Separator className="border-gray-400 my-2 mb-6" />
 
-            <div className="w-full overflow-x-auto">
-                <SubmissionsTable form={form} admin={isAdmin} />
+            <div className="w-full overflow-hidden">
+                <div className="w-full ">
+                    <SubmissionsTable form={form} admin={isAdmin} />
+                </div>
             </div>
 
             <div className="grid grid-cols-1 gap-4">

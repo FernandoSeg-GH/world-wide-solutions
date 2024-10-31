@@ -87,7 +87,7 @@ export function Dashboard() {
 
             <div
                 className={cn(
-                    "flex flex-col gap-6 transition-all duration-300 max-w-screen p-4 h-[100%]",
+                    "flex flex-col gap-6 transition-all duration-300 max-w-screen overflow-hidden p-4 h-[100%]",
                     isMobile ? "m-0 p-0 px-4 mt-16 " : "",
                     isExpanded && !isMobile ? "pl-64" : "pl-14"
                 )}
@@ -97,7 +97,7 @@ export function Dashboard() {
                     isExpanded={isExpanded}
                 // breadcrumbs={mockData.breadcrumbs}
                 />
-                <div className="pl-4 h-full flex flex-col items-start justify-start flex-grow w-full overflow-auto">{RenderComponent(currentSection)}</div>
+                <div className="pl-4 h-full flex flex-col items-start justify-start flex-grow w-full overflow-auto overflow-x-hidden">{RenderComponent(currentSection)}</div>
             </div>
         </div>
     );

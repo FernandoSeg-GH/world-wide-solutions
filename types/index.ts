@@ -114,7 +114,7 @@ export interface Submission {
   formUrl: string;
   status: string;
   content?: Record<string, { label: string; value: string | null }>;
-  createdAt: string;
+  created_at: string;
   fileUrls?: string[];
 }
 

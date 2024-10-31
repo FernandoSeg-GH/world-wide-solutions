@@ -2,11 +2,9 @@
 
 import React, { useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Submission, Form, } from '@/types';
-import { cn } from '@/lib/utils';
+import { Submission, Form } from '@/types';
 import { useSubmissions } from '@/hooks/forms/useSubmissions';
 import Spinner from '@/components/ui/spinner';
-import { formatDistance } from 'date-fns';
 import { useFieldMapping } from '@/hooks/forms/useFieldMapping';
 
 interface Row {
@@ -33,12 +31,12 @@ function SubmissionsTable({ form, admin }: { form: Form; admin?: boolean }) {
             typeof submission.content === 'string' ? JSON.parse(submission.content) : submission.content || {};
 
         const row: { [key: string]: any } = {
-            submittedAt: submission.createdAt,
+            submittedAt: submission.created_at,
         };
 
         fieldKeys.forEach((key) => {
             const fieldValue = parsedContent[key];
-            row[key] = fieldValue?.value || 'N/A';
+            row[key] = fieldValue || 'N/A';
         });
 
         return row;
@@ -46,18 +44,7 @@ function SubmissionsTable({ form, admin }: { form: Form; admin?: boolean }) {
 
     function formatDate(dateString: string): string {
         const date = new Date(dateString);
-
-        const options: Intl.DateTimeFormatOptions = {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            timeZoneName: 'short',
-        };
-
-        return date.toLocaleDateString('en-US', options);
+        return isNaN(date.getTime()) ? 'Invalid Date' : date.toLocaleString();
     }
 
     function renderCellValue(key: string, value: any) {
@@ -84,9 +71,11 @@ function SubmissionsTable({ form, admin }: { form: Form; admin?: boolean }) {
         }
 
         if (fieldType === 'FileUploadField' && typeof value === 'string') {
-
-
-            return value;
+            return (
+                <a href={value} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+                    View File
+                </a>
+            );
         }
 
         if (typeof value === 'object' && value !== null) {
