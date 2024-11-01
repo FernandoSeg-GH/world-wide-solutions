@@ -22,7 +22,7 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ form, submission }) => 
     console.log("Submission Content:", submission.content);
 
     return (
-        <Card key={submission.id} className="overflow-hidden shadow-md text-black dark:text-white">
+        <Card key={submission.id} className="overflow-hidden shadow-md text-black dark:text-white max-w-[600px]">
             <CardHeader className="flex flex-col p-4 cursor-pointer" onClick={toggleExpand}>
                 <CardTitle className="flex justify-between items-center text-lg font-semibold">
                     <span>Submission ID: {submission.id}</span>

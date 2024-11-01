@@ -65,7 +65,7 @@ const FormDetails = () => {
 
             <Separator className="border-gray-400 my-2 mb-6" />
 
-            <div className="w-full overflow-x-auto"> {/* Scrollable container */}
+            <div className="w-full overflow-x-auto">
                 <SubmissionsTable form={form} admin={isAdmin} />
             </div>
 

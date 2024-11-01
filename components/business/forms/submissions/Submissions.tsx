@@ -14,7 +14,7 @@ function Submissions() {
     const { form } = data;
 
     useEffect(() => {
-        if (form && session?.user.role?.id) {
+        if (form && session?.user.role?.id && form.shareUrl) {
             fetchSubmissions(form.shareUrl);
         }
     }, [form, session?.user.role?.id, fetchSubmissions]);
@@ -24,7 +24,7 @@ function Submissions() {
     }
 
     if (!form) return <p>No form found.</p>;
-
+    console.log('submissions', submissions)
     return (
         <div className="text-black dark:text-white w-full">
             <SectionHeader title="Submissions" subtitle="View form submissions." />

@@ -43,7 +43,7 @@ export function FormCard({ form }: FormCardProps) {
     const [isAlertOpen, setIsAlertOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [deleteInputValue, setDeleteInputValue] = useState("");
-
+    const [isRouting, setIsRouting] = useState<boolean>(false)
     const { actions, selectors } = useAppContext();
     const { switchSection } = actions;
     const { setForm } = selectors;
@@ -119,6 +119,19 @@ export function FormCard({ form }: FormCardProps) {
     const handleNavigate = () => {
         setForm(form);
         switchSection("Form");
+    };
+
+    const handleNew = () => {
+        setIsRouting(true)
+        router.push(`/submit/${form.shareUrl}`);
+
+        // else {
+        //     toast({
+        //         title: "Error",
+        //         description: "Form share URL is missing.",
+        //         variant: "destructive",
+        //     });
+        // }
     };
 
     const formattedDate = form.createdAt
@@ -234,18 +247,9 @@ export function FormCard({ form }: FormCardProps) {
                     </div>
                 ) : form.shareUrl !== undefined && session?.user.role.id === 1 ? (
                     <Button
+                        disabled={isRouting}
                         className={`w-full mt-2 text-md gap-4 `}
-                        onClick={() => {
-                            router.push(`/submit/${form.shareUrl}`);
-
-                            // else {
-                            //     toast({
-                            //         title: "Error",
-                            //         description: "Form share URL is missing.",
-                            //         variant: "destructive",
-                            //     });
-                            // }
-                        }}
+                        onClick={handleNew}
                     >
                         New Submission <BiRightArrowAlt />
                     </Button>
