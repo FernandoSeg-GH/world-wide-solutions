@@ -50,7 +50,7 @@ function Logo({ onClick, horizontal, url, width, className = "" }: LogoProps) {
 
   const getLogoSrc = () => {
     if (url) return url;
-    return isDarkMode ? "/assets/vws-dark.png" : "/assets/vws.png";
+    return isDarkMode ? "/assets/vws-dark.png" : "https://vinci-space-nest.nyc3.cdn.digitaloceanspaces.com/vinci-space-nest/business_id_2/branding/logo.avif";
   };
 
   const logoSrc = getLogoSrc();
@@ -71,7 +71,7 @@ function Logo({ onClick, horizontal, url, width, className = "" }: LogoProps) {
         <Image
           layout="fixed"
           width={width ?? 50}
-          height={width}
+          height={width ?? 50}
           src={logoSrc}
           alt={title}
           priority

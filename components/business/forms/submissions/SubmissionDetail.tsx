@@ -1,6 +1,12 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
+import { Terminal } from 'lucide-react';
+import {
+    Alert,
+    AlertDescription,
+    AlertTitle,
+} from "@/components/ui/alert";
 
 interface SubmissionDetailProps {
     row: { [key: string]: any };
@@ -17,6 +23,9 @@ const SubmissionDetail: React.FC<SubmissionDetailProps> = ({
     created_at,
     fileUrls,
 }) => {
+    // Identify missing fields
+    const missingFields = fieldKeys.filter((key) => row[key] === 'N/A' || row[key] === null || row[key] === '');
+
     const renderField = (value: string, label: string) => {
         const isFile = value?.includes('.pdf') || value?.includes('.png');
         return isFile ? (
@@ -34,8 +43,20 @@ const SubmissionDetail: React.FC<SubmissionDetailProps> = ({
     };
 
     return (
-        <div>
+        <div className='w-full'>
             <p><strong>Submitted At:</strong> {new Date(created_at).toLocaleString()}</p>
+
+            {/* Display alert for missing fields if any */}
+            {missingFields.length > 0 && (
+                <Alert className="mt-4">
+                    <Terminal className="h-4 w-4" />
+                    <AlertTitle>Heads up!</AlertTitle>
+                    <AlertDescription>
+                        The following fields are missing data: {missingFields.map((key) => fieldMap[key]?.label || `Field ${key}`).join(', ')}
+                    </AlertDescription>
+                </Alert>
+            )}
+
             <div className="mt-4">
                 {fieldKeys.map((key) => (
                     <div key={key} className="flex justify-between py-1 border-b">
@@ -46,6 +67,7 @@ const SubmissionDetail: React.FC<SubmissionDetailProps> = ({
                     </div>
                 ))}
             </div>
+
             {fileUrls && fileUrls.length > 0 && (
                 <div className="mt-4">
                     <strong>Uploaded Files:</strong>

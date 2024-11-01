@@ -6,6 +6,9 @@ const nextConfig = {
       {
         hostname: "images.unsplash.com",
       },
+      {
+        hostname: "vinci-space-nest.nyc3.cdn.digitaloceanspaces.com",
+      },
     ],
   },
 };
