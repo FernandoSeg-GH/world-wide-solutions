@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useEffect, Suspense } from "react";
 import { Sidebar } from "./sidebar/Sidebar";
@@ -32,7 +32,6 @@ export const RenderComponent = (currentSection: string) => {
         );
     }
 
-
     switch (currentSection) {
         case "Dashboard":
             return <Main />;
@@ -42,8 +41,6 @@ export const RenderComponent = (currentSection: string) => {
             return <FormDetails />;
         case "Submissions":
             return <Submissions />;
-        // case "Notifications":
-        //     return <Notifications />;
         case "Messages":
             return <MessagingLayout />;
         case "Users":
@@ -65,7 +62,7 @@ export function Dashboard() {
     const { currentSection } = data;
 
     const [isMobile, setIsMobile] = useState(false);
-    const { data: session } = useSession()
+    const { data: session } = useSession();
 
     useEffect(() => {
         const handleResize = () => {
@@ -76,10 +73,8 @@ export function Dashboard() {
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-
     return (
-
-        <div className="flex h-screen w-full flex-col bg-muted/10">
+        <div className="flex min-h-screen w-full flex-col bg-muted/10">
             {!isMobile && (
                 <Sidebar isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
             )}
@@ -87,20 +82,19 @@ export function Dashboard() {
 
             <div
                 className={cn(
-                    "flex flex-col gap-6 transition-all duration-300 max-w-screen overflow-hidden p-4 h-[100%]",
-                    isMobile ? "m-0 p-0 px-4 mt-16 " : "",
+                    "flex flex-col gap-6 transition-all duration-300 w-full max-w-screen h-full",
+                    isMobile ? "p-2" : "p-4",
                     isExpanded && !isMobile ? "pl-64" : "pl-14"
                 )}
             >
                 <Header
                     currentSection={currentSection}
                     isExpanded={isExpanded}
-                // breadcrumbs={mockData.breadcrumbs}
                 />
-                <div className="pl-4 h-full flex flex-col items-start justify-start flex-grow w-full overflow-auto overflow-x-hidden">{RenderComponent(currentSection)}</div>
+                <div className="flex-grow overflow-y-auto w-full p-4">{RenderComponent(currentSection)}</div>
             </div>
         </div>
     );
 }
 
-export default Dashboard
+export default Dashboard;

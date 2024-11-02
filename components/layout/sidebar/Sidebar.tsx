@@ -1,5 +1,5 @@
+"use client"
 import React, { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 import {
     Tooltip,
     TooltipContent,
@@ -10,109 +10,19 @@ import {
     ChevronLeft,
     ChevronsRight,
     ChevronRight,
-    BookText,
-    DnaIcon,
-    CircleDashed,
-    NotebookTabs,
-    Users2,
-    CaptionsIcon,
-    Folders,
-    MailCheck,
 } from "lucide-react";
-import {
-    FaHome,
-    FaBusinessTime,
-    FaRobot,
-    FaBell,
-} from "react-icons/fa";
 import { useAppContext } from "@/context/AppProvider";
 import { cn } from "@/lib/utils";
 import Logo from "@/components/Logo";
-import { Form } from "@/types";
 import { useFormState } from "@/hooks/forms/useFormState";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { getSidebarItems, SidebarItem } from "./SidebarItems";
 
 interface SidebarProps {
     isExpanded: boolean;
     setIsExpanded: (value: boolean) => void;
 }
 
-export interface SidebarItem {
-    icon: React.ElementType;
-    label: string;
-    subItems?: SidebarItem[];
-}
-
-export const getSidebarItems = (godMode: boolean, forms: Form[], roleId?: number): SidebarItem[] => {
-    const sidebarItems: SidebarItem[] = [
-        {
-            icon: FaHome,
-            label: "Dashboard",
-        },
-        {
-            icon: BookText,
-            label: "Forms",
-            ...(roleId !== 1 && forms?.length > 0 ? {
-                subItems: forms.map((form) => ({
-                    icon: CircleDashed,
-                    label: form.name,
-                }))
-            } : {}),
-        },
-        {
-            icon: Folders,
-            label: "Submissions",
-        },
-        // {
-        //     icon: FaBell,
-        //     label: "Notifications",
-        // },
-        {
-            icon: MailCheck,
-            label: "Messages",
-        },
-    ];
-
-    // if (roleId === 1) {
-    //     sidebarItems.push(
-    //         {
-    //             icon: CaptionsIcon,
-    //             label: "My Submissions",
-    //         }
-    //     )
-    // }
-    if (roleId === 2 || roleId === 3 || roleId === 4) {
-        sidebarItems.push(
-            {
-                icon: NotebookTabs,
-                label: "All Forms",
-            },
-            {
-                icon: Users2,
-                label: "Users",
-            }
-        )
-    }
-    if (godMode) {
-        sidebarItems.push(
-            {
-                icon: FaBusinessTime,
-                label: "Businesses",
-            },
-            {
-                icon: FaRobot,
-                label: "AI Characters",
-            },
-            {
-                icon: DnaIcon,
-                label: "Vinci",
-            }
-        );
-    }
-
-    return sidebarItems;
-};
 
 export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
     const { actions: layoutState, data, selectors } = useAppContext();
@@ -148,7 +58,7 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
             onClick={() => setIsExpanded(!isExpanded)}
             className={cn(
                 "fixed inset-y-0 left-0 z-10 flex flex-col border-r bg-background transition-all duration-300",
-                isExpanded ? "w-64" : "w-14"
+                isExpanded ? "w-64" : "w-16"
             )}
         >
             <div onClick={(event: React.MouseEvent<HTMLDivElement>) => event.stopPropagation()}>

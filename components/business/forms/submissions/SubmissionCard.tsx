@@ -1,3 +1,4 @@
+"use client"
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronDown, ChevronUp } from 'lucide-react';
@@ -18,21 +19,21 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ form, submission }) => 
         setIsExpanded(!isExpanded);
     };
 
-    console.log("Field Keys:", fieldKeys);
-    console.log("Submission Content:", submission.content);
-
     return (
-        <Card key={submission.id} className="overflow-hidden shadow-md text-black dark:text-white max-w-[600px]">
-            <CardHeader className="flex flex-col p-4 cursor-pointer" onClick={toggleExpand}>
-                <CardTitle className="flex justify-between items-center text-lg font-semibold">
-                    <span>Submission ID: {submission.id}</span>
+        <Card key={submission.id} className="overflow-hidden shadow-lg rounded-lg border border-gray-200 transition-all duration-300 hover:shadow-xl bg-transparent dark:bg-gray-800 dark:border-gray-700 max-w-[600px]">
+            <CardHeader className="flex flex-row justify-between items-center p-4 cursor-pointer bg-gray-50 dark:bg-gray-700 rounded-t-lg" onClick={toggleExpand}>
+                <div className="flex flex-col">
+                    <span className="font-semibold text-gray-900 dark:text-gray-100">Submission ID: {submission.id}</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">{new Date(submission.created_at).toLocaleDateString()}</span>
+                </div>
+                <div className="flex items-center">
                     {isExpanded ? <ChevronUp /> : <ChevronDown />}
-                </CardTitle>
+                </div>
             </CardHeader>
             {isExpanded && (
-                <CardContent className="p-4">
+                <CardContent className="p-4 transition-all duration-300 ease-in-out bg-gray-50 dark:bg-gray-800">
                     <SubmissionDetail
-                        row={submission.content ?? {}} // Check if content aligns with fieldKeys
+                        row={submission.content!}
                         fieldKeys={fieldKeys}
                         fieldMap={fieldMap}
                         created_at={submission.created_at}

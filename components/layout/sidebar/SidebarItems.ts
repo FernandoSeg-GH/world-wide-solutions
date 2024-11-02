@@ -1,23 +1,28 @@
-import React from "react";
-import { FaHome, FaBusinessTime, FaRobot, FaBell } from "react-icons/fa";
+import { FaHome, FaBusinessTime, FaRobot } from "react-icons/fa";
 import {
   BookText,
-  Briefcase,
-  DnaIcon,
-  NotebookPen,
+  CircleDashed,
+  Folders,
+  MailCheck,
+  NotebookTabs,
   Users2,
+  DnaIcon,
 } from "lucide-react";
+import { Form } from "@/types";
 
 export interface SidebarItem {
   icon: React.ElementType;
   label: string;
+  subItems?: SidebarItem[];
 }
 
 export const getSidebarItems = (
-  godMode?: boolean,
+  godMode: boolean,
+  forms: Form[],
   roleId?: number
 ): SidebarItem[] => {
-  const sidebarItems: SidebarItem[] = [
+  // Shared sidebar items across all roles
+  const commonItems: SidebarItem[] = [
     {
       icon: FaHome,
       label: "Dashboard",
@@ -25,44 +30,89 @@ export const getSidebarItems = (
     {
       icon: BookText,
       label: "Forms",
+      ...(roleId !== 1 && forms?.length > 0
+        ? {
+            subItems: forms.map((form) => ({
+              icon: CircleDashed,
+              label: form.name,
+            })),
+          }
+        : {}),
     },
+    // {
+    //   icon: Folders,
+    //   label: "Submissions",
+    // },
     {
-      icon: NotebookPen,
-      label: "Submissions",
-    },
-    {
-      icon: FaBell,
-      label: "Notifications",
-    },
-    {
-      icon: FaBell,
-      label: "Notifications",
+      icon: MailCheck,
+      label: "Messages",
     },
   ];
 
-  if (roleId === 3 || roleId === 4) {
-    sidebarItems.push({
-      icon: Users2,
-      label: "Users",
-    });
-  }
-
-  if (godMode) {
-    sidebarItems.push(
+  // Role-specific sidebar items
+  const roleItems: { [key: number]: SidebarItem[] } = {
+    1: [
+      // Specific items for user role 1
       {
-        icon: FaBusinessTime,
-        label: "Businesses",
+        icon: Folders,
+        label: "My Submissions",
+      },
+    ],
+    2: [
+      // Specific items for user roles 2 & 3
+      {
+        icon: NotebookTabs,
+        label: "All Forms",
       },
       {
-        icon: FaRobot,
-        label: "AI Characters",
+        icon: Users2,
+        label: "Users",
+      },
+    ],
+    3: [
+      // Role 3 (same as role 2 in this case)
+      {
+        icon: NotebookTabs,
+        label: "All Forms",
       },
       {
-        icon: DnaIcon,
-        label: "Vinci",
-      }
-    );
-  }
+        icon: Users2,
+        label: "Users",
+      },
+    ],
+    4: [
+      // Specific items for superadmin (role 4)
+      {
+        icon: NotebookTabs,
+        label: "All Forms",
+      },
+      {
+        icon: Users2,
+        label: "Users",
+      },
+    ],
+  };
 
-  return sidebarItems;
+  // GodMode items
+  const godModeItems: SidebarItem[] = [
+    {
+      icon: FaBusinessTime,
+      label: "Businesses",
+    },
+    {
+      icon: FaRobot,
+      label: "AI Characters",
+    },
+    {
+      icon: DnaIcon,
+      label: "Vinci",
+    },
+  ];
+
+  // Combine the base items with role-specific and GodMode items
+  return [
+    ...commonItems,
+    ...(roleId ? roleItems[roleId] || [] : []),
+    ...(godMode ? godModeItems : []),
+  ];
 };

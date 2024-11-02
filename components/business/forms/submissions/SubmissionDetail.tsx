@@ -1,12 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Download } from 'lucide-react';
-import { Terminal } from 'lucide-react';
-import {
-    Alert,
-    AlertDescription,
-    AlertTitle,
-} from "@/components/ui/alert";
+import { Download, Terminal } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface SubmissionDetailProps {
     row: { [key: string]: any };
@@ -23,7 +18,6 @@ const SubmissionDetail: React.FC<SubmissionDetailProps> = ({
     created_at,
     fileUrls,
 }) => {
-    // Identify missing fields
     const missingFields = fieldKeys.filter((key) => row[key] === 'N/A' || row[key] === null || row[key] === '');
 
     const renderField = (value: string, label: string) => {
@@ -32,7 +26,7 @@ const SubmissionDetail: React.FC<SubmissionDetailProps> = ({
             <Button
                 variant="link"
                 onClick={() => window.open(value, '_blank')}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 text-blue-500 dark:text-blue-300"
             >
                 <Download className="h-4 w-4" />
                 {label}
@@ -44,11 +38,10 @@ const SubmissionDetail: React.FC<SubmissionDetailProps> = ({
 
     return (
         <div className='w-full'>
-            <p><strong>Submitted At:</strong> {new Date(created_at).toLocaleString()}</p>
+            <p className="mb-2 text-gray-700 dark:text-gray-300"><strong>Submitted At:</strong> {new Date(created_at).toLocaleString()}</p>
 
-            {/* Display alert for missing fields if any */}
             {missingFields.length > 0 && (
-                <Alert className="mt-4">
+                <Alert className="mt-4 bg-yellow-100 dark:bg-yellow-900">
                     <Terminal className="h-4 w-4" />
                     <AlertTitle>Heads up!</AlertTitle>
                     <AlertDescription>
@@ -57,23 +50,25 @@ const SubmissionDetail: React.FC<SubmissionDetailProps> = ({
                 </Alert>
             )}
 
-            <div className="mt-4">
+            <div className="mt-4 space-y-2">
                 {fieldKeys.map((key) => (
-                    <div key={key} className="flex justify-between py-1 border-b">
-                        <span className="font-semibold">
+                    <div key={key} className="flex justify-between py-2">
+                        <span className="font-semibold text-gray-600 dark:text-gray-400">
                             {fieldMap[key]?.label || `Field ${key}`}:
                         </span>
-                        <span>{renderField(row[key] || 'N/A', fieldMap[key]?.label || `Field ${key}`)}</span>
+                        <span className="text-gray-800 dark:text-gray-100">{renderField(row[key] || 'N/A', fieldMap[key]?.label || `Field ${key}`)}</span>
                     </div>
                 ))}
             </div>
 
             {fileUrls && fileUrls.length > 0 && (
                 <div className="mt-4">
-                    <strong>Uploaded Files:</strong>
-                    <ul className="list-disc list-inside">
+                    <strong className="text-gray-700 dark:text-gray-300">Uploaded Files:</strong>
+                    <ul className="list-disc list-inside ml-4">
                         {fileUrls.map((url, idx) => (
-                            <li key={idx}>{renderField(url, `File ${idx + 1}`)}</li>
+                            <li key={idx} className="text-blue-500 dark:text-blue-300">
+                                {renderField(url, `File ${idx + 1}`)}
+                            </li>
                         ))}
                     </ul>
                 </div>

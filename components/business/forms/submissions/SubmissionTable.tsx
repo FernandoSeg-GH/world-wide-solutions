@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Submission, Form } from '@/types';
 import { useSubmissions } from '@/hooks/forms/useSubmissions';
 import Spinner from '@/components/ui/spinner';
@@ -13,12 +12,7 @@ interface Row {
     [key: string]: any;
 }
 
-// Helper function to generate the full file URL
-const generateFileUrl = (businessId: string, userId: string, fileName: string) => {
-    return `https://vinci-space-nest.nyc3.cdn.digitaloceanspaces.com/vinci-space-nest/business_id_${businessId}/user_id_${userId}/${fileName}`;
-};
-
-function SubmissionsTable({ form, admin }: { form: Form; admin?: boolean }) {
+const SubmissionsTable = ({ form, admin }: { form: Form; admin: boolean }) => {
     const { submissions, fetchSubmissions, loading } = useSubmissions();
     const { fieldKeys, fieldMap } = useFieldMapping(form);
     const { data: session } = useSession();
@@ -33,108 +27,97 @@ function SubmissionsTable({ form, admin }: { form: Form; admin?: boolean }) {
         return <Spinner />;
     }
 
-    const rows = submissions.map((submission) => {
-        const parsedContent: Record<string, any> =
-            typeof submission.content === 'string' ? JSON.parse(submission.content) : submission.content || {};
-
-        const row: { [key: string]: any } = {
-            submittedAt: submission.created_at,
-        };
+    const rows: Row[] = submissions.map((submission) => {
+        const parsedContent =
+            typeof submission.content === 'string'
+                ? JSON.parse(submission.content)
+                : submission.content || {};
+        const row: Row = { submittedAt: submission.created_at };
 
         fieldKeys.forEach((key) => {
             const fieldValue = parsedContent[key];
-            // Generate the file URL if it's a file upload field
-            if (fieldMap[key]?.type === 'FileUploadField' && fieldValue) {
-                row[key] = generateFileUrl(String(session?.user!.businessId!), String(session?.user.id), fieldValue);
-            } else {
-                row[key] = fieldValue || 'N/A';
-            }
+            row[key] = fieldValue || 'N/A';
         });
 
         return row;
     });
 
-    function formatDate(dateString: string): string {
-        const date = new Date(dateString);
-        return isNaN(date.getTime()) ? 'Invalid Date' : date.toLocaleString();
-    }
-
-    function renderCellValue(key: string, value: any) {
-        const field = fieldMap[key];
-        const fieldType = field?.type;
-
-        if (value === null || value === undefined || value === '') {
-            return <span className="text-gray-400">N/A</span>;
-        }
-
-        if (fieldType === 'SelectField' && typeof value === 'string') {
-            const options = field.extraAttributes?.options || [];
-            const selectedOption = options.find((option: any) => option.value === value);
-            return selectedOption ? selectedOption.label : value;
-        }
-
-        if (fieldType === 'CheckboxField' && typeof value === 'boolean') {
-            return value ? 'Yes' : 'No';
-        }
-
-        if (fieldType === 'DateField' && typeof value === 'string') {
-            const date = new Date(value);
-            return isNaN(date.getTime()) ? value : date.toLocaleDateString();
-        }
-
-        if (fieldType === 'FileUploadField' && typeof value === 'string') {
-            return (
-                <a href={value} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
-                    View File
-                </a>
-            );
-        }
-
-        if (typeof value === 'object' && value !== null) {
-            return JSON.stringify(value);
-        }
-
-        return value;
-    }
+    // Dynamically calculate the width percentage for each column
+    const totalColumns = fieldKeys.length + 1; // +1 for the "Submitted At" column
+    const columnWidthPercentage = `${100 / totalColumns}%`;
 
     return (
-        <div className="inline-block min-w-full align-middle border rounded-lg">
-            <Table className="min-w-full divide-y divide-gray-200">
-                <TableHeader className="bg-gray-50">
-                    <TableRow>
+        <div className="overflow-x-auto w-full">
+            {/* Desktop and tablet view */}
+            <table className="hidden sm:table w-full lg:table-fixed sm:table-auto border border-gray-300">
+                <thead className="bg-gray-50 border-b border-gray-300">
+                    <tr>
                         {fieldKeys.map((fieldKey) => (
-                            <TableHead
+                            <th
                                 key={fieldKey}
-                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                                style={{ minWidth: '150px', width: columnWidthPercentage }} // Min width for readability
+                                className="px-4 py-2 text-center text-xs font-medium text-gray-700 uppercase whitespace-nowrap overflow-hidden text-ellipsis"
                             >
-                                {fieldMap[fieldKey]?.extraAttributes?.label || `Field ${fieldKey}`}
-                            </TableHead>
+                                {fieldMap[fieldKey]?.extraAttributes?.label ||
+                                    `Field ${fieldKey}`}
+                            </th>
                         ))}
-                        <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                        <th
+                            style={{ minWidth: '150px', width: columnWidthPercentage }} // Set width for "Submitted At"
+                            className="px-4 py-2 text-center text-xs font-medium text-gray-700 uppercase whitespace-nowrap overflow-hidden text-ellipsis"
+                        >
                             Submitted At
-                        </TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody className="bg-white divide-y divide-gray-200">
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
                     {rows.map((row, index) => (
-                        <TableRow key={index}>
+                        <tr key={index} className="bg-red-100 border-b border-gray-200">
                             {fieldKeys.map((key) => (
-                                <TableCell
+                                <td
                                     key={key}
-                                    className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap max-w-[200px] overflow-hidden"
+                                    style={{ minWidth: '150px', width: columnWidthPercentage }}
+                                    className="px-4 py-2 text-sm text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis"
                                 >
-                                    {renderCellValue(key, row[key])}
-                                </TableCell>
+                                    {row[key]}
+                                </td>
                             ))}
-                            <TableCell className="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
-                                {formatDate(row.submittedAt)}
-                            </TableCell>
-                        </TableRow>
+                            <td
+                                style={{ minWidth: '150px', width: columnWidthPercentage }}
+                                className="px-4 py-2 text-sm text-gray-600 whitespace-nowrap overflow-hidden text-ellipsis"
+                            >
+                                {new Date(row.submittedAt).toLocaleString()}
+                            </td>
+                        </tr>
                     ))}
-                </TableBody>
-            </Table>
+                </tbody>
+            </table>
+
+            {/* Mobile view */}
+            <div className="sm:hidden space-y-4">
+                {rows.map((row, rowIndex) => (
+                    <div key={rowIndex} className="border border-gray-300 p-4 rounded-md bg-red-100">
+                        {fieldKeys.map((key, index) => (
+                            <div key={index} className="flex justify-between py-2 border-b border-gray-200">
+                                <span className="text-xs font-medium text-gray-500 uppercase">
+                                    {fieldMap[key]?.extraAttributes?.label || `Field ${key}`}
+                                </span>
+                                <span className="text-sm text-gray-700">{row[key]}</span>
+                            </div>
+                        ))}
+                        <div className="flex justify-between py-2">
+                            <span className="text-xs font-medium text-gray-500 uppercase">
+                                Submitted At
+                            </span>
+                            <span className="text-sm text-gray-600">
+                                {new Date(row.submittedAt).toLocaleString()}
+                            </span>
+                        </div>
+                    </div>
+                ))}
+            </div>
         </div>
     );
-}
+};
 
 export default SubmissionsTable;
