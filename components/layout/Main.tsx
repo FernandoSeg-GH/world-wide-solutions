@@ -22,7 +22,7 @@ export default function Main() {
                 title={<p className="capitalize">Welcome!</p>}
                 subtitle="This is your personal dashboard. Follow up and check on your activity."
             />
-            <Separator className="border-gray-400 my-3" />
+            {/* <Separator className="border-gray-400 my-3" /> */}
             <div className="flex flex-col gap-6 mt-4">
                 {session?.user.role.id !== 1 && <BusinessStats />}
                 <Forms />

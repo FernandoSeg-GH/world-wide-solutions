@@ -6,6 +6,7 @@ export async function GET(
   req: NextRequest,
   { params }: { params: { businessId: number; shareUrl: string } }
 ) {
+  console.log("start", params);
   const { businessId, shareUrl } = params;
   const session = await getServerSession(authOptions);
   if (!session || !session.accessToken) {
@@ -14,9 +15,10 @@ export async function GET(
 
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/forms/${encodeURIComponent(
-        businessId
-      )}/share_url/${encodeURIComponent(shareUrl)}/submissions`,
+      `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/forms/submissions?user_id=${session.user.id}`,
+      // `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/forms/${encodeURIComponent(
+      //   businessId
+      // )}/share_url/${encodeURIComponent(shareUrl)}/submissions`
       {
         headers: {
           Authorization: `Bearer ${session.accessToken}`,

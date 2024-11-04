@@ -34,6 +34,8 @@ export const RenderComponent = (currentSection: string) => {
             return <Forms />;
         case "Form":
             return <FormDetails />;
+        case "My Submissions":
+            return <Submissions />;
         case "Submissions":
             return <Submissions />;
         case "Notifications":

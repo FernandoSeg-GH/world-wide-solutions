@@ -38,7 +38,7 @@ export function Header({ currentSection, isExpanded }: HeaderProps) {
     //     }
     // }, [session, fetchForms]);
     return (
-        <header className="sticky top-0 z-0 flex h-14 items-center gap-4 border-b bg-background px-4">
+        <header className="sticky top-0 right-0 z-10 flex h-14 items-center gap-4 bg-lightBlue-foreground shadow-md px-4 w-full">
             {/* {breadcrumbs &&
                 <Breadcrumb className="hidden md:flex">
                     <BreadcrumbList>
@@ -59,7 +59,7 @@ export function Header({ currentSection, isExpanded }: HeaderProps) {
                     </BreadcrumbList>
                 </Breadcrumb>
             } */}
-            <h2 className="font-bold text-2xl sr-only">{currentSection}</h2>
+            <h2 className="font-bold text-2xl sr-only hidden">{currentSection}</h2>
             <div className="relative ml-auto flex-1 md:grow-0">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input

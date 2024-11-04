@@ -19,6 +19,8 @@ function Submissions() {
         }
     }, [form, session?.user.role?.id, fetchSubmissions]);
 
+
+
     if (loading) {
         return <Spinner />;
     }

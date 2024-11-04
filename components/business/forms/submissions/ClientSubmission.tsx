@@ -103,11 +103,12 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
         try {
             const formData = new FormData();
             formData.append('content', JSON.stringify(formValues.current));
+
             Object.entries(filesRef.current).forEach(([fieldId, files]) => {
                 if (Array.isArray(files)) {
-                    files.forEach(file => formData.append('files', file));
-                } else {
-                    formData.append('files', files);
+                    files.forEach((file) => formData.append(`files_${fieldId}[]`, file)); // Properly append multiple files with `[]`
+                } else if (files instanceof File) {
+                    formData.append(`files_${fieldId}`, files); // Append a single file directly
                 }
             });
 
@@ -131,7 +132,6 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
             const result = await response.json();
             resetForm();
             setIsSubmitted(true);
-            console.log("Submission successful!!");
             toast({
                 title: 'Success',
                 description: 'Form submitted successfully.',

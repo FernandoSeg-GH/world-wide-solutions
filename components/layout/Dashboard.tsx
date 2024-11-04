@@ -82,16 +82,17 @@ export function Dashboard() {
 
             <div
                 className={cn(
-                    "flex flex-col gap-6 transition-all duration-300 w-full max-w-screen h-full",
-                    isMobile ? "p-2" : "p-4",
-                    isExpanded && !isMobile ? "pl-64" : "pl-14"
+                    "flex flex-col items-end transition-all duration-300 w-full max-w-screen h-full",
+                    isMobile ? "p-2" : "",
+                    isExpanded && !isMobile && "pl-64",
+                    !isExpanded && !isMobile && "pl-16"
                 )}
             >
                 <Header
                     currentSection={currentSection}
                     isExpanded={isExpanded}
                 />
-                <div className="flex-grow overflow-y-auto w-full p-4">{RenderComponent(currentSection)}</div>
+                <div className="flex-grow overflow-y-auto w-full px-4 py-6">{RenderComponent(currentSection)}</div>
             </div>
         </div>
     );

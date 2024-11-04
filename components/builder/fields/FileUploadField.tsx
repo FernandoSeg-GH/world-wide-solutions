@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import React, { useState, useEffect, ChangeEvent, useCallback } from "react";
 import { FormElement, FormElementInstance, SubmitFunction, ElementsType } from "@/types";
 import { Label } from "@/components/ui/label";
@@ -18,6 +19,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
+import { useDropzone } from "react-dropzone";
 
 const type: ElementsType = "FileUploadField";
 
@@ -25,7 +27,7 @@ const extraAttributes = {
     label: "Upload File",
     helperText: "Choose a file to upload",
     required: false,
-    multiple: false,
+    multiple: true,
 };
 
 export const FileUploadFieldFormElement: FormElement = {
@@ -51,7 +53,6 @@ export const FileUploadFieldFormElement: FormElement = {
         return true;
     },
 };
-
 
 type CustomInstance = FormElementInstance & {
     extraAttributes: typeof extraAttributes;
@@ -91,8 +92,7 @@ function FormComponent({
     handleFileChange?: (fieldId: string, files: File | File[]) => void;
 }) {
     const element = elementInstance as CustomInstance;
-
-    const [selectedFile, setSelectedFile] = useState<File | File[] | null>(null);
+    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [error, setError] = useState(false);
 
     useEffect(() => {
@@ -101,55 +101,109 @@ function FormComponent({
 
     const { label, required, helperText, multiple } = element.extraAttributes;
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const files = e.target.files;
-        if (files) {
-            const fileList = Array.from(files);
-            const fileToSet = multiple ? fileList : fileList[0] || null;
-            setSelectedFile(fileToSet);
+    const onDrop = useCallback(
+        (acceptedFiles: File[]) => {
+            console.log('acceptedFiles', acceptedFiles);
+            if (acceptedFiles.length === 0) return;
 
-            if (handleFileChange) {
-                handleFileChange(element.id, multiple ? fileList : fileList[0] || "");
-            }
+            setSelectedFiles((prevFiles) => {
+                const newFiles = multiple
+                    ? [...prevFiles, ...acceptedFiles]
+                    : acceptedFiles.slice(0, 1);
 
-            if (submitValue) {
-                if (multiple) {
-                    submitValue(element.id, fileList.map((f) => f.name).join(", "));
-                } else {
-                    submitValue(element.id, fileList[0]?.name || "");
+                console.log('newFiles', newFiles);
+                if (handleFileChange) {
+                    handleFileChange(element.id, multiple ? newFiles : newFiles[0]);
                 }
-            }
-        }
-    };
+
+                if (submitValue) {
+                    const value = multiple
+                        ? newFiles.map((f) => f.name).join(', ')
+                        : newFiles.length > 0
+                            ? newFiles[0].name
+                            : '';
+                    submitValue(element.id, value);
+                }
+                return newFiles;
+            });
+        },
+        [element.id, handleFileChange, multiple, submitValue]
+    );
+
+    const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
+        onDrop,
+        multiple,
+    });
 
     return (
-        <div className="flex flex-col gap-2 w-full">
-            <Label className={cn(error && "text-red-500")}>
+        <div
+            key={multiple ? 'multiple' : 'single'} // Force re-mount when `multiple` changes
+            className="flex flex-col gap-2 w-full"
+        >
+            <Label className={cn(error && 'text-red-500')}>
                 {label}
-                {required && "*"}
+                {required && '*'}
             </Label>
-            <Input
-                type="file"
-                required={required}
-                multiple={multiple}
-                onChange={handleChange}
-                className={cn(error && "border-red-500")}
-            />
+            <div
+                {...getRootProps()}
+                className={cn(
+                    'border-2 border-dashed rounded-md p-4 cursor-pointer',
+                    error && 'border-red-500',
+                    isDragActive && 'border-blue-500'
+                )}
+            >
+                <input {...getInputProps({ required, multiple })} />
+                <div className="flex flex-col items-center justify-center">
+                    <UploadIcon className="h-10 w-10 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">
+                        {isDragActive
+                            ? 'Drop the files here ...'
+                            : 'Drag & drop some files here, or click to select files'}
+                    </p>
+                    <Button variant="outline" className="mt-2" onClick={open}>
+                        Select Files
+                    </Button>
+                </div>
+            </div>
             {helperText && (
-                <p className={cn("text-muted-foreground text-[0.8rem]", error && "text-red-500")}>
+                <p
+                    className={cn(
+                        'text-muted-foreground text-[0.8rem]',
+                        error && 'text-red-500'
+                    )}
+                >
                     {helperText}
                 </p>
+            )}
+            {selectedFiles.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-4">
+                    {selectedFiles.map((file, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                            {isImage(file) ? (
+                                <img
+                                    src={URL.createObjectURL(file)}
+                                    alt={file.name}
+                                    className="h-16 w-16 object-cover rounded-md"
+                                />
+                            ) : (
+                                getFileIcon(file)
+                            )}
+                            <p className="text-sm">{file.name}</p>
+                        </div>
+                    ))}
+                </div>
             )}
         </div>
     );
 }
 
 
+
 const propertiesSchema = z.object({
     label: z.string().min(2).max(50),
     helperText: z.string().max(200),
     required: z.boolean().default(false),
-    multiple: z.boolean().default(false),
+    multiple: z.boolean(),
 });
 
 type PropertiesFormSchemaType = z.infer<typeof propertiesSchema>;
@@ -158,7 +212,7 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
     const element = elementInstance as CustomInstance;
     const form = useForm<PropertiesFormSchemaType>({
         resolver: zodResolver(propertiesSchema),
-        mode: "onBlur",
+        mode: 'onBlur',
         defaultValues: element.extraAttributes,
     });
 
@@ -167,6 +221,7 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
     }, [element, form]);
 
     function applyChanges(values: PropertiesFormSchemaType) {
+        // Create a new object to ensure React detects the change
         element.extraAttributes = { ...values };
     }
 
@@ -255,3 +310,32 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
         </ShadForm>
     );
 }
+
+import { ImageIcon, FileTextIcon, FileXIcon } from "lucide-react"; // Import necessary icons
+
+// Helper function to check if a file is an image
+const isImage = (file: File) => {
+    return file.type.startsWith("image/");
+};
+
+// Function to get the appropriate icon based on file type
+const getFileIcon = (file: File) => {
+    if (file.type === "application/pdf") {
+        return <FileTextIcon className="h-6 w-6 text-gray-500" />;
+    } else if (
+        file.type ===
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+        file.type === "application/msword"
+    ) {
+        return <FileTextIcon className="h-6 w-6 text-blue-500" />;
+    } else if (
+        file.type ===
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+        file.type === "application/vnd.ms-excel" ||
+        file.type === "text/csv"
+    ) {
+        return <FileXIcon className="h-6 w-6 text-green-500" />;
+    } else {
+        return <FileTextIcon className="h-6 w-6 text-gray-500" />;
+    }
+};

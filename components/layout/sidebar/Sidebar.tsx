@@ -57,13 +57,13 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
         <aside
             onClick={() => setIsExpanded(!isExpanded)}
             className={cn(
-                "fixed inset-y-0 left-0 z-10 flex flex-col border-r bg-background transition-all duration-300",
+                "fixed inset-y-0 left-0 z-10 flex flex-col border-r bg-navyBlue transition-all duration-300 shadow",
                 isExpanded ? "w-64" : "w-16"
             )}
         >
             <div onClick={(event: React.MouseEvent<HTMLDivElement>) => event.stopPropagation()}>
                 {
-                    isExpanded ? <Logo url="https://vinci-space-nest.nyc3.cdn.digitaloceanspaces.com/vinci-space-nest/business_id_2/branding/logo.avif" width={160} className="" /> : <Logo url="/assets/vws.png" width={25} className="" />
+                    isExpanded ? <Logo url="https://vinci-space-nest.nyc3.cdn.digitaloceanspaces.com/vinci-space-nest/business_id_2/branding/Logotipo-1.png" width={160} className="" /> : <Logo url="https://vinci-space-nest.nyc3.cdn.digitaloceanspaces.com/vinci-space-nest/business_id_2/branding/IsoVW-1.png" width={25} className="" />
                 }
             </div>
             <nav className="flex flex-col gap-4 px-2 py-4">
@@ -85,7 +85,7 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
                                             "flex items-center rounded-lg transition-colors hover:text-foreground w-full",
                                             currentSection === item.label || item.subItems?.some(sub => currentSection === sub.label)
                                                 ? "bg-accent text-accent-foreground"
-                                                : "text-muted-foreground",
+                                                : "text-white/80",
                                             isExpanded ? "px-3 py-2" : "justify-center py-2"
                                         )}
                                         aria-haspopup={item.subItems ? "true" : undefined}
@@ -121,10 +121,10 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
                                                                 }
                                                             }}
                                                             className={cn(
-                                                                "flex items-center rounded-lg transition-colors hover:text-foreground w-full",
+                                                                "flex items-center rounded-lg transition-colors hover:text-white w-full",
                                                                 currentSection === subItem.label
                                                                     ? "bg-accent text-accent-foreground"
-                                                                    : "text-muted-foreground",
+                                                                    : "text-white/60",
                                                                 isExpanded ? "px-3 py-2" : "justify-center py-2"
                                                             )}
                                                         >

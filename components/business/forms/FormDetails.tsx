@@ -71,13 +71,13 @@ const FormDetails = () => {
             </div>
 
             {/* Table/Card view wrapper */}
-            <div className="flex-grow overflow-hidden h-full">
+            <div className="flex-grow overflow-auto h-full">
                 {showTable ? (
                     <div className="overflow-x-auto w-full max-w-full"> {/* Scrollable on x-axis */}
                         <SubmissionsTable form={form} admin={isAdmin} />
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-y-auto w-full">
+                    <div className="grid grid-cols-1 w-full gap-4">
                         {submissions.map((submission) => (
                             <SubmissionCard
                                 key={submission.id}

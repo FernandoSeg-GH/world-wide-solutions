@@ -4,7 +4,7 @@ import { Download, Terminal } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface SubmissionDetailProps {
-    row: { [key: string]: any };
+    row: { [key: string]: any } | undefined;
     fieldKeys: string[];
     fieldMap: { [key: string]: { label: string; type: string; extraAttributes?: any } };
     created_at: string;
@@ -18,7 +18,11 @@ const SubmissionDetail: React.FC<SubmissionDetailProps> = ({
     created_at,
     fileUrls,
 }) => {
-    const missingFields = fieldKeys.filter((key) => row[key] === 'N/A' || row[key] === null || row[key] === '');
+    if (!row || Object.keys(row).length === 0) {
+        return <p>No data available.</p>; // Add a message for better UX
+    }
+
+    const missingFields = fieldKeys.filter((key) => row[key] === undefined || row[key] === null || row[key] === '');
 
     const renderField = (value: string, label: string) => {
         const isFile = value?.includes('.pdf') || value?.includes('.png');
