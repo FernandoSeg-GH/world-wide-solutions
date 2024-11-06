@@ -5,7 +5,7 @@ import { useAppContext } from '@/context/AppProvider';
 import SectionHeader from "@/components/layout/navbar/SectionHeader";
 import { Separator } from '@/components/ui/separator';
 import { useSession } from 'next-auth/react';
-import SubmissionCard from './submissions/SubmissionCard';
+import AdminSubmissionCard from './submissions/AdminSubmissionCard';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import SubmissionsTable from './submissions/SubmissionTable';
@@ -79,7 +79,7 @@ const FormDetails = () => {
                 ) : (
                     <div className="grid grid-cols-1 w-full gap-4">
                         {submissions.map((submission) => (
-                            <SubmissionCard
+                            <AdminSubmissionCard
                                 key={submission.id}
                                 submission={submission}
                                 form={form}
