@@ -389,6 +389,64 @@ export const useSubmissions = () => {
     [session]
   );
 
+  const updateSubmissionContent = useCallback(
+    async (
+      submissionId: number,
+      updatedContent: string,
+      formId: number
+    ): Promise<void> => {
+      if (!session) {
+        console.error("User is not authenticated.");
+        toast({
+          title: "Error",
+          description: "You must be logged in to edit submissions.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/forms/submissions/${formId}/edit`, {
+          method: "PUT",
+          body: JSON.stringify({ content: updatedContent }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to update submission.");
+        }
+
+        const data = await response.json();
+
+        // Update the submission in the state
+        setSubmissions((prevSubmissions) =>
+          prevSubmissions.map((submission) =>
+            submission.id === submissionId
+              ? { ...submission, content: JSON.parse(updatedContent) }
+              : submission
+          )
+        );
+
+        toast({
+          title: "Success",
+          description: "Submission updated successfully.",
+          variant: "default",
+        });
+      } catch (error: any) {
+        console.error("Error updating submission:", error);
+        toast({
+          title: "Error",
+          description: error.message || "Failed to update submission.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    },
+    [session]
+  );
+
   return {
     submissions,
     loading,
@@ -403,5 +461,6 @@ export const useSubmissions = () => {
     fetchClientSubmissions,
     setLoading,
     updateSubmissionStatus,
+    updateSubmissionContent,
   };
 };

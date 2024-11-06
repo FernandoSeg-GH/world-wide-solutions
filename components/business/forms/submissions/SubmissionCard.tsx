@@ -1,25 +1,31 @@
-import React from "react";
-import { ElementsType, Form, Submission } from '@/types';
+import React, { useState, useEffect } from "react";
+import { Form, Submission } from '@/types';
+import { useSubmissions } from '@/hooks/forms/useSubmissions';
+import { toast } from "@/components/ui/use-toast";
 
 import {
-    FaTextHeight,
-    FaHeading,
     FaParagraph,
     FaSlidersH,
-    FaFileUpload,
-    FaCalendarAlt,
-    FaPhone,
-    FaCheckSquare,
-    FaUpload,
-    FaClipboardList,
     FaMinusCircle,
     FaFileAlt,
     FaQuestionCircle,
+    FaClipboardList,
+    FaCalendarAlt,
+    FaPhone,
+    FaCheckSquare,
+    FaFileUpload,
 } from 'react-icons/fa';
 import { VscDebugBreakpointDataUnverified, VscDebugBreakpointLog, VscDebugBreakpointFunction } from "react-icons/vsc";
 import { GoMultiSelect } from "react-icons/go";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
 
-export const iconMap = {
+export const iconMap: { [key: string]: React.ComponentType } = {
     TextField: VscDebugBreakpointDataUnverified,
     TitleField: VscDebugBreakpointLog,
     SubTitleField: VscDebugBreakpointFunction,
@@ -35,41 +41,76 @@ export const iconMap = {
     FileUploadField: FaFileUpload,
 };
 
-const SubmissionCard = ({ submission, form }: { submission: Submission, form: Form }) => {
+interface SubmissionCardProps {
+    submission: Submission;
+    form: Form;
+}
+
+const SubmissionCard: React.FC<SubmissionCardProps> = ({ submission, form }) => {
     const { content } = submission;
     const fields = form.fields || [];
+    const { updateSubmissionContent } = useSubmissions();
 
     const informationalFields = ["TitleField", "SubTitleField", "ParagraphField"];
     const separatorFields = ["SeparatorField"];
 
+    const [isEditing, setIsEditing] = useState(false);
+    const [editedContent, setEditedContent] = useState<Record<string, string>>({});
+
+    useEffect(() => {
+        const initialContent: Record<string, string> = {};
+        fields.forEach((field) => {
+            const fieldId = field.id;
+            initialContent[fieldId] = content ? content[fieldId] || "" : "";
+        });
+        setEditedContent(initialContent);
+    }, [fields, content]);
+
+    const handleEditClick = () => setIsEditing(true);
+    const handleCancelClick = () => {
+        setIsEditing(false);
+        setEditedContent(content || {});
+    };
+
+    const handleSaveClick = async () => {
+        try {
+            await updateSubmissionContent(submission.id, String(editedContent), form.id);
+            setIsEditing(false);
+            toast({ title: "Success", description: "Submission updated successfully.", variant: "default" });
+        } catch (error) {
+            toast({ title: "Error", description: "Failed to update submission.", variant: "destructive" });
+        }
+    };
+
+    const handleChange = (fieldId: string, value: string) => {
+        setEditedContent((prev) => ({ ...prev, [fieldId]: value }));
+    };
+
     return (
-        <div className="border border-gray-200 rounded-lg p-6 shadow-lg max-w-2xl">
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">{form.name}</h3>
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">Submission ID: <span className="underline">{submission.id}</span></h2>
-            <p className="text-sm text-gray-500 mb-4">
-                Submitted At: {new Date(submission.created_at).toLocaleString()}
-            </p>
-            <div className="mt-4 space-y-4">
+        <Card className="max-w-3xl mb-6 shadow-lg">
+            <CardHeader>
+                <CardTitle>{form.name}</CardTitle>
+                <CardDescription>
+                    Submission ID: <span>{submission.id}</span>
+                </CardDescription>
+                <p className="text-sm text-gray-500">Submitted At: {new Date(submission.created_at).toLocaleString()}</p>
+            </CardHeader>
+            <CardContent className="space-y-4">
                 {fields.map((field) => {
-                    const fieldId = field.id.toString();
-                    const label =
-                        field.extraAttributes?.label ||
-                        field.extraAttributes?.title ||
-                        field.extraAttributes?.text ||
-                        `Field ${fieldId}`;
+                    const fieldId = field.id;
+                    const label = field.extraAttributes?.label || field.extraAttributes?.title || field.extraAttributes?.text || `Field ${fieldId}`;
                     const type = field.type;
                     const IconComponent = iconMap[type] || FaQuestionCircle;
 
-                    if (separatorFields.includes(type)) {
-                        return <hr key={fieldId} className="my-6 border-t border-gray-300" />;
-                    }
+                    if (separatorFields.includes(type)) return <Separator key={fieldId} />;
 
-                    const value = content ? content[fieldId] : "N/A";
+                    const value = content ? content[fieldId] || "" : "";
 
+                    // Styling for informational fields
                     if (type === "TitleField") {
                         return (
                             <div key={fieldId} className="flex items-center mb-2">
-                                <IconComponent className="mr-2 text-gray-600 text-2xl" />
+                                <span className="mr-2 text-gray-600 text-2xl"><IconComponent /></span>
                                 <span className="text-xl font-semibold text-gray-800">{label}</span>
                             </div>
                         );
@@ -78,7 +119,7 @@ const SubmissionCard = ({ submission, form }: { submission: Submission, form: Fo
                     if (type === "SubTitleField") {
                         return (
                             <div key={fieldId} className="flex items-center mb-2">
-                                <IconComponent className="mr-2 text-gray-500 text-xl" />
+                                <span className="mr-2 text-gray-500 text-xl"><IconComponent /></span>
                                 <span className="text-lg font-medium text-gray-700">{label}</span>
                             </div>
                         );
@@ -87,24 +128,85 @@ const SubmissionCard = ({ submission, form }: { submission: Submission, form: Fo
                     if (type === "ParagraphField") {
                         return (
                             <div key={fieldId} className="flex items-start mb-2">
-                                {/* <IconComponent className="mr-2 text-gray-500" /> */}
                                 <p className="text-gray-600 text-base">{label}</p>
                             </div>
                         );
                     }
 
+                    // Editable fields in editing mode
+                    if (isEditing) {
+                        return (
+                            <div key={fieldId} className="flex items-center justify-between">
+                                <div className="flex items-center">
+                                    <span className="mr-2 text-gray-500"><IconComponent /></span>
+                                    <span className="font-semibold text-gray-800">{label}:</span>
+                                </div>
+                                <div className="w-full max-w-80">
+                                    {(() => {
+                                        switch (type) {
+                                            case "TextField":
+                                            case "NumberField":
+                                            case "TelephoneField":
+                                                return <Input value={editedContent[fieldId]} onChange={(e) => handleChange(fieldId, e.target.value)} />;
+                                            case "TextAreaField":
+                                                return <Textarea value={editedContent[fieldId]} onChange={(e) => handleChange(fieldId, e.target.value)} />;
+                                            case "DateField":
+                                                return <Input type="date" value={editedContent[fieldId]} onChange={(e) => handleChange(fieldId, e.target.value)} />;
+                                            case "SelectField":
+                                                return (
+                                                    <Select value={editedContent[fieldId]} onValueChange={(value) => handleChange(fieldId, value)}>
+                                                        <SelectTrigger>Select an option</SelectTrigger>
+                                                        <SelectContent>
+                                                            {field.extraAttributes?.options?.map((option, index) => (
+                                                                <SelectItem key={index} value={option.value}>
+                                                                    {option.label}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                );
+                                            case "CheckboxField":
+                                                return <Checkbox checked={editedContent[fieldId] === "true"} onCheckedChange={(checked) => handleChange(fieldId, checked ? "true" : "false")} />;
+                                            default:
+                                                return <Input value={editedContent[fieldId]} onChange={(e) => handleChange(fieldId, e.target.value)} />;
+                                        }
+                                    })()}
+                                </div>
+                            </div>
+                        );
+                    }
+
+                    // Display fields when not editing
                     return (
                         <div key={fieldId} className="flex items-center justify-between">
                             <div className="flex items-center">
-                                <IconComponent className="mr-2 text-gray-500" />
+                                <span className="mr-2 text-gray-500"><IconComponent /></span>
                                 <span className="font-semibold text-gray-800">{label}:</span>
                             </div>
-                            <span className="text-gray-700 capitalize">{value || "N/A"}</span>
+                            <span>{type === "FileUploadField" && value ? <a href={value}>View File</a> : value || "N/A"}</span>
                         </div>
                     );
                 })}
-            </div>
-        </div>
+            </CardContent>
+            <CardFooter className="space-x-2 border-t pt-6">
+                {!isEditing ? (
+                    <div className="flex items-center justify-end w-full">
+                        <Button onClick={handleEditClick} variant="default" className="">
+                            Modify Information
+                        </Button>
+                    </div>
+                ) : (
+                    <>
+                        <Button onClick={handleSaveClick} variant="default">
+                            Save
+                        </Button>
+                        <Button onClick={handleCancelClick} variant="secondary">
+                            Cancel
+                        </Button>
+                    </>
+                )}
+            </CardFooter>
+        </Card>
     );
 };
 
