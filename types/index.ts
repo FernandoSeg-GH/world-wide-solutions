@@ -113,7 +113,8 @@ export interface Submission {
   username?: string;
   formUrl: string;
   status: string;
-  content?: Record<string, { label: string; value: string | null }>;
+  content?: Record<string, string>;
+  // content?: Record<string, { label: string; value: string | null }>;
   created_at: string;
   fileUrls?: string[];
 }
