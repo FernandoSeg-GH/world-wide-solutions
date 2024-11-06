@@ -286,6 +286,7 @@ export const useSubmissions = () => {
     [session]
   );
 
+  // Ensure all fetch calls for submissions are directed to authenticated endpoints
   const fetchSubmissionsByFormUrl = useCallback(
     async (formUrl: string) => {
       const businessId = session?.user.businessId;
@@ -317,7 +318,7 @@ export const useSubmissions = () => {
         }
 
         const data = await response.json();
-        setSubmissions(data.submissions);
+        setSubmissions(data.submissions || []);
         setTotalPages(data.pages || 1);
         setCurrentPage(data.page || 1);
       } catch (error: any) {

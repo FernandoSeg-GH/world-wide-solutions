@@ -31,24 +31,31 @@ export const useFormState = (initialForm?: Form) => {
     setUnsavedChanges(true);
   }, []);
 
-  const setForm = useCallback((newForm: Form | null) => {
-    setFormState((prevForm) => {
-      if (deepEqual(prevForm, newForm)) {
-        return prevForm;
-      }
+  const setForm = useCallback(
+    (newForm: Form | null) => {
+      setFormState((prevForm) => {
+        if (deepEqual(prevForm, newForm)) {
+          // If the new form is deeply equal to the previous form, return previous form to prevent re-render
+          return prevForm;
+        }
 
-      if (newForm) {
-        setFormName(newForm.name);
-        setElements(newForm.fields!);
-        setUnsavedChanges(true);
-      } else {
-        setFormName("");
-        setElements([]);
-        setUnsavedChanges(true);
-      }
-      return newForm;
-    });
-  }, []);
+        // Update form state and other related states based on new form data
+        if (newForm) {
+          setFormName(newForm.name || ""); // Set name if present, else use empty string
+          setElements(newForm.fields || []); // Set fields if present, else use empty array
+          setUnsavedChanges(true); // Mark as having unsaved changes
+        } else {
+          // If newForm is null, clear form-related states
+          setFormName("");
+          setElements([]);
+          setUnsavedChanges(false); // No unsaved changes when clearing the form
+        }
+
+        return newForm; // Return the updated form
+      });
+    },
+    [setFormName, setElements, setUnsavedChanges] // Include dependencies to avoid stale closures
+  );
 
   const addElement = useCallback(
     (index: number, element: FormElementInstance) => {

@@ -8,6 +8,7 @@ import SectionHeader from '@/components/layout/navbar/SectionHeader';
 import { useAppContext } from '@/context/AppProvider';
 import { ElementsType, Form, Submission } from '@/types';
 import SubmissionCard from "./SubmissionCard";
+import { useFormState } from "@/hooks/forms/useFormState";
 
 export function useFieldMapping(form: Form, submission: { [key: string]: any } = {}) {
     const { fieldMap, fieldKeys } = useMemo(() => {
@@ -58,40 +59,29 @@ export function useFieldMapping(form: Form, submission: { [key: string]: any } =
 
 function Submissions() {
     const { data: session } = useSession();
-    const { loading, setLoading, setSubmissions } = useSubmissions();
+    const { loading, setLoading, setSubmissions, submissions, fetchSubmissionsByFormUrl } = useSubmissions();
     const { data } = useAppContext();
-    const { form, submissions } = data;
+    const { form } = data;
 
     useEffect(() => {
         const fetchUserSubmissions = async () => {
             if (form && session?.user.role?.id && form.shareUrl) {
                 try {
-                    setLoading(true);
-                    const response = await fetch(`/api/forms/${session.user.businessId}/share-url/${form.shareUrl}/submissions`);
-                    if (!response.ok) throw new Error("Failed to fetch submissions");
-
-                    // Specify the type for `data` and `data.submissions`
-                    const data: { submissions: Submission[] } = await response.json();
-
-                    if (data.submissions && Array.isArray(data.submissions)) {
-                        const filteredSubmissions = data.submissions.filter((sub: Submission) => sub.formId === form.id);
-                        setSubmissions(filteredSubmissions);
-                    } else {
-                        console.error("Invalid data structure:", data);
-                    }
+                    await fetchSubmissionsByFormUrl(form.shareUrl);
                 } catch (error) {
                     console.error("Error fetching submissions:", error);
-                } finally {
-                    setLoading(false);
                 }
             }
         };
         fetchUserSubmissions();
-    }, [form, session?.user.businessId, session?.user.role?.id, setLoading, setSubmissions]);
-
+    }, [form, session?.user.businessId, session?.user.role?.id, fetchSubmissionsByFormUrl]);
 
     if (loading) {
-        return <Spinner />;
+        return (
+            <div className="flex items-center justify-center w-screen h-screen">
+                <Spinner />
+            </div>
+        );
     }
 
     if (!form) return <p>No form found.</p>;
@@ -118,5 +108,6 @@ function Submissions() {
         </div>
     );
 }
+
 
 export default Submissions;    

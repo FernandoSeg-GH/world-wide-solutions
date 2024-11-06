@@ -153,14 +153,14 @@ function FormComponent({
                 )}
             >
                 <input {...getInputProps({ required, multiple })} />
-                <div className="flex flex-col items-center justify-center">
+                <div className="flex flex-col items-center justify-center py-12">
                     <UploadIcon className="h-10 w-10 text-muted-foreground" />
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground my-4">
                         {isDragActive
                             ? 'Drop the files here ...'
                             : 'Drag & drop some files here, or click to select files'}
                     </p>
-                    <Button variant="outline" className="mt-2" onClick={open}>
+                    <Button variant="outline" className="" onClick={open}>
                         Select Files
                     </Button>
                 </div>

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { formatDistance } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { BiRightArrowAlt } from "react-icons/bi";
+import { BiPlus, BiPlusCircle, BiRightArrowAlt } from "react-icons/bi";
 import { Badge } from "@/components/ui/badge";
 import {
     Card,
@@ -65,6 +65,7 @@ export function FormCard({ form }: FormCardProps) {
         try {
             await formActions.publishForm(action);
 
+            // Update the form in context immutably
             setForm({ ...form, published: !form.published });
 
             toast({
@@ -138,7 +139,9 @@ export function FormCard({ form }: FormCardProps) {
         ? formatDistance(new Date(form.createdAt), new Date(), { addSuffix: true })
         : "Unknown";
 
-    if (!form) return <Spinner />
+    if (!form) return <div className="flex items-center justify-center w-screen h-screen">
+        <Spinner />
+    </div>;
 
     return (
         <Card
@@ -251,7 +254,7 @@ export function FormCard({ form }: FormCardProps) {
                         className={`w-full mt-2 text-md gap-4 `}
                         onClick={handleNew}
                     >
-                        New Submission <BiRightArrowAlt />
+                        New Submission <BiPlus />
                     </Button>
                 ) : null}
             </CardFooter>

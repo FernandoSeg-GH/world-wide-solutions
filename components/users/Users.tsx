@@ -38,7 +38,9 @@ const Users: React.FC = () => {
     }, [fetchAllUsers]);
 
     if (userLoading || businessLoading) {
-        return <Spinner />;
+        return <div className="flex items-center justify-center w-screen h-screen">
+            <Spinner />
+        </div>;;
     }
 
     return (

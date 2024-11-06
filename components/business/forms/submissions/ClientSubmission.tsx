@@ -149,7 +149,9 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
     const formattedDate = format(new Date(), 'dd MMMM yyyy');
 
     if (!form) {
-        return <Spinner />;
+        return <div className="flex items-center justify-center w-screen h-screen">
+            <Spinner />
+        </div>;
     }
 
     return (

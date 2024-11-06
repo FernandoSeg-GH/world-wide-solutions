@@ -27,7 +27,9 @@ const SubmissionsTable = ({ form, admin }: { form: Form; admin: boolean }) => {
     }, [form.shareUrl, fetchSubmissions]);
 
     if (loading || !form) {
-        return <Spinner />;
+        return <div className="flex items-center justify-center w-screen h-screen">
+            <Spinner />
+        </div>;;
     }
 
     const rows: Row[] = submissions.map((submission) => {

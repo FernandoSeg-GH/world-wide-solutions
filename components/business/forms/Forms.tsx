@@ -53,7 +53,9 @@ function Forms({ }: Props) {
     ]);
 
     if (loading) {
-        return <Spinner />;
+        return <div className="flex items-center justify-center w-screen h-screen">
+            <Spinner />
+        </div>;;
     }
 
     if (error) {

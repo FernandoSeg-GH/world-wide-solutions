@@ -39,7 +39,9 @@ const UsersList = () => {
         fetchUsers();
     }, []);
 
-    if (loading) return <Spinner />;
+    if (loading) return <div className="flex items-center justify-center w-screen h-screen">
+        <Spinner />
+    </div>;;
     if (error) return <div>Error: {error}</div>;
 
     return (

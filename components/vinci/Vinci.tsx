@@ -98,7 +98,9 @@ export default function Vinci() {
     }
 
     if (loading) {
-        return <Spinner />;
+        return <div className="flex items-center justify-center w-screen h-screen">
+            <Spinner />
+        </div>;;
     }
     const handlePrevious = () => {
         if (currentPage as number > 1) {
