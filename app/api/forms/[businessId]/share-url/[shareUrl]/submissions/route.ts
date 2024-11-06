@@ -6,7 +6,6 @@ export async function GET(
   req: NextRequest,
   { params }: { params: { businessId: number; shareUrl: string } }
 ) {
-  console.log("start", params);
   const { businessId, shareUrl } = params;
   const session = await getServerSession(authOptions);
   if (!session || !session.accessToken) {
@@ -25,7 +24,7 @@ export async function GET(
         },
       }
     );
-    console.log("response", response);
+
     if (!response.ok) {
       const errorData = await response.json();
       return NextResponse.json(
@@ -35,7 +34,6 @@ export async function GET(
     }
 
     const data = await response.json();
-    console.log("data", data);
     return NextResponse.json(data);
   } catch (error) {
     console.error("Error fetching submissions by share URL:", error);

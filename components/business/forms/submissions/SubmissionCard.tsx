@@ -21,7 +21,7 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ form, submission }) => 
 
     return (
         <Card key={submission.id} className="overflow-hidden shadow-lg rounded-lg border border-gray-200 transition-all duration-300 hover:shadow-xl   dark:bg-gray-800 dark:border-gray-700 max-w-[600px]">
-            <CardHeader className="flex flex-row justify-between items-center p-4 cursor-pointer bg-gray-50 dark:bg-gray-700 rounded-t-lg" onClick={toggleExpand}>
+            <CardHeader className="flex flex-row justify-between items-center p-4 cursor-pointer bg-gray-200 dark:bg-gray-700 rounded-t-lg" onClick={toggleExpand}>
                 <div className="flex flex-col">
                     <span className="font-semibold text-gray-900 dark:text-gray-100">Submission ID: {submission.id}</span>
                     <span className="text-xs text-gray-500 dark:text-gray-400">{new Date(submission.created_at).toLocaleDateString()}</span>

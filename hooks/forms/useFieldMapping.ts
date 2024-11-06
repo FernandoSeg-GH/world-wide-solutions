@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Form, ElementsType } from "@/types";
 
-// Assuming "submission" is an object with field IDs as keys and their values as values
 export function useFieldMapping(
   form: Form,
   submission: { [key: string]: any } = {}
@@ -38,11 +37,17 @@ export function useFieldMapping(
 
   fields.forEach((field) => {
     if (isInputField(field.type)) {
-      const fieldValue = submission[field.id] || ""; // Retrieve the submission value if it exists
+      const matchingSubmissionKey = Object.keys(submission).find(
+        (key) => key === field.id.toString()
+      );
+
+      const fieldValue = matchingSubmissionKey
+        ? submission[matchingSubmissionKey]
+        : "";
       fieldMap[field.id] = {
         label: field.extraAttributes?.label || `Field ${field.id}`,
         type: field.type,
-        value: fieldValue, // Store the submission value in fieldMap
+        value: fieldValue,
         extraAttributes: field.extraAttributes,
       };
       fieldKeys.push(field.id);
