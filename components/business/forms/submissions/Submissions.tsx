@@ -57,24 +57,24 @@ export function useFieldMapping(form: Form, submission: { [key: string]: any } =
 }
 
 
+
 function Submissions() {
     const { data: session } = useSession();
-    const { loading, setLoading, setSubmissions, submissions, fetchSubmissionsByFormUrl } = useSubmissions();
-    const { data } = useAppContext();
-    const { form } = data;
+    const { loading, submissionsForms, fetchUserSubmissionsWithForms } = useSubmissions();
 
+    // Only fetch once
     useEffect(() => {
         const fetchUserSubmissions = async () => {
-            if (form && session?.user.role?.id && form.shareUrl) {
+            if (session?.user.role?.id === 1) {
                 try {
-                    await fetchSubmissionsByFormUrl(form.shareUrl);
+                    await fetchUserSubmissionsWithForms();
                 } catch (error) {
                     console.error("Error fetching submissions:", error);
                 }
             }
         };
         fetchUserSubmissions();
-    }, [form, session?.user.businessId, session?.user.role?.id, fetchSubmissionsByFormUrl]);
+    }, [session?.user.role?.id, fetchUserSubmissionsWithForms]);
 
     if (loading) {
         return (
@@ -84,30 +84,41 @@ function Submissions() {
         );
     }
 
-    if (!form) return <p>No form found.</p>;
+    // Ensure submissions are only displayed once
+    const hasSubmissions = Object.keys(submissionsForms).length > 0;
+
+    if (!hasSubmissions) {
+        return <p>No submissions found.</p>;
+    }
 
     return (
         <div className="text-black dark:text-white w-full">
             <SectionHeader title="Submissions" subtitle="View form submissions." />
             <Separator className="border-gray-400 my-2 mb-6" />
             <div className="mb-12 w-full">
-                <div className="flex flex-col gap-4">
-                    {submissions.length > 0 ? (
-                        submissions.map((submission) => (
-                            <SubmissionCard
-                                key={submission.id}
-                                submission={submission}
-                                form={form}
-                            />
-                        ))
-                    ) : (
-                        <p>No submissions found</p>
-                    )}
-                </div>
+                {Object.entries(submissionsForms).map(([formId, formData]) => (
+                    <div key={formId} className="mb-8">
+                        {/* Form Title */}
+                        <h2 className="text-lg font-bold mb-4">{formData.form.name}</h2>
+                        {/* Submissions List */}
+                        <div className="flex flex-col gap-4">
+                            {formData.submissions.length > 0 ? (
+                                formData.submissions.map((submission: Submission) => (
+                                    <SubmissionCard
+                                        key={submission.id}
+                                        submission={submission}
+                                        form={formData.form}
+                                    />
+                                ))
+                            ) : (
+                                <p>No submissions for this form.</p>
+                            )}
+                        </div>
+                    </div>
+                ))}
             </div>
         </div>
     );
 }
 
-
-export default Submissions;    
+export default Submissions;

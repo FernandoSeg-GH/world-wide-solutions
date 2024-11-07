@@ -42,7 +42,6 @@ export async function GET(
     const data = await response.json();
 
     const camelCaseData = camelcaseKeys(data, { deep: true });
-
     return NextResponse.json(camelCaseData, { status: 200 });
   } catch (error) {
     console.error("Error fetching published forms:", error);

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Form, Submission } from '@/types';
 import { useSubmissions } from '@/hooks/forms/useSubmissions';
 import { toast } from "@/components/ui/use-toast";
-
 import {
     FaParagraph,
     FaSlidersH,
@@ -51,9 +50,6 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ submission, form }) => 
     const fields = form.fields || [];
     const { updateSubmissionContent } = useSubmissions();
 
-    const informationalFields = ["TitleField", "SubTitleField", "ParagraphField"];
-    const separatorFields = ["SeparatorField"];
-
     const [isEditing, setIsEditing] = useState(false);
     const [editedContent, setEditedContent] = useState<Record<string, string>>({});
 
@@ -74,7 +70,7 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ submission, form }) => 
 
     const handleSaveClick = async () => {
         try {
-            await updateSubmissionContent(submission.id, String(editedContent), form.id);
+            await updateSubmissionContent(submission.id, JSON.stringify(editedContent), form.id);
             setIsEditing(false);
             toast({ title: "Success", description: "Submission updated successfully.", variant: "default" });
         } catch (error) {
@@ -102,11 +98,10 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ submission, form }) => 
                     const type = field.type;
                     const IconComponent = iconMap[type] || FaQuestionCircle;
 
-                    if (separatorFields.includes(type)) return <Separator key={fieldId} />;
+                    if (type === "SeparatorField" || type === "SpacerField") return <Separator key={fieldId} />;
 
                     const value = content ? content[fieldId] || "" : "";
 
-                    // Styling for informational fields
                     if (type === "TitleField") {
                         return (
                             <div key={fieldId} className="flex items-center mb-2">
@@ -133,13 +128,6 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ submission, form }) => 
                         );
                     }
 
-                    if (type === "SpacerField") {
-                        return (
-                            <Separator key={fieldId} />
-                        );
-                    }
-
-                    // Editable fields in editing mode
                     if (isEditing) {
                         return (
                             <div key={fieldId} className="flex items-center justify-between">
@@ -160,7 +148,7 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ submission, form }) => 
                                                 return <Input type="date" value={editedContent[fieldId]} onChange={(e) => handleChange(fieldId, e.target.value)} />;
                                             case "SelectField":
                                                 return (
-                                                    <Select value={editedContent[fieldId]} onValueChange={(value) => handleChange(fieldId, value)} >
+                                                    <Select value={editedContent[fieldId]} onValueChange={(value) => handleChange(fieldId, value)}>
                                                         <SelectTrigger>Select an option</SelectTrigger>
                                                         <SelectContent className="max-h-[300px] overflow-y-auto z-50">
                                                             {field.extraAttributes?.options?.map((option, index) => (
@@ -182,14 +170,23 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ submission, form }) => 
                         );
                     }
 
-                    // Display fields when not editing
                     return (
                         <div key={fieldId} className="flex items-center justify-between">
                             <div className="flex items-center">
                                 <span className="mr-2 text-gray-500"><IconComponent /></span>
                                 <span className="font-semibold text-gray-800">{label}:</span>
                             </div>
-                            <span>{type === "FileUploadField" && value ? <a href={value}>View File/s</a> : value || "N/A"}</span>
+                            {type === "FileUploadField" && Array.isArray(value) ? (
+                                <div>
+                                    {value.map((fileUrl, idx) => (
+                                        <a key={idx} href={fileUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500">
+                                            File {idx + 1}
+                                        </a>
+                                    ))}
+                                </div>
+                            ) : (
+                                <span>{value || "N/A"}</span>
+                            )}
                         </div>
                     );
                 })}
@@ -197,18 +194,12 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ submission, form }) => 
             <CardFooter className="space-x-2 border-t pt-6">
                 {!isEditing ? (
                     <div className="flex items-center justify-end w-full">
-                        <Button onClick={handleEditClick} variant="default" className="">
-                            Modify Information
-                        </Button>
+                        <Button onClick={handleEditClick} variant="default">Modify Information</Button>
                     </div>
                 ) : (
                     <>
-                        <Button onClick={handleSaveClick} variant="default">
-                            Save
-                        </Button>
-                        <Button onClick={handleCancelClick} variant="secondary">
-                            Cancel
-                        </Button>
+                        <Button onClick={handleSaveClick} variant="default">Save</Button>
+                        <Button onClick={handleCancelClick} variant="secondary">Cancel</Button>
                     </>
                 )}
             </CardFooter>

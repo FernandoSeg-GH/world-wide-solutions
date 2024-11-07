@@ -11,6 +11,12 @@ export const useSubmissions = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [submissionsForms, setSubmissionsForms] = useState<{
+    [key: number]: {
+      form: Form;
+      submissions: Submission[];
+    };
+  }>({});
 
   const fetchSubmissions = useCallback(
     async (shareUrl: string, page = 1): Promise<void> => {
@@ -39,16 +45,16 @@ export const useSubmissions = () => {
       }
 
       switch (roleId) {
-        case 1: // End User
+        case 1:
           endpoint = `/api/forms/${
             session?.user.businessId
           }/share-url/${encodeURIComponent(shareUrl)}/submissions?page=${page}`;
           break;
         case 2:
-        case 3: // Business User
+        case 3:
           endpoint = `/api/forms/submissions?page=${page}`;
           break;
-        case 4: // Superadmin
+        case 4:
           endpoint = `/api/forms/submissions?page=${page}`;
           break;
         default:
@@ -286,7 +292,6 @@ export const useSubmissions = () => {
     [session]
   );
 
-  // Ensure all fetch calls for submissions are directed to authenticated endpoints
   const fetchSubmissionsByFormUrl = useCallback(
     async (formUrl: string) => {
       const businessId = session?.user.businessId;
@@ -419,7 +424,6 @@ export const useSubmissions = () => {
 
         const data = await response.json();
 
-        // Update the submission in the state
         setSubmissions((prevSubmissions) =>
           prevSubmissions.map((submission) =>
             submission.id === submissionId
@@ -447,11 +451,81 @@ export const useSubmissions = () => {
     [session]
   );
 
+  const fetchUserSubmissionsWithForms = useCallback(async (): Promise<void> => {
+    if (!session || !session.accessToken) {
+      console.error("User is not authenticated.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const formsResponse = await fetch(
+        `/api/forms/${session.user.businessId}/published`,
+        {
+          headers: { Authorization: `Bearer ${session.accessToken}` },
+        }
+      );
+
+      if (!formsResponse.ok) {
+        throw new Error("Failed to fetch forms.");
+      }
+
+      const formsData = await formsResponse.json();
+      const forms = formsData;
+
+      if (!Array.isArray(forms) || forms.length === 0) {
+        console.warn("No forms found or data is invalid:", formsData);
+        setLoading(false);
+        return;
+      }
+
+      const submissionsData = await Promise.all(
+        forms.map(async (form: Form) => {
+          const response = await fetch(
+            `/api/forms/submissions/${form.id}/user`,
+            {
+              headers: { Authorization: `Bearer ${session.accessToken}` },
+            }
+          );
+
+          if (!response.ok) {
+            console.warn(`Failed to fetch submissions for form ${form.id}.`);
+            return { form, submissions: [] };
+          }
+
+          const data = await response.json();
+          return { form, submissions: data.submissions };
+        })
+      );
+
+      const submissionsMap = submissionsData.reduce(
+        (acc, { form, submissions }) => {
+          acc[form.id] = { form, submissions };
+          return acc;
+        },
+        {} as { [key: number]: { form: Form; submissions: Submission[] } }
+      );
+
+      setSubmissionsForms(submissionsMap);
+    } catch (error: any) {
+      console.error("Error fetching user submissions with forms:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch forms and submissions.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [session]);
+
   return {
     submissions,
     loading,
     currentPage,
     totalPages,
+    submissionsForms,
     fetchSubmissions,
     fetchAllSubmissions,
     setSubmissions,
@@ -462,5 +536,6 @@ export const useSubmissions = () => {
     setLoading,
     updateSubmissionStatus,
     updateSubmissionContent,
+    fetchUserSubmissionsWithForms,
   };
 };

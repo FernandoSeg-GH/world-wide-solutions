@@ -4,20 +4,19 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { businessId: number; shareUrl: string } }
+  { params }: { params: { formId: number } }
 ) {
-  const { businessId, shareUrl } = params;
   const session = await getServerSession(authOptions);
+
   if (!session || !session.accessToken) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
+  const { formId } = params;
+
   try {
     const response = await fetch(
-      // `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/forms/submissions?user_id=${session.user.id}`,
-      `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/forms/${encodeURIComponent(
-        businessId
-      )}/share_url/${encodeURIComponent(shareUrl)}/submissions`,
+      `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/forms/${formId}/user_submissions`,
       {
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
@@ -36,7 +35,7 @@ export async function GET(
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
-    console.error("Error fetching submissions by share URL:", error);
+    console.error("Error fetching user submissions for form:", error);
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }
