@@ -39,6 +39,7 @@ import { toast } from "@/components/ui/use-toast";
 import { useAppContext } from "@/context/AppProvider";
 import { cn } from "@/lib/utils";
 import { Control, UseFormRegister } from 'react-hook-form';
+import { Switch } from "@/components/ui/switch";
 
 const type: ElementsType = "ExpandableSelectField";
 
@@ -335,9 +336,47 @@ function PropertiesComponent({
     return (
         <Form {...form}>
             <form onSubmit={handleSubmit(applyChanges)} className="space-y-3">
-                {/* Label */}
-                {/* ... (other form fields) */}
-                {/* Options with Sub-options */}
+                {/* Editable fields */}
+                <FormField
+                    control={control}
+                    name="label"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Label</FormLabel>
+                            <FormControl>
+                                <Input {...field} placeholder="Field label" />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={control}
+                    name="helperText"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Helper Text</FormLabel>
+                            <FormControl>
+                                <Input {...field} placeholder="Helper text" />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={control}
+                    name="placeHolder"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Placeholder</FormLabel>
+                            <FormControl>
+                                <Input {...field} placeholder="Placeholder text" />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
                 <FormField
                     control={control}
                     name="options"
@@ -402,6 +441,21 @@ function PropertiesComponent({
                         </FormItem>
                     )}
                 />
+
+                <FormField
+                    control={control}
+                    name="required"
+                    render={({ field }) => (
+                        <FormItem className="flex items-center justify-between rounded-lg border p-3 shadow-sm">
+                            <FormLabel>Required</FormLabel>
+                            <FormControl>
+                                <Switch checked={field.value} onCheckedChange={field.onChange} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
                 <Button className="w-full" type="submit">
                     Save
                 </Button>
@@ -409,7 +463,6 @@ function PropertiesComponent({
         </Form>
     );
 }
-
 
 type PropertiesFormSchemaType = z.infer<typeof propertiesSchema>;
 

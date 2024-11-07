@@ -1,20 +1,40 @@
 "use client";
 
-import { ElementsType, FormElement, FormElementInstance, SubmitFunction } from "@/types";
+import {
+    ElementsType,
+    FormElement,
+    FormElementInstance,
+    SubmitFunction,
+} from "@/types";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { RxDropdownMenu } from "react-icons/rx";
-import { Form, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+    Form,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+    FormControl,
+} from "@/components/ui/form";
 import { cn } from "@/lib/utils";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { AiOutlineClose, AiOutlinePlus } from "react-icons/ai";
 import { toast } from "@/components/ui/use-toast";
 import { useAppContext } from "@/context/AppProvider";
+import { Switch } from "@/components/ui/switch";
 
 const type: ElementsType = "SelectField";
 
@@ -23,7 +43,7 @@ const extraAttributes = {
     helperText: "Helper text",
     required: false,
     placeHolder: "Value here...",
-    options: [],
+    options: [] as { label: string; value: string }[],
 };
 
 const propertiesSchema = z.object({
@@ -167,9 +187,7 @@ function FormComponent({
     );
 }
 
-
-
-type propertiesFormSchemaType = z.infer<typeof propertiesSchema>;
+type PropertiesFormSchemaType = z.infer<typeof propertiesSchema>;
 
 function PropertiesComponent({ elementInstance }: { elementInstance: FormElementInstance }) {
     const element = elementInstance as CustomInstance;
@@ -177,7 +195,7 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
     const { formActions } = actions;
     const { setSelectedElement } = selectors;
 
-    const form = useForm<propertiesFormSchemaType>({
+    const form = useForm<PropertiesFormSchemaType>({
         resolver: zodResolver(propertiesSchema),
         mode: "onSubmit",
         defaultValues: {
@@ -189,20 +207,29 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
         },
     });
 
+    const { control, handleSubmit, register } = form;
+    const {
+        fields: optionsFields,
+        append: optionsAppend,
+        remove: optionsRemove,
+    } = useFieldArray({
+        control,
+        name: 'options',
+    });
+
     useEffect(() => {
         form.reset(element.extraAttributes);
     }, [element, form]);
 
-    function applyChanges(values: propertiesFormSchemaType) {
-        const { label, helperText, placeHolder, required, options } = values;
+    function applyChanges(values: PropertiesFormSchemaType) {
         formActions.updateElement(element.id, {
             ...element,
             extraAttributes: {
-                label,
-                helperText,
-                placeHolder,
-                required,
-                options,
+                label: values.label,
+                helperText: values.helperText,
+                placeHolder: values.placeHolder,
+                required: values.required,
+                options: values.options,
             },
         });
 
@@ -216,63 +243,109 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(applyChanges)} className="space-y-3">
+            <form onSubmit={handleSubmit(applyChanges)} className="space-y-3">
+                {/* Editable fields */}
                 <FormField
-                    control={form.control}
-                    name="options"
+                    control={control}
+                    name="label"
                     render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Label</FormLabel>
+                            <FormControl>
+                                <Input {...field} placeholder="Field label" />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={control}
+                    name="helperText"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Helper Text</FormLabel>
+                            <FormControl>
+                                <Input {...field} placeholder="Helper text" />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={control}
+                    name="placeHolder"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Placeholder</FormLabel>
+                            <FormControl>
+                                <Input {...field} placeholder="Placeholder text" />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={control}
+                    name="required"
+                    render={({ field }) => (
+                        <FormItem className="flex items-center justify-between rounded-lg border p-3 shadow-sm">
+                            <FormLabel>Required</FormLabel>
+                            <FormControl>
+                                <Switch checked={field.value} onCheckedChange={field.onChange} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                {/* Options */}
+                <FormField
+                    control={control}
+                    name="options"
+                    render={() => (
                         <FormItem>
                             <div className="flex justify-between items-center">
                                 <FormLabel>Options</FormLabel>
                                 <Button
-                                    variant={"outline"}
+                                    variant="outline"
                                     className="gap-2"
                                     onClick={(e) => {
                                         e.preventDefault();
-                                        form.setValue("options", field.value.concat({ label: "New option", value: "new_option" }));
+                                        optionsAppend({
+                                            label: 'New Option',
+                                            value: 'new_option',
+                                        });
                                     }}
                                 >
                                     <AiOutlinePlus />
-                                    Add
+                                    Add Option
                                 </Button>
                             </div>
                             <div className="flex flex-col gap-2">
-                                {form.watch("options").map((option, index) => (
-                                    <div key={index} className="flex items-center justify-between gap-1">
-                                        <Input
-                                            placeholder="Label"
-                                            value={option.label}
-                                            onChange={(e) => {
-                                                const updatedOptions = [...field.value];
-                                                updatedOptions[index] = { ...updatedOptions[index], label: e.target.value };
-                                                field.onChange(updatedOptions);
-                                            }}
-                                        />
-                                        <Input
-                                            placeholder="Value"
-                                            value={option.value}
-                                            onChange={(e) => {
-                                                const updatedOptions = [...field.value];
-                                                updatedOptions[index] = { ...updatedOptions[index], value: e.target.value };
-                                                field.onChange(updatedOptions);
-                                            }}
-                                        />
-                                        <Button
-                                            variant={"ghost"}
-                                            size={"icon"}
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                const updatedOptions = [...field.value];
-                                                updatedOptions.splice(index, 1);
-                                                field.onChange(updatedOptions);
-                                            }}
-                                        >
-                                            <AiOutlineClose />
-                                        </Button>
+                                {optionsFields.map((option, index) => (
+                                    <div key={option.id} className="border p-2 rounded-md">
+                                        <div className="flex items-center justify-between gap-1">
+                                            <Input
+                                                placeholder="Label"
+                                                {...register(`options.${index}.label` as const)}
+                                            />
+                                            <Input
+                                                placeholder="Value"
+                                                {...register(`options.${index}.value` as const)}
+                                            />
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    optionsRemove(index);
+                                                }}
+                                            >
+                                                <AiOutlineClose />
+                                            </Button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
-
                             <FormDescription>
                                 Define the options for the select field.
                             </FormDescription>
