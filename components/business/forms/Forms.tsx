@@ -26,6 +26,7 @@ function Forms({ }: Props) {
     useEffect(() => {
         const fetchData = async () => {
             try {
+                console.log('session?.user.role.id', session?.user.role.id)
                 if (session?.user?.role?.id === 4) {
                     await formActions.fetchAllForms();
                 } else if (session?.user?.businessId && session?.user?.role?.id === 3) {

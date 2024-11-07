@@ -94,15 +94,21 @@ function FormComponent({
     defaultValue?: string;
 }) {
     const element = elementInstance as CustomInstance;
-
     const [value, setValue] = useState(defaultValue || "");
     const [error, setError] = useState(false);
+    const [searchQuery, setSearchQuery] = useState(""); // State for search query
 
     useEffect(() => {
         setError(isInvalid === true);
     }, [isInvalid]);
 
     const { label, required, placeHolder, helperText, options } = element.extraAttributes;
+
+    // Filtered options based on search query
+    const filteredOptions = options.filter((option) =>
+        option.label.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     return (
         <div className="flex flex-col gap-2 w-full">
             <Label className={cn(error && "text-red-500")}>
@@ -122,18 +128,46 @@ function FormComponent({
                 <SelectTrigger className={cn("w-full", error && "border-red-500")}>
                     <SelectValue placeholder={placeHolder} />
                 </SelectTrigger>
-                <SelectContent>
-                    {options.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
+                <SelectContent className="max-h-60 overflow-y-scroll">
+                    <Input
+                        type="text"
+                        placeholder="Search options..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="p-2 mb-2 border rounded"
+                    />
+                    {filteredOptions.map((option) => (
+                        <SelectItem
+                            key={option.value}
+                            value={option.value}
+                            style={{
+                                backgroundColor: value === option.value ? "#64748b" : "transparent",
+                                color: value === option.value ? "white" : "inherit",
+                                cursor: "pointer"
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = "#64748b";
+                                e.currentTarget.style.color = "white";
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = "transparent";
+                                e.currentTarget.style.color = "inherit";
+                            }}
+                        >
                             {option.label}
                         </SelectItem>
                     ))}
+                    {filteredOptions.length === 0 && (
+                        <p className="text-gray-500 p-2">No options found</p>
+                    )}
                 </SelectContent>
             </Select>
             {helperText && <p className={cn("text-muted-foreground text-[0.8rem]", error && "text-red-500")}>{helperText}</p>}
         </div>
     );
 }
+
+
 
 type propertiesFormSchemaType = z.infer<typeof propertiesSchema>;
 

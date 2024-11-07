@@ -299,32 +299,34 @@ export const useFormState = (initialForm?: Form) => {
 
   const fetchFormsByBusinessId = useCallback(
     async (businessId: number): Promise<void> => {
-      try {
-        setLoading(true);
-        const response = await fetch(`/api/forms/${businessId}`);
+      if (session?.user.role.id !== 1) {
+        try {
+          setLoading(true);
+          const response = await fetch(`/api/forms/${businessId}`);
 
-        if (!response.ok) {
+          if (!response.ok) {
+            toast({
+              title: "Error",
+              description: "Failed to fetch forms for this business.",
+              variant: "destructive",
+            });
+            return;
+          }
+          const data = await response.json();
+          console.log("data.forms", data.forms);
+          // TODO: Agregarr paginación
+          setForms(data.forms);
+        } catch (error) {
+          console.error("Error fetching forms for business:", error);
           toast({
             title: "Error",
-            description: "Failed to fetch forms for this business.",
+            description:
+              "An error occurred while fetching forms for this business.",
             variant: "destructive",
           });
-          return;
+        } finally {
+          setLoading(false);
         }
-        const data = await response.json();
-        console.log("data.forms", data.forms);
-        // TODO: Agregarr paginación
-        setForms(data.forms);
-      } catch (error) {
-        console.error("Error fetching forms for business:", error);
-        toast({
-          title: "Error",
-          description:
-            "An error occurred while fetching forms for this business.",
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
       }
     },
     []

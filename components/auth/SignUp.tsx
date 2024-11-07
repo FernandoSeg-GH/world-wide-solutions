@@ -16,8 +16,8 @@ export default function SignUp({ onToggle }: { onToggle: () => void }) {
         email: "",
         password: "",
         confirmPassword: "",
-        roleId: 2,
-        businessId: "",
+        roleId: 1,
+        businessId: "2",
     });
 
     const handleSubmit = async (e: React.FormEvent) => {

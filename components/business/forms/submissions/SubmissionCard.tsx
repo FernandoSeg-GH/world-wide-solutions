@@ -133,6 +133,12 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ submission, form }) => 
                         );
                     }
 
+                    if (type === "SpacerField") {
+                        return (
+                            <Separator />
+                        );
+                    }
+
                     // Editable fields in editing mode
                     if (isEditing) {
                         return (
@@ -154,9 +160,9 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ submission, form }) => 
                                                 return <Input type="date" value={editedContent[fieldId]} onChange={(e) => handleChange(fieldId, e.target.value)} />;
                                             case "SelectField":
                                                 return (
-                                                    <Select value={editedContent[fieldId]} onValueChange={(value) => handleChange(fieldId, value)}>
+                                                    <Select value={editedContent[fieldId]} onValueChange={(value) => handleChange(fieldId, value)} >
                                                         <SelectTrigger>Select an option</SelectTrigger>
-                                                        <SelectContent>
+                                                        <SelectContent className="max-h-[300px] overflow-y-auto z-50">
                                                             {field.extraAttributes?.options?.map((option, index) => (
                                                                 <SelectItem key={index} value={option.value}>
                                                                     {option.label}
@@ -183,7 +189,7 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ submission, form }) => 
                                 <span className="mr-2 text-gray-500"><IconComponent /></span>
                                 <span className="font-semibold text-gray-800">{label}:</span>
                             </div>
-                            <span>{type === "FileUploadField" && value ? <a href={value}>View File</a> : value || "N/A"}</span>
+                            <span>{type === "FileUploadField" && value ? <a href={value}>View File/s</a> : value || "N/A"}</span>
                         </div>
                     );
                 })}
