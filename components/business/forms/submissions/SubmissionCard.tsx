@@ -135,7 +135,7 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ submission, form }) => 
 
                     if (type === "SpacerField") {
                         return (
-                            <Separator />
+                            <Separator key={fieldId} />
                         );
                     }
 

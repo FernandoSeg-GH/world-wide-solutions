@@ -37,7 +37,7 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
         if (session?.user.businessId && session.user.role.id !== 1) {
             fetchFormsByBusinessId(session.user.businessId);
         }
-    }, [session?.user.businessId, fetchFormsByBusinessId]);
+    }, [session?.user.businessId, fetchFormsByBusinessId, session?.user.role.id]);
 
     const sidebarItems: SidebarItem[] = getSidebarItems(godMode, forms, session?.user.role.id);
 

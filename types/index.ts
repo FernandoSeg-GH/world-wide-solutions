@@ -12,6 +12,7 @@ import { TitleFieldFormElement } from "@/components/builder/fields/TitleField";
 import { TelephoneFieldFormElement } from "@/components/builder/fields/TelephoneField";
 import { Dispatch, SetStateAction } from "react";
 import { FileUploadFieldFormElement } from "@/components/builder/fields/FileUploadField";
+import { ExpandableSelectFieldFormElement } from "@/components/builder/fields/ExpandableSelectField";
 
 export enum BrandColors {
   BluePrimary = "#151342",
@@ -232,6 +233,24 @@ export interface UserAICharacter {
   aiCharacter?: AICharacter;
 }
 
+export interface Option {
+  label: string;
+  value: string;
+}
+
+export interface NestedOption extends Option {
+  subOptions?: Option[];
+}
+
+export type OptionWithSubOptions = {
+  label: string;
+  value: string;
+  subOptions?: {
+    label: string;
+    value: string;
+  }[];
+};
+
 export interface FormField {
   id: string;
   type: ElementsType;
@@ -242,7 +261,7 @@ export interface FormField {
     required?: boolean;
     placeHolder?: string;
     helperText?: string;
-    options?: Array<{ label: string; value: string }>;
+    options?: Array<Option | NestedOption>;
     rows?: number;
     [key: string]: any;
   };
@@ -259,6 +278,7 @@ export type ElementsType =
   | "TextAreaField"
   | "DateField"
   | "SelectField"
+  | "ExpandableSelectField"
   | "TelephoneField"
   | "CheckboxField"
   | "FileUploadField";
@@ -310,6 +330,7 @@ export const FormElements: FormElementsType = {
   TextAreaField: TextAreaFormElement,
   DateField: DateFieldFormElement,
   SelectField: SelectFieldFormElement,
+  ExpandableSelectField: ExpandableSelectFieldFormElement,
   CheckboxField: CheckboxFieldFormElement,
   TelephoneField: TelephoneFieldFormElement,
   FileUploadField: FileUploadFieldFormElement,

@@ -313,7 +313,6 @@ export const useFormState = (initialForm?: Form) => {
             return;
           }
           const data = await response.json();
-          console.log("data.forms", data.forms);
           // TODO: Agregarr paginación
           setForms(data.forms);
         } catch (error) {

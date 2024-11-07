@@ -25,6 +25,7 @@ function FormElementsSidebar() {
                 <SidebarBtnElement formElement={FormElements.SelectField} />
                 <SidebarBtnElement formElement={FormElements.CheckboxField} />
                 <SidebarBtnElement formElement={FormElements.FileUploadField} />
+                <SidebarBtnElement formElement={FormElements.ExpandableSelectField} />
             </div>
         </div>
     );
