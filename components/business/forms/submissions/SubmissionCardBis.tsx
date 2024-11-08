@@ -23,7 +23,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { ExpandableSelectFieldFormElement } from "@/components/builder/fields/ExpandableSelectField";
 import Image from "next/image";
 
 export const iconMap: { [key: string]: React.ComponentType } = {
@@ -85,18 +84,21 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ submission, form }) => 
     };
 
     return (
-        <Card className="max-w-3xl mb-6 shadow-lg">
-            <CardHeader className="flex flex-row items-center justify-between w-full">
-                <div className="">
-                    <CardTitle>{form.name}</CardTitle>
-                    <CardDescription>
-                        Submission ID: <span>{submission.id}</span>
-                    </CardDescription>
-                    <p className="text-sm text-gray-500">Submitted At: {new Date(submission.created_at).toLocaleString()}</p>
+        <Card className="max-w-3xl mb-6 shadow-md border border-gray-200 rounded-lg bg-white">
+            <CardHeader className="p-4 border-b border-gray-300 flex items-center">
+                {/* Logo and Document Title */}
+                <Image src="/logo.png" alt="Company Logo" width={40} height={40} className="mr-3" />
+                <div>
+                    <CardTitle className="text-xl font-serif font-bold">Accident Claim Report</CardTitle>
+                    <CardDescription className="text-sm text-gray-500">Submission ID: <span>{submission.id}</span></CardDescription>
+                    <p className="text-xs text-gray-500">Submitted At: {new Date(submission.created_at).toLocaleString()}</p>
                 </div>
-                <Image src={"https://vinci-space-nest.nyc3.cdn.digitaloceanspaces.com/vinci-space-nest/business_id_2/branding/logo.avif"} width={200} height={50} alt="VWSolutions" />
             </CardHeader>
-            <CardContent className="space-y-4 bg-white py-6">
+            <CardContent className="px-8 py-6 space-y-6">
+                <p className="text-sm text-gray-700 italic">
+                    This form is completed for information required by the company. Terms of service and privacy policies apply.
+                </p>
+                <Separator className="mb-4" />
                 {fields.map((field) => {
                     const fieldId = field.id;
                     const label = field.extraAttributes?.label || field.extraAttributes?.title || field.extraAttributes?.text || `Field ${fieldId}`;
@@ -130,19 +132,6 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ submission, form }) => 
                             <div key={fieldId} className="flex items-start mb-2">
                                 <p className="text-gray-600 text-base">{label}</p>
                             </div>
-                        );
-                    }
-
-
-                    if (field.type === "ExpandableSelectField" && isEditing) {
-                        return (
-                            <ExpandableSelectFieldFormElement.formComponent
-                                key={field.id}
-                                elementInstance={field}
-                                submitValue={(fieldId, selectedValue) => handleChange(fieldId, selectedValue)}
-                                defaultValue={editedContent[field.id]}
-                                isInvalid={!editedContent[field.id]}
-                            />
                         );
                     }
 
@@ -209,15 +198,19 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ submission, form }) => 
                     );
                 })}
             </CardContent>
-            <CardFooter className="space-x-2 border-t pt-6">
+            <CardFooter className="px-8 py-4 border-t border-gray-300 flex justify-end">
                 {!isEditing ? (
-                    <div className="flex items-center justify-end w-full">
-                        <Button onClick={handleEditClick} variant="default">Modify Information</Button>
-                    </div>
+                    <Button onClick={handleEditClick} variant="default" className="px-4 py-2 font-medium text-sm">
+                        Modify Information
+                    </Button>
                 ) : (
                     <>
-                        <Button onClick={handleSaveClick} variant="default">Save</Button>
-                        <Button onClick={handleCancelClick} variant="secondary">Cancel</Button>
+                        <Button onClick={handleSaveClick} variant="default" className="mr-2 px-4 py-2 font-medium text-sm">
+                            Save
+                        </Button>
+                        <Button onClick={handleCancelClick} variant="secondary" className="px-4 py-2 font-medium text-sm">
+                            Cancel
+                        </Button>
                     </>
                 )}
             </CardFooter>
@@ -226,7 +219,3 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ submission, form }) => 
 };
 
 export default SubmissionCard;
-
-
-
-

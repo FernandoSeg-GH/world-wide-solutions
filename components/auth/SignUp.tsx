@@ -127,7 +127,7 @@ export default function SignUp({ onToggle }: { onToggle: () => void }) {
                     required
                 />
             </div>
-            <div>
+            {/* <div>
                 <Label htmlFor="roleId">Role</Label>
                 <select
                     id="roleId"
@@ -154,7 +154,7 @@ export default function SignUp({ onToggle }: { onToggle: () => void }) {
                         required
                     />
                 </div>
-            )}
+            )} */}
 
             <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? "Signing up..." : "Sign Up"}
