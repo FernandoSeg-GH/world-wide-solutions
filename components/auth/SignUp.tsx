@@ -44,8 +44,8 @@ export default function SignUp({ onToggle }: { onToggle: () => void }) {
                     username: formData.username,
                     email: formData.email,
                     password: formData.password,
-                    role_id: formData.roleId,
-                    businessId: formData.roleId === 1 ? formData.businessId : 0,
+                    role_id: 1,
+                    businessId: 2,
                 }),
             });
 
