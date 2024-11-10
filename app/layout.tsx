@@ -11,8 +11,11 @@ import ErrorBoundary from '@/components/ui/error-boundary'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Vinci Suite',
-  description: 'Smart Tools for Business',
+  title: 'Vinci Suite - VW Solutions',
+  description: 'Accident Claim Reports Dashboard',
+  icons: {
+    icon: '/assets/vws.png', // Relative path to your favicon image
+  },
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

@@ -1,7 +1,5 @@
 "use client"
 import React from 'react'
-// import AccidentClaimsView from './AccidentClaimView'
-import AccidentClaimForm from './AccidentClaimForm'
 import AccidentClaimsView from './accident-claim/AccidentClaimsView'
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -34,8 +32,6 @@ function ClaimReports({ }: Props) {
                 </Card>
             }
             <AccidentClaimsView />
-            {/* <AccidentClaimsView /> */}
-            {/* <AccidentClaimForm /> */}
         </div>
     )
 }

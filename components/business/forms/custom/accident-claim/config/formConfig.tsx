@@ -1,9 +1,9 @@
 // formConfig.ts
 import { FaUser, FaCarSide, FaBriefcaseMedical, FaFileAlt, FaBalanceScale } from "react-icons/fa";
 
-import { countryOptions } from "../country-options";
-import { accidentTypeOptions } from "../accident-options";
-import { AccidentClaimFormData, Claim } from "../accident-claim-form";
+import { countryOptions } from "./country-options";
+import { accidentTypeOptions } from "./accident-options";
+import { AccidentClaimFormData, Claim } from "./types";
 
 export interface FieldConfig {
   id: string;
@@ -148,134 +148,11 @@ export const formSections: SectionConfig[] = [
 ];
 
 
-
-// export const mapClaimToFormData = (claim: Claim): AccidentClaimFormData => ({
-//   formUrl: claim.formUrl || "",
-
-//   // Patient Personal Information
-//   full_name: claim.full_name,
-//   email: claim.email,
-//   country: claim.country,
-//   state: claim.state,
-//   primary_contact: claim.primary_contact,
-//   other_contact_name: claim.other_contact_name,
-//   other_contact_phone: claim.other_contact_phone,
-
-//   // Accident Information
-//   accident_date: claim.accident_date ? new Date(claim.accident_date) : null,
-//   accident_place: claim.accident_place,
-//   accident_type: claim.accident_type,
-//   sub_accident_type: claim.sub_accident_type,
-
-//   // Motor Vehicle Accident Details
-//   mva_type: claim.mva_type,
-//   mva_location: claim.mva_location,
-//   vehicle_details: claim.vehicle_details.map(v => ({
-//     insuranceName: v.insuranceName,
-//     policyNumber: v.policyNumber
-//   })),
-//   selected_vehicle: claim.selected_vehicle,
-//   mva_description: claim.mva_description,
-//   mva_medical_info: {
-//     assistanceType: claim.mva_medical_info.assistanceType,
-//     diagnosis: claim.mva_medical_info.diagnosis,
-//     treatment: claim.mva_medical_info.treatment,
-//     primaryCareProvider: claim.mva_medical_info.primaryCareProvider,
-//   },
-//   mva_costs: {
-//     totalCost: claim.mva_costs.totalCost,
-//     policyLimits: claim.mva_costs.policyLimits,
-//     assistanceStatus: claim.mva_costs.assistanceStatus,
-//     medicalProviderCosts: claim.mva_costs.medicalProviderCosts,
-//     repatriationCosts: claim.mva_costs.repatriationCosts,
-//     otherCosts: claim.mva_costs.otherCosts,
-//   },
-//   mva_third_party_info: {
-//     insuranceCompany: claim.mva_third_party_info.insuranceCompany,
-//     claimReferenceNumber: claim.mva_third_party_info.claimReferenceNumber,
-//     adjusterName: claim.mva_third_party_info.adjusterName,
-//     adjusterContactDetails: claim.mva_third_party_info.adjusterContactDetails,
-//     ownerBusinessName: claim.mva_third_party_info.ownerBusinessName,
-//     ownerReferenceNumber: claim.mva_third_party_info.ownerReferenceNumber,
-//     ownerPhoneNumber: claim.mva_third_party_info.ownerPhoneNumber,
-//     coInsured: claim.mva_third_party_info.coInsured,
-//     otherPartyInfo: claim.mva_third_party_info.otherPartyInfo,
-//   },
-//   mva_attorney_info: {
-//     lawFirmName: claim.mva_attorney_info.lawFirmName,
-//     attorneyName: claim.mva_attorney_info.attorneyName,
-//     attorneyPhone: claim.mva_attorney_info.attorneyPhone,
-//   },
-
-//   // Slip and Fall Details
-//   slip_description: claim.slip_description,
-//   slip_accident_type: claim.slip_accident_type,
-//   negligence_description: claim.negligence_description,
-//   witness_info: {
-//     name: claim.witness_info.name,
-//     email: claim.witness_info.email,
-//     phone: claim.witness_info.phone,
-//   },
-//   slip_medical_info: {
-//     assistanceType: claim.slip_medical_info.assistanceType,
-//     diagnosis: claim.slip_medical_info.diagnosis,
-//     treatment: claim.slip_medical_info.treatment,
-//     primaryCareProvider: claim.slip_medical_info.primaryCareProvider,
-//   },
-//   slip_costs: {
-//     totalCost: claim.slip_costs.totalCost,
-//     policyLimits: claim.slip_costs.policyLimits,
-//     assistanceStatus: claim.slip_costs.assistanceStatus,
-//     medicalCost: claim.slip_costs.medicalCost,
-//     repatriationCosts: claim.slip_costs.repatriationCosts,
-//     otherCosts: claim.slip_costs.otherCosts,
-//   },
-//   slip_third_party_info: {
-//     insuranceCompany: claim.slip_third_party_info.insuranceCompany,
-//     claimReferenceNumber: claim.slip_third_party_info.claimReferenceNumber,
-//     adjusterName: claim.slip_third_party_info.adjusterName,
-//     adjusterContactDetails: claim.slip_third_party_info.adjusterContactDetails,
-//     ownerBusinessName: claim.slip_third_party_info.ownerBusinessName,
-//     ownerReferenceNumber: claim.slip_third_party_info.ownerReferenceNumber,
-//     ownerPhoneNumber: claim.slip_third_party_info.ownerPhoneNumber,
-//     coInsuredName: claim.slip_third_party_info.coInsuredName,
-//     otherPartyInfo: claim.slip_third_party_info.otherPartyInfo,
-//   },
-//   slip_attorney_info: {
-//     lawFirmName: claim.slip_attorney_info.lawFirmName,
-//     attorneyName: claim.slip_attorney_info.attorneyName,
-//     attorneyPhone: claim.slip_attorney_info.attorneyPhone,
-//   },
-
-//   // File Uploads
-//   documentFiles: claim.documentFiles,
-//   mvaUploadDocumentation: claim.mvaUploadDocumentation,
-//   mvaRepatriationBills: claim.mvaRepatriationBills,
-//   mvaOtherFiles: claim.mvaOtherFiles,
-//   mvaInsuranceDocs: claim.mvaInsuranceDocs,
-//   mvaBusinessDocs: claim.mvaBusinessDocs,
-//   mvaCoInsuredDocs: claim.mvaCoInsuredDocs,
-//   mvaAttorneyDocs: claim.mvaAttorneyDocs,
-
-//   slipAccidentReports: claim.slipAccidentReports,
-//   slipPhotos: claim.slipPhotos,
-//   slipMedicalDocs: claim.slipMedicalDocs,
-//   slipMedicalBills: claim.slipMedicalBills,
-//   slipRepatriationBills: claim.slipRepatriationBills,
-//   slipThirdPartyDocs: claim.slipThirdPartyDocs,
-//   slipBusinessDocs: claim.slipBusinessDocs,
-//   slipCoInsuredDocs: claim.slipCoInsuredDocs,
-// });
-
-// pages/AccidentClaimsView.tsx
-
-// pages/AccidentClaimsView.tsx
-
-// pages/AccidentClaimsView.tsx
-
 export function mapClaimToFormData(claim: Claim): AccidentClaimFormData {
   return {
     formUrl: "", // Assuming a default value
+
+    // Patient Personal Information
     full_name: claim.full_name || "",
     email: claim.email || "",
     country: claim.country || "",
@@ -283,7 +160,9 @@ export function mapClaimToFormData(claim: Claim): AccidentClaimFormData {
     primary_contact: claim.primary_contact || "",
     other_contact_name: claim.other_contact_name || "",
     other_contact_phone: claim.other_contact_phone || "",
-    accident_date: claim.accident_date ? new Date(claim.accident_date).toISOString() : null,
+
+    // Accident Information
+    accident_date: claim.accident_date,
     accident_place: claim.accident_place || "",
     accident_type: claim.accident_type || "",
     sub_accident_type: claim.sub_accident_type || "",
@@ -295,7 +174,7 @@ export function mapClaimToFormData(claim: Claim): AccidentClaimFormData {
     selected_vehicle: claim.selected_vehicle || "",
     mva_description: claim.mva_description || "",
 
-    // Nested fields directly accessed
+    // Nested Motor Vehicle Medical Info
     mva_medical_info: {
       assistanceType: claim.mva_medical_info?.assistanceType || "",
       diagnosis: claim.mva_medical_info?.diagnosis || "",
@@ -367,23 +246,43 @@ export function mapClaimToFormData(claim: Claim): AccidentClaimFormData {
       attorneyPhone: claim.slip_attorney_info?.attorneyPhone || "",
     },
 
-    // File Uploads (set to null or empty arrays as needed)
-    documentFiles: claim.documentFiles || null,
-    mvaUploadDocumentation: claim.mvaUploadDocumentation || null,
-    mvaRepatriationBills: claim.mvaRepatriationBills || null,
-    mvaOtherFiles: claim.mvaOtherFiles || null,
-    mvaInsuranceDocs: claim.mvaInsuranceDocs || null,
-    mvaBusinessDocs: claim.mvaBusinessDocs || null,
-    mvaCoInsuredDocs: claim.mvaCoInsuredDocs || null,
-    mvaAttorneyDocs: claim.mvaAttorneyDocs || null,
+    // File Uploads (ensure arrays)
+    file_uploads: {
+      documentFiles: null,
+      mvaUploadDocumentation: null,
+      mvaRepatriationBills: null,
+      mvaOtherFiles: null,
+      mvaInsuranceDocs: null,
+      mvaBusinessDocs: null,
+      mvaCoInsuredDocs: null,
+      mvaAttorneyDocs: null,
 
-    slipAccidentReports: claim.slipAccidentReports || null,
-    slipPhotos: claim.slipPhotos || null,
-    slipMedicalDocs: claim.slipMedicalDocs || null,
-    slipMedicalBills: claim.slipMedicalBills || null,
-    slipRepatriationBills: claim.slipRepatriationBills || null,
-    slipThirdPartyDocs: claim.slipThirdPartyDocs || null,
-    slipBusinessDocs: claim.slipBusinessDocs || null,
-    slipCoInsuredDocs: claim.slipCoInsuredDocs || null,
+      slipAccidentReports: null,
+      slipPhotos: null,
+      slipMedicalDocs: null,
+      slipMedicalBills: null,
+      slipRepatriationBills: null,
+      slipThirdPartyDocs: null,
+      slipBusinessDocs: null,
+      slipCoInsuredDocs: null,
+
+      newDocumentFiles: null,
+      newMvaUploadDocumentation: null,
+      newMvaRepatriationBills: null,
+      newMvaOtherFiles: null,
+      newMvaInsuranceDocs: null,
+      newMvaBusinessDocs: null,
+      newMvaCoInsuredDocs: null,
+      newMvaAttorneyDocs: null,
+
+      newSlipAccidentReports: null,
+      newSlipPhotos: null,
+      newSlipMedicalDocs: null,
+      newSlipMedicalBills: null,
+      newSlipRepatriationBills: null,
+      newSlipThirdPartyDocs: null,
+      newSlipBusinessDocs: null,
+      newSlipCoInsuredDocs: null,
+    }
   };
 }

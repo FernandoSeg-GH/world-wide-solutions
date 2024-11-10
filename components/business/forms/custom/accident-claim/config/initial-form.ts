@@ -1,5 +1,5 @@
 // initial-form.ts
-import { AccidentClaimFormData } from "./accident-claim-form";
+import { AccidentClaimFormData } from "./types";
 
 export const initialForm: AccidentClaimFormData = {
   formUrl: "",
@@ -14,7 +14,7 @@ export const initialForm: AccidentClaimFormData = {
   other_contact_phone: "",
 
   // Accident Information
-  accident_date: null, // Expecting ISO string format when converted
+  accident_date: "", // Expecting ISO string format
   accident_place: "",
   accident_type: "",
   sub_accident_type: "",
@@ -22,7 +22,11 @@ export const initialForm: AccidentClaimFormData = {
   // Motor Vehicle Accident Details
   mva_type: "",
   mva_location: "",
-  vehicle_details: [{ insuranceName: "", policyNumber: "" }], // Array of objects
+  vehicle_details: [
+    { insuranceName: "", policyNumber: "" }, // Vehicle #1
+    { insuranceName: "", policyNumber: "" }, // Vehicle #2
+    { insuranceName: "", policyNumber: "" }, // Vehicle #3
+  ],
   selected_vehicle: "",
   mva_description: "",
 
@@ -114,23 +118,39 @@ export const initialForm: AccidentClaimFormData = {
     attorneyPhone: "",
   },
 
-  // File Uploads (null to indicate no files initially)
-  documentFiles: null,
-  mvaUploadDocumentation: null,
-  mvaRepatriationBills: null,
-  mvaOtherFiles: null,
-  mvaInsuranceDocs: null,
-  mvaBusinessDocs: null,
-  mvaCoInsuredDocs: null,
-  mvaAttorneyDocs: null,
-
-  // Additional Slip-Related File Uploads
-  slipAccidentReports: null,
-  slipPhotos: null,
-  slipMedicalDocs: null,
-  slipMedicalBills: null,
-  slipRepatriationBills: null,
-  slipThirdPartyDocs: null,
-  slipBusinessDocs: null,
-  slipCoInsuredDocs: null,
+  // File Uploads (nested under `file_uploads` key to match database structure)
+  file_uploads: {
+    documentFiles: null,
+    mvaUploadDocumentation: null,
+    mvaRepatriationBills: null,
+    mvaOtherFiles: null,
+    mvaInsuranceDocs: null,
+    mvaBusinessDocs: null,
+    mvaCoInsuredDocs: null,
+    mvaAttorneyDocs: null,
+    slipAccidentReports: null,
+    slipPhotos: null,
+    slipMedicalDocs: null,
+    slipMedicalBills: null,
+    slipRepatriationBills: null,
+    slipThirdPartyDocs: null,
+    slipBusinessDocs: null,
+    slipCoInsuredDocs: null,
+    newDocumentFiles: null,
+    newMvaUploadDocumentation: null,
+    newMvaRepatriationBills: null,
+    newMvaOtherFiles: null,
+    newMvaInsuranceDocs: null,
+    newMvaBusinessDocs: null,
+    newMvaCoInsuredDocs: null,
+    newMvaAttorneyDocs: null,
+    newSlipAccidentReports: null,
+    newSlipPhotos: null,
+    newSlipMedicalDocs: null,
+    newSlipMedicalBills: null,
+    newSlipRepatriationBills: null,
+    newSlipThirdPartyDocs: null,
+    newSlipBusinessDocs: null,
+    newSlipCoInsuredDocs: null,
+  },
 };

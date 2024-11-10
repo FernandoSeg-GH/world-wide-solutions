@@ -11,7 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import FormCard from './FormCard';
 import { Separator } from '@/components/ui/separator';
 import { AppContextType } from '@/types';
-import AccidentClaimForm from './custom/AccidentClaimForm';
+import AccidentClaimForm from './custom/accident-claim/AccidentClaimForm';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -57,9 +57,9 @@ function Forms({ }: Props) {
         formActions.fetchPublishedFormsByBusinessId
     ]);
 
-    if (loading) {
-        return <Skeleton className='w-full h-full min-h-80' />
-    }
+    // if (loading) {
+    //     return <Skeleton className='w-full h-full min-h-80' />
+    // }
 
     if (error) {
         return <div className="text-red-500">{error}</div>;
@@ -84,9 +84,9 @@ function Forms({ }: Props) {
                         <CreateFormBtn />
                     )}
 
-                    {loading && (
+                    {/* {loading && (
                         <Skeleton className="border-2 border-primary/20 h-[210px] w-full lg:max-w-[380px]" />
-                    )}
+                    )} */}
 
                     {/* {forms && forms.length > 0 ? (
                         forms.map((form) => <FormCard key={form.id} form={form} />)

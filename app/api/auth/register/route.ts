@@ -16,6 +16,7 @@ export async function POST(req: NextRequest) {
           email,
           password,
           role_id: 1,
+          business_id: 2,
         }),
       }
     );

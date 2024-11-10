@@ -15,7 +15,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { countryOptions } from "@/components/business/forms/custom/country-options";
+import { countryOptions } from "@/components/business/forms/custom/accident-claim/config/country-options";
 import ProgressBar from "@/components/ui/progress-bar";
 import {
     FaUser,
@@ -34,15 +34,16 @@ import {
     FaCar,
     FaWalking,
 } from "react-icons/fa";
-import { usaStates } from "@/components/business/forms/custom/state-options";
-import { accidentTypeOptions } from "./accident-options";
-import { AccidentClaimFormData } from "./accident-claim-form";
+import { usaStates } from "@/components/business/forms/custom/accident-claim/config/state-options";
+import { accidentTypeOptions } from "./config/accident-options";
+import { AccidentClaimFormData } from "./config/types";
 import Image from "next/image";
-import { initialForm } from "./initial-form";
+import { initialForm } from "@/components/business/forms/custom/accident-claim/config/initial-form";
 import { useSession } from "next-auth/react";
 import { toast } from "@/components/ui/use-toast";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
+
 
 export default function AccidentClaimForm() {
     const [formData, setFormData] = useState<AccidentClaimFormData>(initialForm);
@@ -211,15 +212,17 @@ export default function AccidentClaimForm() {
                 !(value instanceof FileList)
             ) {
                 submitData.append(key, JSON.stringify(value));
-            } else if (key === "accident_date" && value instanceof Date) {
-                submitData.append(key, value.toISOString());
+            } else if (key === "accident_date") {
+                // Ensure accident_date is in ISO format
+                submitData.append(key, new Date(value).toISOString());
             } else {
                 submitData.append(key, value as string);
             }
         });
 
+
         // Add file uploads to submitData
-        const fileFields: Array<keyof AccidentClaimFormData> = [
+        const fileFields: Array<keyof AccidentClaimFormData['file_uploads']> = [
             "documentFiles",
             "mvaUploadDocumentation",
             "mvaRepatriationBills",
@@ -239,7 +242,7 @@ export default function AccidentClaimForm() {
         ];
 
         fileFields.forEach((field) => {
-            const files = formData[field];
+            const files = formData.file_uploads[field];
             if (files instanceof FileList && files.length > 0) {
                 Array.from(files).forEach((file) => {
                     submitData.append(field, file);
@@ -468,9 +471,9 @@ export default function AccidentClaimForm() {
                                     Date of Accident <span className="text-red-500">*</span>
                                 </Label>
                                 <DatePicker
-                                    selectedDate={formData.accident_date as Date}
+                                    selectedDate={new Date(formData.accident_date)}
                                     onChange={(date) =>
-                                        setFormData({ ...formData, accident_date: date })
+                                        setFormData({ ...formData, accident_date: date ? date.toISOString() : "" })
                                     }
                                 />
                             </div>
@@ -550,7 +553,13 @@ export default function AccidentClaimForm() {
                             <FileUpload
                                 multiple
                                 onFilesSelected={(files) =>
-                                    setFormData({ ...formData, documentFiles: files })
+                                    setFormData({
+                                        ...formData,
+                                        file_uploads: {
+                                            ...formData.file_uploads,
+                                            documentFiles: files
+                                        }
+                                    })
                                 }
                                 className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
                             />
@@ -718,7 +727,10 @@ export default function AccidentClaimForm() {
                                     onFilesSelected={(files) =>
                                         setFormData({
                                             ...formData,
-                                            mvaUploadDocumentation: files,
+                                            file_uploads: {
+                                                ...formData.file_uploads,
+                                                mvaUploadDocumentation: files,
+                                            },
                                         })
                                     }
                                     className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
@@ -844,7 +856,7 @@ export default function AccidentClaimForm() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <Label>
-                                    mva_medical_info.assistanceType <span className="text-red-500">*</span>
+                                    Assistance Type <span className="text-red-500">*</span>
                                 </Label>
                                 <Textarea
                                     name="assistanceType"
@@ -865,7 +877,7 @@ export default function AccidentClaimForm() {
                             </div>
                             <div>
                                 <Label>
-                                    mva_medical_info.diagnosis <span className="text-red-500">*</span>
+                                    Diagnosis <span className="text-red-500">*</span>
                                 </Label>
                                 <Textarea
                                     name="diagnosis"
@@ -886,7 +898,7 @@ export default function AccidentClaimForm() {
                             </div>
                             <div className="md:col-span-2">
                                 <Label>
-                                    mva_medical_info.treatment <span className="text-red-500">*</span>
+                                    Treatment <span className="text-red-500">*</span>
                                 </Label>
                                 <Textarea
                                     name="treatment"
@@ -907,7 +919,7 @@ export default function AccidentClaimForm() {
                             </div>
                             <div className="md:col-span-2">
                                 <Label>
-                                    mva_medical_info.primaryCareProvider{" "}
+                                    Primary Care Provider{" "}
                                     <span className="text-red-500">*</span>
                                 </Label>
                                 <Input
@@ -938,7 +950,7 @@ export default function AccidentClaimForm() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="relative">
                                 <Label>
-                                    mva_costs.totalCost ($) <span className="text-red-500">*</span>
+                                    Total Cost ($) <span className="text-red-500">*</span>
                                 </Label>
                                 <div className="relative mt-1">
                                     <FaDollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -962,7 +974,7 @@ export default function AccidentClaimForm() {
                             </div>
                             <div className="relative">
                                 <Label>
-                                    mva_costs.policyLimits of Assistance Coverage{" "}
+                                    Policy Limits of Assistance Coverage{" "}
                                     <span className="text-red-500">*</span>
                                 </Label>
                                 <div className="relative mt-1">
@@ -987,7 +999,7 @@ export default function AccidentClaimForm() {
                             </div>
                             <div>
                                 <Label>
-                                    mva_costs.assistanceStatus{" "}
+                                    Assistance Status{" "}
                                     <span className="text-red-500">*</span>
                                 </Label>
                                 <Select
@@ -1014,7 +1026,7 @@ export default function AccidentClaimForm() {
                                 </Select>
                             </div>
                             <div className="md:col-span-2">
-                                <Label>mva_costs.medicalProviderCosts</Label>
+                                <Label>Medical Provider Costs</Label>
                                 <Textarea
                                     name="medicalProviderCosts"
                                     placeholder="Details about medical provider costs..."
@@ -1033,7 +1045,7 @@ export default function AccidentClaimForm() {
                                 />
                             </div>
                             <div className="md:col-span-2">
-                                <Label>mva_costs.repatriationCosts</Label>
+                                <Label>Repatriation Costs</Label>
                                 <Textarea
                                     name="repatriationCosts"
                                     placeholder="Details about repatriation costs..."
@@ -1058,14 +1070,17 @@ export default function AccidentClaimForm() {
                                     onFilesSelected={(files) =>
                                         setFormData({
                                             ...formData,
-                                            mvaRepatriationBills: files,
+                                            file_uploads: {
+                                                ...formData.file_uploads,
+                                                mvaRepatriationBills: files,
+                                            },
                                         })
                                     }
                                     className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
                                 />
                             </div>
                             <div className="md:col-span-2">
-                                <Label>mva_costs.otherCosts</Label>
+                                <Label>Other Costs</Label>
                                 <Textarea
                                     name="otherCosts"
                                     placeholder="Details about other costs..."
@@ -1090,7 +1105,10 @@ export default function AccidentClaimForm() {
                                     onFilesSelected={(files) =>
                                         setFormData({
                                             ...formData,
-                                            mvaOtherFiles: files,
+                                            file_uploads: {
+                                                ...formData.file_uploads,
+                                                mvaOtherFiles: files,
+                                            },
                                         })
                                     }
                                     className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
@@ -1115,7 +1133,7 @@ export default function AccidentClaimForm() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <Label>
-                                            insuranceCompany <span className="text-red-500">*</span>
+                                            Insurance Company <span className="text-red-500">*</span>
                                         </Label>
                                         <Input
                                             name="insuranceCompany"
@@ -1127,7 +1145,7 @@ export default function AccidentClaimForm() {
                                     </div>
                                     <div>
                                         <Label>
-                                            claimReferenceNumber <span className="text-red-500">*</span>
+                                            Claim Reference Number <span className="text-red-500">*</span>
                                         </Label>
                                         <Input
                                             name="claimReferenceNumber"
@@ -1139,7 +1157,7 @@ export default function AccidentClaimForm() {
                                     </div>
                                     <div>
                                         <Label>
-                                            adjusterName <span className="text-red-500">*</span>
+                                            Adjuster Name <span className="text-red-500">*</span>
                                         </Label>
                                         <Input
                                             name="adjusterName"
@@ -1151,7 +1169,7 @@ export default function AccidentClaimForm() {
                                     </div>
                                     <div>
                                         <Label>
-                                            adjusterContactDetails{" "}
+                                            Adjuster Contact Details{" "}
                                             <span className="text-red-500">*</span>
                                         </Label>
                                         <Textarea
@@ -1169,7 +1187,13 @@ export default function AccidentClaimForm() {
                                     <FileUpload
                                         multiple
                                         onFilesSelected={(files) =>
-                                            setFormData({ ...formData, mvaInsuranceDocs: files })
+                                            setFormData({
+                                                ...formData,
+                                                file_uploads: {
+                                                    ...formData.file_uploads,
+                                                    mvaInsuranceDocs: files,
+                                                },
+                                            })
                                         }
                                         className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
                                     />
@@ -1185,7 +1209,7 @@ export default function AccidentClaimForm() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <Label>
-                                            ownerBusinessName <span className="text-red-500">*</span>
+                                            Owner Business Name <span className="text-red-500">*</span>
                                         </Label>
                                         <Input
                                             name="ownerBusinessName"
@@ -1197,7 +1221,7 @@ export default function AccidentClaimForm() {
                                     </div>
                                     <div>
                                         <Label>
-                                            ownerReferenceNumber{" "}
+                                            Owner Reference Number{" "}
                                             <span className="text-red-500">*</span>
                                         </Label>
                                         <Input
@@ -1210,7 +1234,7 @@ export default function AccidentClaimForm() {
                                     </div>
                                     <div>
                                         <Label>
-                                            ownerPhoneNumber <span className="text-red-500">*</span>
+                                            Owner Phone Number <span className="text-red-500">*</span>
                                         </Label>
                                         <Input
                                             name="ownerPhoneNumber"
@@ -1226,7 +1250,13 @@ export default function AccidentClaimForm() {
                                     <FileUpload
                                         multiple
                                         onFilesSelected={(files) =>
-                                            setFormData({ ...formData, mvaBusinessDocs: files })
+                                            setFormData({
+                                                ...formData,
+                                                file_uploads: {
+                                                    ...formData.file_uploads,
+                                                    mvaBusinessDocs: files,
+                                                },
+                                            })
                                         }
                                         className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
                                     />
@@ -1241,7 +1271,7 @@ export default function AccidentClaimForm() {
                                 </h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
-                                        <Label>coInsured</Label>
+                                        <Label>Co-Insured</Label>
                                         <Input
                                             name="coInsured"
                                             placeholder="Enter co-insured name"
@@ -1255,7 +1285,13 @@ export default function AccidentClaimForm() {
                                         <FileUpload
                                             multiple
                                             onFilesSelected={(files) =>
-                                                setFormData({ ...formData, mvaCoInsuredDocs: files })
+                                                setFormData({
+                                                    ...formData,
+                                                    file_uploads: {
+                                                        ...formData.file_uploads,
+                                                        mvaCoInsuredDocs: files,
+                                                    },
+                                                })
                                             }
                                             className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
                                         />
@@ -1271,7 +1307,7 @@ export default function AccidentClaimForm() {
                                 </h3>
                                 <div>
                                     <Label>
-                                        otherPartyInfo <span className="text-red-500">*</span>
+                                        Other Party Info <span className="text-red-500">*</span>
                                     </Label>
                                     <Textarea
                                         name="otherPartyInfo"
@@ -1298,7 +1334,7 @@ export default function AccidentClaimForm() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <Label>
-                                    mva_attorney_info.lawFirmName{" "}
+                                    Law Firm Name{" "}
                                     <span className="text-red-500">*</span>
                                 </Label>
                                 <Input
@@ -1311,7 +1347,7 @@ export default function AccidentClaimForm() {
                             </div>
                             <div>
                                 <Label>
-                                    mva_attorney_info.attorneyName{" "}
+                                    Attorney Name{" "}
                                     <span className="text-red-500">*</span>
                                 </Label>
                                 <Input
@@ -1324,7 +1360,7 @@ export default function AccidentClaimForm() {
                             </div>
                             <div>
                                 <Label>
-                                    mva_attorney_info.attorneyPhone{" "}
+                                    Attorney Phone{" "}
                                     <span className="text-red-500">*</span>
                                 </Label>
                                 <Input
@@ -1341,7 +1377,13 @@ export default function AccidentClaimForm() {
                                 <FileUpload
                                     multiple
                                     onFilesSelected={(files) =>
-                                        setFormData({ ...formData, mvaAttorneyDocs: files })
+                                        setFormData({
+                                            ...formData,
+                                            file_uploads: {
+                                                ...formData.file_uploads,
+                                                mvaAttorneyDocs: files,
+                                            },
+                                        })
                                     }
                                     className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
                                 />

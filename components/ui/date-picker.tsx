@@ -1,7 +1,3 @@
-// Updated DatePicker Component
-
-"use client";
-
 import * as React from "react";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
@@ -16,11 +12,15 @@ import {
 } from "@/components/ui/popover";
 
 interface DatePickerProps {
-    selectedDate: Date | null;
+    selectedDate: Date | string | null;
     onChange: (date: Date | null) => void;
 }
 
 export function DatePicker({ selectedDate, onChange }: DatePickerProps) {
+    // Check if `selectedDate` is a valid date string or Date object
+    const isValidDate = selectedDate && !isNaN(new Date(selectedDate).getTime());
+    const selectedDateAsDate = isValidDate ? new Date(selectedDate) : undefined;
+
     return (
         <Popover>
             <PopoverTrigger asChild>
@@ -32,13 +32,13 @@ export function DatePicker({ selectedDate, onChange }: DatePickerProps) {
                     )}
                 >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
+                    {isValidDate ? format(new Date(selectedDate as string), "P") : <span>Pick a date</span>}
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0">
                 <Calendar
                     mode="single"
-                    selected={selectedDate || undefined} // Convert null to undefined for compatibility
+                    selected={selectedDateAsDate} // Now correctly typed as `Date | undefined`
                     onSelect={(date) => onChange(date ?? null)} // Convert undefined to null for formData compatibility
                     initialFocus
                 />

@@ -1,6 +1,6 @@
 // components/GenericField.tsx
 import React from "react";
-import { FieldConfig } from "./formConfig";
+import { FieldConfig } from "./config/formConfig";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";

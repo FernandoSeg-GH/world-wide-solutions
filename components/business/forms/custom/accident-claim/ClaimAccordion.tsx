@@ -4,7 +4,7 @@ import { FaChevronUp, FaEdit, FaSave, FaTimes } from "react-icons/fa";
 import ClaimDetails from "./ClaimDetails";
 import AccidentClaimSection from "./AccidentClaimSection";
 import { Button } from "@/components/ui/button";
-import { formSections } from "./formConfig";
+import { formSections } from "./config/formConfig";
 import { EditableClaim } from "./AccidentClaimsView";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
@@ -94,7 +94,13 @@ const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
                                 ) : (
                                     <div>
                                         {/* View Mode - Render Claim Details */}
-                                        <ClaimDetails claim={claim} onEdit={() => toggleEdit(claim.claim_id)} />
+                                        <ClaimDetails
+                                            claim={claim}
+                                            onEdit={toggleEdit}
+                                            handleSave={handleSave}
+                                            handleCancel={handleCancel}
+                                            handleFieldChange={handleFieldChange}
+                                        />
                                         <div className="flex justify-end mt-4">
                                             <Button
                                                 onClick={() => toggleEdit(claim.claim_id)}

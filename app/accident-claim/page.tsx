@@ -1,4 +1,4 @@
-import AccidentClaimForm from "@/components/business/forms/custom/AccidentClaimForm";
+import AccidentClaimForm from "@/components/business/forms/custom/accident-claim/AccidentClaimForm";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import AuthForm from "@/components/auth/AuthForm";
