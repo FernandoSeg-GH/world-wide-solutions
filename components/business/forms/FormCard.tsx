@@ -146,7 +146,7 @@ export function FormCard({ form }: FormCardProps) {
     return (
         <Card
             className={cn(
-                "w-full bg-muted/10 dark:text-gray-100 min-w-[300px]",
+                "w-full bg-white dark:text-gray-100 dark:bg-card-dark min-w-[300px]",
                 isAdminRole ? "h-auto" : "h-[210px]"
             )}
         >
@@ -254,7 +254,7 @@ export function FormCard({ form }: FormCardProps) {
                         className={`w-full mt-2 text-md gap-4 `}
                         onClick={handleNew}
                     >
-                        New Submission <BiPlus />
+                        New Claim Report <BiPlus />
                     </Button>
                 ) : null}
             </CardFooter>

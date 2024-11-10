@@ -201,7 +201,7 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ submission, form }) => 
             <CardFooter className="px-8 py-4 border-t border-gray-300 flex justify-end">
                 {!isEditing ? (
                     <Button onClick={handleEditClick} variant="default" className="px-4 py-2 font-medium text-sm">
-                        Modify Information
+                        Edit Information
                     </Button>
                 ) : (
                     <>

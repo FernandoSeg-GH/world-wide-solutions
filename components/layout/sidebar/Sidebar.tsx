@@ -57,7 +57,7 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
         <aside
             onClick={() => setIsExpanded(!isExpanded)}
             className={cn(
-                "fixed inset-y-0 left-0 z-20 flex flex-col border-r bg-navyBlue transition-all duration-300 shadow",
+                "fixed inset-y-0 left-0 z-20 flex flex-col border-r bg-navyBlue dark:bg-indigo-950 transition-all duration-300 shadow",
                 isExpanded ? "w-64" : "w-16"
             )}
         >

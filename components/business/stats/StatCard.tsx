@@ -10,7 +10,7 @@ type StatCardProps = {
 
 const StatCard = ({ title, icon, value, description }: StatCardProps) => {
     return (
-        <Card className='bg-muted/10 dark:text-gray-100'>
+        <Card className='bg-white dark:text-gray-100 dark:bg-card-dark'>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium"><span>{title}</span></CardTitle>
                 {icon}

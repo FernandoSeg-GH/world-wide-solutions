@@ -19,6 +19,7 @@ import Vinci from "@/components/vinci/Vinci";
 import FormDetails from "@/components/business/forms/FormDetails";
 import Users from "@/components/users";
 import MessagingLayout from "../notifications/MessagingLayout";
+import ClaimReports from "../business/forms/custom/ClaimReports";
 
 export const RenderComponent = (currentSection: string) => {
     const url = usePathname();
@@ -35,6 +36,8 @@ export const RenderComponent = (currentSection: string) => {
     switch (currentSection) {
         case "Dashboard":
             return <Main />;
+        case "Claim Reports":
+            return <ClaimReports />;
         case "Forms":
             return <Forms />;
         case "Form":
@@ -74,7 +77,7 @@ export function Dashboard() {
     }, []);
 
     return (
-        <div className="flex min-h-screen w-full flex-col bg-muted/10">
+        <div className="flex min-h-screen w-full flex-col bg-gray-200 dark:bg-muted-dark/20">
             {!isMobile && (
                 <Sidebar isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
             )}

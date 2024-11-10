@@ -12,6 +12,8 @@ import Spinner from "@/components/ui/spinner";
 import { useSession } from "next-auth/react";
 import AdminNotifications from "./business/notifications/AdminNotifications";
 import FormDetails from "./business/forms/FormDetails";
+import ClaimReports from "./business/forms/custom/ClaimReports";
+import AccidentClaimsView from "./business/forms/custom/accident-claim/AccidentClaimsView";
 
 export const RenderComponent = (currentSection: string) => {
     const url = usePathname();
@@ -32,6 +34,8 @@ export const RenderComponent = (currentSection: string) => {
             return <Main />;
         case "All Forms":
             return <Forms />;
+        case "Claim Reports":
+            return <AccidentClaimsView />;
         case "Form":
             return <FormDetails />;
         case "My Submissions":
@@ -47,7 +51,7 @@ export const RenderComponent = (currentSection: string) => {
         case "Vinci":
             return <Vinci />;
         default:
-            return <Forms />;
+            return <></>;
     }
 };
 

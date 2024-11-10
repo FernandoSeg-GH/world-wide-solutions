@@ -10,11 +10,11 @@ const MessagingLayout: React.FC = () => {
 
     return (
         <div className="flex flex-col md:flex-row h-full w-full gap-4 flex-grow">
-            <Card className="w-full md:w-1/3 p-4 shadow-lg mb-4 md:mb-0 overflow-auto">
+            <Card className="w-full md:w-1/3 p-4 shadow-lg mb-4 md:mb-0 overflow-auto dark:bg-card-dark dark:text-white">
                 <ConversationList onSelectConversation={setSelectedConversationId} />
             </Card>
 
-            <Card className="w-full md:w-2/3 p-4 shadow-lg overflow-auto">
+            <Card className="w-full md:w-2/3 p-4 shadow-lg overflow-auto dark:bg-card-dark">
                 {selectedConversationId ? (
                     <ConversationView conversationId={selectedConversationId} />
                 ) : (

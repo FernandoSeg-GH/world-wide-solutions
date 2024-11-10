@@ -28,7 +28,6 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
     const router = useRouter();
 
     const filesRef = useRef<{ [key: string]: File | File[] }>({});
-
     const handleFileChange = useCallback((fieldId: string, files: File | File[]) => {
         filesRef.current[fieldId] = files;
     }, []);
@@ -155,10 +154,10 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
     }
 
     return (
-        <div className="flex flex-col justify-start w-full min-h-screen items-center p-8 bg-muted/40 dark:bg-muted">
+        <div className="flex flex-col justify-start w-full min-h-screen items-center p-8 bg-gray-100 dark:bg-muted">
             <div
                 key={renderKey}
-                className="max-w-[620px] h-auto flex flex-col gap-4 bg-background w-full p-8 overflow-y-auto border shadow-xl shadow-gray-200 rounded-md dark:border-gray-300 my-6 dark:bg-white dark:text-black"
+                className="max-w-[800px] h-auto flex flex-col gap-4 bg-background w-full p-8 overflow-y-auto border shadow-xl shadow-gray-200 rounded-md dark:border-gray-300 my-6 dark:bg-white dark:text-black"
             >
                 <div className="flex items-center justify-between">
                     <Logo url="/assets/vws-hor.png" width={160} className="" />

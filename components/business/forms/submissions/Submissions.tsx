@@ -93,7 +93,9 @@ function Submissions() {
 
     return (
         <div className="text-black dark:text-white w-full">
-            <SectionHeader title="Submissions" subtitle="View form submissions." />
+            <SectionHeader title="My Submissions"
+            // subtitle="View Accident Claim Report Submissions." 
+            />
             <Separator className="border-gray-400 my-2 mb-6" />
             <div className="mb-12 w-full">
                 {Object.entries(submissionsForms).map(([formId, formData]) => (
@@ -101,7 +103,7 @@ function Submissions() {
                         {/* Form Title */}
                         <h2 className="text-lg font-bold mb-4">{formData.form.name}</h2>
                         {/* Submissions List */}
-                        <div className="flex flex-col gap-4">
+                        <div className="flex flex-row gap-4">
                             {formData.submissions.length > 0 ? (
                                 formData.submissions.map((submission: Submission) => (
                                     <SubmissionCard

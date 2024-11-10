@@ -27,13 +27,13 @@ const ConversationList: React.FC<ConversationListProps> = ({ onSelectConversatio
     }
 
     return (
-        <div>
+        <div className=''>
             <h2 className="text-xl font-semibold mb-4">Your Conversations</h2>
             {conversations.length === 0 ? (
-                <p className="text-gray-500">No conversations found.</p>
+                <p className="text-gray-500 dark:text-gray-200">No conversations found.</p>
             ) : (
                 conversations.map((conv) => (
-                    <Card key={conv.conversationId} className="mb-2 p-2 hover:shadow-md transition-shadow cursor-pointer">
+                    <Card key={conv.conversationId} className="mb-2 p-2 hover:shadow-md transition-shadow cursor-pointer dark:bg-indigo-950 dark:text-white">
                         <Button
                             variant="link"
                             onClick={() => {
@@ -51,11 +51,11 @@ const ConversationList: React.FC<ConversationListProps> = ({ onSelectConversatio
                         >
                             <div className="flex flex-col">
                                 <div className="flex flex-col justify-between items-start">
-                                    <span className="font-medium capitalize">
+                                    <span className="text-base capitalize dark:text-white font-bold">
                                         {conv.participants.map((p) => p.username).join(', ')}
                                     </span>
                                     {conv.lastMessage && (
-                                        <span className="text-sm text-gray-500">
+                                        <span className="text-sm text-gray-500 dark:text-gray-200">
                                             {new Date(conv.lastMessage.timestamp).toLocaleString()}
                                         </span>
                                     )}
@@ -63,7 +63,7 @@ const ConversationList: React.FC<ConversationListProps> = ({ onSelectConversatio
 
                                 {conv.lastMessage && (
                                     <p
-                                        className="text-sm text-gray-600 w-full mt-1 truncate overflow-hidden text-ellipsis"
+                                        className="text-sm text-gray-600 dark:text-gray-400 w-full mt-1 truncate overflow-hidden text-ellipsis"
                                         style={{ whiteSpace: 'nowrap', maxWidth: '100%' }}
                                     >
                                         {conv.lastMessage.content}

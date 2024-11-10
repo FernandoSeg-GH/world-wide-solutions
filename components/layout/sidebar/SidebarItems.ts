@@ -29,16 +29,21 @@ export const getSidebarItems = (
     },
     {
       icon: BookText,
-      label: "Forms",
-      ...(roleId !== 1 && forms?.length > 0
-        ? {
-            subItems: forms.map((form) => ({
-              icon: CircleDashed,
-              label: form.name,
-            })),
-          }
-        : {}),
+      label: "Claim Reports",
     },
+    // {
+    //   icon: BookText,
+    //   label: "Forms",
+    //   ...(roleId !== 1 && forms?.length > 0
+    //     ? {
+    //         subItems: forms.map((form) => ({
+    //           icon: CircleDashed,
+    //           label: form.name,
+    //         })),
+    //       }
+    //     : {}),
+    // },
+
     // {
     //   icon: Folders,
     //   label: "Submissions",
@@ -51,13 +56,13 @@ export const getSidebarItems = (
 
   // Role-specific sidebar items
   const roleItems: { [key: number]: SidebarItem[] } = {
-    1: [
-      // Specific items for user role 1
-      {
-        icon: Folders,
-        label: "My Submissions",
-      },
-    ],
+    // 1: [
+    //   // Specific items for user role 1
+    //   {
+    //     icon: Folders,
+    //     label: "My Submissions",
+    //   },
+    // ],
     2: [
       // Specific items for user roles 2 & 3
       {
@@ -74,6 +79,18 @@ export const getSidebarItems = (
       {
         icon: NotebookTabs,
         label: "All Forms",
+      },
+      {
+        icon: BookText,
+        label: "Forms",
+        ...(roleId !== 1 && forms?.length > 0
+          ? {
+              subItems: forms.map((form) => ({
+                icon: CircleDashed,
+                label: form.name,
+              })),
+            }
+          : {}),
       },
       {
         icon: Users2,

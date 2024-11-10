@@ -25,6 +25,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { ExpandableSelectFieldFormElement } from "@/components/builder/fields/ExpandableSelectField";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 
 export const iconMap: { [key: string]: React.ComponentType } = {
     TextField: VscDebugBreakpointDataUnverified,
@@ -51,7 +52,7 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ submission, form }) => 
     const { content } = submission;
     const fields = form.fields || [];
     const { updateSubmissionContent } = useSubmissions();
-
+    const { data: session } = useSession()
     const [isEditing, setIsEditing] = useState(false);
     const [editedContent, setEditedContent] = useState<Record<string, string>>({});
 
@@ -89,6 +90,7 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ submission, form }) => 
             <CardHeader className="flex flex-row items-center justify-between w-full">
                 <div className="">
                     <CardTitle>{form.name}</CardTitle>
+                    <p>Patient: NOMBE DEL PACIENTE</p>
                     <CardDescription>
                         Submission ID: <span>{submission.id}</span>
                     </CardDescription>
@@ -212,7 +214,7 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({ submission, form }) => 
             <CardFooter className="space-x-2 border-t pt-6">
                 {!isEditing ? (
                     <div className="flex items-center justify-end w-full">
-                        <Button onClick={handleEditClick} variant="default">Modify Information</Button>
+                        <Button onClick={handleEditClick} variant="default">Edit Information</Button>
                     </div>
                 ) : (
                     <>

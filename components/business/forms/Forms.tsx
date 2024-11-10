@@ -11,6 +11,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 import FormCard from './FormCard';
 import { Separator } from '@/components/ui/separator';
 import { AppContextType } from '@/types';
+import AccidentClaimForm from './custom/AccidentClaimForm';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { PlusCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 
 interface Props { }
 
@@ -20,7 +25,7 @@ function Forms({ }: Props) {
     const { data, actions } = useAppContext() as AppContextType;
     const { form, submissions, loading: formLoading, loading, forms } = data;
     const { formActions } = actions;
-
+    const router = useRouter()
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -53,9 +58,7 @@ function Forms({ }: Props) {
     ]);
 
     if (loading) {
-        return <div className="flex items-center justify-center w-full h-full">
-            <Spinner />
-        </div>;;
+        return <Skeleton className='w-full h-full min-h-80' />
     }
 
     if (error) {
@@ -85,7 +88,7 @@ function Forms({ }: Props) {
                         <Skeleton className="border-2 border-primary/20 h-[210px] w-full lg:max-w-[380px]" />
                     )}
 
-                    {forms && forms.length > 0 ? (
+                    {/* {forms && forms.length > 0 ? (
                         forms.map((form) => <FormCard key={form.id} form={form} />)
                     ) : (
                         <div className="text-center text-gray-500">
@@ -94,10 +97,9 @@ function Forms({ }: Props) {
                                 : "You have no forms available. Please contact your administrator."
                             }
                         </div>
-                    )}
+                    )} */}
+
                 </div>
-
-
             </div>
         </div>
     )
