@@ -51,7 +51,7 @@ const AccidentClaimsView: React.FC = () => {
                 }
 
                 const data = await response.json();
-                console.log('data', data)
+
                 const initializedClaims: EditableClaim[] = Array.isArray(data.claims)
                     ? data.claims.map((claim: Claim) => ({
                         ...claim,
@@ -71,8 +71,6 @@ const AccidentClaimsView: React.FC = () => {
                     }))
                     : [];
 
-
-                console.log('initializedClaims', initializedClaims);
                 setClaims(initializedClaims)
                 setLoading(false);
             } catch (err: any) {
@@ -266,7 +264,6 @@ const AccidentClaimsView: React.FC = () => {
                 <div className="text-center text-red-500">Error: {error}</div>
             </div>
         );
-    console.log('claims', claims)
     return (
 
         <div className="w-full  bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 xl:p-8 overflow-y-auto">

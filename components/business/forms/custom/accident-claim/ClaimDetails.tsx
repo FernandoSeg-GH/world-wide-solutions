@@ -1,5 +1,3 @@
-// components/business/forms/custom/accident-claim/ClaimDetails.tsx
-
 import React from "react";
 import { EditableClaim } from "./AccidentClaimsView";
 import { formSections } from "./config/formConfig";
@@ -21,15 +19,15 @@ export function getNestedValue(obj: any, path: string[]): any {
 
 const formatLabel = (field: string) => {
     return field
-        // Insert space before uppercase letters
+
         .replace(/([A-Z])/g, " $1")
-        // Capitalize the first letter
+
         .replace(/^./, (str) => str.toUpperCase())
-        // Replace abbreviations if necessary
+
         .replace(/Mva/g, "MVA");
 };
 
-// Utility to parse JSON fields
+
 function parseJSONField(field: string | null) {
     try {
         return field ? JSON.parse(field) : null;
@@ -55,19 +53,19 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
     const slipCosts = parseJSONField(claim.slip_costs as unknown as string);
     const slipThirdPartyInfo = parseJSONField(claim.slip_third_party_info as unknown as string);
     const slipAttorneyInfo = parseJSONField(claim.slip_attorney_info as unknown as string);
-    // const vehicleDetails = parseJSONField(claim.vehicle_details as unknown as string) || [];
+
     const vehicleDetails = typeof claim.vehicle_details === 'string'
         ? parseJSONField(claim.vehicle_details)
         : claim.vehicle_details;
 
-    // Helper function to render existing files
+
     const renderExistingFiles = (files: string[] | null) => {
         if (!files || files.length === 0)
             return <span className="text-gray-500 dark:text-gray-400">No existing files</span>;
         return files.map((fileUrl, index) => <FileDisplay key={`existing-${index}`} fileUrl={fileUrl} />);
     };
 
-    // Helper function to render new file uploads
+
     const renderNewFiles = (files: FileList | null) => {
         if (!files || files.length === 0)
             return <span className="text-gray-500 dark:text-gray-400">No new files uploaded</span>;
@@ -137,19 +135,16 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {section.fields.map((field) => {
-                            const path = field.id.split("."); // Handle nested paths
+                            const path = field.id.split(".");
                             let value = getNestedValue(isEditing ? editedData : claim, path);
 
-                            console.log(`Field: ${field.id}, Value:`, value); // Debugging
-
-                            // Handle different field types
                             const renderValue = () => {
                                 if (field.type === "file") {
                                     if (isEditing) {
-                                        // Render new file uploads
+
                                         return <div className="space-y-2">{renderNewFiles(value as FileList | null)}</div>;
                                     } else {
-                                        // Render existing files
+
                                         return <div className="space-y-2">{renderExistingFiles(value as string[] | null)}</div>;
                                     }
                                 }
@@ -171,15 +166,15 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                                             </select>
                                         );
                                     } else {
-                                        // Find the label for the selected option
+
                                         const selectedOption = field.options?.find((opt) => opt.value === value);
                                         return <span className="text-gray-700 dark:text-gray-300">{selectedOption?.label || "N/A"}</span>;
                                     }
                                 }
 
                                 if (field.type === "conditionalSelect") {
-                                    // Implement conditional select logic if needed
-                                    // For simplicity, render as text
+
+
                                     return <span className="text-gray-700 dark:text-gray-300">{value || "N/A"}</span>;
                                 }
 
@@ -187,19 +182,36 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                                     if (isEditing) {
                                         return (
                                             <textarea
-                                                value={value}
+                                                value={typeof value === 'string' ? value : ''}
                                                 onChange={(e) => handleFieldChange(claim.claim_id, field.id, e.target.value)}
                                                 className="w-full border border-gray-300 rounded-md p-2"
                                             />
                                         );
                                     } else {
-                                        return <span className="text-gray-700 dark:text-gray-300">{value || "N/A"}</span>;
+                                        if (typeof value === 'string') {
+                                            return <span className="text-gray-700 dark:text-gray-300">{value || "N/A"}</span>;
+                                        } else if (Array.isArray(value)) {
+                                            return (
+                                                <ul>
+                                                    {value.map((item, index) => (
+                                                        <li key={index} className="text-gray-700 dark:text-gray-300">
+                                                            {JSON.stringify(item)}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            );
+                                        } else if (typeof value === 'object' && value !== null) {
+                                            return <span className="text-gray-700 dark:text-gray-300">{JSON.stringify(value)}</span>;
+                                        } else {
+                                            return <span className="text-gray-700 dark:text-gray-300">N/A</span>;
+                                        }
                                     }
                                 }
 
+
                                 if (field.type === "date") {
                                     if (isEditing) {
-                                        // Ensure the date is in YYYY-MM-DD format
+
                                         const dateValue = typeof value === "string" ? value.split("T")[0] : "";
                                         return (
                                             <input
@@ -248,14 +260,14 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                                     }
                                 }
 
-                                if (field.id === "vehicle_details") {
+                                if (field.type === "vehicleDetails") {
                                     let vehicleDetailsValue = typeof value === "string" ? parseJSONField(value) : value;
                                     return renderVehicleDetails(vehicleDetailsValue);
                                 }
 
 
+
                                 if (typeof value === "object" && !Array.isArray(value)) {
-                                    // Convert objects to JSON string or display a placeholder
                                     return <span className="text-gray-700 dark:text-gray-300">{JSON.stringify(value) || "N/A"}</span>;
                                 }
 
@@ -269,12 +281,12 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                                     );
                                 }
 
-                                return <span className="text-gray-700 dark:text-gray-300">N/A</span>;
+                                return <span className="text-gray-700 dark:text-gray-300">{value !== null && value !== undefined ? value.toString() : "N/A"}</span>;
                             };
 
                             return (
                                 <div key={field.id} className="flex flex-col">
-                                    <label className="font-semibold text-gray-800 dark:text-gray-200">{formatLabel(field.id)}</label>
+                                    <label className="font-semibold text-gray-800 dark:text-gray-200">{formatLabel(field.label)}</label>
                                     <div className="mt-1">{renderValue()}</div>
                                 </div>
                             );
@@ -308,9 +320,9 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                         "slipBusinessDocs",
                         "slipCoInsuredDocs",
                     ].map((fileField) => {
-                        // Existing files from Claim (string[] | null)
+
                         const existingFiles = claim[fileField as keyof Claim] as string[] | null;
-                        // New files from editedData (FileList | null)
+
                         const newFiles = editedData[`new${fileField.charAt(0).toUpperCase() + fileField.slice(1)}` as keyof AccidentClaimFormData];
 
                         return (

@@ -1,4 +1,4 @@
-// AccidentClaimForm.tsx
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -78,7 +78,7 @@ export default function AccidentClaimForm() {
                     [name]: value,
                 };
             }
-            // Motor Vehicle Accident Details
+
             else if (name in prevData.mva_third_party_info) {
                 return {
                     ...prevData,
@@ -122,7 +122,7 @@ export default function AccidentClaimForm() {
                     mva_description: value,
                 };
             }
-            // Witness Info
+
             else if (name in prevData.witness_info) {
                 return {
                     ...prevData,
@@ -132,7 +132,7 @@ export default function AccidentClaimForm() {
                     },
                 };
             }
-            // Slip and Fall Details
+
             else if (name in prevData.slip_third_party_info) {
                 return {
                     ...prevData,
@@ -181,7 +181,7 @@ export default function AccidentClaimForm() {
                     negligence_description: value,
                 };
             }
-            // Default case: Assign value to a top-level field if not nested
+
             return { ...prevData, [name]: value };
         });
     };
@@ -198,13 +198,8 @@ export default function AccidentClaimForm() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        // Log formData for debugging
-        console.log("Form Data:", formData);
-
-        // Prepare form data for submission
         const submitData = new FormData();
 
-        // Append form fields to submitData
         Object.entries(formData).forEach(([key, value]) => {
             if (
                 typeof value === "object" &&
@@ -213,7 +208,7 @@ export default function AccidentClaimForm() {
             ) {
                 submitData.append(key, JSON.stringify(value));
             } else if (key === "accident_date") {
-                // Ensure accident_date is in ISO format
+
                 submitData.append(key, new Date(value).toISOString());
             } else {
                 submitData.append(key, value as string);
@@ -221,7 +216,7 @@ export default function AccidentClaimForm() {
         });
 
 
-        // Add file uploads to submitData
+
         const fileFields: Array<keyof AccidentClaimFormData['file_uploads']> = [
             "documentFiles",
             "mvaUploadDocumentation",
@@ -270,8 +265,7 @@ export default function AccidentClaimForm() {
             }
 
             const result = await response.json();
-            console.log("Form submitted successfully:", result);
-            // Optionally, reset the form or redirect the user
+
             toast({ title: "Success!", description: "Form submitted successfully!" });
             setFormData(initialForm);
             setSuccessMessage(true)
@@ -811,7 +805,7 @@ export default function AccidentClaimForm() {
                                             <Label htmlFor="witness_name">Full Name</Label>
                                             <Input
                                                 id="witness_name"
-                                                name="name" // This corresponds to witness_info.name
+                                                name="name"
                                                 placeholder="Enter witness's full name"
                                                 value={formData.witness_info.name}
                                                 onChange={handleInputChange}
@@ -822,7 +816,7 @@ export default function AccidentClaimForm() {
                                             <Label htmlFor="witness_email">Email</Label>
                                             <Input
                                                 id="witness_email"
-                                                name="email" // This corresponds to witness_info.email
+                                                name="email"
                                                 type="email"
                                                 placeholder="Enter witness's email"
                                                 value={formData.witness_info.email}
@@ -834,7 +828,7 @@ export default function AccidentClaimForm() {
                                             <Label htmlFor="witness_phone">Phone</Label>
                                             <Input
                                                 id="witness_phone"
-                                                name="phone" // This corresponds to witness_info.phone
+                                                name="phone"
                                                 placeholder="+1 234 567 890"
                                                 value={formData.witness_info.phone}
                                                 onChange={handleInputChange}

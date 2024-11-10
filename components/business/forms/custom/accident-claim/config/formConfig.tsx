@@ -50,7 +50,7 @@ export const formSections: SectionConfig[] = [
     fields: [
       { id: "mva_type", label: "Type of Motor Vehicle", type: "select", options: [{ value: "sedan", label: "Sedan" }, { value: "suv", label: "SUV" }, { value: "truck", label: "Truck" }] },
       { id: "mva_location", label: "Location of Accident", type: "text" },
-      { id: "vehicle_details", label: "Vehicle Details", type: "textarea" },  // Represent array of objects as textarea for simplicity
+      { id: "vehicle_details", label: "Vehicle Details", type: "vehicleDetails" },  // Represent array of objects as textarea for simplicity
       { id: "selected_vehicle", label: "Selected Vehicle", type: "select", options: [{ value: "vehicle1", label: "Vehicle 1" }, { value: "vehicle2", label: "Vehicle 2" }, { value: "vehicle3", label: "Vehicle 3" }] },
       { id: "mva_description", label: "Description of Accident", type: "textarea" },
 
