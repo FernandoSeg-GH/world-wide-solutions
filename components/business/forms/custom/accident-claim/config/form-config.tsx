@@ -4,6 +4,7 @@ import { FaUser, FaCarSide, FaBriefcaseMedical, FaFileAlt, FaBalanceScale } from
 import { countryOptions } from "./country-options";
 import { accidentTypeOptions } from "./accident-options";
 import { AccidentClaimFormData, Claim } from "./types";
+import { usaStates } from "./state-options";
 
 export interface FieldConfig {
   id: string;
@@ -20,6 +21,7 @@ export interface SectionConfig {
   fields: FieldConfig[];
 }
 
+
 export const formSections: SectionConfig[] = [
   {
     title: "Patient Personal Information",
@@ -28,7 +30,7 @@ export const formSections: SectionConfig[] = [
       { id: "full_name", label: "Full Name", type: "text", required: true },
       { id: "email", label: "Email", type: "email", required: true },
       { id: "country", label: "Country", type: "select", required: true, options: countryOptions },
-      { id: "state", label: "State", type: "conditionalSelect", required: true },
+      { id: "state", label: "State", type: "conditionalSelect", required: true, options: usaStates },  // Use a list of options if needed for USA states
       { id: "primary_contact", label: "Primary Contact Phone Number", type: "text", required: true },
       { id: "other_contact_name", label: "Relative or Friend", type: "text", required: true },
       { id: "other_contact_phone", label: "Other Contact Phone Number", type: "text", required: true },
@@ -41,17 +43,38 @@ export const formSections: SectionConfig[] = [
       { id: "accident_date", label: "Accident Date", type: "date", required: true },
       { id: "accident_place", label: "Accident Place", type: "text", required: true },
       { id: "accident_type", label: "Accident Type", type: "select", required: true, options: accidentTypeOptions },
-      { id: "sub_accident_type", label: "Sub Accident Type", type: "text" },  // Added this field
+      { id: "sub_accident_type", label: "Sub Accident Type", type: "text" },
     ],
   },
   {
     title: "Motor Vehicle Accident Details",
     icon: <FaCarSide />,
+    // condition: (claim: any) => claim.accident_type === "motor_vehicle_accidents", // Display based on condition
     fields: [
-      { id: "mva_type", label: "Type of Motor Vehicle", type: "select", options: [{ value: "sedan", label: "Sedan" }, { value: "suv", label: "SUV" }, { value: "truck", label: "Truck" }] },
+      {
+        id: "mva_type",
+        label: "Type of Motor Vehicle",
+        type: "select",
+        options: [
+          { value: "sedan", label: "Sedan" },
+          { value: "suv", label: "SUV" },
+          { value: "truck", label: "Truck" },
+          { value: "motorcycle", label: "Motorcycle" },
+          { value: "other", label: "Other" }
+        ],
+      },
       { id: "mva_location", label: "Location of Accident", type: "text" },
-      { id: "vehicle_details", label: "Vehicle Details", type: "vehicleDetails" },  // Represent array of objects as textarea for simplicity
-      { id: "selected_vehicle", label: "Selected Vehicle", type: "select", options: [{ value: "vehicle1", label: "Vehicle 1" }, { value: "vehicle2", label: "Vehicle 2" }, { value: "vehicle3", label: "Vehicle 3" }] },
+      { id: "vehicle_details", label: "Vehicle Details", type: "vehicleDetails" },
+      {
+        id: "selected_vehicle",
+        label: "Selected Vehicle",
+        type: "select",
+        options: [
+          { value: "vehicle1", label: "Vehicle 1" },
+          { value: "vehicle2", label: "Vehicle 2" },
+          { value: "vehicle3", label: "Vehicle 3" }
+        ],
+      },
       { id: "mva_description", label: "Description of Accident", type: "textarea" },
 
       // Medical Info - Nested Fields
@@ -63,7 +86,17 @@ export const formSections: SectionConfig[] = [
       // Costs - Nested Fields
       { id: "mva_costs.totalCost", label: "Total Cost", type: "number" },
       { id: "mva_costs.policyLimits", label: "Policy Limits", type: "number" },
-      { id: "mva_costs.assistanceStatus", label: "Assistance Status", type: "text" },
+      {
+        id: "mva_costs.assistanceStatus",
+        label: "Assistance Status",
+        type: "select",
+        options: [
+          { value: "open", label: "Open" },
+          { value: "under_review", label: "Under Review" },
+          { value: "approved", label: "Approved" },
+          { value: "closed", label: "Closed" }
+        ],
+      },
       { id: "mva_costs.medicalProviderCosts", label: "Medical Provider Costs", type: "number" },
       { id: "mva_costs.repatriationCosts", label: "Repatriation Costs", type: "number" },
       { id: "mva_costs.otherCosts", label: "Other Costs", type: "number" },
@@ -72,7 +105,7 @@ export const formSections: SectionConfig[] = [
       { id: "mva_third_party_info.insuranceCompany", label: "Insurance Company", type: "text" },
       { id: "mva_third_party_info.claimReferenceNumber", label: "Claim Reference Number", type: "text" },
       { id: "mva_third_party_info.adjusterName", label: "Adjuster Name", type: "text" },
-      { id: "mva_third_party_info.adjusterContactDetails", label: "Adjuster Contact Details", type: "text" },
+      { id: "mva_third_party_info.adjusterContactDetails", label: "Adjuster Contact Details", type: "textarea" },
       { id: "mva_third_party_info.ownerBusinessName", label: "Owner Business Name", type: "text" },
       { id: "mva_third_party_info.ownerReferenceNumber", label: "Owner Reference Number", type: "text" },
       { id: "mva_third_party_info.ownerPhoneNumber", label: "Owner Phone Number", type: "text" },
@@ -88,20 +121,35 @@ export const formSections: SectionConfig[] = [
   {
     title: "Slip and Fall Details",
     icon: <FaBriefcaseMedical />,
+    // condition: (claim: any) => claim.accident_type === "slip_and_fall",
     fields: [
       { id: "slip_description", label: "Slip Description", type: "textarea" },
       { id: "slip_accident_type", label: "Slip Accident Type", type: "text" },
-      { id: "negligence_description", label: "Negligence Description", type: "textarea" },  // Added this missing field
+      { id: "negligence_description", label: "Negligence Description", type: "textarea" },
       { id: "witness_info.name", label: "Witness Name", type: "text" },
       { id: "witness_info.email", label: "Witness Email", type: "email" },
       { id: "witness_info.phone", label: "Witness Phone", type: "text" },
+
+      // Medical Info - Nested Fields
       { id: "slip_medical_info.assistanceType", label: "Assistance Type", type: "text" },
       { id: "slip_medical_info.diagnosis", label: "Diagnosis", type: "text" },
       { id: "slip_medical_info.treatment", label: "Treatment", type: "text" },
       { id: "slip_medical_info.primaryCareProvider", label: "Primary Care Provider", type: "text" },
+
+      // Costs - Nested Fields
       { id: "slip_costs.totalCost", label: "Total Cost", type: "number" },
       { id: "slip_costs.policyLimits", label: "Policy Limits", type: "number" },
-      { id: "slip_costs.assistanceStatus", label: "Assistance Status", type: "text" },
+      {
+        id: "slip_costs.assistanceStatus",
+        label: "Assistance Status",
+        type: "select",
+        options: [
+          { value: "open", label: "Open" },
+          { value: "under_review", label: "Under Review" },
+          { value: "approved", label: "Approved" },
+          { value: "closed", label: "Closed" }
+        ],
+      },
       { id: "slip_costs.medicalCost", label: "Medical Cost", type: "number" },
       { id: "slip_costs.repatriationCosts", label: "Repatriation Costs", type: "number" },
       { id: "slip_costs.otherCosts", label: "Other Costs", type: "number" },
@@ -110,7 +158,7 @@ export const formSections: SectionConfig[] = [
       { id: "slip_third_party_info.insuranceCompany", label: "Insurance Company", type: "text" },
       { id: "slip_third_party_info.claimReferenceNumber", label: "Claim Reference Number", type: "text" },
       { id: "slip_third_party_info.adjusterName", label: "Adjuster Name", type: "text" },
-      { id: "slip_third_party_info.adjusterContactDetails", label: "Adjuster Contact Details", type: "text" },
+      { id: "slip_third_party_info.adjusterContactDetails", label: "Adjuster Contact Details", type: "textarea" },
       { id: "slip_third_party_info.ownerBusinessName", label: "Owner Business Name", type: "text" },
       { id: "slip_third_party_info.ownerReferenceNumber", label: "Owner Reference Number", type: "text" },
       { id: "slip_third_party_info.ownerPhoneNumber", label: "Owner Phone Number", type: "text" },
@@ -150,6 +198,7 @@ export const formSections: SectionConfig[] = [
 
 export function mapClaimToFormData(claim: Claim): AccidentClaimFormData {
   return {
+    business_id: "2",
     formUrl: "", // Assuming a default value
 
     // Patient Personal Information

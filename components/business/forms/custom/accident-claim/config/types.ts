@@ -1,4 +1,5 @@
 export interface AccidentClaimFormData {
+  business_id: string;
   formUrl: string;
 
   // Patient Personal Information

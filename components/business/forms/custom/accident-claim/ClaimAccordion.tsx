@@ -4,7 +4,7 @@ import { FaChevronUp, FaEdit, FaSave, FaTimes } from "react-icons/fa";
 import ClaimDetails from "./ClaimDetails";
 import AccidentClaimSection from "./AccidentClaimSection";
 import { Button } from "@/components/ui/button";
-import { formSections } from "./config/formConfig";
+import { formSections } from "./config/form-config";
 import { EditableClaim } from "./AccidentClaimsView";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";

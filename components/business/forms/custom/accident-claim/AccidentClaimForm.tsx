@@ -353,6 +353,7 @@ export default function AccidentClaimForm() {
                                         setFormData({ ...formData, country: value })
                                     }
                                     value={formData.country}
+                                    required
                                 >
                                     <SelectTrigger
                                         id="country"
@@ -377,6 +378,7 @@ export default function AccidentClaimForm() {
                                             setFormData({ ...formData, state: value })
                                         }
                                         value={formData.state}
+                                        required
                                     >
                                         <SelectTrigger
                                             id="state"
@@ -743,7 +745,7 @@ export default function AccidentClaimForm() {
                                 {/* Accident Description */}
                                 <div>
                                     <Label>
-                                        slip_description <span className="text-red-500">*</span>
+                                        Slip Description <span className="text-red-500">*</span>
                                     </Label>
                                     <Textarea
                                         name="slip_description"
@@ -758,7 +760,7 @@ export default function AccidentClaimForm() {
                                 {/* Accident Type */}
                                 <div>
                                     <Label>
-                                        slip_accident_type <span className="text-red-500">*</span>
+                                        Slip Accident Type <span className="text-red-500">*</span>
                                     </Label>
                                     <Select
                                         onValueChange={(value) =>
@@ -783,7 +785,7 @@ export default function AccidentClaimForm() {
 
                                 {/* Negligence Description */}
                                 <div>
-                                    <Label>negligence_description</Label>
+                                    <Label>Negligence Description</Label>
                                     <Textarea
                                         name="negligence_description"
                                         placeholder="Explain if there was any negligence..."

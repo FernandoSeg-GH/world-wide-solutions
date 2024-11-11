@@ -1,6 +1,8 @@
+// ClaimDetails.tsx
+
 import React from "react";
 import { EditableClaim } from "./AccidentClaimsView";
-import { formSections } from "./config/formConfig";
+import { formSections } from "./config/form-config";
 import { FaFileAlt, FaFilePdf } from "react-icons/fa";
 import FileDisplay from "./FileDisplay";
 import { AccidentClaimFormData, Claim } from "./config/types";
@@ -19,14 +21,10 @@ export function getNestedValue(obj: any, path: string[]): any {
 
 const formatLabel = (field: string) => {
     return field
-
         .replace(/([A-Z])/g, " $1")
-
         .replace(/^./, (str) => str.toUpperCase())
-
         .replace(/Mva/g, "MVA");
 };
-
 
 function parseJSONField(field: string | null) {
     try {
@@ -35,6 +33,8 @@ function parseJSONField(field: string | null) {
         return null;
     }
 }
+
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 const ClaimDetails: React.FC<ClaimDetailsProps> = ({
     claim,
@@ -45,26 +45,15 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
 }) => {
     const { isEditing, editedData } = claim;
 
-    const mvaMedicalInfo = parseJSONField(claim.mva_medical_info as unknown as string);
-    const mvaCosts = parseJSONField(claim.mva_costs as unknown as string);
-    const mvaThirdPartyInfo = parseJSONField(claim.mva_third_party_info as unknown as string);
-    const mvaAttorneyInfo = parseJSONField(claim.mva_attorney_info as unknown as string);
-    const slipMedicalInfo = parseJSONField(claim.slip_medical_info as unknown as string);
-    const slipCosts = parseJSONField(claim.slip_costs as unknown as string);
-    const slipThirdPartyInfo = parseJSONField(claim.slip_third_party_info as unknown as string);
-    const slipAttorneyInfo = parseJSONField(claim.slip_attorney_info as unknown as string);
 
-    const vehicleDetails = typeof claim.vehicle_details === 'string'
-        ? parseJSONField(claim.vehicle_details)
-        : claim.vehicle_details;
-
-
-    const renderExistingFiles = (files: string[] | null) => {
-        if (!files || files.length === 0)
+    const renderExistingFiles = (files?: string[] | null) => {
+        if (!files || files.length === 0) {
             return <span className="text-gray-500 dark:text-gray-400">No existing files</span>;
-        return files.map((fileUrl, index) => <FileDisplay key={`existing-${index}`} fileUrl={fileUrl} />);
+        }
+        return files.map((fileUrl, index) => (
+            <FileDisplay key={`existing-${index}`} fileUrl={fileUrl} />
+        ));
     };
-
 
     const renderNewFiles = (files: FileList | null) => {
         if (!files || files.length === 0)
@@ -151,6 +140,7 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
 
                                 if (field.type === "select") {
                                     if (isEditing) {
+
                                         return (
                                             <select
                                                 value={value}
@@ -180,6 +170,7 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
 
                                 if (field.type === "textarea") {
                                     if (isEditing) {
+
                                         return (
                                             <textarea
                                                 value={typeof value === 'string' ? value : ''}
@@ -265,8 +256,6 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                                     return renderVehicleDetails(vehicleDetailsValue);
                                 }
 
-
-
                                 if (typeof value === "object" && !Array.isArray(value)) {
                                     return <span className="text-gray-700 dark:text-gray-300">{JSON.stringify(value) || "N/A"}</span>;
                                 }
@@ -301,66 +290,23 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                     <FaFileAlt />
                     File Uploads
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {[
-                        "documentFiles",
-                        "mvaUploadDocumentation",
-                        "mvaRepatriationBills",
-                        "mvaOtherFiles",
-                        "mvaInsuranceDocs",
-                        "mvaBusinessDocs",
-                        "mvaCoInsuredDocs",
-                        "mvaAttorneyDocs",
-                        "slipAccidentReports",
-                        "slipPhotos",
-                        "slipMedicalDocs",
-                        "slipMedicalBills",
-                        "slipRepatriationBills",
-                        "slipThirdPartyDocs",
-                        "slipBusinessDocs",
-                        "slipCoInsuredDocs",
-                    ].map((fileField) => {
-
-                        const existingFiles = claim[fileField as keyof Claim] as string[] | null;
-
-                        const newFiles = editedData[`new${fileField.charAt(0).toUpperCase() + fileField.slice(1)}` as keyof AccidentClaimFormData];
-
-                        return (
-                            <div key={fileField} className="flex flex-col">
-                                <label className="font-semibold text-gray-800 dark:text-gray-200 capitalize">
-                                    {formatLabel(fileField)}
-                                </label>
-                                <div className="mt-1">
-                                    {/* Existing Files */}
-                                    {existingFiles && existingFiles.length > 0 && (
-                                        <div className="mb-2">
-                                            <span className="font-medium text-gray-700 dark:text-gray-300">Existing Files:</span>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-1">
-                                                {renderExistingFiles(existingFiles)}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* New File Uploads */}
-                                    {isEditing && (
-                                        <div>
-                                            <span className="font-medium text-gray-700 dark:text-gray-300">New Uploads:</span>
-                                            <div className="mt-1">
-                                                {newFiles instanceof FileList && newFiles.length > 0 ? (
-                                                    <div className="space-y-2">
-                                                        {renderNewFiles(newFiles)}
-                                                    </div>
-                                                ) : (
-                                                    <span className="text-gray-500 dark:text-gray-400">No new files uploaded</span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        );
-                    })}
+                {/* Always display existing files */}
+                <div className="space-y-2">
+                    <span className="font-medium text-gray-700 dark:text-gray-300">Existing Files:</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-1">
+                        {renderExistingFiles(claim.file_uploads as string[] | null)}
+                    </div>
                 </div>
+
+                {/* Show New Uploads only in edit mode */}
+                {isEditing && (
+                    <div className="mt-4">
+                        <span className="font-medium text-gray-700 dark:text-gray-300">New Uploads:</span>
+                        <div className="mt-1">
+                            {renderNewFiles(editedData.file_uploads?.newDocumentFiles as FileList | null)}
+                        </div>
+                    </div>
+                )}
             </section>
         </div>
     );
