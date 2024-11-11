@@ -164,13 +164,20 @@ const AccidentClaimsView: React.FC = () => {
 
         // Append all non-file fields
         Object.entries(claimToUpdate.editedData).forEach(([key, value]) => {
-            if (typeof value === "object" && value !== null && !(value instanceof FileList) && !Array.isArray(value)) {
+            if (typeof value === "object" && value instanceof FileList) {
+                // For FileList, append each file individually
+                Array.from(value).forEach(file => submitData.append(key, file));
+            } else if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+                // For other objects, stringify
                 submitData.append(key, JSON.stringify(value));
             } else if (key === "accident_date" && typeof value === "string") {
+                // Handle date as a string
                 submitData.append(key, value);
             } else if (Array.isArray(value)) {
+                // For arrays, stringify the array
                 submitData.append(key, JSON.stringify(value));
             } else if (typeof value === "string") {
+                // For simple strings
                 submitData.append(key, value);
             }
         });
