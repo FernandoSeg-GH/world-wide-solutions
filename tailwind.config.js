@@ -21,78 +21,78 @@ module.exports = {
         ring: "hsl(var(--ring))",
         input: "hsl(var(--input))",
         background: {
-          DEFAULT: "hsl(var(--background))", // Light mode background
-          dark: "#1a1b1e", // Dark mode background (dark gray)
+          DEFAULT: "hsl(var(--background))",
+          dark: "#1a1b1e",
         },
         foreground: {
-          DEFAULT: "hsl(var(--foreground))", // Light mode text
-          dark: "#e4e4e7", // Dark mode text (off-white)
+          DEFAULT: "hsl(var(--foreground))",
+          dark: "#e4e4e7",
         },
         primary: {
-          DEFAULT: "#151342", // Deep Blue for light mode
-          dark: "#202053", // Subdued Deep Blue for dark mode
-          foreground: "#FFFFFF", // White for text in both modes
+          DEFAULT: "#151342",
+          dark: "#202053",
+          foreground: "#FFFFFF",
         },
         secondary: {
-          DEFAULT: "#242262", // Dark Blue for light mode
-          dark: "#2a2a6a", // Subdued Dark Blue for dark mode
-          foreground: "#FFFFFF", // White for text in both modes
+          DEFAULT: "#242262",
+          dark: "#2a2a6a",
+          foreground: "#FFFFFF",
         },
         purple: {
-          DEFAULT: "#5100B9", // Purple for light mode
-          dark: "#6b42cc", // Softer purple for dark mode
-          foreground: "#FFFFFF", // White for text in both modes
+          DEFAULT: "#5100B9",
+          dark: "#6b42cc",
+          foreground: "#FFFFFF",
         },
         lightBlue: {
-          DEFAULT: "#5252C6", // Light Blue for light mode
-          dark: "#6363d2", // Softer Light Blue for dark mode
-          foreground: "#FFFFFF", // White for text in both modes
+          DEFAULT: "#5252C6",
+          dark: "#6363d2",
+          foreground: "#FFFFFF",
         },
         navyBlue: {
-          DEFAULT: "#223499", // Navy Blue for light mode
-          dark: "#2d4b9a", // Softer Navy Blue for dark mode
-          foreground: "#FFFFFF", // White for text in both modes
+          DEFAULT: "#223499",
+          dark: "#2d4b9a",
+          foreground: "#FFFFFF",
         },
         cyan: {
-          DEFAULT: "#00D9EF", // Cyan for light mode
-          dark: "#00b9cc", // Softer Cyan for dark mode
-          foreground: "#000000", // Black for text in both modes
+          DEFAULT: "#00D9EF",
+          dark: "#00b9cc",
+          foreground: "#000000",
         },
         destructive: {
-          DEFAULT: "#FF0000", // Bright Red for light mode
-          dark: "#D32F2F", // Muted Red for dark mode
-          foreground: "#FFFFFF", // White for text in both modes
+          DEFAULT: "#FF0000",
+          dark: "#D32F2F",
+          foreground: "#FFFFFF",
         },
         muted: {
-          DEFAULT: "#F1F5F9", // Light Muted for light mode
-          dark: "#3c3c42", // Darker Muted for dark mode
-          foreground: "#475569", // Muted text color
+          DEFAULT: "#F1F5F9",
+          dark: "#3c3c42",
+          foreground: "#475569",
         },
         accent: {
-          DEFAULT: "#ffffff", // Accent Cyan for light mode
-          dark: "#00b9cc", // Muted Cyan for dark mode
-          foreground: "#000000", // Black for text in both modes
+          DEFAULT: "#ffffff",
+          dark: "#00b9cc",
+          foreground: "#000000",
         },
         popover: {
-          DEFAULT: "#FFFFFF", // White for light mode
-          dark: "#2a2a2e", // Dark gray for dark mode
-          foreground: "#000000", // Black for text in both modes
+          DEFAULT: "#FFFFFF",
+          dark: "#2a2a2e",
+          foreground: "#000000",
         },
         card: {
-          DEFAULT: "#F8FAFC", // Light card background for light mode
-          dark: "#27272a", // Dark card background for dark mode
-          foreground: "#1F2937", // Darker text for light mode
+          DEFAULT: "#F8FAFC",
+          dark: "#27272a",
+          foreground: "#1F2937",
         },
         sidebar: {
-          DEFAULT: "#151342", // Sidebar background deep blue
-          dark: "#1a1a3b", // Darker sidebar for dark mode
-          foreground: "#FFFFFF", // White text in both modes
-          primary: "#242262", // Sidebar primary dark blue
-          "primary-foreground": "#FFFFFF", // White text in both modes
-          accent: "#5100B9", // Sidebar accent purple
-          "accent-foreground": "#FFFFFF", // White text in both modes
-          border: "#223499", // Navy blue border
-          ring: "#00D9EF", // Cyan ring
+          DEFAULT: "#151342",
+          dark: "#1a1a3b",
+          foreground: "#FFFFFF",
+          primary: "#242262",
+          "primary-foreground": "#FFFFFF",
+          accent: "#5100B9",
+          "accent-foreground": "#FFFFFF",
+          border: "#223499",
+          ring: "#00D9EF",
         },
       },
       borderRadius: {

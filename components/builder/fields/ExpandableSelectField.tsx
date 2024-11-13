@@ -1,4 +1,3 @@
-// ExpandableSelectField.tsx
 
 "use client";
 
@@ -105,7 +104,7 @@ type CustomInstance = FormElementInstance & {
     extraAttributes: typeof extraAttributes;
 };
 
-// Designer Component
+
 function DesignerComponent({
     elementInstance,
 }: {
@@ -152,7 +151,7 @@ function DesignerComponent({
     );
 }
 
-// Form Component
+
 function FormComponent({
     elementInstance,
     submitValue,
@@ -170,7 +169,7 @@ function FormComponent({
     const [selectedMainOption, setSelectedMainOption] = useState<string | null>(
         null
     );
-    const [searchQuery, setSearchQuery] = useState(""); // State for search query
+    const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
         setError(isInvalid === true);
@@ -179,12 +178,12 @@ function FormComponent({
     const { label, required, placeHolder, helperText, options } =
         element.extraAttributes;
 
-    // Filtered options based on search query
+
     const filteredOptions = options.filter((option) =>
         option.label.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    // Find the selected main option to get subOptions
+
     const selectedOption = options.find(
         (opt) => opt.value === selectedMainOption
     ) as NestedOption | undefined;
@@ -467,7 +466,7 @@ function PropertiesComponent({
 type PropertiesFormSchemaType = z.infer<typeof propertiesSchema>;
 
 function SubOptions({
-    nestIndex, // Index of the parent option
+    nestIndex,
     control,
     register,
 }: {
@@ -545,7 +544,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
             type="checkbox"
             checked={checked}
             onChange={(e) => onCheckedChange(e.target.checked)}
-            className="checkbox-class" // Add your styling here
+            className="checkbox-class"
         />
     );
 };

@@ -116,7 +116,7 @@ function FormComponent({
     const element = elementInstance as CustomInstance;
     const [value, setValue] = useState(defaultValue || "");
     const [error, setError] = useState(false);
-    const [searchQuery, setSearchQuery] = useState(""); // State for search query
+    const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
         setError(isInvalid === true);
@@ -124,7 +124,6 @@ function FormComponent({
 
     const { label, required, placeHolder, helperText, options } = element.extraAttributes;
 
-    // Filtered options based on search query
     const filteredOptions = options.filter((option) =>
         option.label.toLowerCase().includes(searchQuery.toLowerCase())
     );

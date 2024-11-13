@@ -35,26 +35,23 @@ export const useFormState = (initialForm?: Form) => {
     (newForm: Form | null) => {
       setFormState((prevForm) => {
         if (deepEqual(prevForm, newForm)) {
-          // If the new form is deeply equal to the previous form, return previous form to prevent re-render
           return prevForm;
         }
 
-        // Update form state and other related states based on new form data
         if (newForm) {
-          setFormName(newForm.name || ""); // Set name if present, else use empty string
-          setElements(newForm.fields || []); // Set fields if present, else use empty array
-          setUnsavedChanges(true); // Mark as having unsaved changes
+          setFormName(newForm.name || "");
+          setElements(newForm.fields || []);
+          setUnsavedChanges(true);
         } else {
-          // If newForm is null, clear form-related states
           setFormName("");
           setElements([]);
-          setUnsavedChanges(false); // No unsaved changes when clearing the form
+          setUnsavedChanges(false);
         }
 
-        return newForm; // Return the updated form
+        return newForm;
       });
     },
-    [setFormName, setElements, setUnsavedChanges] // Include dependencies to avoid stale closures
+    [setFormName, setElements, setUnsavedChanges]
   );
 
   const addElement = useCallback(
@@ -313,7 +310,7 @@ export const useFormState = (initialForm?: Form) => {
             return;
           }
           const data = await response.json();
-          // TODO: Agregarr paginación
+
           setForms(data.forms);
         } catch (error) {
           console.error("Error fetching forms for business:", error);

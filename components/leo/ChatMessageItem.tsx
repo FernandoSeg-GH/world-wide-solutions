@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react";
 import Prism from "prismjs";
-import "prismjs/themes/prism-okaidia.css"; // Optional theme
+import "prismjs/themes/prism-okaidia.css";
 
 import { ChatMessage } from "@/context/LeoProvider";
 

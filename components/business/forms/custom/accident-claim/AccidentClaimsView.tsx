@@ -1,4 +1,4 @@
-// AccidentClaimsView.tsx
+// components/AccidentClaimsView.tsx
 
 "use client";
 import React, { useEffect, useState } from "react";
@@ -7,8 +7,10 @@ import { FaEdit } from "react-icons/fa";
 import { useRouter } from 'next/navigation';
 
 import { AccidentClaimFormData, Claim } from "./config/types";
-import { mapClaimToFormData } from "./config/form-config";
+import { mapClaimToFormData, formSections } from "./config/form-config";
 import ClaimAccordion from "./ClaimAccordion";
+import { toast } from "@/components/ui/use-toast";
+import { getNestedValue } from "./ClaimDetails";
 
 function safeJsonParse(value: string | any, fieldName: string) {
     try {
@@ -30,6 +32,7 @@ const AccidentClaimsView: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
+    const businessId = String(session?.user?.businessId)
 
     useEffect(() => {
         const fetchClaims = async () => {
@@ -60,13 +63,14 @@ const AccidentClaimsView: React.FC = () => {
                         mva_third_party_info: safeJsonParse(claim.mva_third_party_info, 'mva_third_party_info'),
                         vehicle_details: safeJsonParse(claim.vehicle_details, 'vehicle_details'),
                         witness_info: safeJsonParse(claim.witness_info, 'witness_info'),
+                        accident_date: claim.accident_date ? new Date(claim.accident_date).toISOString() : null,
                         slip_attorney_info: safeJsonParse(claim.slip_attorney_info, 'slip_attorney_info'),
                         slip_costs: safeJsonParse(claim.slip_costs, 'slip_costs'),
                         slip_medical_info: safeJsonParse(claim.slip_medical_info, 'slip_medical_info'),
                         slip_third_party_info: safeJsonParse(claim.slip_third_party_info, 'slip_third_party_info'),
                         // Initialize editing state
                         isEditing: false,
-                        editedData: mapClaimToFormData(claim),
+                        editedData: mapClaimToFormData(claim, businessId),
                     }))
                     : [];
 
@@ -92,7 +96,7 @@ const AccidentClaimsView: React.FC = () => {
                     ? {
                         ...claim,
                         isEditing: !claim.isEditing,
-                        editedData: !claim.isEditing ? mapClaimToFormData(claim) : { ...claim.editedData },
+                        editedData: !claim.isEditing ? mapClaimToFormData(claim, businessId) : { ...claim.editedData },
                     }
                     : claim
             )
@@ -106,24 +110,30 @@ const AccidentClaimsView: React.FC = () => {
             prevClaims.map((claim) => {
                 if (claim.claim_id !== claim_id) return claim;
 
-                // Handle nested file_uploads.new* fields
-                if (
-                    pathParts.length === 2 &&
-                    pathParts[0] === "file_uploads" &&
-                    pathParts[1].startsWith("new")
-                ) {
-                    const newField = pathParts[1];
+                // Handle nested file_uploads fields
+                // if (pathParts.length === 2 && pathParts[0] === "file_uploads") {
+                //     const fileCategory = pathParts[1];
+                //     return {
+                //         ...claim,
+                //         editedData: {
+                //             ...claim.editedData,
+                //             file_uploads: {
+                //                 ...claim.editedData.file_uploads,
+                //                 [fileCategory]: value, // value is FileList
+                //             },
+                //         },
+                //     };
+                // Handle new_file_uploads
+                if (fieldPath === "new_file_uploads") {
                     return {
                         ...claim,
                         editedData: {
                             ...claim.editedData,
-                            file_uploads: {
-                                ...claim.editedData.file_uploads,
-                                [newField]: value,
-                            },
+                            new_file_uploads: value,
                         },
                     };
                 }
+
 
                 // Handle other nested fields
                 if (pathParts.length === 2) {
@@ -154,25 +164,62 @@ const AccidentClaimsView: React.FC = () => {
     };
 
 
+    const validateForm = (editedData: AccidentClaimFormData): string[] => {
+        const errors: string[] = [];
+
+        formSections.forEach((section) => {
+            section.fields.forEach((field) => {
+                if (field.required) {
+                    const path = field.id.split(".");
+                    const value = getNestedValue(editedData, path);
+                    if (
+                        value === null ||
+                        value === undefined ||
+                        value === "" ||
+                        (Array.isArray(value) && value.length === 0)
+                    ) {
+                        errors.push(`${field.label} is required.`);
+                    }
+                }
+            });
+        });
+
+        return errors;
+    };
+
+    // components/AccidentClaimsView.tsx (Within handleSave)
+
     const handleSave = async (claim_id: string) => {
         const claimToUpdate = claims.find((claim) => claim.claim_id === claim_id);
         if (!claimToUpdate || !claimToUpdate.editedData) return;
 
-        console.log('Edited Data before submitting:', claimToUpdate.editedData); // Debugging
+        console.log('Edited Data before submitting:', claimToUpdate.editedData);
+        console.log('accident_date:', claimToUpdate.editedData.accident_date);
+
+        // Validate required fields
+        const validationErrors = validateForm(claimToUpdate.editedData);
+        if (validationErrors.length > 0) {
+            validationErrors.forEach((error) => toast({
+                title: "Validation Error",
+                description: error,
+            }));
+            return; // Prevent submission
+        }
 
         const submitData = new FormData();
 
-        // Append all non-file fields
+        // Append all non-file fields except 'new_file_uploads'
         Object.entries(claimToUpdate.editedData).forEach(([key, value]) => {
+            if (key === 'new_file_uploads') return; // Exclude 'new_file_uploads'
+
             if (typeof value === "object" && value instanceof FileList) {
-                // For FileList, append each file individually
-                Array.from(value).forEach(file => submitData.append(key, file));
+                // Handle other FileList fields if any
             } else if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-                // For other objects, stringify
+                // For nested objects, stringify them
                 submitData.append(key, JSON.stringify(value));
             } else if (key === "accident_date" && typeof value === "string") {
                 // Handle date as a string
-                submitData.append(key, value);
+                submitData.append(key, value); // Ensure 'value' is in "YYYY-MM-DD" format
             } else if (Array.isArray(value)) {
                 // For arrays, stringify the array
                 submitData.append(key, JSON.stringify(value));
@@ -182,43 +229,15 @@ const AccidentClaimsView: React.FC = () => {
             }
         });
 
+        // Handle new file uploads
+        if (claimToUpdate.editedData.new_file_uploads) {
+            Array.from(claimToUpdate.editedData.new_file_uploads).forEach((file) => {
+                submitData.append("files", file); // Backend expects 'files'
+            });
+        }
 
-        const newFileFields: Array<keyof AccidentClaimFormData['file_uploads']> = [
-            "newDocumentFiles",
-            "newMvaUploadDocumentation",
-            "newMvaRepatriationBills",
-            "newMvaOtherFiles",
-            "newMvaInsuranceDocs",
-            "newMvaBusinessDocs",
-            "newMvaCoInsuredDocs",
-            "newMvaAttorneyDocs",
-            "newSlipAccidentReports",
-            "newSlipPhotos",
-            "newSlipMedicalDocs",
-            "newSlipMedicalBills",
-            "newSlipRepatriationBills",
-            "newSlipThirdPartyDocs",
-            "newSlipBusinessDocs",
-            "newSlipCoInsuredDocs",
-            "slipCoInsuredDocs",
-            "slipThirdPartyDocs"
-        ];
-
-        // Append each file in file uploads
-        newFileFields.forEach((field) => {
-            const files = claimToUpdate.editedData!.file_uploads[field];
-            if (files && files instanceof FileList && files.length > 0) {
-                Array.from(files).forEach((file) => {
-                    console.log(`Appending file for field: ${field}, file name: ${file.name}`);
-                    const backendFieldName = field.replace(/^new/, "");
-                    submitData.append(backendFieldName, file);
-                });
-            }
-        });
-
-        // Verify the files in submitData
+        // Debug: Verify the files in submitData
         submitData.forEach((value, key) => console.log(`${key}:`, value instanceof File ? value.name : value));
-
 
         try {
             const response = await fetch(
@@ -234,7 +253,8 @@ const AccidentClaimsView: React.FC = () => {
                 throw new Error(errorData.message || "Failed to update claim.");
             }
 
-            const updatedClaim: Claim = await response.json();
+            const responseData = await response.json();
+            const updatedClaim: Claim = responseData.claim; // Adjust based on backend response
 
             setClaims((prevClaims) =>
                 prevClaims.map((claim) =>
@@ -242,17 +262,25 @@ const AccidentClaimsView: React.FC = () => {
                         ? {
                             ...updatedClaim,
                             isEditing: false,
-                            editedData: mapClaimToFormData(updatedClaim),
+                            editedData: mapClaimToFormData(updatedClaim, businessId),
                         }
                         : claim
                 )
             );
-            alert("Form submitted successfully!");
+            toast({
+                title: "Success",
+                description: "Form submitted successfully!",
+            });
+            // Optionally, redirect to dashboard
             // router.push("/dashboard")
         } catch (err: any) {
-            alert(`Failed to submit form: ${err.message || "Unknown error"}`);
+            toast({
+                title: "Submission Error",
+                description: `Failed to submit form: ${err.message || "Unknown error"}`,
+            });
         }
     };
+
 
     const handleCancel = (claim_id: string) => {
         setClaims((prevClaims) =>
@@ -261,7 +289,7 @@ const AccidentClaimsView: React.FC = () => {
                     ? {
                         ...claim,
                         isEditing: false,
-                        editedData: mapClaimToFormData(claim),
+                        editedData: mapClaimToFormData(claim, businessId),
                     }
                     : claim
             )
@@ -281,9 +309,9 @@ const AccidentClaimsView: React.FC = () => {
                 <div className="text-center text-red-500">Error: {error}</div>
             </div>
         );
-    return (
 
-        <div className="w-full  bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 xl:p-8 overflow-y-auto">
+    return (
+        <div className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 xl:p-8 overflow-y-auto">
             <div className="p-4 mt-8">
                 {/* Title Section */}
                 <div className="mb-8 flex flex-row items-start justify-between w-full gap-16 text-start">

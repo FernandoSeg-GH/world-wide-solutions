@@ -1,8 +1,9 @@
 // components/ClaimAccordion.tsx
+
+import React from "react";
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react";
-import { FaChevronUp, FaEdit, FaSave, FaTimes } from "react-icons/fa";
+import { FaChevronUp, FaEdit } from "react-icons/fa";
 import ClaimDetails from "./ClaimDetails";
-import AccidentClaimSection from "./AccidentClaimSection";
 import { Button } from "@/components/ui/button";
 import { formSections } from "./config/form-config";
 import { EditableClaim } from "./AccidentClaimsView";
@@ -30,11 +31,15 @@ const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
             {({ open }) => (
                 <div className="border border-gray-300 rounded-lg">
                     {/* Disclosure Button */}
-                    <DisclosureButton className={cn("flex justify-between w-full px-4 py-3 text-sm font-medium text-left text-white bg-navyBlue rounded-t-lg focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75", !open && "hover:bg-navyBlue-dark rounded-b-lg ")}>
+                    <DisclosureButton
+                        className={cn(
+                            "flex justify-between w-full px-4 py-3 text-sm font-medium text-left text-white bg-navyBlue rounded-t-lg focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75",
+                            !open && "hover:bg-navyBlue-dark rounded-b-lg"
+                        )}
+                    >
                         <span>{claim.full_name} - {new Date(claim.created_at).toLocaleDateString()}</span>
                         <FaChevronUp
-                            className={`${open ? 'transform rotate-180' : ''
-                                } w-5 h-5 text-purple-500`}
+                            className={`${open ? 'transform rotate-180' : ''} w-5 h-5 text-purple-500`}
                         />
                     </DisclosureButton>
 
@@ -44,12 +49,18 @@ const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
                             <CardHeader className="p-0 mb-4">
                                 <div className="flex w-full items-center justify-between bg-white dark:bg-gray-800 p-6">
                                     <div>
-                                        <CardTitle className="text-lg font-bold text-navyBlue dark:text-white">Accident Claim Report</CardTitle>
-                                        <p className="mt-2 text-gray-600 dark:text-gray-400">Patient: <strong>{claim.full_name}</strong></p>
+                                        <CardTitle className="text-lg font-bold text-navyBlue dark:text-white">
+                                            Accident Claim Report
+                                        </CardTitle>
+                                        <p className="mt-2 text-gray-600 dark:text-gray-400">
+                                            Patient: <strong>{claim.full_name}</strong>
+                                        </p>
                                         <CardDescription className="mt-1 text-gray-600 dark:text-gray-400">
                                             Submission ID: <span className="font-medium">{claim.claim_id}</span>
                                         </CardDescription>
-                                        <p className="text-sm text-gray-500 dark:text-gray-300">Submitted At: {new Date(claim.created_at).toLocaleDateString()}</p>
+                                        <p className="text-sm text-gray-500 dark:text-gray-300">
+                                            Submitted At: {new Date(claim.created_at).toLocaleDateString()}
+                                        </p>
                                     </div>
                                     <Image
                                         src="https://vinci-space-nest.nyc3.cdn.digitaloceanspaces.com/vinci-space-nest/business_id_2/branding/logo.avif"
@@ -62,35 +73,13 @@ const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
                             </CardHeader>
                             <CardContent>
                                 {claim.isEditing ? (
-                                    <div>
-                                        {formSections.map((section) => (
-                                            <AccidentClaimSection
-                                                key={section.title}
-                                                section={section}
-                                                data={claim.editedData}
-                                                onFieldChange={(fieldId, value) => handleFieldChange(claim.claim_id, fieldId, value)}
-                                            />
-                                        ))}
-
-                                        {/* Save and Cancel Buttons */}
-                                        <div className="flex justify-end mt-6 space-x-2">
-                                            <Button
-                                                onClick={() => handleCancel(claim.claim_id)}
-                                                variant="secondary"
-                                                className="flex items-center gap-2"
-                                            >
-                                                <FaTimes />
-                                                Cancel
-                                            </Button>
-                                            <Button
-                                                onClick={() => handleSave(claim.claim_id)}
-                                                className="flex items-center gap-2"
-                                            >
-                                                <FaSave />
-                                                Save
-                                            </Button>
-                                        </div>
-                                    </div>
+                                    <ClaimDetails
+                                        claim={claim}
+                                        onEdit={toggleEdit}
+                                        handleSave={handleSave}
+                                        handleCancel={handleCancel}
+                                        handleFieldChange={handleFieldChange}
+                                    />
                                 ) : (
                                     <div>
                                         {/* View Mode - Render Claim Details */}

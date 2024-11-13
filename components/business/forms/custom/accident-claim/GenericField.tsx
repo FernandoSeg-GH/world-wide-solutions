@@ -10,10 +10,11 @@ import FileUploadField from "./FileUploadField";
 interface GenericFieldProps {
     field: FieldConfig;
     value: any;
+    existingFiles?: string[];
     onChange: (value: any) => void;
 }
 
-const GenericField: React.FC<GenericFieldProps> = ({ field, value, onChange }) => {
+const GenericField: React.FC<GenericFieldProps> = ({ field, value, onChange, existingFiles }) => {
     const renderField = () => {
         switch (field.type) {
             case "text":
@@ -79,7 +80,8 @@ const GenericField: React.FC<GenericFieldProps> = ({ field, value, onChange }) =
                     <FileUploadField
                         id={field.id}
                         label={field.label}
-                        files={value}
+                        files={value as FileList | null}
+                        // existingFiles={existingFiles || []}
                         onChange={onChange}
                     />
                 );

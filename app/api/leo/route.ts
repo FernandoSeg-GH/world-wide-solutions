@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
       prompt,
       max_tokens,
       temperature,
-      stream: false, // Set to true if you prefer streaming responses
+      stream: false,
     }),
   });
 

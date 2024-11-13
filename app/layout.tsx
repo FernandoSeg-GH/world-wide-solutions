@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   title: 'Vinci Suite - VW Solutions',
   description: 'Accident Claim Reports Dashboard',
   icons: {
-    icon: '/assets/vws.png', // Relative path to your favicon image
+    icon: '/assets/vws.png',
   },
 }
 

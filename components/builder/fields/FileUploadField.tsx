@@ -137,7 +137,7 @@ function FormComponent({
 
     return (
         <div
-            key={multiple ? 'multiple' : 'single'} // Force re-mount when `multiple` changes
+            key={multiple ? 'multiple' : 'single'}
             className="flex flex-col gap-2 w-full"
         >
             <Label className={cn(error && 'text-red-500')}>
@@ -221,7 +221,7 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
     }, [element, form]);
 
     function applyChanges(values: PropertiesFormSchemaType) {
-        // Create a new object to ensure React detects the change
+
         element.extraAttributes = { ...values };
     }
 
@@ -311,14 +311,14 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
     );
 }
 
-import { ImageIcon, FileTextIcon, FileXIcon } from "lucide-react"; // Import necessary icons
+import { ImageIcon, FileTextIcon, FileXIcon } from "lucide-react";
 
-// Helper function to check if a file is an image
+
 const isImage = (file: File) => {
     return file.type.startsWith("image/");
 };
 
-// Function to get the appropriate icon based on file type
+
 const getFileIcon = (file: File) => {
     if (file.type === "application/pdf") {
         return <FileTextIcon className="h-6 w-6 text-gray-500" />;

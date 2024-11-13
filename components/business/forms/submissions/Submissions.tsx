@@ -29,11 +29,10 @@ export function useFieldMapping(form: Form, submission: { [key: string]: any } =
             const fieldLabel = field.extraAttributes?.label || `Field ${fieldId}`;
             let fieldValue = "N/A";
 
-            // Use the fieldId directly to fetch the corresponding value from submission
             if (submission.content && submission.content[fieldId] !== undefined) {
                 fieldValue = submission.content[fieldId];
             } else if (submission.content) {
-                // Additional fallback based on labels (if needed)
+
                 const matchingKey = Object.keys(submission.content).find(
                     (key) => submission.content[key] === fieldLabel
                 );
@@ -62,7 +61,7 @@ function Submissions() {
     const { data: session } = useSession();
     const { loading, submissionsForms, fetchUserSubmissionsWithForms } = useSubmissions();
 
-    // Only fetch once
+
     useEffect(() => {
         const fetchUserSubmissions = async () => {
             if (session?.user.role?.id === 1) {
@@ -84,7 +83,7 @@ function Submissions() {
         );
     }
 
-    // Ensure submissions are only displayed once
+
     const hasSubmissions = Object.keys(submissionsForms).length > 0;
 
     if (!hasSubmissions) {
@@ -94,7 +93,7 @@ function Submissions() {
     return (
         <div className="text-black dark:text-white w-full">
             <SectionHeader title="My Submissions"
-            // subtitle="View Accident Claim Report Submissions." 
+
             />
             <Separator className="border-gray-400 my-2 mb-6" />
             <div className="mb-12 w-full">

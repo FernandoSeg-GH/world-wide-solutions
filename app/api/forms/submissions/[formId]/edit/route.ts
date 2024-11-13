@@ -12,17 +12,14 @@ export async function PUT(
   }
 
   const { formId } = params;
-  const submissionId = formId; // Adjust this if submission ID differs from form ID in your setup
+  const submissionId = formId;
   const editUrl = `${process.env.BACKEND_URL}/submission/${submissionId}/edit`;
 
   try {
-    // Extract token if available from request headers for authorization
     const token = request.headers.get("Authorization") || "";
 
-    // Prepare request payload
     const body = await request.json();
 
-    // Forward the PUT request to the Flask backend
     const res = await fetch(editUrl, {
       method: "PUT",
       headers: {
@@ -32,7 +29,6 @@ export async function PUT(
       body: JSON.stringify(body),
     });
 
-    // Handle the response from the backend
     if (!res.ok) {
       const error = await res.json();
       return NextResponse.json(

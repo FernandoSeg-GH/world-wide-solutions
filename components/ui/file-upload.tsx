@@ -1,6 +1,4 @@
-"use client";
-
-import * as React from "react";
+import React from "react";
 import { Button } from "./button";
 import { FaFileUpload, FaTrash } from "react-icons/fa";
 import { cn } from "@/lib/utils";
@@ -46,7 +44,6 @@ export function FileUpload({ multiple = false, onFilesSelected, className }: Fil
         const updatedFiles = [...selectedFiles];
         updatedFiles.splice(index, 1);
         setSelectedFiles(updatedFiles);
-        // Manually create a FileList from the updated files array to pass to onFilesSelected
         const dataTransfer = new DataTransfer();
         updatedFiles.forEach((file) => dataTransfer.items.add(file));
         onFilesSelected(dataTransfer.files);

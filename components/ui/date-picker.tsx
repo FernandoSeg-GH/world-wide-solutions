@@ -1,7 +1,6 @@
 import * as React from "react";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -17,9 +16,11 @@ interface DatePickerProps {
 }
 
 export function DatePicker({ selectedDate, onChange }: DatePickerProps) {
-    // Check if `selectedDate` is a valid date string or Date object
+
     const isValidDate = selectedDate && !isNaN(new Date(selectedDate).getTime());
     const selectedDateAsDate = isValidDate ? new Date(selectedDate) : undefined;
+
+    console.log(`DatePicker: selectedDate = ${selectedDate}, isValidDate = ${isValidDate}`);
 
     return (
         <Popover>
@@ -32,14 +33,19 @@ export function DatePicker({ selectedDate, onChange }: DatePickerProps) {
                     )}
                 >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {isValidDate ? format(new Date(selectedDate as string), "P") : <span>Pick a date</span>}
+                    {isValidDate
+                        ? format(new Date(selectedDate as string), "P")
+                        : <span>Pick a date</span>}
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0">
                 <Calendar
                     mode="single"
-                    selected={selectedDateAsDate} // Now correctly typed as `Date | undefined`
-                    onSelect={(date) => onChange(date ?? null)} // Convert undefined to null for formData compatibility
+                    selected={selectedDateAsDate}
+                    onSelect={(date) => {
+                        console.log(`DatePicker: onSelect date = ${date}`);
+                        onChange(date ?? null);
+                    }}
                     initialFocus
                 />
             </PopoverContent>

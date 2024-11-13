@@ -6,6 +6,7 @@ import { accidentTypeOptions } from "./accident-options";
 import { AccidentClaimFormData, Claim } from "./types";
 import { usaStates } from "./state-options";
 
+
 export interface FieldConfig {
   id: string;
   label: string;
@@ -13,6 +14,7 @@ export interface FieldConfig {
   required?: boolean;
   options?: { value: string; label: string }[]; // For select fields
   nestedSection?: string; // For nested objects
+  multiple?: boolean; // For file uploads
 }
 
 export interface SectionConfig {
@@ -20,7 +22,6 @@ export interface SectionConfig {
   icon: JSX.Element;
   fields: FieldConfig[];
 }
-
 
 export const formSections: SectionConfig[] = [
   {
@@ -30,10 +31,10 @@ export const formSections: SectionConfig[] = [
       { id: "full_name", label: "Full Name", type: "text", required: true },
       { id: "email", label: "Email", type: "email", required: true },
       { id: "country", label: "Country", type: "select", required: true, options: countryOptions },
-      { id: "state", label: "State", type: "conditionalSelect", required: true, options: usaStates },  // Use a list of options if needed for USA states
+      { id: "state", label: "State", type: "conditionalSelect", required: true, options: usaStates }, // Use a list of options if needed for USA states
       { id: "primary_contact", label: "Primary Contact Phone Number", type: "text", required: true },
-      { id: "other_contact_name", label: "Relative or Friend", type: "text", required: true },
-      { id: "other_contact_phone", label: "Other Contact Phone Number", type: "text", required: true },
+      { id: "other_contact_name", label: "Relative or Friend", type: "text", required: false },
+      { id: "other_contact_phone", label: "Other Contact Phone Number", type: "text", required: false },
     ],
   },
   {
@@ -49,7 +50,6 @@ export const formSections: SectionConfig[] = [
   {
     title: "Motor Vehicle Accident Details",
     icon: <FaCarSide />,
-    // condition: (claim: any) => claim.accident_type === "motor_vehicle_accidents", // Display based on condition
     fields: [
       {
         id: "mva_type",
@@ -60,7 +60,7 @@ export const formSections: SectionConfig[] = [
           { value: "suv", label: "SUV" },
           { value: "truck", label: "Truck" },
           { value: "motorcycle", label: "Motorcycle" },
-          { value: "other", label: "Other" }
+          { value: "other", label: "Other" },
         ],
       },
       { id: "mva_location", label: "Location of Accident", type: "text" },
@@ -72,7 +72,7 @@ export const formSections: SectionConfig[] = [
         options: [
           { value: "vehicle1", label: "Vehicle 1" },
           { value: "vehicle2", label: "Vehicle 2" },
-          { value: "vehicle3", label: "Vehicle 3" }
+          { value: "vehicle3", label: "Vehicle 3" },
         ],
       },
       { id: "mva_description", label: "Description of Accident", type: "textarea" },
@@ -94,7 +94,7 @@ export const formSections: SectionConfig[] = [
           { value: "open", label: "Open" },
           { value: "under_review", label: "Under Review" },
           { value: "approved", label: "Approved" },
-          { value: "closed", label: "Closed" }
+          { value: "closed", label: "Closed" },
         ],
       },
       { id: "mva_costs.medicalProviderCosts", label: "Medical Provider Costs", type: "number" },
@@ -121,7 +121,6 @@ export const formSections: SectionConfig[] = [
   {
     title: "Slip and Fall Details",
     icon: <FaBriefcaseMedical />,
-    // condition: (claim: any) => claim.accident_type === "slip_and_fall",
     fields: [
       { id: "slip_description", label: "Slip Description", type: "textarea" },
       { id: "slip_accident_type", label: "Slip Accident Type", type: "text" },
@@ -147,7 +146,7 @@ export const formSections: SectionConfig[] = [
           { value: "open", label: "Open" },
           { value: "under_review", label: "Under Review" },
           { value: "approved", label: "Approved" },
-          { value: "closed", label: "Closed" }
+          { value: "closed", label: "Closed" },
         ],
       },
       { id: "slip_costs.medicalCost", label: "Medical Cost", type: "number" },
@@ -175,31 +174,16 @@ export const formSections: SectionConfig[] = [
     title: "File Uploads",
     icon: <FaFileAlt />,
     fields: [
-      { id: "documentFiles", label: "Document Files", type: "file" },
-      { id: "mvaUploadDocumentation", label: "MVA Upload Documentation", type: "file" },
-      { id: "mvaRepatriationBills", label: "MVA Repatriation Bills", type: "file" },
-      { id: "mvaOtherFiles", label: "MVA Other Files", type: "file" },
-      { id: "mvaInsuranceDocs", label: "MVA Insurance Documents", type: "file" },
-      { id: "mvaBusinessDocs", label: "MVA Business Documents", type: "file" },
-      { id: "mvaCoInsuredDocs", label: "MVA Co-Insured Documents", type: "file" },
-      { id: "mvaAttorneyDocs", label: "MVA Attorney Documents", type: "file" },
-      { id: "slipAccidentReports", label: "Slip Accident Reports", type: "file" },
-      { id: "slipPhotos", label: "Slip Photos", type: "file" },
-      { id: "slipMedicalDocs", label: "Slip Medical Documents", type: "file" },
-      { id: "slipMedicalBills", label: "Slip Medical Bills", type: "file" },
-      { id: "slipRepatriationBills", label: "Slip Repatriation Bills", type: "file" },
-      { id: "slipThirdPartyDocs", label: "Slip Third Party Documents", type: "file" },
-      { id: "slipBusinessDocs", label: "Slip Business Documents", type: "file" },
-      { id: "slipCoInsuredDocs", label: "Slip Co-Insured Documents", type: "file" },
+      { id: "new_file_uploads", label: "Upload Files", type: "file", multiple: true },
     ],
   },
 ];
 
-
-export function mapClaimToFormData(claim: Claim): AccidentClaimFormData {
+// Updated mapClaimToFormData to handle multiple file categories
+export function mapClaimToFormData(claim: Claim, businessId: string): AccidentClaimFormData {
   return {
-    business_id: "2",
-    formUrl: "", // Assuming a default value
+    business_id: businessId,
+    formUrl: claim.formUrl || "", // Ensure a default value if necessary
 
     // Patient Personal Information
     full_name: claim.full_name || "",
@@ -211,7 +195,7 @@ export function mapClaimToFormData(claim: Claim): AccidentClaimFormData {
     other_contact_phone: claim.other_contact_phone || "",
 
     // Accident Information
-    accident_date: claim.accident_date,
+    accident_date: claim.accident_date ? claim.accident_date.split("T")[0] : "",
     accident_place: claim.accident_place || "",
     accident_type: claim.accident_type || "",
     sub_accident_type: claim.sub_accident_type || "",
@@ -295,43 +279,8 @@ export function mapClaimToFormData(claim: Claim): AccidentClaimFormData {
       attorneyPhone: claim.slip_attorney_info?.attorneyPhone || "",
     },
 
-    // File Uploads (ensure arrays)
-    file_uploads: {
-      documentFiles: null,
-      mvaUploadDocumentation: null,
-      mvaRepatriationBills: null,
-      mvaOtherFiles: null,
-      mvaInsuranceDocs: null,
-      mvaBusinessDocs: null,
-      mvaCoInsuredDocs: null,
-      mvaAttorneyDocs: null,
-
-      slipAccidentReports: null,
-      slipPhotos: null,
-      slipMedicalDocs: null,
-      slipMedicalBills: null,
-      slipRepatriationBills: null,
-      slipThirdPartyDocs: null,
-      slipBusinessDocs: null,
-      slipCoInsuredDocs: null,
-
-      newDocumentFiles: null,
-      newMvaUploadDocumentation: null,
-      newMvaRepatriationBills: null,
-      newMvaOtherFiles: null,
-      newMvaInsuranceDocs: null,
-      newMvaBusinessDocs: null,
-      newMvaCoInsuredDocs: null,
-      newMvaAttorneyDocs: null,
-
-      newSlipAccidentReports: null,
-      newSlipPhotos: null,
-      newSlipMedicalDocs: null,
-      newSlipMedicalBills: null,
-      newSlipRepatriationBills: null,
-      newSlipThirdPartyDocs: null,
-      newSlipBusinessDocs: null,
-      newSlipCoInsuredDocs: null,
-    }
+    // File Uploads (categorized structure)
+    file_uploads: null,
+    new_file_uploads: null,
   };
 }

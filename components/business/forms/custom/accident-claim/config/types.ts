@@ -2,7 +2,6 @@ export interface AccidentClaimFormData {
   business_id: string;
   formUrl: string;
 
-  // Patient Personal Information
   full_name: string;
   email: string;
   country: string;
@@ -11,13 +10,11 @@ export interface AccidentClaimFormData {
   other_contact_name: string;
   other_contact_phone: string;
 
-  // Accident Information
   accident_date: string;
   accident_place: string;
   accident_type: string;
   sub_accident_type: string;
 
-  // Motor Vehicle Accident Details
   mva_type: string;
   mva_location: string;
   vehicle_details: Array<{ insuranceName: string; policyNumber: string }>;
@@ -54,7 +51,6 @@ export interface AccidentClaimFormData {
     attorneyPhone: string;
   };
 
-  // Slip and Fall Details
   slip_description: string;
   slip_accident_type: string;
   negligence_description: string;
@@ -94,49 +90,14 @@ export interface AccidentClaimFormData {
     attorneyPhone: string;
   };
 
-  // File Uploads
-  file_uploads: {
-    documentFiles: FileList | null;
-    mvaUploadDocumentation: FileList | null;
-    mvaRepatriationBills: FileList | null;
-    mvaOtherFiles: FileList | null;
-    mvaInsuranceDocs: FileList | null;
-    mvaBusinessDocs: FileList | null;
-    mvaCoInsuredDocs: FileList | null;
-    mvaAttorneyDocs: FileList | null;
+  file_uploads?: FileList | null;
 
-    slipAccidentReports: FileList | null;
-    slipPhotos: FileList | null;
-    slipMedicalDocs: FileList | null;
-    slipMedicalBills: FileList | null;
-    slipRepatriationBills: FileList | null;
-    slipThirdPartyDocs: FileList | null;
-    slipBusinessDocs: FileList | null;
-    slipCoInsuredDocs: FileList | null;
-
-    newDocumentFiles: FileList | null;
-    newMvaUploadDocumentation: FileList | null;
-    newMvaRepatriationBills: FileList | null;
-    newMvaOtherFiles: FileList | null;
-    newMvaInsuranceDocs: FileList | null;
-    newMvaBusinessDocs: FileList | null;
-    newMvaCoInsuredDocs: FileList | null;
-    newMvaAttorneyDocs: FileList | null;
-
-    newSlipAccidentReports: FileList | null;
-    newSlipPhotos: FileList | null;
-    newSlipMedicalDocs: FileList | null;
-    newSlipMedicalBills: FileList | null;
-    newSlipRepatriationBills: FileList | null;
-    newSlipThirdPartyDocs: FileList | null;
-    newSlipBusinessDocs: FileList | null;
-    newSlipCoInsuredDocs: FileList | null;
-  };
+  new_file_uploads?: File[] | null;
+  [key: string]: any;
 }
 
 export type VehicleKey = "vehicle1" | "vehicle2" | "vehicle3";
 
-// types/Claim.ts
 export interface VehicleDetail {
   insuranceName: string;
   policyNumber: string;
@@ -225,7 +186,7 @@ export interface Claim {
   primary_contact: string;
   other_contact_name: string;
   other_contact_phone: string;
-  accident_date: string; // ISO string
+  accident_date: string;
   accident_place: string;
   accident_type: string;
   sub_accident_type: string;
@@ -246,26 +207,10 @@ export interface Claim {
   slip_costs: SlipCostsInfo;
   slip_third_party_info: SlipThirdPartyInfo;
   slip_attorney_info: SlipAttorneyInfo;
-  file_uploads: string[]; // Define more precisely based on backend
+
+  file_uploads: string[] | null;
+
   additional_notes?: string;
-
-  documentFiles: string[] | null;
-  mvaUploadDocumentation: string[] | null;
-  mvaRepatriationBills: string[] | null;
-  mvaOtherFiles: string[] | null;
-  mvaInsuranceDocs: string[] | null;
-  mvaBusinessDocs: string[] | null;
-  mvaCoInsuredDocs: string[] | null;
-  mvaAttorneyDocs: string[] | null;
-
-  slipAccidentReports: string[] | null;
-  slipPhotos: string[] | null;
-  slipMedicalDocs: string[] | null;
-  slipMedicalBills: string[] | null;
-  slipRepatriationBills: string[] | null;
-  slipThirdPartyDocs: string[] | null;
-  slipBusinessDocs: string[] | null;
-  slipCoInsuredDocs: string[] | null;
 
   formUrl: string;
   created_at: string;

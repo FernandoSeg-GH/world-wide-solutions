@@ -65,7 +65,6 @@ export function FormCard({ form }: FormCardProps) {
         try {
             await formActions.publishForm(action);
 
-            // Update the form in context immutably
             setForm({ ...form, published: !form.published });
 
             toast({

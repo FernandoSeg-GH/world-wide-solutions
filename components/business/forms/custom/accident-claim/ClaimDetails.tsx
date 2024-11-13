@@ -2,10 +2,13 @@
 
 import React from "react";
 import { EditableClaim } from "./AccidentClaimsView";
-import { formSections } from "./config/form-config";
-import { FaFileAlt, FaFilePdf } from "react-icons/fa";
+import { formSections } from "./config/form-config"; // Ensure form-config.ts has 'file_uploads' removed
+import { FaFileAlt, FaFilePdf, FaTrash } from "react-icons/fa";
 import FileDisplay from "./FileDisplay";
 import { AccidentClaimFormData, Claim } from "./config/types";
+import DatePicker from "@/components/ui/date-picker";
+import { Button } from "@/components/ui/button";
+import FileUpload from "@/components/ui/file-upload"; // Import your FileUpload component
 
 interface ClaimDetailsProps {
     claim: EditableClaim;
@@ -50,21 +53,27 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
         if (!files || files.length === 0) {
             return <span className="text-gray-500 dark:text-gray-400">No existing files</span>;
         }
-        return files.map((fileUrl, index) => (
-            <FileDisplay key={`existing-${index}`} fileUrl={fileUrl} />
-        ));
+        return (
+            <div className="flex flex-wrap gap-4">
+                {files.map((fileUrl, index) => (
+                    <div key={index} className="flex flex-col items-center">
+                        {fileUrl.endsWith(".pdf") ? (
+                            <FaFilePdf size={48} />
+                        ) : fileUrl.match(/\.(jpeg|jpg|gif|png)$/) ? (
+                            <img src={fileUrl} alt="File Thumbnail" className="w-12 h-12 object-cover" />
+                        ) : (
+                            <FaFileAlt size={48} />
+                        )}
+                        <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm mt-2">
+                            {fileUrl.split("/").pop()}
+                        </a>
+                    </div>
+                ))}
+            </div>
+        );
     };
 
-    const renderNewFiles = (files: FileList | null) => {
-        if (!files || files.length === 0)
-            return <span className="text-gray-500 dark:text-gray-400">No new files uploaded</span>;
-        return Array.from(files).map((file, index) => (
-            <div key={`new-${index}`} className="flex items-center space-x-2">
-                <FaFileAlt className="text-gray-600 text-2xl" />
-                <span>{file.name}</span>
-            </div>
-        ));
-    };
+    // Removed the second renderExistingFiles function to prevent duplication
 
     const renderVehicleDetails = (vehicleDetails: any) => {
         if (!Array.isArray(vehicleDetails) || vehicleDetails.length === 0) {
@@ -83,6 +92,13 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
         ));
     };
 
+    console.log('claim', claim);
+
+    // Extract existing files from claim
+    const existingFiles = claim.file_uploads;
+    // Extract new files from editedData
+    const newFiles = isEditing ? editedData.new_file_uploads : null;
+
     return (
         <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
             {/* Header with Edit/Save/Cancel Buttons */}
@@ -91,26 +107,29 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                 <div className="flex space-x-4">
                     {isEditing ? (
                         <>
-                            <button
+                            <Button
+                                variant="default"
                                 onClick={() => handleSave(claim.claim_id)}
-                                className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
+                                className="flex items-center px-4 py-2 rounded-md transition"
                             >
                                 Save
-                            </button>
-                            <button
+                            </Button>
+                            <Button
+                                variant="secondary"
                                 onClick={() => handleCancel(claim.claim_id)}
-                                className="flex items-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition"
+                                className="flex items-center px-4 py-2 rounded-md transition"
                             >
                                 Cancel
-                            </button>
+                            </Button>
                         </>
                     ) : (
-                        <button
+                        <Button
+                            variant="default"
                             onClick={() => onEdit(claim.claim_id)}
-                            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                            className="flex items-center px-4 py-2 rounded-md transition"
                         >
                             Edit Claim
-                        </button>
+                        </Button>
                     )}
                 </div>
             </div>
@@ -122,30 +141,86 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                         {section.icon}
                         {section.title}
                     </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
                         {section.fields.map((field) => {
+                            // **IMPORTANT**: Ensure that 'file_uploads' field has been removed from formSections in form-config.ts
+                            if (field.id === "file_uploads") {
+                                return null; // Skip rendering the 'file_uploads' field to prevent duplication
+                            }
+
                             const path = field.id.split(".");
                             let value = getNestedValue(isEditing ? editedData : claim, path);
 
                             const renderValue = () => {
+                                // Inside the renderValue function for 'file' type
                                 if (field.type === "file") {
                                     if (isEditing) {
-
-                                        return <div className="space-y-2">{renderNewFiles(value as FileList | null)}</div>;
+                                        return (
+                                            <div className="space-y-4 w-full">
+                                                {/* Existing Files */}
+                                                <div>
+                                                    <h4 className="font-semibold text-gray-700 dark:text-gray-300">Existing Files</h4>
+                                                    {renderExistingFiles(existingFiles)}
+                                                </div>
+                                                {/* New File Upload */}
+                                                <div>
+                                                    <h4 className="font-semibold text-gray-700 dark:text-gray-300">{formatLabel(field.label)}</h4>
+                                                    <FileUpload
+                                                        multiple
+                                                        onFilesSelected={(files: FileList) =>
+                                                            handleFieldChange(claim.claim_id, "new_file_uploads", files)
+                                                        }
+                                                        className="mt-2"
+                                                    />
+                                                    {/* Display previews of new files */}
+                                                    {newFiles && newFiles.length > 0 && (
+                                                        <div className="mt-2 grid grid-cols-2 md:grid-cols-4 gap-4">
+                                                            {Array.from(newFiles).map((file, index) => (
+                                                                <div key={index} className="file-thumbnail relative border rounded-lg p-2 shadow-sm">
+                                                                    <img
+                                                                        src={URL.createObjectURL(file)}
+                                                                        alt={file.name}
+                                                                        className="w-full h-20 object-cover rounded-md"
+                                                                    />
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            const updatedFiles = Array.from(newFiles);
+                                                                            updatedFiles.splice(index, 1);
+                                                                            const dataTransfer = new DataTransfer();
+                                                                            updatedFiles.forEach((f) => dataTransfer.items.add(f));
+                                                                            handleFieldChange(claim.claim_id, "new_file_uploads", dataTransfer.files);
+                                                                        }}
+                                                                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-700 transition-colors"
+                                                                        aria-label="Remove file"
+                                                                    >
+                                                                        <FaTrash size={12} />
+                                                                    </button>
+                                                                    <p className="text-xs mt-1 truncate text-gray-600">{file.name}</p>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        );
                                     } else {
-
-                                        return <div className="space-y-2">{renderExistingFiles(value as string[] | null)}</div>;
+                                        return (
+                                            <div className="space-y-2 w-full">
+                                                <h4 className="font-semibold text-gray-700 dark:text-gray-300">{formatLabel(field.label)}</h4>
+                                                {renderExistingFiles(existingFiles)}
+                                            </div>
+                                        );
                                     }
                                 }
 
                                 if (field.type === "select") {
                                     if (isEditing) {
-
                                         return (
                                             <select
                                                 value={value}
                                                 onChange={(e) => handleFieldChange(claim.claim_id, field.id, e.target.value)}
                                                 className="w-full border border-gray-300 rounded-md p-2"
+                                                required={field.required}
                                             >
                                                 <option value="">Select</option>
                                                 {field.options?.map((option) => (
@@ -156,26 +231,23 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                                             </select>
                                         );
                                     } else {
-
                                         const selectedOption = field.options?.find((opt) => opt.value === value);
                                         return <span className="text-gray-700 dark:text-gray-300">{selectedOption?.label || "N/A"}</span>;
                                     }
                                 }
 
                                 if (field.type === "conditionalSelect") {
-
-
                                     return <span className="text-gray-700 dark:text-gray-300">{value || "N/A"}</span>;
                                 }
 
                                 if (field.type === "textarea") {
                                     if (isEditing) {
-
                                         return (
                                             <textarea
                                                 value={typeof value === 'string' ? value : ''}
                                                 onChange={(e) => handleFieldChange(claim.claim_id, field.id, e.target.value)}
                                                 className="w-full border border-gray-300 rounded-md p-2"
+                                                required={field.required}
                                             />
                                         );
                                     } else {
@@ -199,17 +271,21 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                                     }
                                 }
 
-
                                 if (field.type === "date") {
                                     if (isEditing) {
-
-                                        const dateValue = typeof value === "string" ? value.split("T")[0] : "";
+                                        const dateValue = typeof value === "string" ? value.split("T")[0] : null;
+                                        console.log(`Editing Mode: dateValue for ${field.id} is ${dateValue}`);
                                         return (
-                                            <input
-                                                type="date"
-                                                value={dateValue || ""}
-                                                onChange={(e) => handleFieldChange(claim.claim_id, field.id, e.target.value)}
-                                                className="w-full border border-gray-300 rounded-md p-2"
+                                            <DatePicker
+                                                selectedDate={dateValue}
+                                                onChange={(date) => {
+                                                    if (date) {
+                                                        const formattedDate = date.toISOString().split("T")[0];
+                                                        handleFieldChange(claim.claim_id, field.id, formattedDate);
+                                                    } else {
+                                                        handleFieldChange(claim.claim_id, field.id, null);
+                                                    }
+                                                }}
                                             />
                                         );
                                     } else {
@@ -229,6 +305,7 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                                                 value={value}
                                                 onChange={(e) => handleFieldChange(claim.claim_id, field.id, e.target.value)}
                                                 className="w-full border border-gray-300 rounded-md p-2"
+                                                required={field.required}
                                             />
                                         );
                                     } else {
@@ -244,6 +321,7 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                                                 value={value}
                                                 onChange={(e) => handleFieldChange(claim.claim_id, field.id, e.target.value)}
                                                 className="w-full border border-gray-300 rounded-md p-2"
+                                                required={field.required}
                                             />
                                         );
                                     } else {
@@ -271,43 +349,49 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                                 }
 
                                 return <span className="text-gray-700 dark:text-gray-300">{value !== null && value !== undefined ? value.toString() : "N/A"}</span>;
-                            };
+                            }
 
                             return (
                                 <div key={field.id} className="flex flex-col">
-                                    <label className="font-semibold text-gray-800 dark:text-gray-200">{formatLabel(field.label)}</label>
-                                    <div className="mt-1">{renderValue()}</div>
+                                    <h4 className="font-semibold text-gray-700 dark:text-gray-300">{formatLabel(field.label)}</h4>
+                                    {renderValue()}
                                 </div>
                             );
-                        })}
+                        }
+                        )}
                     </div>
                 </section>
             ))}
 
-            {/* File Uploads Section */}
-            <section className="mb-8">
-                <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2 text-gray-800 dark:text-gray-200">
-                    <FaFileAlt />
-                    File Uploads
-                </h2>
-                {/* Always display existing files */}
-                <div className="space-y-2">
-                    <span className="font-medium text-gray-700 dark:text-gray-300">Existing Files:</span>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-1">
-                        {renderExistingFiles(claim.file_uploads as string[] | null)}
-                    </div>
-                </div>
-
-                {/* Show New Uploads only in edit mode */}
-                {isEditing && (
-                    <div className="mt-4">
-                        <span className="font-medium text-gray-700 dark:text-gray-300">New Uploads:</span>
-                        <div className="mt-1">
-                            {renderNewFiles(editedData.file_uploads?.newDocumentFiles as FileList | null)}
-                        </div>
-                    </div>
+            {/* Footer with Save/Cancel Buttons */}
+            <div className="flex space-x-4">
+                {isEditing ? (
+                    <>
+                        <Button
+                            variant="default"
+                            onClick={() => handleSave(claim.claim_id)}
+                            className="flex items-center px-4 py-2 rounded-md transition"
+                        >
+                            Save
+                        </Button>
+                        <Button
+                            variant="secondary"
+                            onClick={() => handleCancel(claim.claim_id)}
+                            className="flex items-center px-4 py-2 rounded-md transition"
+                        >
+                            Cancel
+                        </Button>
+                    </>
+                ) : (
+                    <Button
+                        variant="default"
+                        onClick={() => onEdit(claim.claim_id)}
+                        className="flex items-center px-4 py-2 rounded-md transition"
+                    >
+                        Edit Claim
+                    </Button>
                 )}
-            </section>
+            </div>
         </div>
     );
 

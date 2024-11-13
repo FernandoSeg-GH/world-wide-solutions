@@ -25,6 +25,9 @@ const AccidentClaimSection: React.FC<AccidentClaimSectionProps> = ({ section, da
         return data[field.id];
     };
 
+    const existingFiles = section.fields.find(f => f.type === "file") ? data.file_uploads || [] : [];
+
+
     return (
         <section className="mb-8 bg-gray-100 dark:bg-gray-700 shadow p-6 rounded-lg">
             <h2 className="text-xl font-semibold mb-6 flex items-center gap-2 text-gray-800 dark:text-gray-200">
@@ -37,6 +40,7 @@ const AccidentClaimSection: React.FC<AccidentClaimSectionProps> = ({ section, da
                         key={field.id}
                         field={field}
                         value={getFieldValue(field)}
+                        existingFiles={field.type === "file" ? existingFiles : []}
                         onChange={(value) => handleNestedChange(field, value)}
                     />
                 ))}
