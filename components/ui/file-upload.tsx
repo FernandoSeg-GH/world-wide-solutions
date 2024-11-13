@@ -1,3 +1,5 @@
+// components/FileUpload.tsx
+
 import React from "react";
 import { Button } from "./button";
 import { FaFileUpload, FaTrash } from "react-icons/fa";
@@ -5,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 interface FileUploadProps {
     multiple?: boolean;
-    onFilesSelected: (files: File[]) => void; // Change to File[] for flexibility
+    onFilesSelected: (files: File[]) => void; // Changed to File[] for flexibility
     className?: string;
 }
 
@@ -24,7 +26,7 @@ export function FileUpload({ multiple = false, onFilesSelected, className }: Fil
             setSelectedFiles(updatedFiles);
             onFilesSelected(updatedFiles);  // Send updated list of files
 
-            // Clear input value to allow re-uploading same file if needed
+            // Clear input value to allow re-uploading the same file if needed
             event.target.value = "";
         }
     };
@@ -36,6 +38,9 @@ export function FileUpload({ multiple = false, onFilesSelected, className }: Fil
             const updatedFiles = multiple ? [...selectedFiles, ...files] : files;
             setSelectedFiles(updatedFiles);
             onFilesSelected(updatedFiles);
+
+            // Prevent default behavior
+            event.stopPropagation();
         }
     };
 
@@ -81,11 +86,16 @@ export function FileUpload({ multiple = false, onFilesSelected, className }: Fil
                 <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
                     {selectedFiles.map((file, index) => (
                         <div key={index} className="file-thumbnail relative border rounded-lg p-2 shadow-sm">
-                            <img
-                                src={URL.createObjectURL(file)}
-                                alt={file.name}
-                                className="w-full h-20 object-cover rounded-md"
-                            />
+                            {file.type.startsWith("image/") ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                    src={URL.createObjectURL(file)}
+                                    alt={file.name}
+                                    className="w-full h-20 object-cover rounded-md"
+                                />
+                            ) : (
+                                <FaFileUpload className="text-4xl text-gray-400 mb-2" />
+                            )}
                             <button
                                 onClick={() => removeFile(index)}
                                 className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-700 transition-colors"
