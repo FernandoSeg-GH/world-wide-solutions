@@ -5,13 +5,16 @@ import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/ca
 import { Button } from '@/components/ui/button'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { PlusCircle } from 'lucide-react'
+import { ChevronDown, ChevronUp, PlusCircle } from 'lucide-react'
 import SectionHeader from '@/components/layout/navbar/SectionHeader'
+import AccidentClaimForm from './accident-claim/AccidentClaimForm'
 
 type Props = {}
 
 function ClaimReports({ }: Props) {
     const { data: session } = useSession()
+    const [expanded, setExpanded] = React.useState(false)
+
     const router = useRouter()
 
     return (
@@ -30,8 +33,26 @@ function ClaimReports({ }: Props) {
                         <Button onClick={() => router.push("/accident-claim")}>New Claim <PlusCircle /></Button>
                     </CardDescription>
                 </Card>
+
             }
-            <AccidentClaimsView />
+            {session?.user.role.id === 1 &&
+                <AccidentClaimsView />
+            }
+            {session?.user.role.id === 3 &&
+                <div className='bg-white dark:bg-gray-800 p-4 rounded-lg shadow'>
+                    {/* <AccidentClaimForm/> */}
+
+                    <Button variant="ghost" onClick={() => setExpanded(!expanded)} className='font-semibold text-lg w-full'>
+                        1) Accident Claim Report {expanded ? <ChevronUp /> : <ChevronDown />}
+                    </Button>
+                    {expanded &&
+                        <div className='w-full flex flex-col gap-6'>
+                            <h3 className='text-lg font-semibold text-center'>Submit a new Accident Claim Report:</h3>
+                            <AccidentClaimForm />
+                        </div>
+                    }
+                </div>
+            }
         </div>
     )
 }

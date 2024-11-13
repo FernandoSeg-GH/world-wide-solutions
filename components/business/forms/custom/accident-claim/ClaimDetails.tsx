@@ -98,8 +98,6 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
         ));
     };
 
-    console.log('claim', claim);
-
     const existingFiles = (() => {
         try {
             return typeof claim.file_uploads === 'string'
@@ -289,7 +287,6 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                                 if (field.type === "date") {
                                     if (isEditing) {
                                         const dateValue = typeof value === "string" ? value.split("T")[0] : null;
-                                        console.log(`Editing Mode: dateValue for ${field.id} is ${dateValue}`);
                                         return (
                                             <DatePicker
                                                 selectedDate={dateValue}

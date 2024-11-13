@@ -20,8 +20,6 @@ export function DatePicker({ selectedDate, onChange }: DatePickerProps) {
     const isValidDate = selectedDate && !isNaN(new Date(selectedDate).getTime());
     const selectedDateAsDate = isValidDate ? new Date(selectedDate) : undefined;
 
-    console.log(`DatePicker: selectedDate = ${selectedDate}, isValidDate = ${isValidDate}`);
-
     return (
         <Popover>
             <PopoverTrigger asChild>
@@ -43,7 +41,6 @@ export function DatePicker({ selectedDate, onChange }: DatePickerProps) {
                     mode="single"
                     selected={selectedDateAsDate}
                     onSelect={(date) => {
-                        console.log(`DatePicker: onSelect date = ${date}`);
                         onChange(date ?? null);
                     }}
                     initialFocus

@@ -10,9 +10,7 @@ import Vinci from "@/components/vinci/Vinci";
 import { Suspense } from "react";
 import Spinner from "@/components/ui/spinner";
 import { useSession } from "next-auth/react";
-import AdminNotifications from "./business/notifications/AdminNotifications";
 import FormDetails from "./business/forms/FormDetails";
-import ClaimReports from "./business/forms/custom/ClaimReports";
 import AccidentClaimsView from "./business/forms/custom/accident-claim/AccidentClaimsView";
 
 export const RenderComponent = (currentSection: string) => {

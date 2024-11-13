@@ -36,48 +36,94 @@ const AccidentClaimsView: React.FC = () => {
     const businessId = String(session?.user?.businessId)
 
     useEffect(() => {
-        const fetchClaims = async () => {
+        const fetchClaims = async (roleId: number) => {
+
             try {
-                const response = await fetch(
-                    `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/forms/user_accident_claims`,
-                    {
-                        method: "GET",
-                        headers: {
-                            Authorization: `Bearer ${session?.accessToken}`,
-                        },
+                if (roleId === 1) {
+                    // Existing logic for role id 1 (regular user)
+                    const response = await fetch(
+                        `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/custom/forms/user_accident_claims`,
+                        {
+                            method: "GET",
+                            headers: {
+                                Authorization: `Bearer ${session?.accessToken}`,
+                            },
+                        }
+                    );
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || "Failed to fetch claims.");
                     }
-                );
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || "Failed to fetch claims.");
+                    const data = await response.json();
+
+                    const initializedClaims: EditableClaim[] = Array.isArray(data.claims)
+                        ? data.claims.map((claim: Claim) => ({
+                            ...claim,
+                            mva_attorney_info: safeJsonParse(claim.mva_attorney_info, 'mva_attorney_info'),
+                            mva_costs: safeJsonParse(claim.mva_costs, 'mva_costs'),
+                            mva_medical_info: safeJsonParse(claim.mva_medical_info, 'mva_medical_info'),
+                            mva_third_party_info: safeJsonParse(claim.mva_third_party_info, 'mva_third_party_info'),
+                            vehicle_details: safeJsonParse(claim.vehicle_details, 'vehicle_details'),
+                            witness_info: safeJsonParse(claim.witness_info, 'witness_info'),
+                            accident_date: claim.accident_date ? new Date(claim.accident_date).toISOString() : null,
+                            slip_attorney_info: safeJsonParse(claim.slip_attorney_info, 'slip_attorney_info'),
+                            slip_costs: safeJsonParse(claim.slip_costs, 'slip_costs'),
+                            slip_medical_info: safeJsonParse(claim.slip_medical_info, 'slip_medical_info'),
+                            slip_third_party_info: safeJsonParse(claim.slip_third_party_info, 'slip_third_party_info'),
+                            isEditing: false,
+                            editedData: mapClaimToFormData(claim, businessId),
+                        }))
+                        : [];
+
+                    setClaims(initializedClaims);
+
+                    setLoading(false);
+                } else if ([2, 3, 4].includes(roleId)) {
+                    // Logic for roles 2, 3, 4 (business users and admins)
+                    const response = await fetch(
+                        `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/custom/forms/business_accident_claims`,
+                        {
+                            method: "GET",
+                            headers: {
+                                Authorization: `Bearer ${session?.accessToken}`,
+                            },
+                        }
+                    );
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || "Failed to fetch business claims.");
+                    }
+
+                    const data = await response.json();
+
+                    const initializedClaims: EditableClaim[] = Array.isArray(data.claims)
+                        ? data.claims.map((claim: Claim) => ({
+                            ...claim,
+                            mva_attorney_info: safeJsonParse(claim.mva_attorney_info, 'mva_attorney_info'),
+                            mva_costs: safeJsonParse(claim.mva_costs, 'mva_costs'),
+                            mva_medical_info: safeJsonParse(claim.mva_medical_info, 'mva_medical_info'),
+                            mva_third_party_info: safeJsonParse(claim.mva_third_party_info, 'mva_third_party_info'),
+                            vehicle_details: safeJsonParse(claim.vehicle_details, 'vehicle_details'),
+                            witness_info: safeJsonParse(claim.witness_info, 'witness_info'),
+                            accident_date: claim.accident_date ? new Date(claim.accident_date).toISOString() : null,
+                            slip_attorney_info: safeJsonParse(claim.slip_attorney_info, 'slip_attorney_info'),
+                            slip_costs: safeJsonParse(claim.slip_costs, 'slip_costs'),
+                            slip_medical_info: safeJsonParse(claim.slip_medical_info, 'slip_medical_info'),
+                            slip_third_party_info: safeJsonParse(claim.slip_third_party_info, 'slip_third_party_info'),
+                            isEditing: false,
+                            editedData: mapClaimToFormData(claim, businessId),
+                        }))
+                        : [];
+
+                    setClaims(initializedClaims);
+                    setLoading(false);
+
+                } else {
+                    setLoading(false);
                 }
-
-                const data = await response.json();
-
-                const initializedClaims: EditableClaim[] = Array.isArray(data.claims)
-                    ? data.claims.map((claim: Claim) => ({
-                        ...claim,
-                        mva_attorney_info: safeJsonParse(claim.mva_attorney_info, 'mva_attorney_info'),
-                        mva_costs: safeJsonParse(claim.mva_costs, 'mva_costs'),
-                        mva_medical_info: safeJsonParse(claim.mva_medical_info, 'mva_medical_info'),
-                        mva_third_party_info: safeJsonParse(claim.mva_third_party_info, 'mva_third_party_info'),
-                        vehicle_details: safeJsonParse(claim.vehicle_details, 'vehicle_details'),
-                        witness_info: safeJsonParse(claim.witness_info, 'witness_info'),
-                        accident_date: claim.accident_date ? new Date(claim.accident_date).toISOString() : null,
-                        slip_attorney_info: safeJsonParse(claim.slip_attorney_info, 'slip_attorney_info'),
-                        slip_costs: safeJsonParse(claim.slip_costs, 'slip_costs'),
-                        slip_medical_info: safeJsonParse(claim.slip_medical_info, 'slip_medical_info'),
-                        slip_third_party_info: safeJsonParse(claim.slip_third_party_info, 'slip_third_party_info'),
-                        // Initialize editing state
-                        isEditing: false,
-                        editedData: mapClaimToFormData(claim, businessId),
-                    }))
-                    : [];
-
-                setClaims(initializedClaims);
-                console.log('Initialized Claims:', initializedClaims); // Verify business_id here
-                setLoading(false);
             } catch (err: any) {
                 console.error(err);
                 setError(err.message || "An error occurred.");
@@ -85,10 +131,11 @@ const AccidentClaimsView: React.FC = () => {
             }
         };
 
-        if (session?.accessToken) {
-            fetchClaims();
+        if (session?.accessToken && session?.user?.role.id) {
+            fetchClaims(session.user.role.id);
         }
     }, [businessId, session]);
+
 
     const toggleEdit = (claim_id: string) => {
         setClaims((prevClaims) =>
@@ -179,8 +226,6 @@ const AccidentClaimsView: React.FC = () => {
         const claimToUpdate = claims.find((claim) => claim.claim_id === claim_id);
         if (!claimToUpdate || !claimToUpdate.editedData) return;
 
-        console.log('Edited Data before submitting:', claimToUpdate.editedData);
-        console.log('accident_date:', claimToUpdate.editedData.accident_date);
 
         // Validate required fields
         const validationErrors = validateForm(claimToUpdate.editedData);
@@ -221,7 +266,6 @@ const AccidentClaimsView: React.FC = () => {
         }
 
         // Debug: Verify the files in submitData
-        submitData.forEach((value, key) => console.log(`${key}:`, value instanceof File ? value.name : value));
 
         try {
             const response = await fetch(
@@ -323,7 +367,7 @@ const AccidentClaimsView: React.FC = () => {
                     <div className="lg:text-left">
                         <h1 className="text-navyBlue dark:text-white text-3xl leading-7 font-bold underline flex items-center gap-2 justify-center lg:justify-start">
                             <FaEdit />
-                            Your Accident Claims
+                            {session?.user?.role.id === 1 ? "My Accident Claims" : "All Accident Claims"}
                         </h1>
                         <p className="text-gray-600 dark:text-gray-400 mt-4">
                             Review and manage your submitted accident claims below.

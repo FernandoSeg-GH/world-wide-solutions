@@ -23,9 +23,9 @@ export async function PUT(
 
   try {
     const formData = await req.formData();
-    console.log("formData", formData);
+
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/forms/update_accident_claim/${claimId}`,
+      `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/custom/forms/update_accident_claim/${claimId}`,
       {
         method: "PUT",
         headers: {

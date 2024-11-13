@@ -32,7 +32,18 @@ export default function Main() {
             {/* <Separator className="border-gray-400 my-3" /> */}
             <div className="flex flex-col gap-6 mt-4">
                 {session?.user.role.id !== 1 && <BusinessStats />}
-                <Forms />
+                {session?.user.role.id === 4 && (
+                    <Forms />
+                )}
+                {session?.user.role.id === 4 && (
+                    <Submissions />
+                )}
+                {session?.user.role.id === 3 && (
+                    <ClaimReports />
+                )}
+                {session?.user.role.id === 3 && (
+                    <AccidentClaimsView />
+                )}
                 {/* {session?.user.role.id === 1 && (
                     <Submissions />
                 )} */}

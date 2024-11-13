@@ -1,5 +1,3 @@
-// components/business/forms/custom/accident-claim/FileDisplay.tsx
-
 import React from "react";
 import Image from "next/image";
 import { FaFilePdf, FaFileAlt, FaFileImage, FaFileVideo, FaFileAudio } from "react-icons/fa";

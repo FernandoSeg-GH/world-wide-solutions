@@ -134,7 +134,7 @@ export default function AccidentClaimForm() {
 
         try {
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/forms/accident-claim/submit`,
+                `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/custom/forms/accident-claim/submit`,
                 {
                     method: "POST",
                     headers: {
@@ -250,7 +250,7 @@ export default function AccidentClaimForm() {
                                     </SelectTrigger>
                                     <SelectContent className="max-h-[320px] overflow-y-auto">
                                         {countryOptions.map((country) => (
-                                            <SelectItem key={country.value} value={country.value}>
+                                            <SelectItem className="hover:bg-slate-500" key={country.value} value={country.value}>
                                                 {country.label}
                                             </SelectItem>
                                         ))}
@@ -274,7 +274,7 @@ export default function AccidentClaimForm() {
                                         </SelectTrigger>
                                         <SelectContent className="max-h-[320px] overflow-y-auto">
                                             {usaStates.map((state) => (
-                                                <SelectItem key={state.value} value={state.value}>
+                                                <SelectItem className="hover:bg-slate-500" key={state.value} value={state.value}>
                                                     {state.label}
                                                 </SelectItem>
                                             ))}
@@ -383,7 +383,7 @@ export default function AccidentClaimForm() {
                                     </SelectTrigger>
                                     <SelectContent>
                                         {accidentTypeOptions.map((option) => (
-                                            <SelectItem key={option.value} value={option.value}>
+                                            <SelectItem className="hover:bg-slate-500" key={option.value} value={option.value}>
                                                 {option.label}
                                             </SelectItem>
                                         ))}
@@ -404,7 +404,7 @@ export default function AccidentClaimForm() {
                                         </SelectTrigger>
                                         <SelectContent>
                                             {subAccidentOptions.map((option) => (
-                                                <SelectItem key={option.value} value={option.value}>
+                                                <SelectItem className="hover:bg-slate-500" key={option.value} value={option.value}>
                                                     {option.label}
                                                 </SelectItem>
                                             ))}
@@ -474,7 +474,7 @@ export default function AccidentClaimForm() {
                                                         option.value === "motor_vehicle_accidents"
                                                 )
                                                 ?.subOptions.map((option) => (
-                                                    <SelectItem key={option.value} value={option.value}>
+                                                    <SelectItem className="hover:bg-slate-500" key={option.value} value={option.value}>
                                                         {option.label}
                                                     </SelectItem>
                                                 ))}
@@ -493,10 +493,10 @@ export default function AccidentClaimForm() {
                                             <SelectValue placeholder="Select an option..." />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="passenger">Passenger</SelectItem>
-                                            <SelectItem value="driver">Driver</SelectItem>
-                                            <SelectItem value="pedestrian">Pedestrian</SelectItem>
-                                            <SelectItem value="bicycle">Bicycle</SelectItem>
+                                            <SelectItem className="hover:bg-slate-500" value="passenger">Passenger</SelectItem>
+                                            <SelectItem className="hover:bg-slate-500" value="driver">Driver</SelectItem>
+                                            <SelectItem className="hover:bg-slate-500" value="pedestrian">Pedestrian</SelectItem>
+                                            <SelectItem className="hover:bg-slate-500" value="bicycle">Bicycle</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -575,9 +575,9 @@ export default function AccidentClaimForm() {
                                         <SelectValue placeholder="Vehicle #..." />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="vehicle1">Vehicle #1</SelectItem>
-                                        <SelectItem value="vehicle2">Vehicle #2</SelectItem>
-                                        <SelectItem value="vehicle3">Vehicle #3</SelectItem>
+                                        <SelectItem className="hover:bg-slate-500" value="vehicle1">Vehicle #1</SelectItem>
+                                        <SelectItem className="hover:bg-slate-500" value="vehicle2">Vehicle #2</SelectItem>
+                                        <SelectItem className="hover:bg-slate-500" value="vehicle3">Vehicle #3</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -656,7 +656,7 @@ export default function AccidentClaimForm() {
                                             {accidentTypeOptions
                                                 .find((option) => option.value === "slip_and_fall")
                                                 ?.subOptions.map((option) => (
-                                                    <SelectItem key={option.value} value={option.value}>
+                                                    <SelectItem className="hover:bg-slate-500" key={option.value} value={option.value}>
                                                         {option.label}
                                                     </SelectItem>
                                                 ))}
@@ -848,10 +848,10 @@ export default function AccidentClaimForm() {
                                         <SelectValue placeholder="Select status:" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="open">Open</SelectItem>
-                                        <SelectItem value="under_review">Under Review</SelectItem>
-                                        <SelectItem value="approved">Approved</SelectItem>
-                                        <SelectItem value="closed">Closed</SelectItem>
+                                        <SelectItem className="hover:bg-slate-500" value="open">Open</SelectItem>
+                                        <SelectItem className="hover:bg-slate-500" value="under_review">Under Review</SelectItem>
+                                        <SelectItem className="hover:bg-slate-500" value="approved">Approved</SelectItem>
+                                        <SelectItem className="hover:bg-slate-500" value="closed">Closed</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>

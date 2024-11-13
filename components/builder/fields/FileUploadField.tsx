@@ -103,7 +103,6 @@ function FormComponent({
 
     const onDrop = useCallback(
         (acceptedFiles: File[]) => {
-            console.log('acceptedFiles', acceptedFiles);
             if (acceptedFiles.length === 0) return;
 
             setSelectedFiles((prevFiles) => {
@@ -111,7 +110,6 @@ function FormComponent({
                     ? [...prevFiles, ...acceptedFiles]
                     : acceptedFiles.slice(0, 1);
 
-                console.log('newFiles', newFiles);
                 if (handleFileChange) {
                     handleFileChange(element.id, multiple ? newFiles : newFiles[0]);
                 }

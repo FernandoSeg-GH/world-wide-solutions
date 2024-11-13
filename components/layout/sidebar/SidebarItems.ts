@@ -76,22 +76,22 @@ export const getSidebarItems = (
     ],
     3: [
       // Role 3 (same as role 2 in this case)
-      {
-        icon: NotebookTabs,
-        label: "All Forms",
-      },
-      {
-        icon: BookText,
-        label: "Forms",
-        ...(roleId !== 1 && forms?.length > 0
-          ? {
-              subItems: forms.map((form) => ({
-                icon: CircleDashed,
-                label: form.name,
-              })),
-            }
-          : {}),
-      },
+      // {
+      //   icon: NotebookTabs,
+      //   label: "All Forms",
+      // },
+      // {
+      //   icon: BookText,
+      //   label: "Forms",
+      //   ...(roleId !== 1 && forms?.length > 0
+      //     ? {
+      //         subItems: forms.map((form) => ({
+      //           icon: CircleDashed,
+      //           label: form.name,
+      //         })),
+      //       }
+      //     : {}),
+      // },
       {
         icon: Users2,
         label: "Users",
@@ -106,6 +106,18 @@ export const getSidebarItems = (
       {
         icon: Users2,
         label: "Users",
+      },
+      {
+        icon: BookText,
+        label: "Forms",
+        ...(roleId !== 1 && forms?.length > 0
+          ? {
+              subItems: forms.map((form) => ({
+                icon: CircleDashed,
+                label: form.name,
+              })),
+            }
+          : {}),
       },
     ],
   };

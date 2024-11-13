@@ -24,7 +24,7 @@ export async function POST(
 
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/forms/accident-claim/submit`,
+      `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/custom/forms/accident-claim/submit`,
       {
         method: "POST",
         headers: {
