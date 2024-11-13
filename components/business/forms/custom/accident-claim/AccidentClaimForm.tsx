@@ -272,7 +272,7 @@ export default function AccidentClaimForm() {
                                         >
                                             <SelectValue placeholder="Select your state" />
                                         </SelectTrigger>
-                                        <SelectContent>
+                                        <SelectContent className="max-h-[320px] overflow-y-auto">
                                             {usaStates.map((state) => (
                                                 <SelectItem key={state.value} value={state.value}>
                                                     {state.label}
