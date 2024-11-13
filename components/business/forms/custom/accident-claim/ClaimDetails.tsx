@@ -50,17 +50,21 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
 
 
     const renderExistingFiles = (files?: string[] | null) => {
-        if (!files || files.length === 0) {
+        // Ensure 'files' is an array to prevent runtime errors
+        const validFiles = Array.isArray(files) ? files : [];
+
+        if (validFiles.length === 0) {
             return <span className="text-gray-500 dark:text-gray-400">No existing files</span>;
         }
         return (
             <div className="flex flex-wrap gap-4 w-full">
-                {files.map((fileUrl, index) => (
+                {validFiles.map((fileUrl, index) => (
                     <div key={index} className="flex flex-row gap-2 items-center border w-full p-2 rounded-md overflow-hidden">
                         <div className="w-12 flex items-center justify-center">
                             {fileUrl.endsWith(".pdf") ? (
                                 <FaFilePdf size={48} />
                             ) : fileUrl.match(/\.(jpeg|jpg|gif|png)$/) ? (
+                                // eslint-disable-next-line @next/next/no-img-element
                                 <img src={fileUrl} alt="File Thumbnail" className="min-w-12 h-12 object-cover" />
                             ) : (
                                 <FaFileAlt size={48} />
@@ -96,10 +100,19 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
 
     console.log('claim', claim);
 
-    // Extract existing files from claim
-    const existingFiles = claim.file_uploads;
-    // Extract new files from editedData
-    const newFiles = isEditing ? editedData.new_file_uploads : null;
+    const existingFiles = (() => {
+        try {
+            return typeof claim.file_uploads === 'string'
+                ? JSON.parse(claim.file_uploads)
+                : Array.isArray(claim.file_uploads)
+                    ? claim.file_uploads
+                    : [];
+        } catch (error) {
+            console.error("Failed to parse file_uploads:", error);
+            return [];
+        }
+    })();
+
 
     return (
         <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
