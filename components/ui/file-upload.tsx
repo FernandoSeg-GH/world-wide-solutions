@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 interface FileUploadProps {
     multiple?: boolean;
-    onFilesSelected: (files: FileList) => void;
+    onFilesSelected: (files: File[]) => void; // Change to File[] for flexibility
     className?: string;
 }
 
@@ -20,33 +20,34 @@ export function FileUpload({ multiple = false, onFilesSelected, className }: Fil
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
             const files = Array.from(event.target.files);
-            setSelectedFiles((prevFiles) => (multiple ? [...prevFiles, ...files] : files));
-            onFilesSelected(event.target.files);
+            const updatedFiles = multiple ? [...selectedFiles, ...files] : files;
+            setSelectedFiles(updatedFiles);
+            onFilesSelected(updatedFiles);  // Send updated list of files
+
+            // Clear input value to allow re-uploading same file if needed
+            event.target.value = "";
         }
     };
 
     const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault();
-        event.stopPropagation();
         if (event.dataTransfer.files) {
             const files = Array.from(event.dataTransfer.files);
-            setSelectedFiles((prevFiles) => (multiple ? [...prevFiles, ...files] : files));
-            onFilesSelected(event.dataTransfer.files);
+            const updatedFiles = multiple ? [...selectedFiles, ...files] : files;
+            setSelectedFiles(updatedFiles);
+            onFilesSelected(updatedFiles);
         }
     };
 
     const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault();
-        event.stopPropagation();
     };
 
     const removeFile = (index: number) => {
         const updatedFiles = [...selectedFiles];
         updatedFiles.splice(index, 1);
         setSelectedFiles(updatedFiles);
-        const dataTransfer = new DataTransfer();
-        updatedFiles.forEach((file) => dataTransfer.items.add(file));
-        onFilesSelected(dataTransfer.files);
+        onFilesSelected(updatedFiles);
     };
 
     return (

@@ -54,16 +54,18 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
             return <span className="text-gray-500 dark:text-gray-400">No existing files</span>;
         }
         return (
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-4 w-full">
                 {files.map((fileUrl, index) => (
-                    <div key={index} className="flex flex-col items-center">
-                        {fileUrl.endsWith(".pdf") ? (
-                            <FaFilePdf size={48} />
-                        ) : fileUrl.match(/\.(jpeg|jpg|gif|png)$/) ? (
-                            <img src={fileUrl} alt="File Thumbnail" className="w-12 h-12 object-cover" />
-                        ) : (
-                            <FaFileAlt size={48} />
-                        )}
+                    <div key={index} className="flex flex-row gap-2 items-center border w-full p-2 rounded-md overflow-hidden">
+                        <div className="w-12 flex items-center justify-center">
+                            {fileUrl.endsWith(".pdf") ? (
+                                <FaFilePdf size={48} />
+                            ) : fileUrl.match(/\.(jpeg|jpg|gif|png)$/) ? (
+                                <img src={fileUrl} alt="File Thumbnail" className="min-w-12 h-12 object-cover" />
+                            ) : (
+                                <FaFileAlt size={48} />
+                            )}
+                        </div>
                         <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm mt-2">
                             {fileUrl.split("/").pop()}
                         </a>
@@ -167,14 +169,14 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                                                     <h4 className="font-semibold text-gray-700 dark:text-gray-300">{formatLabel(field.label)}</h4>
                                                     <FileUpload
                                                         multiple
-                                                        onFilesSelected={(files: FileList) =>
+                                                        onFilesSelected={(files: File[]) =>
                                                             handleFieldChange(claim.claim_id, "new_file_uploads", files)
                                                         }
                                                         className="mt-2"
                                                     />
                                                     {/* Display previews of new files */}
-                                                    {newFiles && newFiles.length > 0 && (
-                                                        <div className="mt-2 grid grid-cols-2 md:grid-cols-4 gap-4">
+                                                    {/* {newFiles && newFiles.length > 0 && (
+                                                        <div className="mt-2 flex flex-col w-full gap-4">
                                                             {Array.from(newFiles).map((file, index) => (
                                                                 <div key={index} className="file-thumbnail relative border rounded-lg p-2 shadow-sm">
                                                                     <img
@@ -199,7 +201,7 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                                                                 </div>
                                                             ))}
                                                         </div>
-                                                    )}
+                                                    )} */}
                                                 </div>
                                             </div>
                                         );
