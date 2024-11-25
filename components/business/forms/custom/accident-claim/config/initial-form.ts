@@ -5,7 +5,7 @@ import { AccidentClaimFormData } from "./types";
 export const initialForm: AccidentClaimFormData = {
   business_id: "",
   formUrl: "",
-
+  status: "",
   // Personal Information
   full_name: "",
   email: "",

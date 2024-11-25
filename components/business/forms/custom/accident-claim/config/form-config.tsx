@@ -132,7 +132,7 @@ export const formSections: SectionConfig[] = [
 
 export function mapClaimToFormData(claim: Claim, businessId: string): AccidentClaimFormData {
   return {
-
+    status: "",
     business_id: "",
     formUrl: "",
     full_name: "",

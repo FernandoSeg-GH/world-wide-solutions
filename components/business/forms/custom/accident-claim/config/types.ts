@@ -20,7 +20,7 @@ export interface OtherCosts {
 export interface AccidentClaimFormData {
   business_id: string;
   formUrl: string;
-
+  status: string;
   // Personal Information
   full_name: string;
   email: string;

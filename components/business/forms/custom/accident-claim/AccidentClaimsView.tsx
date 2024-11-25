@@ -29,33 +29,16 @@ const AccidentClaimsView: React.FC = () => {
     const [isSpreadsheetView, setIsSpreadsheetView] = useState<boolean>(false);
 
     useEffect(() => {
-        const fetchClaims = async (roleId: number) => {
+        const fetchClaims = async () => {
             try {
-                let endpoint = "";
-
-                if (roleId === 1) {
-                    endpoint = `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/custom/forms/user_accident_claims`;
-                } else if ([2, 3, 4].includes(roleId)) {
-                    endpoint = `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/custom/forms/business_accident_claims`;
-                } else {
-                    setLoading(false);
-                    return;
-                }
-
-                const response = await fetch(endpoint, {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${session?.accessToken}`,
-                    },
-                });
+                const response = await fetch("/api/forms/accident-claims");
 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    throw new Error(errorData.error || "Failed to fetch claims.");
+                    throw new Error(errorData.message || "Failed to fetch claims.");
                 }
 
                 const data = await response.json();
-                console.log('Fetched data:', data); // Debugging
 
                 const initializedClaims: EditableClaim[] = Array.isArray(data.claims)
                     ? data.claims.map((claim: Claim) => ({
@@ -64,14 +47,12 @@ const AccidentClaimsView: React.FC = () => {
                         isEditing: false,
                         editedData: mapClaimToFormData(claim, businessId),
                         user: {
-                            user_id: String(claim.user_id),           // Ensure these fields are present
+                            user_id: String(claim.user_id),
                             username: claim.username,
                             user_email: claim.user_email,
                         },
                     }))
                     : [];
-
-                console.log("Initialized Claims:", initializedClaims); // Debugging
 
                 setClaims(initializedClaims);
                 setLoading(false);
@@ -83,9 +64,10 @@ const AccidentClaimsView: React.FC = () => {
         };
 
         if (session?.accessToken && session?.user?.role.id) {
-            fetchClaims(session.user.role.id);
+            fetchClaims();
         }
     }, [businessId, session]);
+
 
     useEffect(() => {
         // Group claims by user for roles 2,3,4
@@ -325,7 +307,44 @@ const AccidentClaimsView: React.FC = () => {
         }
     };
 
+    const handleStatusChange = async (claim_id: string, newStatus: string) => {
+        try {
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/custom/forms/accident-claim/${claim_id}/status`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${session?.accessToken}`,
+                    },
+                    body: JSON.stringify({ status: newStatus }),
+                }
+            );
 
+            if (!response.ok) {
+                throw new Error("Failed to update status.");
+            }
+
+            const data = await response.json();
+
+            setClaims((prevClaims) =>
+                prevClaims.map((claim) =>
+                    claim.claim_id === claim_id ? { ...claim, status: newStatus } : claim
+                )
+            );
+
+            toast({
+                title: "Success",
+                description: "Claim status updated successfully!",
+            });
+        } catch (err) {
+            toast({
+                title: "Error",
+                description: "Failed to update status.",
+                variant: "destructive",
+            });
+        }
+    };
     if (loading)
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
@@ -372,9 +391,9 @@ const AccidentClaimsView: React.FC = () => {
                             <Button onClick={() => handleDownloadAllClaims('csv')} variant="outline">
                                 <FaEdit className="mr-2" /> Download CSV
                             </Button>
-                            <Button onClick={() => handleDownloadAllClaims('excel')} variant="outline">
+                            {/* <Button onClick={() => handleDownloadAllClaims('excel')} variant="outline">
                                 <FaEdit className="mr-2" /> Download Excel
-                            </Button>
+                            </Button> */}
                             <Button onClick={() => handleDownloadAllClaims('pdf')} variant="outline">
                                 <FaEdit className="mr-2" /> Download PDF
                             </Button>
@@ -394,6 +413,7 @@ const AccidentClaimsView: React.FC = () => {
                             // Role 1: User - Show their own claims in accordions
                             claims.map((claim) => (
                                 <ClaimAccordion
+                                    handleStatusChange={handleStatusChange}
                                     key={claim.claim_id}
                                     claim={claim}
                                     toggleEdit={toggleEdit}
@@ -416,9 +436,10 @@ const AccidentClaimsView: React.FC = () => {
                                         </p>
                                     </div>
                                     {/* Claims for the User */}
-                                    <div className="space-y-2">
+                                    <div className="space-y-6">
                                         {group.claims.map((claim) => (
                                             <ClaimAccordion
+                                                handleStatusChange={handleStatusChange}
                                                 key={claim.claim_id}
                                                 claim={claim}
                                                 toggleEdit={toggleEdit}
@@ -429,9 +450,9 @@ const AccidentClaimsView: React.FC = () => {
                                         ))}
                                     </div>
                                     {/* Optional: Add a horizontal separator between user groups, except after the last group */}
-                                    {index < groupedClaims.length - 1 && (
+                                    {/* {index < groupedClaims.length - 1 && (
                                         <hr className="mt-6 border-gray-300 dark:border-gray-600" />
-                                    )}
+                                    )} */}
                                 </div>
                             ))
                         )}

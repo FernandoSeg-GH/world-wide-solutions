@@ -17,18 +17,7 @@ const BusinessStats = () => {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                // Determine the endpoint based on the user's role
-                const endpoint =
-                    session?.user?.role?.id === 1
-                        ? `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/custom/forms/user_stats`
-                        : `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/custom/forms/business_stats`;
-
-                const response = await fetch(endpoint, {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${session?.accessToken}`,
-                    },
-                });
+                const response = await fetch("/api/business/stats");
 
                 if (!response.ok) {
                     throw new Error("Failed to fetch stats.");
@@ -36,12 +25,11 @@ const BusinessStats = () => {
 
                 const data = await response.json();
 
-                // Dynamically map stats based on the response
                 setStats({
-                    usersCount: data.users_count || 0,
-                    claimsCount: data.claims_count || 0,
-                    messagesCount: data.messages_count || 0,
-                    newMessagesCount: data.new_messages_count || 0,
+                    usersCount: data.usersCount,
+                    claimsCount: data.claimsCount,
+                    messagesCount: data.messagesCount,
+                    newMessagesCount: data.newMessagesCount,
                 });
             } catch (error) {
                 console.error("Error fetching stats:", error);
@@ -51,7 +39,8 @@ const BusinessStats = () => {
         if (session?.accessToken) {
             fetchStats();
         }
-    }, [session?.accessToken, session?.user?.role?.id]);
+    }, [session?.accessToken]);
+
 
     return (
         <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">

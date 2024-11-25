@@ -13,6 +13,9 @@ import jsPDF from "jspdf";
 import autoTable, { RowInput } from 'jspdf-autotable';
 import html2canvas from "html2canvas";
 import { EditableClaim } from "./config/types";
+import { useSession } from "next-auth/react";
+import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface ClaimAccordionProps {
     claim: EditableClaim;
@@ -20,6 +23,7 @@ interface ClaimAccordionProps {
     handleFieldChange: (claim_id: string, fieldPath: string, value: any) => void;
     handleSave: (claim_id: string) => void;
     handleCancel: (claim_id: string) => void;
+    handleStatusChange: (claim_id: string, newStatus: string) => void; // Add handler for status change
 }
 
 const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
@@ -28,8 +32,10 @@ const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
     handleFieldChange,
     handleSave,
     handleCancel,
+    handleStatusChange,
 }) => {
-
+    const { data: session } = useSession();
+    const userRole = session?.user?.role.id;
     const handleDownloadClaim = async (format: 'csv' | 'excel' | 'pdf') => {
         const flatClaim = flattenClaimData(claim);
 
@@ -110,13 +116,64 @@ const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
                         )}
                     >
                         <div className="w-full ">
-                            <div className="flex flex-col px-4 py-3 items-start w-full justify-between">
-                                <span className="font-semibold">
-                                    {claim.full_name} - {new Date(claim.created_at).toLocaleDateString()}
-                                </span>
-                                <span className="text-sm text-gray-200">
-                                    Submitted by: {claim.username} ({claim.user_email})
-                                </span>
+                            <div className="flex items-center justify-between w-full px-4 py-3 ">
+                                <div className="flex flex-col items-start w-full justify-between">
+                                    <span className="font-semibold">
+                                        {claim.full_name} - {new Date(claim.created_at).toLocaleDateString()}
+                                    </span>
+                                    <span className="text-sm text-gray-200">
+                                        Submitted by: {claim.username} ({claim.user_email})
+                                    </span>
+                                </div>
+                                <div>
+                                    {userRole === 1 ? (
+                                        // Show badge for regular users
+                                        <Badge
+                                            className={`text-sm whitespace-nowrap capitalize ${claim.status === "received"
+                                                ? "bg-green-100 text-green-800"
+                                                : claim.status === "approved"
+                                                    ? "bg-blue-100 text-blue-800"
+                                                    : claim.status === "in progress"
+                                                        ? "bg-yellow-100 text-yellow-800"
+                                                        : claim.status === "documentation missing"
+                                                            ? "bg-red-100 text-red-800"
+                                                            : claim.status === "reviewing"
+                                                                ? "bg-purple-100 text-purple-800"
+                                                                : "bg-gray-100 text-gray-800"
+                                                }`}
+                                        >
+                                            {claim.status}
+                                        </Badge>
+                                    ) : (
+                                        // Show dropdown for admins
+                                        <Select
+                                            value={claim.status}
+                                            onValueChange={(value) => handleStatusChange(claim.claim_id, value)}
+                                        >
+                                            <SelectTrigger className={`min-w-[200px] whitespace-nowrap capitalize text-sm text-center ${claim.status === "received"
+                                                ? "bg-green-100 text-green-800"
+                                                : claim.status === "approved"
+                                                    ? "bg-blue-100 text-blue-800"
+                                                    : claim.status === "in progress"
+                                                        ? "bg-yellow-100 text-yellow-800"
+                                                        : claim.status === "documentation missing"
+                                                            ? "bg-red-100 text-red-800"
+                                                            : claim.status === "reviewing"
+                                                                ? "bg-purple-100 text-purple-800"
+                                                                : "bg-gray-100 text-gray-800"
+                                                }`}>
+                                                <SelectValue placeholder="Select status" className="text-center" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem className="text-center" value="received">Received</SelectItem>
+                                                <SelectItem className="text-center" value="approved">Approved</SelectItem>
+                                                <SelectItem className="text-center" value="in progress">In Progress</SelectItem>
+                                                <SelectItem className="text-center" value="documentation missing">Documentation Missing</SelectItem>
+                                                <SelectItem className="text-center" value="reviewing">Reviewing</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    )}
+                                </div>
                             </div>
                             <div className="w-full bg-white px-4 py-3 ">
                                 <CardTitle className="text-lg font-bold text-navyBlue dark:text-white">
