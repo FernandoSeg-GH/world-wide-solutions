@@ -1,129 +1,82 @@
-// components/AccidentClaimsView.tsx
+// components/business/forms/custom/accident-claim/AccidentClaimsView.tsx
 
 "use client";
+
 import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { FaEdit } from "react-icons/fa";
 import { useRouter } from 'next/navigation';
 
-import { AccidentClaimFormData, Claim } from "./config/types";
+import { AccidentClaimFormData, Claim, EditableClaim, GroupedClaims } from "./config/types";
 import { mapClaimToFormData, formSections } from "./config/form-config";
 import ClaimAccordion from "./ClaimAccordion";
 import { toast } from "@/components/ui/use-toast";
-import { getNestedValue } from "./ClaimDetails";
-import { sub } from "date-fns";
-
-function safeJsonParse(value: string | any, fieldName: string) {
-    try {
-        return typeof value === 'string' ? JSON.parse(value) : value;
-    } catch (e) {
-        console.error(`Error parsing ${fieldName}:`, e);
-        return null;
-    }
-}
-
-export interface EditableClaim extends Claim {
-    isEditing: boolean;
-    editedData: AccidentClaimFormData;
-}
+import SpreadsheetView from "./SpreadsheetView";
+import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
+import { saveAs } from "file-saver";
+import * as XLSX from "xlsx";
+import jsPDF from "jspdf";
+import autoTable, { RowInput } from 'jspdf-autotable';
+import { flattenClaimData } from "@/lib/utils";
 
 const AccidentClaimsView: React.FC = () => {
     const { data: session } = useSession();
     const [claims, setClaims] = useState<EditableClaim[]>([]);
+    const [groupedClaims, setGroupedClaims] = useState<GroupedClaims[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
-    const businessId = String(session?.user?.businessId)
+    const businessId = String(session?.user?.businessId);
+    const [isSpreadsheetView, setIsSpreadsheetView] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchClaims = async (roleId: number) => {
-
             try {
+                let endpoint = "";
+
                 if (roleId === 1) {
-                    // Existing logic for role id 1 (regular user)
-                    const response = await fetch(
-                        `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/custom/forms/user_accident_claims`,
-                        {
-                            method: "GET",
-                            headers: {
-                                Authorization: `Bearer ${session?.accessToken}`,
-                            },
-                        }
-                    );
-
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.error || "Failed to fetch claims.");
-                    }
-
-                    const data = await response.json();
-
-                    const initializedClaims: EditableClaim[] = Array.isArray(data.claims)
-                        ? data.claims.map((claim: Claim) => ({
-                            ...claim,
-                            mva_attorney_info: safeJsonParse(claim.mva_attorney_info, 'mva_attorney_info'),
-                            mva_costs: safeJsonParse(claim.mva_costs, 'mva_costs'),
-                            mva_medical_info: safeJsonParse(claim.mva_medical_info, 'mva_medical_info'),
-                            mva_third_party_info: safeJsonParse(claim.mva_third_party_info, 'mva_third_party_info'),
-                            vehicle_details: safeJsonParse(claim.vehicle_details, 'vehicle_details'),
-                            witness_info: safeJsonParse(claim.witness_info, 'witness_info'),
-                            accident_date: claim.accident_date ? new Date(claim.accident_date).toISOString() : null,
-                            slip_attorney_info: safeJsonParse(claim.slip_attorney_info, 'slip_attorney_info'),
-                            slip_costs: safeJsonParse(claim.slip_costs, 'slip_costs'),
-                            slip_medical_info: safeJsonParse(claim.slip_medical_info, 'slip_medical_info'),
-                            slip_third_party_info: safeJsonParse(claim.slip_third_party_info, 'slip_third_party_info'),
-                            isEditing: false,
-                            editedData: mapClaimToFormData(claim, businessId),
-                        }))
-                        : [];
-
-                    setClaims(initializedClaims);
-
-                    setLoading(false);
+                    endpoint = `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/custom/forms/user_accident_claims`;
                 } else if ([2, 3, 4].includes(roleId)) {
-                    // Logic for roles 2, 3, 4 (business users and admins)
-                    const response = await fetch(
-                        `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/custom/forms/business_accident_claims`,
-                        {
-                            method: "GET",
-                            headers: {
-                                Authorization: `Bearer ${session?.accessToken}`,
-                            },
-                        }
-                    );
-
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.error || "Failed to fetch business claims.");
-                    }
-
-                    const data = await response.json();
-
-                    const initializedClaims: EditableClaim[] = Array.isArray(data.claims)
-                        ? data.claims.map((claim: Claim) => ({
-                            ...claim,
-                            mva_attorney_info: safeJsonParse(claim.mva_attorney_info, 'mva_attorney_info'),
-                            mva_costs: safeJsonParse(claim.mva_costs, 'mva_costs'),
-                            mva_medical_info: safeJsonParse(claim.mva_medical_info, 'mva_medical_info'),
-                            mva_third_party_info: safeJsonParse(claim.mva_third_party_info, 'mva_third_party_info'),
-                            vehicle_details: safeJsonParse(claim.vehicle_details, 'vehicle_details'),
-                            witness_info: safeJsonParse(claim.witness_info, 'witness_info'),
-                            accident_date: claim.accident_date ? new Date(claim.accident_date).toISOString() : null,
-                            slip_attorney_info: safeJsonParse(claim.slip_attorney_info, 'slip_attorney_info'),
-                            slip_costs: safeJsonParse(claim.slip_costs, 'slip_costs'),
-                            slip_medical_info: safeJsonParse(claim.slip_medical_info, 'slip_medical_info'),
-                            slip_third_party_info: safeJsonParse(claim.slip_third_party_info, 'slip_third_party_info'),
-                            isEditing: false,
-                            editedData: mapClaimToFormData(claim, businessId),
-                        }))
-                        : [];
-
-                    setClaims(initializedClaims);
-                    setLoading(false);
-
+                    endpoint = `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/custom/forms/business_accident_claims`;
                 } else {
                     setLoading(false);
+                    return;
                 }
+
+                const response = await fetch(endpoint, {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${session?.accessToken}`,
+                    },
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || "Failed to fetch claims.");
+                }
+
+                const data = await response.json();
+                console.log('Fetched data:', data); // Debugging
+
+                const initializedClaims: EditableClaim[] = Array.isArray(data.claims)
+                    ? data.claims.map((claim: Claim) => ({
+                        ...claim,
+                        accident_date: claim.accident_date ? new Date(claim.accident_date).toISOString() : "",
+                        isEditing: false,
+                        editedData: mapClaimToFormData(claim, businessId),
+                        user: {
+                            user_id: String(claim.user_id),           // Ensure these fields are present
+                            username: claim.username,
+                            user_email: claim.user_email,
+                        },
+                    }))
+                    : [];
+
+                console.log("Initialized Claims:", initializedClaims); // Debugging
+
+                setClaims(initializedClaims);
+                setLoading(false);
             } catch (err: any) {
                 console.error(err);
                 setError(err.message || "An error occurred.");
@@ -136,6 +89,27 @@ const AccidentClaimsView: React.FC = () => {
         }
     }, [businessId, session]);
 
+    useEffect(() => {
+        // Group claims by user for roles 2,3,4
+        if ([2, 3, 4].includes(Number(session?.user?.role.id))) {
+            const groups: { [key: string]: GroupedClaims } = {};
+
+            claims.forEach((claim) => {
+                const userKey = claim.user.user_id;
+                if (!groups[userKey]) {
+                    groups[userKey] = {
+                        user: claim.user,
+                        claims: [],
+                    };
+                }
+                groups[userKey].claims.push(claim);
+            });
+
+            // Convert the groups object to an array
+            const groupedArray: GroupedClaims[] = Object.values(groups);
+            setGroupedClaims(groupedArray);
+        }
+    }, [claims, session?.user?.role.id]);
 
     const toggleEdit = (claim_id: string) => {
         setClaims((prevClaims) =>
@@ -151,53 +125,21 @@ const AccidentClaimsView: React.FC = () => {
         );
     };
 
-    const handleFieldChange = (claim_id: string, fieldPath: string, value: any) => {
-        const pathParts = fieldPath.split(".");
-
+    const handleFieldChange = (claim_id: string, fieldId: string, value: any) => {
         setClaims((prevClaims) =>
             prevClaims.map((claim) => {
                 if (claim.claim_id !== claim_id) return claim;
 
-                // Handle new_file_uploads separately
-                if (fieldPath === "new_file_uploads") {
-                    return {
-                        ...claim,
-                        editedData: {
-                            ...claim.editedData,
-                            new_file_uploads: value, // value is File[]
-                        },
-                    };
-                }
-
-                // Handle nested fields
-                if (pathParts.length === 2) {
-                    const [section, fieldId] = pathParts as [keyof AccidentClaimFormData, string];
-
-                    return {
-                        ...claim,
-                        editedData: {
-                            ...claim.editedData,
-                            [section]: {
-                                ...(claim.editedData[section] as any || {}),
-                                [fieldId]: value,
-                            },
-                        },
-                    };
-                }
-
-                // Handle top-level fields
                 return {
                     ...claim,
                     editedData: {
                         ...claim.editedData,
-                        [fieldPath]: value,
+                        [fieldId]: value,
                     },
                 };
             })
         );
     };
-
-
 
     const validateForm = (editedData: AccidentClaimFormData): string[] => {
         const errors: string[] = [];
@@ -205,8 +147,7 @@ const AccidentClaimsView: React.FC = () => {
         formSections.forEach((section) => {
             section.fields.forEach((field) => {
                 if (field.required) {
-                    const path = field.id.split(".");
-                    const value = getNestedValue(editedData, path);
+                    const value = editedData[field.id as keyof AccidentClaimFormData];
                     if (
                         value === null ||
                         value === undefined ||
@@ -226,46 +167,40 @@ const AccidentClaimsView: React.FC = () => {
         const claimToUpdate = claims.find((claim) => claim.claim_id === claim_id);
         if (!claimToUpdate || !claimToUpdate.editedData) return;
 
-
-        // Validate required fields
         const validationErrors = validateForm(claimToUpdate.editedData);
         if (validationErrors.length > 0) {
             validationErrors.forEach((error) => toast({
                 title: "Validation Error",
                 description: error,
             }));
-            return; // Prevent submission
+            return;
         }
 
         const submitData = new FormData();
 
-        // Append all non-file fields except 'new_file_uploads'
         Object.entries(claimToUpdate.editedData).forEach(([key, value]) => {
-            if (key === 'new_file_uploads') return; // Exclude 'new_file_uploads'
+            if (key === 'new_file_uploads') return;
 
             if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-                // For nested objects, stringify them
+                // For JSON fields
                 submitData.append(key, JSON.stringify(value));
-            } else if (key === "accident_date" && typeof value === "string") {
-                // Handle date as a string
-                submitData.append(key, value); // Ensure 'value' is in "YYYY-MM-DD" format
             } else if (Array.isArray(value)) {
-                // For arrays, stringify the array
+                // For array fields like vehicle_details
                 submitData.append(key, JSON.stringify(value));
-            } else if (typeof value === "string") {
-                // For simple strings
-                submitData.append(key, value);
+            } else if (typeof value === "string" || typeof value === "number") {
+                submitData.append(key, value.toString());
             }
         });
 
         // Handle new file uploads
-        if (claimToUpdate.editedData.new_file_uploads && claimToUpdate.editedData.new_file_uploads.length > 0) {
+        if (
+            claimToUpdate.editedData.new_file_uploads &&
+            claimToUpdate.editedData.new_file_uploads.length > 0
+        ) {
             claimToUpdate.editedData.new_file_uploads.forEach((file) => {
-                submitData.append("new_file_uploads", file); // Backend expects 'new_file_uploads'
+                submitData.append("new_file_uploads", file);
             });
         }
-
-        // Debug: Verify the files in submitData
 
         try {
             const response = await fetch(
@@ -284,7 +219,7 @@ const AccidentClaimsView: React.FC = () => {
             const responseData = await response.json();
 
             if (responseData.claim) {
-                const updatedClaim: Claim = responseData.claim; // Ensure 'claim' is returned by backend
+                const updatedClaim: Claim = responseData.claim;
 
                 setClaims((prevClaims) =>
                     prevClaims.map((claim) =>
@@ -293,12 +228,16 @@ const AccidentClaimsView: React.FC = () => {
                                 ...updatedClaim,
                                 isEditing: false,
                                 editedData: mapClaimToFormData(updatedClaim, businessId),
+                                user: {
+                                    user_id: String(updatedClaim.user_id),          // Ensure these fields are present
+                                    username: updatedClaim.username,
+                                    user_email: updatedClaim.user_email,
+                                },
                             }
                             : claim
                     )
                 );
             } else {
-                // If 'claim' is not returned, manually update the claim's editedData without affecting 'file_uploads'
                 setClaims((prevClaims) =>
                     prevClaims.map((claim) =>
                         claim.claim_id === claim_id
@@ -307,7 +246,6 @@ const AccidentClaimsView: React.FC = () => {
                                 isEditing: false,
                                 editedData: {
                                     ...claim.editedData,
-                                    ...claimToUpdate.editedData,
                                 },
                             }
                             : claim
@@ -319,8 +257,8 @@ const AccidentClaimsView: React.FC = () => {
                 title: "Success",
                 description: "Form submitted successfully!",
             });
-            // Optionally, redirect to dashboard
-            // router.push("/dashboard")
+
+
         } catch (err: any) {
             console.error("Submission Error:", err);
             toast({
@@ -345,6 +283,47 @@ const AccidentClaimsView: React.FC = () => {
         );
     };
 
+    const handleDownloadAllClaims = (format: 'csv' | 'excel' | 'pdf') => {
+
+        if (format === 'csv' || format === 'excel') {
+
+            const worksheetData = claims.map(claim => {
+                const flatClaim = flattenClaimData(claim);
+                return flatClaim;
+            });
+
+            const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Claims");
+
+            if (format === 'excel') {
+                const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+                const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+                saveAs(blob, 'claims.xlsx');
+            } else if (format === 'csv') {
+                const csvData = XLSX.utils.sheet_to_csv(worksheet);
+                const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+                saveAs(blob, 'claims.csv');
+            }
+        } else if (format === 'pdf') {
+            const doc = new jsPDF();
+            if (claims.length > 0) {
+                const tableColumn = Object.keys(flattenClaimData(claims[0]));
+                const tableRows = claims.map(claim => Object.values(flattenClaimData(claim)));
+
+                autoTable(doc, {
+                    head: [tableColumn],
+                    body: tableRows as RowInput[],
+                });
+            } else {
+                doc.text("No claims available to generate PDF.", 10, 10);
+            }
+
+            doc.save('claims.pdf');
+        }
+    };
+
+
     if (loading)
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
@@ -360,14 +339,14 @@ const AccidentClaimsView: React.FC = () => {
         );
 
     return (
-        <div className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 xl:p-8 overflow-y-auto">
-            <div className="p-4 mt-8">
+        <div className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 overflow-y-scroll no-scrollbar">
+            <div className="">
                 {/* Title Section */}
                 <div className="mb-8 flex flex-row items-start justify-between w-full gap-16 text-start">
                     <div className="lg:text-left">
                         <h1 className="text-navyBlue dark:text-white text-3xl leading-7 font-bold underline flex items-center gap-2 justify-center lg:justify-start">
                             <FaEdit />
-                            {session?.user?.role.id === 1 ? "My Accident Claims" : "All Accident Claims"}
+                            {session?.user?.role.id === 1 ? "My Claim Reports" : "All Accident Claims"}
                         </h1>
                         <p className="text-gray-600 dark:text-gray-400 mt-4">
                             Review and manage your submitted accident claims below.
@@ -375,28 +354,85 @@ const AccidentClaimsView: React.FC = () => {
                             Click on a claim to view or edit its details.
                         </p>
                     </div>
+
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center">
+                            <span className="mr-2 text-gray-700 dark:text-gray-200">
+                                {isSpreadsheetView ? "Spreadsheet View" : "Card View"}
+                            </span>
+                            <Switch
+                                checked={isSpreadsheetView}
+                                onCheckedChange={setIsSpreadsheetView}
+                            />
+                        </div>
+                        {/* Download Buttons */}
+                        {/* <div className="flex items-center gap-2">
+                            <Button onClick={() => handleDownloadAllClaims('csv')}>
+                                <FaDownload className="mr-2" /> Download All CSV
+                            </Button>
+                            <Button onClick={() => handleDownloadAllClaims('excel')}>
+                                <FaDownload className="mr-2" /> Download All Excel
+                            </Button>
+                            <Button onClick={() => handleDownloadAllClaims('pdf')}>
+                                <FaDownload className="mr-2" /> Download All PDF
+                            </Button>
+                        </div> */}
+                    </div>
+
                 </div>
 
                 {/* Claims List */}
                 {claims.length === 0 ? (
                     <p className="text-center text-white">No claims found.</p>
+                ) : isSpreadsheetView ? (
+                    <SpreadsheetView claims={claims} />
                 ) : (
                     <div className="space-y-4">
-                        {claims.map((claim) => (
-                            <ClaimAccordion
-                                key={claim.claim_id}
-                                claim={claim}
-                                toggleEdit={toggleEdit}
-                                handleFieldChange={handleFieldChange}
-                                handleSave={handleSave}
-                                handleCancel={handleCancel}
-                            />
-                        ))}
+                        {session?.user?.role.id === 1 ? (
+                            // Role 1: User - Show their own claims in accordions
+                            claims.map((claim) => (
+                                <ClaimAccordion
+                                    key={claim.claim_id}
+                                    claim={claim}
+                                    toggleEdit={toggleEdit}
+                                    handleFieldChange={handleFieldChange}
+                                    handleSave={handleSave}
+                                    handleCancel={handleCancel}
+                                />
+                            ))
+                        ) : (
+                            // Roles 2,3,4: Business/Admin - Group claims by user
+                            groupedClaims.map((group) => (
+                                <div key={group.user.user_id} className="border rounded-md p-4 bg-gray-100 dark:bg-gray-700">
+                                    <div className="mb-4">
+                                        <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
+                                            {group.user.username}
+                                        </h2>
+                                        <p className="text-gray-600 dark:text-gray-400">
+                                            {group.user.user_email}
+                                        </p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        {group.claims.map((claim) => (
+                                            <ClaimAccordion
+                                                key={claim.claim_id}
+                                                claim={claim}
+                                                toggleEdit={toggleEdit}
+                                                handleFieldChange={handleFieldChange}
+                                                handleSave={handleSave}
+                                                handleCancel={handleCancel}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            ))
+                        )}
                     </div>
                 )}
             </div>
         </div>
     );
+
 };
 
 export default AccidentClaimsView;

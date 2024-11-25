@@ -1,9 +1,12 @@
+// src/components/business/forms/custom/accident-claim/config/formConfig.ts
+
 import { AccidentClaimFormData } from "./types";
 
 export const initialForm: AccidentClaimFormData = {
   business_id: "",
   formUrl: "",
 
+  // Personal Information
   full_name: "",
   email: "",
   country: "",
@@ -12,11 +15,13 @@ export const initialForm: AccidentClaimFormData = {
   other_contact_name: "",
   other_contact_phone: "",
 
-  accident_date: "",
+  // Accident Information
+  accident_date: "", // Should be ISO Date string
   accident_place: "",
   accident_type: "",
   sub_accident_type: "",
 
+  // Motor Vehicle Accident Details
   mva_type: "",
   mva_location: "",
   vehicle_details: [
@@ -27,83 +32,48 @@ export const initialForm: AccidentClaimFormData = {
   selected_vehicle: "",
   mva_description: "",
 
-  mva_medical_info: {
-    assistanceType: "",
-    diagnosis: "",
-    treatment: "",
-    primaryCareProvider: "",
-  },
+  // Medical Information (Flat Fields)
+  medical_assistance_type: "",
+  medical_diagnosis: "",
+  medical_treatment: "",
+  primary_care_provider: "",
 
-  mva_costs: {
-    totalCost: "",
-    policyLimits: "",
-    assistanceStatus: "",
-    medicalProviderCosts: "",
-    repatriationCosts: "",
-    otherCosts: "",
-  },
+  // Cost of Assistance
+  medical_total_cost: 0, // Initialized as number
+  policy_limits: 0, // Initialized as number
+  assistance_status: "",
+  medical_provider_costs: {}, // Initialized as empty object
+  repatriation_costs: {}, // Initialized as empty object
+  other_costs: {}, // Initialized as empty object
 
-  mva_third_party_info: {
-    insuranceCompany: "",
-    claimReferenceNumber: "",
-    adjusterName: "",
-    adjusterContactDetails: "",
-    ownerBusinessName: "",
-    ownerReferenceNumber: "",
-    ownerPhoneNumber: "",
-    coInsured: "",
-    otherPartyInfo: "",
-  },
+  // Third Party Information
+  insurance_company: "",
+  claim_reference_number: "",
+  adjuster_name: "",
+  adjuster_contact_details: "",
+  owner_business_name: "",
+  owner_reference_number: "",
+  owner_phone_number: "",
+  co_insured_name: "",
+  other_party_info: "",
 
-  mva_attorney_info: {
-    lawFirmName: "",
-    attorneyName: "",
-    attorneyPhone: "",
-  },
+  // Attorney Information
+  law_firm_name: "",
+  attorney_name: "",
+  attorney_phone: "",
 
+  // Slip and Fall Accident Details
   slip_description: "",
   slip_accident_type: "",
   negligence_description: "",
+  witness_name: "",
+  witness_email: "",
+  witness_phone: "",
 
-  witness_info: {
-    name: "",
-    email: "",
-    phone: "",
-  },
+  // File Uploads
+  file_uploads: null, // Initially no uploads
+  new_file_uploads: null, // Initially no new uploads
 
-  slip_medical_info: {
-    assistanceType: "",
-    diagnosis: "",
-    treatment: "",
-    primaryCareProvider: "",
-  },
-
-  slip_costs: {
-    totalCost: "",
-    policyLimits: "",
-    assistanceStatus: "",
-    medicalCost: "",
-    repatriationCosts: "",
-    otherCosts: "",
-  },
-
-  slip_third_party_info: {
-    insuranceCompany: "",
-    claimReferenceNumber: "",
-    adjusterName: "",
-    adjusterContactDetails: "",
-    ownerBusinessName: "",
-    ownerReferenceNumber: "",
-    ownerPhoneNumber: "",
-    coInsuredName: "",
-    otherPartyInfo: "",
-  },
-
-  slip_attorney_info: {
-    lawFirmName: "",
-    attorneyName: "",
-    attorneyPhone: "",
-  },
-
-  file_uploads: null,
+  // Additional Notes (if any)
+  additional_notes: "",
 };

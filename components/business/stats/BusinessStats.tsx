@@ -1,67 +1,86 @@
-"use client"
-import { useAppContext } from '@/context/AppProvider'
-import { Users, Briefcase, FileText, DollarSign } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
-import StatCard from './StatCard'
-import { useSession } from 'next-auth/react'
-import { useUser } from '@/hooks/user/useUser'
-import { useGodMode } from '@/hooks/user/useGodMode'
+"use client";
+
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { Users, Briefcase, FileText, DollarSign } from "lucide-react";
+import StatCard from "./StatCard";
 
 const BusinessStats = () => {
     const { data: session } = useSession();
-    const { godMode } = useGodMode();
-    const { data, actions } = useAppContext()
-    const { businesses, subscriptionPlans, forms, loading } = data
-    const { getAllBusinesses, fetchSubscriptionPlans, formActions } = actions
-
-    const { users, fetchAllUsers } = useUser();
-    const [userCount, setUserCount] = useState<number>(0)
+    const [stats, setStats] = useState({
+        usersCount: 0,
+        claimsCount: 0,
+        messagesCount: 0,
+        newMessagesCount: 0,
+    });
 
     useEffect(() => {
-        if (session?.user.role.id === 4) {
-            getAllBusinesses()
-            fetchSubscriptionPlans()
-            formActions.fetchAllForms()
-        }
-        /* TODO: This should be by businessId */
-        if (session?.user?.role?.id === 4) {
-            fetchAllUsers().then((data) => {
-                if (data) {
-                    setUserCount(data.length)
+        const fetchStats = async () => {
+            try {
+                // Determine the endpoint based on the user's role
+                const endpoint =
+                    session?.user?.role?.id === 1
+                        ? `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/custom/forms/user_stats`
+                        : `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/custom/forms/business_stats`;
+
+                const response = await fetch(endpoint, {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${session?.accessToken}`,
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to fetch stats.");
                 }
-            }).catch((error) => console.error("Error fetching users:", error))
+
+                const data = await response.json();
+
+                // Dynamically map stats based on the response
+                setStats({
+                    usersCount: data.users_count || 0,
+                    claimsCount: data.claims_count || 0,
+                    messagesCount: data.messages_count || 0,
+                    newMessagesCount: data.new_messages_count || 0,
+                });
+            } catch (error) {
+                console.error("Error fetching stats:", error);
+            }
+        };
+
+        if (session?.accessToken) {
+            fetchStats();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [session?.user?.role?.id, session?.user?.businessId])
+    }, [session?.accessToken, session?.user?.role?.id]);
 
     return (
         <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
             <StatCard
-                title="Businesses Created"
+                title="Users Count"
+                icon={<Users className="h-4 w-4 text-muted-foreground" />}
+                value={stats.usersCount}
+                description={session?.user?.role?.id === 1 ? "+2 claims added this month" : "+5% since last month"}
+            />
+            <StatCard
+                title="Claims Count"
+                icon={<FileText className="h-4 w-4 text-muted-foreground" />}
+                value={stats.claimsCount}
+                description={session?.user?.role?.id === 1 ? "+1 claim reviewed" : "+8% since last month"}
+            />
+            <StatCard
+                title="Messages Sent"
                 icon={<Briefcase className="h-4 w-4 text-muted-foreground" />}
-                value={businesses?.length || 0}
+                value={stats.messagesCount}
                 description="+10% since last month"
             />
             <StatCard
-                title="Users Subscribed"
-                icon={<Users className="h-4 w-4 text-muted-foreground" />}
-                value={userCount}
-                description="+5% since last month"
-            />
-            <StatCard
-                title="Forms Created"
-                icon={<FileText className="h-4 w-4 text-muted-foreground" />}
-                value={forms?.length || 0}
-                description="+8% since last month"
-            />
-            <StatCard
-                title="Total Subscriptions"
+                title="New Messages"
                 icon={<DollarSign className="h-4 w-4 text-muted-foreground" />}
-                value={subscriptionPlans?.length || 0}
+                value={stats.newMessagesCount}
                 description="+12% since last month"
             />
         </div>
-    )
-}
+    );
+};
 
-export default BusinessStats
+export default BusinessStats;

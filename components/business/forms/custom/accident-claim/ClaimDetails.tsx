@@ -1,14 +1,12 @@
-// ClaimDetails.tsx
+// components/ClaimDetails.tsx
 
 import React from "react";
-import { EditableClaim } from "./AccidentClaimsView";
-import { formSections } from "./config/form-config"; // Ensure form-config.ts has 'file_uploads' removed
+import { formSections } from "./config/form-config";
 import { FaFileAlt, FaFilePdf, FaTrash } from "react-icons/fa";
-import FileDisplay from "./FileDisplay";
-import { AccidentClaimFormData, Claim } from "./config/types";
-import DatePicker from "@/components/ui/date-picker";
 import { Button } from "@/components/ui/button";
-import FileUpload from "@/components/ui/file-upload"; // Import your FileUpload component
+import FileUpload from "@/components/ui/file-upload";
+import DatePicker from "@/components/ui/date-picker";
+import { EditableClaim } from "./config/types";
 
 interface ClaimDetailsProps {
     claim: EditableClaim;
@@ -29,16 +27,6 @@ const formatLabel = (field: string) => {
         .replace(/Mva/g, "MVA");
 };
 
-function parseJSONField(field: string | null) {
-    try {
-        return field ? JSON.parse(field) : null;
-    } catch {
-        return null;
-    }
-}
-
-const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
-
 const ClaimDetails: React.FC<ClaimDetailsProps> = ({
     claim,
     onEdit,
@@ -48,9 +36,7 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
 }) => {
     const { isEditing, editedData } = claim;
 
-
     const renderExistingFiles = (files?: string[] | null) => {
-        // Ensure 'files' is an array to prevent runtime errors
         const validFiles = Array.isArray(files) ? files : [];
 
         if (validFiles.length === 0) {
@@ -79,8 +65,6 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
         );
     };
 
-    // Removed the second renderExistingFiles function to prevent duplication
-
     const renderVehicleDetails = (vehicleDetails: any) => {
         if (!Array.isArray(vehicleDetails) || vehicleDetails.length === 0) {
             return <span className="text-gray-500 dark:text-gray-400">No vehicle details provided</span>;
@@ -98,19 +82,14 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
         ));
     };
 
-    const existingFiles = (() => {
-        try {
-            return typeof claim.file_uploads === 'string'
-                ? JSON.parse(claim.file_uploads)
-                : Array.isArray(claim.file_uploads)
-                    ? claim.file_uploads
-                    : [];
-        } catch (error) {
-            console.error("Failed to parse file_uploads:", error);
-            return [];
-        }
-    })();
+    // Access parsed file_uploads and vehicle_details from editedData or claim
+    const existingFiles = isEditing
+        ? Array.isArray(editedData.file_uploads) ? editedData.file_uploads : []
+        : Array.isArray(claim.file_uploads) ? claim.file_uploads : [];
 
+    const vehicleDetails = isEditing
+        ? Array.isArray(editedData.vehicle_details) ? editedData.vehicle_details : []
+        : Array.isArray(claim.vehicle_details) ? claim.vehicle_details : [];
 
     return (
         <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
@@ -165,7 +144,8 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                             let value = getNestedValue(isEditing ? editedData : claim, path);
 
                             const renderValue = () => {
-                                // Inside the renderValue function for 'file' type
+                                console.log(`Rendering field: ${field.id}`, value); // Debugging log
+
                                 if (field.type === "file") {
                                     if (isEditing) {
                                         return (
@@ -185,34 +165,6 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                                                         }
                                                         className="mt-2"
                                                     />
-                                                    {/* Display previews of new files */}
-                                                    {/* {newFiles && newFiles.length > 0 && (
-                                                        <div className="mt-2 flex flex-col w-full gap-4">
-                                                            {Array.from(newFiles).map((file, index) => (
-                                                                <div key={index} className="file-thumbnail relative border rounded-lg p-2 shadow-sm">
-                                                                    <img
-                                                                        src={URL.createObjectURL(file)}
-                                                                        alt={file.name}
-                                                                        className="w-full h-20 object-cover rounded-md"
-                                                                    />
-                                                                    <button
-                                                                        onClick={() => {
-                                                                            const updatedFiles = Array.from(newFiles);
-                                                                            updatedFiles.splice(index, 1);
-                                                                            const dataTransfer = new DataTransfer();
-                                                                            updatedFiles.forEach((f) => dataTransfer.items.add(f));
-                                                                            handleFieldChange(claim.claim_id, "new_file_uploads", dataTransfer.files);
-                                                                        }}
-                                                                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-700 transition-colors"
-                                                                        aria-label="Remove file"
-                                                                    >
-                                                                        <FaTrash size={12} />
-                                                                    </button>
-                                                                    <p className="text-xs mt-1 truncate text-gray-600">{file.name}</p>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    )} */}
                                                 </div>
                                             </div>
                                         );
@@ -249,40 +201,48 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                                     }
                                 }
 
-                                if (field.type === "conditionalSelect") {
-                                    return <span className="text-gray-700 dark:text-gray-300">{value || "N/A"}</span>;
-                                }
-
-                                if (field.type === "textarea") {
+                                if (field.type === "textarea" || field.type === "text") {
                                     if (isEditing) {
                                         return (
                                             <textarea
-                                                value={typeof value === 'string' ? value : ''}
+                                                value={typeof value === "string" ? value : ""}
                                                 onChange={(e) => handleFieldChange(claim.claim_id, field.id, e.target.value)}
                                                 className="w-full border border-gray-300 rounded-md p-2"
                                                 required={field.required}
                                             />
                                         );
                                     } else {
-                                        if (typeof value === 'string') {
+                                        if (typeof value === "string") {
                                             return <span className="text-gray-700 dark:text-gray-300">{value || "N/A"}</span>;
-                                        } else if (Array.isArray(value)) {
+                                        } else if (typeof value === "object" && value !== null) {
                                             return (
                                                 <ul>
-                                                    {value.map((item, index) => (
+                                                    {Object.entries(value).map(([key, val], index) => (
                                                         <li key={index} className="text-gray-700 dark:text-gray-300">
-                                                            {JSON.stringify(item)}
+                                                            {key}: {JSON.stringify(val)}
                                                         </li>
                                                     ))}
                                                 </ul>
                                             );
-                                        } else if (typeof value === 'object' && value !== null) {
-                                            return <span className="text-gray-700 dark:text-gray-300">{JSON.stringify(value)}</span>;
-                                        } else {
-                                            return <span className="text-gray-700 dark:text-gray-300">N/A</span>;
                                         }
+                                        return <span className="text-gray-700 dark:text-gray-300">N/A</span>;
                                     }
                                 }
+
+                                // Handle generic objects
+                                if (typeof value === "object" && value !== null) {
+                                    return (
+                                        <ul>
+                                            {Object.entries(value).map(([key, val], index) => (
+                                                <li key={index} className="text-gray-700 dark:text-gray-300">
+                                                    {key}: {JSON.stringify(val)}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    );
+                                }
+
+
 
                                 if (field.type === "date") {
                                     if (isEditing) {
@@ -342,12 +302,13 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                                 }
 
                                 if (field.type === "vehicleDetails") {
-                                    let vehicleDetailsValue = typeof value === "string" ? parseJSONField(value) : value;
-                                    return renderVehicleDetails(vehicleDetailsValue);
+                                    // vehicleDetails is already parsed into an array
+                                    return renderVehicleDetails(vehicleDetails);
                                 }
 
-                                if (typeof value === "object" && !Array.isArray(value)) {
-                                    return <span className="text-gray-700 dark:text-gray-300">{JSON.stringify(value) || "N/A"}</span>;
+                                // Handle unexpected field types or object structures
+                                if (typeof value === "object" && value !== null) {
+                                    return <span className="text-gray-700 dark:text-gray-300">{JSON.stringify(value)}</span>;
                                 }
 
                                 if (Array.isArray(value)) {
@@ -361,16 +322,17 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                                 }
 
                                 return <span className="text-gray-700 dark:text-gray-300">{value !== null && value !== undefined ? value.toString() : "N/A"}</span>;
-                            }
+                            };
 
                             return (
                                 <div key={field.id} className="flex flex-col">
-                                    <h4 className="font-semibold text-gray-700 dark:text-gray-300">{formatLabel(field.label)}</h4>
+                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        {formatLabel(field.label)}
+                                    </label>
                                     {renderValue()}
                                 </div>
                             );
-                        }
-                        )}
+                        })}
                     </div>
                 </section>
             ))}

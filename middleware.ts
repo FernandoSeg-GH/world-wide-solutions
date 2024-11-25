@@ -5,7 +5,7 @@ import { jwtDecode } from "jwt-decode";
 
 const TOKEN_EXPIRATION_THRESHOLD = 60 * 1000; // 1 minute
 
-async function refreshAccessToken(refreshToken: string): Promise<any> {
+export async function refreshAccessToken(refreshToken: string): Promise<any> {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/auth/refresh`,
     {
@@ -23,7 +23,9 @@ async function refreshAccessToken(refreshToken: string): Promise<any> {
     );
   }
 
-  return await response.json();
+  const data = await response.json();
+  console.log("Token refreshed successfully:", data);
+  return data;
 }
 
 export async function middleware(req: NextRequest) {

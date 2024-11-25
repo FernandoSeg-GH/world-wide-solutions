@@ -31,7 +31,7 @@ export default function Main() {
             />
             {/* <Separator className="border-gray-400 my-3" /> */}
             <div className="flex flex-col gap-6 mt-4">
-                {session?.user.role.id !== 1 && <BusinessStats />}
+                <BusinessStats />
                 {session?.user.role.id === 4 && (
                     <Forms />
                 )}

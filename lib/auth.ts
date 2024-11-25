@@ -99,7 +99,8 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }: { token: JWT; user?: any }) {
+      // Initial sign in
       if (user) {
         token.accessToken = user.access_token;
         token.refreshToken = user.refresh_token;
@@ -112,7 +113,7 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Access token does not have an exp claim");
         }
 
-        token.accessTokenExpires = decodedAccessToken.exp * 1000;
+        token.accessTokenExpires = decodedAccessToken.exp * 1000; // Convert to milliseconds
         token.id = Number(user.id);
         token.email = user.email;
         token.username = user.username;
@@ -130,16 +131,20 @@ export const authOptions: NextAuthOptions = {
             name: "Unknown",
           };
         }
+
         return token;
       }
 
+      // Return previous token if the access token has not expired yet
       if (Date.now() < (token.accessTokenExpires as number)) {
         return token;
       }
 
+      // Access token has expired, try to update it
       const newToken = await refreshAccessToken(token);
 
       if (newToken.error) {
+        // If there was an error, return the old token with an error property
         return {
           ...token,
           error: "RefreshAccessTokenError",
@@ -148,7 +153,7 @@ export const authOptions: NextAuthOptions = {
 
       return newToken;
     },
-    async session({ session, token }) {
+    async session({ session, token }: { session: any; token: JWT }) {
       session.accessToken = token.accessToken;
       session.user = {
         id: Number(token.id),

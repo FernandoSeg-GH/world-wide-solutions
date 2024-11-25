@@ -1,11 +1,10 @@
-// formConfig.ts
-import { FaUser, FaCarSide, FaBriefcaseMedical, FaFileAlt, FaBalanceScale } from "react-icons/fa";
+import { FaUser, FaCarSide, FaFileAlt } from "react-icons/fa";
 
 import { countryOptions } from "./country-options";
 import { accidentTypeOptions } from "./accident-options";
 import { AccidentClaimFormData, Claim } from "./types";
 import { usaStates } from "./state-options";
-
+import { RiAlarmWarningFill } from "react-icons/ri";
 
 export interface FieldConfig {
   id: string;
@@ -39,7 +38,7 @@ export const formSections: SectionConfig[] = [
   },
   {
     title: "Accident Information",
-    icon: <FaCarSide />,
+    icon: <RiAlarmWarningFill />,
     fields: [
       { id: "accident_date", label: "Accident Date", type: "date", required: true },
       { id: "accident_place", label: "Accident Place", type: "text", required: true },
@@ -77,17 +76,17 @@ export const formSections: SectionConfig[] = [
       },
       { id: "mva_description", label: "Description of Accident", type: "textarea" },
 
-      // Medical Info - Nested Fields
-      { id: "mva_medical_info.assistanceType", label: "Assistance Type", type: "text" },
-      { id: "mva_medical_info.diagnosis", label: "Diagnosis", type: "text" },
-      { id: "mva_medical_info.treatment", label: "Treatment", type: "text" },
-      { id: "mva_medical_info.primaryCareProvider", label: "Primary Care Provider", type: "text" },
+      // Medical Info - Flat Fields
+      { id: "medical_assistance_type", label: "Assistance Type", type: "text" },
+      { id: "medical_diagnosis", label: "Diagnosis", type: "text" },
+      { id: "medical_treatment", label: "Treatment", type: "text" },
+      { id: "primary_care_provider", label: "Primary Care Provider", type: "text" },
 
-      // Costs - Nested Fields
-      { id: "mva_costs.totalCost", label: "Total Cost", type: "number" },
-      { id: "mva_costs.policyLimits", label: "Policy Limits", type: "number" },
+      // Costs - Flat Fields
+      { id: "medical_total_cost", label: "Total Cost", type: "number" },
+      { id: "policy_limits", label: "Policy Limits", type: "number" },
       {
-        id: "mva_costs.assistanceStatus",
+        id: "assistance_status",
         label: "Assistance Status",
         type: "select",
         options: [
@@ -97,77 +96,25 @@ export const formSections: SectionConfig[] = [
           { value: "closed", label: "Closed" },
         ],
       },
-      { id: "mva_costs.medicalProviderCosts", label: "Medical Provider Costs", type: "number" },
-      { id: "mva_costs.repatriationCosts", label: "Repatriation Costs", type: "number" },
-      { id: "mva_costs.otherCosts", label: "Other Costs", type: "number" },
+      { id: "medical_provider_costs", label: "Medical Provider Costs", type: "number" },
+      { id: "repatriation_costs", label: "Repatriation Costs", type: "number" },
+      { id: "other_costs", label: "Other Costs", type: "number" },
 
-      // Third Party Info - Nested Fields
-      { id: "mva_third_party_info.insuranceCompany", label: "Insurance Company", type: "text" },
-      { id: "mva_third_party_info.claimReferenceNumber", label: "Claim Reference Number", type: "text" },
-      { id: "mva_third_party_info.adjusterName", label: "Adjuster Name", type: "text" },
-      { id: "mva_third_party_info.adjusterContactDetails", label: "Adjuster Contact Details", type: "textarea" },
-      { id: "mva_third_party_info.ownerBusinessName", label: "Owner Business Name", type: "text" },
-      { id: "mva_third_party_info.ownerReferenceNumber", label: "Owner Reference Number", type: "text" },
-      { id: "mva_third_party_info.ownerPhoneNumber", label: "Owner Phone Number", type: "text" },
-      { id: "mva_third_party_info.coInsured", label: "Co-Insured", type: "text" },
-      { id: "mva_third_party_info.otherPartyInfo", label: "Other Party Information", type: "textarea" },
+      // Third Party Info - Flat Fields
+      { id: "insurance_company", label: "Insurance Company", type: "text" },
+      { id: "claim_reference_number", label: "Claim Reference Number", type: "text" },
+      { id: "adjuster_name", label: "Adjuster Name", type: "text" },
+      { id: "adjuster_contact_details", label: "Adjuster Contact Details", type: "textarea" },
+      { id: "owner_business_name", label: "Owner Business Name", type: "text" },
+      { id: "owner_reference_number", label: "Owner Reference Number", type: "text" },
+      { id: "owner_phone_number", label: "Owner Phone Number", type: "text" },
+      { id: "co_insured_name", label: "Co-Insured Name", type: "text" },
+      { id: "other_party_info", label: "Other Party Information", type: "textarea" },
 
-      // Attorney Info - Nested Fields
-      { id: "mva_attorney_info.lawFirmName", label: "Law Firm Name", type: "text" },
-      { id: "mva_attorney_info.attorneyName", label: "Attorney Name", type: "text" },
-      { id: "mva_attorney_info.attorneyPhone", label: "Attorney Phone", type: "text" },
-    ],
-  },
-  {
-    title: "Slip and Fall Details",
-    icon: <FaBriefcaseMedical />,
-    fields: [
-      { id: "slip_description", label: "Slip Description", type: "textarea" },
-      { id: "slip_accident_type", label: "Slip Accident Type", type: "text" },
-      { id: "negligence_description", label: "Negligence Description", type: "textarea" },
-      { id: "witness_info.name", label: "Witness Name", type: "text" },
-      { id: "witness_info.email", label: "Witness Email", type: "email" },
-      { id: "witness_info.phone", label: "Witness Phone", type: "text" },
-
-      // Medical Info - Nested Fields
-      { id: "slip_medical_info.assistanceType", label: "Assistance Type", type: "text" },
-      { id: "slip_medical_info.diagnosis", label: "Diagnosis", type: "text" },
-      { id: "slip_medical_info.treatment", label: "Treatment", type: "text" },
-      { id: "slip_medical_info.primaryCareProvider", label: "Primary Care Provider", type: "text" },
-
-      // Costs - Nested Fields
-      { id: "slip_costs.totalCost", label: "Total Cost", type: "number" },
-      { id: "slip_costs.policyLimits", label: "Policy Limits", type: "number" },
-      {
-        id: "slip_costs.assistanceStatus",
-        label: "Assistance Status",
-        type: "select",
-        options: [
-          { value: "open", label: "Open" },
-          { value: "under_review", label: "Under Review" },
-          { value: "approved", label: "Approved" },
-          { value: "closed", label: "Closed" },
-        ],
-      },
-      { id: "slip_costs.medicalCost", label: "Medical Cost", type: "number" },
-      { id: "slip_costs.repatriationCosts", label: "Repatriation Costs", type: "number" },
-      { id: "slip_costs.otherCosts", label: "Other Costs", type: "number" },
-
-      // Third Party Info - Nested Fields
-      { id: "slip_third_party_info.insuranceCompany", label: "Insurance Company", type: "text" },
-      { id: "slip_third_party_info.claimReferenceNumber", label: "Claim Reference Number", type: "text" },
-      { id: "slip_third_party_info.adjusterName", label: "Adjuster Name", type: "text" },
-      { id: "slip_third_party_info.adjusterContactDetails", label: "Adjuster Contact Details", type: "textarea" },
-      { id: "slip_third_party_info.ownerBusinessName", label: "Owner Business Name", type: "text" },
-      { id: "slip_third_party_info.ownerReferenceNumber", label: "Owner Reference Number", type: "text" },
-      { id: "slip_third_party_info.ownerPhoneNumber", label: "Owner Phone Number", type: "text" },
-      { id: "slip_third_party_info.coInsuredName", label: "Co-Insured Name", type: "text" },
-      { id: "slip_third_party_info.otherPartyInfo", label: "Other Party Information", type: "textarea" },
-
-      // Attorney Info - Nested Fields
-      { id: "slip_attorney_info.lawFirmName", label: "Law Firm Name", type: "text" },
-      { id: "slip_attorney_info.attorneyName", label: "Attorney Name", type: "text" },
-      { id: "slip_attorney_info.attorneyPhone", label: "Attorney Phone", type: "text" },
+      // Attorney Info - Flat Fields
+      { id: "law_firm_name", label: "Law Firm Name", type: "text" },
+      { id: "attorney_name", label: "Attorney Name", type: "text" },
+      { id: "attorney_phone", label: "Attorney Phone", type: "text" },
     ],
   },
   {
@@ -179,108 +126,67 @@ export const formSections: SectionConfig[] = [
   },
 ];
 
-// Updated mapClaimToFormData to handle multiple file categories
+
+
+
+
 export function mapClaimToFormData(claim: Claim, businessId: string): AccidentClaimFormData {
   return {
-    business_id: businessId,
-    formUrl: claim.formUrl || "", // Ensure a default value if necessary
 
-    // Patient Personal Information
-    full_name: claim.full_name || "",
-    email: claim.email || "",
-    country: claim.country || "",
-    state: claim.state || "",
-    primary_contact: claim.primary_contact || "",
-    other_contact_name: claim.other_contact_name || "",
-    other_contact_phone: claim.other_contact_phone || "",
-
-    // Accident Information
-    accident_date: claim.accident_date ? claim.accident_date.split("T")[0] : "",
-    accident_place: claim.accident_place || "",
-    accident_type: claim.accident_type || "",
-    sub_accident_type: claim.sub_accident_type || "",
-
-    // Motor Vehicle Accident Details
-    mva_type: claim.mva_type || "",
-    mva_location: claim.mva_location || "",
-    vehicle_details: claim.vehicle_details || [],
-    selected_vehicle: claim.selected_vehicle || "",
-    mva_description: claim.mva_description || "",
-
-    // Nested Motor Vehicle Medical Info
-    mva_medical_info: {
-      assistanceType: claim.mva_medical_info?.assistanceType || "",
-      diagnosis: claim.mva_medical_info?.diagnosis || "",
-      treatment: claim.mva_medical_info?.treatment || "",
-      primaryCareProvider: claim.mva_medical_info?.primaryCareProvider || "",
-    },
-    mva_costs: {
-      totalCost: claim.mva_costs?.totalCost || "",
-      policyLimits: claim.mva_costs?.policyLimits || "",
-      assistanceStatus: claim.mva_costs?.assistanceStatus || "",
-      medicalProviderCosts: claim.mva_costs?.medicalProviderCosts || "",
-      repatriationCosts: claim.mva_costs?.repatriationCosts || "",
-      otherCosts: claim.mva_costs?.otherCosts || "",
-    },
-    mva_third_party_info: {
-      insuranceCompany: claim.mva_third_party_info?.insuranceCompany || "",
-      claimReferenceNumber: claim.mva_third_party_info?.claimReferenceNumber || "",
-      adjusterName: claim.mva_third_party_info?.adjusterName || "",
-      adjusterContactDetails: claim.mva_third_party_info?.adjusterContactDetails || "",
-      ownerBusinessName: claim.mva_third_party_info?.ownerBusinessName || "",
-      ownerReferenceNumber: claim.mva_third_party_info?.ownerReferenceNumber || "",
-      ownerPhoneNumber: claim.mva_third_party_info?.ownerPhoneNumber || "",
-      coInsured: claim.mva_third_party_info?.coInsured || "",
-      otherPartyInfo: claim.mva_third_party_info?.otherPartyInfo || "",
-    },
-    mva_attorney_info: {
-      lawFirmName: claim.mva_attorney_info?.lawFirmName || "",
-      attorneyName: claim.mva_attorney_info?.attorneyName || "",
-      attorneyPhone: claim.mva_attorney_info?.attorneyPhone || "",
-    },
-
-    // Slip and Fall Details
-    slip_description: claim.slip_description || "",
-    slip_accident_type: claim.slip_accident_type || "",
-    negligence_description: claim.negligence_description || "",
-    witness_info: {
-      name: claim.witness_info?.name || "",
-      email: claim.witness_info?.email || "",
-      phone: claim.witness_info?.phone || "",
-    },
-    slip_medical_info: {
-      assistanceType: claim.slip_medical_info?.assistanceType || "",
-      diagnosis: claim.slip_medical_info?.diagnosis || "",
-      treatment: claim.slip_medical_info?.treatment || "",
-      primaryCareProvider: claim.slip_medical_info?.primaryCareProvider || "",
-    },
-    slip_costs: {
-      totalCost: claim.slip_costs?.totalCost || "",
-      policyLimits: claim.slip_costs?.policyLimits || "",
-      assistanceStatus: claim.slip_costs?.assistanceStatus || "",
-      medicalCost: claim.slip_costs?.medicalCost || "",
-      repatriationCosts: claim.slip_costs?.repatriationCosts || "",
-      otherCosts: claim.slip_costs?.otherCosts || "",
-    },
-    slip_third_party_info: {
-      insuranceCompany: claim.slip_third_party_info?.insuranceCompany || "",
-      claimReferenceNumber: claim.slip_third_party_info?.claimReferenceNumber || "",
-      adjusterName: claim.slip_third_party_info?.adjusterName || "",
-      adjusterContactDetails: claim.slip_third_party_info?.adjusterContactDetails || "",
-      ownerBusinessName: claim.slip_third_party_info?.ownerBusinessName || "",
-      ownerReferenceNumber: claim.slip_third_party_info?.ownerReferenceNumber || "",
-      ownerPhoneNumber: claim.slip_third_party_info?.ownerPhoneNumber || "",
-      coInsuredName: claim.slip_third_party_info?.coInsuredName || "",
-      otherPartyInfo: claim.slip_third_party_info?.otherPartyInfo || "",
-    },
-    slip_attorney_info: {
-      lawFirmName: claim.slip_attorney_info?.lawFirmName || "",
-      attorneyName: claim.slip_attorney_info?.attorneyName || "",
-      attorneyPhone: claim.slip_attorney_info?.attorneyPhone || "",
-    },
-
-    // File Uploads (categorized structure)
-    file_uploads: null,
-    new_file_uploads: null,
+    business_id: "",
+    formUrl: "",
+    full_name: "",
+    email: "",
+    country: "",
+    state: "",
+    primary_contact: "",
+    other_contact_name: "",
+    other_contact_phone: "",
+    accident_date: "",
+    accident_place: "",
+    accident_type: "",
+    sub_accident_type: "",
+    mva_type: "",
+    mva_location: "",
+    vehicle_details: [],
+    selected_vehicle: "",
+    mva_description: "",
+    medical_assistance_type: "",
+    medical_diagnosis: "",
+    medical_treatment: "",
+    primary_care_provider: "",
+    medical_total_cost: 0,
+    policy_limits: 0,
+    assistance_status: "",
+    medical_provider_costs: {},
+    repatriation_costs: {},
+    other_costs: {},
+    insurance_company: "",
+    claim_reference_number: "",
+    adjuster_name: "",
+    adjuster_contact_details: "",
+    owner_business_name: "",
+    owner_reference_number: "",
+    owner_phone_number: "",
+    co_insured_name: "",
+    other_party_info: "",
+    law_firm_name: "",
+    attorney_name: "",
+    attorney_phone: "",
+    slip_description: "",
+    slip_accident_type: "",
+    negligence_description: "",
+    witness_name: "",
+    witness_email: "",
+    witness_phone: ""
   };
+}
+
+function parseJSONField(field: string | any, fieldName: string = ""): any {
+  try {
+    return typeof field === 'string' ? JSON.parse(field) : field;
+  } catch (error) {
+    console.error(`Failed to parse field "${fieldName}":`, error);
+    return null;
+  }
 }
