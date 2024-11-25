@@ -1,5 +1,3 @@
-// components/business/forms/custom/accident-claim/AccidentClaimsView.tsx
-
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -107,6 +105,10 @@ const AccidentClaimsView: React.FC = () => {
 
             // Convert the groups object to an array
             const groupedArray: GroupedClaims[] = Object.values(groups);
+
+            // Optional: Sort the groups alphabetically by username
+            groupedArray.sort((a, b) => a.user.username.localeCompare(b.user.username));
+
             setGroupedClaims(groupedArray);
         }
     }, [claims, session?.user?.role.id]);
@@ -366,28 +368,28 @@ const AccidentClaimsView: React.FC = () => {
                             />
                         </div>
                         {/* Download Buttons */}
-                        {/* <div className="flex items-center gap-2">
-                            <Button onClick={() => handleDownloadAllClaims('csv')}>
-                                <FaDownload className="mr-2" /> Download All CSV
+                        <div className="flex items-center gap-2">
+                            <Button onClick={() => handleDownloadAllClaims('csv')} variant="outline">
+                                <FaEdit className="mr-2" /> Download CSV
                             </Button>
-                            <Button onClick={() => handleDownloadAllClaims('excel')}>
-                                <FaDownload className="mr-2" /> Download All Excel
+                            <Button onClick={() => handleDownloadAllClaims('excel')} variant="outline">
+                                <FaEdit className="mr-2" /> Download Excel
                             </Button>
-                            <Button onClick={() => handleDownloadAllClaims('pdf')}>
-                                <FaDownload className="mr-2" /> Download All PDF
+                            <Button onClick={() => handleDownloadAllClaims('pdf')} variant="outline">
+                                <FaEdit className="mr-2" /> Download PDF
                             </Button>
-                        </div> */}
+                        </div>
                     </div>
 
                 </div>
 
                 {/* Claims List */}
                 {claims.length === 0 ? (
-                    <p className="text-center text-white">No claims found.</p>
+                    <p className="text-center text-gray-500 dark:text-gray-400">No claims found.</p>
                 ) : isSpreadsheetView ? (
                     <SpreadsheetView claims={claims} />
                 ) : (
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                         {session?.user?.role.id === 1 ? (
                             // Role 1: User - Show their own claims in accordions
                             claims.map((claim) => (
@@ -402,16 +404,18 @@ const AccidentClaimsView: React.FC = () => {
                             ))
                         ) : (
                             // Roles 2,3,4: Business/Admin - Group claims by user
-                            groupedClaims.map((group) => (
-                                <div key={group.user.user_id} className="border rounded-md p-4 bg-gray-100 dark:bg-gray-700">
+                            groupedClaims.map((group, index) => (
+                                <div key={group.user.user_id} className="border-t border-gray-300 dark:border-gray-600 pt-6">
+                                    {/* User Subheader */}
                                     <div className="mb-4">
-                                        <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
-                                            {group.user.username}
+                                        <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
+                                            Submitted by: <span className="capitalize">{group.user.username}</span>
                                         </h2>
                                         <p className="text-gray-600 dark:text-gray-400">
                                             {group.user.user_email}
                                         </p>
                                     </div>
+                                    {/* Claims for the User */}
                                     <div className="space-y-2">
                                         {group.claims.map((claim) => (
                                             <ClaimAccordion
@@ -424,6 +428,10 @@ const AccidentClaimsView: React.FC = () => {
                                             />
                                         ))}
                                     </div>
+                                    {/* Optional: Add a horizontal separator between user groups, except after the last group */}
+                                    {index < groupedClaims.length - 1 && (
+                                        <hr className="mt-6 border-gray-300 dark:border-gray-600" />
+                                    )}
                                 </div>
                             ))
                         )}
