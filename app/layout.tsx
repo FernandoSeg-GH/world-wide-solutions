@@ -11,7 +11,7 @@ import ErrorBoundary from '@/components/ui/error-boundary'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Vinci Suite - VW Solutions',
+  title: 'Victoria Worldwide Solutions',
   description: 'Accident Claim Reports Dashboard',
   icons: {
     icon: '/assets/vws.png',

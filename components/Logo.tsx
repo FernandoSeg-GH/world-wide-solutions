@@ -16,7 +16,7 @@ type LogoProps = {
 
 function Logo({ onClick, horizontal, url, width, className = "" }: LogoProps) {
   const { data: session } = useSession();
-  const [title, setTitle] = useState<string>("Vinci Suite");
+  const [title, setTitle] = useState<string>("Victoria Worldwide Solutions");
   const { data } = useAppContext();
   const { isExpanded, currentUser } = data;
   const [isMobile, setIsMobile] = useState(false);
