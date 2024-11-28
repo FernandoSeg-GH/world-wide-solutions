@@ -1,5 +1,3 @@
-// src/components/business/forms/custom/accident-claim/AccidentClaimForm.tsx
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -34,10 +32,11 @@ import {
     FaCarSide,
     FaCar,
     FaWalking,
+    FaPlusCircle,
 } from "react-icons/fa";
 import { usaStates } from "@/components/business/forms/custom/accident-claim/config/state-options";
 import { accidentTypeOptions } from "./config/accident-options";
-import { AccidentClaimFormData } from "./config/types";
+import { AccidentClaimFormData, CostDetail, VehicleDetail } from "./config/types";
 import Image from "next/image";
 import { initialForm } from "@/components/business/forms/custom/accident-claim/config/initial-form";
 import { useSession } from "next-auth/react";
@@ -45,7 +44,8 @@ import { toast } from "@/components/ui/use-toast";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import CustomPhoneInput from "@/components/ui/phone-input";
-
+import { Ellipsis, Hospital, PlaneTakeoff, PlusCircle } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 
 export default function AccidentClaimForm() {
     const [formData, setFormData] = useState<AccidentClaimFormData>(initialForm);
@@ -132,14 +132,21 @@ export default function AccidentClaimForm() {
         const submitData = new FormData();
 
         Object.entries(formData).forEach(([key, value]) => {
-            if (
-                typeof value === "object" &&
-                value !== null &&
-                !(value instanceof FileList)
+            if (typeof value === "object" && value !== null && !(value instanceof FileList)) {
+                submitData.append(key, JSON.stringify(value));
+            } else if (
+                key === 'vehicle_details' ||
+                key === 'medical_provider_costs' ||
+                key === 'repatriation_costs' ||
+                key === 'other_costs'
             ) {
                 submitData.append(key, JSON.stringify(value));
             } else if (key === "accident_date") {
-                submitData.append(key, new Date(value).toISOString());
+                if (value && !isNaN(new Date(value).getTime())) {
+                    submitData.append(key, new Date(value).toISOString());
+                } else {
+                    console.warn(`Invalid accident_date: ${value}`);
+                }
             } else if (
                 ["slip_description", "slip_accident_type", "negligence_description", "witness_name", "witness_email", "witness_phone"].includes(key)
             ) {
@@ -188,6 +195,116 @@ export default function AccidentClaimForm() {
             console.error("An error occurred while submitting the form:", error);
             toast({ title: "Error", description: "An error occurred while submitting the form.", variant: "destructive", });
         }
+    };
+
+    const handleAddVehicle = () => {
+        setFormData((prevData) => ({
+            ...prevData,
+            vehicle_details: [
+                ...prevData.vehicle_details,
+                {
+                    licenseNumber: "",
+                    year: "",
+                    model: "",
+                    insuranceName: "",
+                    policyNumber: "",
+                },
+            ],
+        }));
+    };
+
+    const handleVehicleDetailChange = (
+        index: number,
+        field: keyof VehicleDetail,
+        value: string
+    ) => {
+        setFormData((prevData) => {
+            const updatedVehicles = [...prevData.vehicle_details];
+            updatedVehicles[index] = {
+                ...updatedVehicles[index],
+                [field]: value,
+            };
+            return { ...prevData, vehicle_details: updatedVehicles };
+        });
+    };
+
+    const handleRemoveVehicle = (index: number) => {
+        setFormData((prevData) => {
+            const updatedVehicles = prevData.vehicle_details.filter(
+                (_, i) => i !== index
+            );
+            return { ...prevData, vehicle_details: updatedVehicles };
+        });
+    };
+
+    const handleAddMedicalCost = () => {
+        setFormData((prevData) => ({
+            ...prevData,
+            medical_provider_costs: [
+                ...prevData.medical_provider_costs,
+                {
+                    providerName: "",
+                    amountBilled: 0,
+                    amountPaid: 0,
+                    amountUnpaid: 0,
+                },
+            ],
+        }));
+    };
+
+    const handleAddRepatriationCost = () => {
+        setFormData((prevData) => ({
+            ...prevData,
+            repatriation_costs: [
+                ...prevData.repatriation_costs,
+                {
+                    providerName: "",
+                    amountBilled: 0,
+                    amountPaid: 0,
+                    amountUnpaid: 0,
+                },
+            ],
+        }));
+    };
+
+    const handleAddOtherCost = () => {
+        setFormData((prevData) => ({
+            ...prevData,
+            other_costs: [
+                ...prevData.other_costs,
+                {
+                    providerName: "",
+                    amountBilled: 0,
+                    amountPaid: 0,
+                    amountUnpaid: 0,
+                },
+            ],
+        }));
+    };
+
+    const handleCostChange = (
+        costType: keyof AccidentClaimFormData,
+        index: number,
+        field: keyof CostDetail,
+        value: string | number
+    ) => {
+        setFormData((prevData) => {
+            const updatedCosts = [...(prevData[costType] as CostDetail[])];
+            updatedCosts[index] = {
+                ...updatedCosts[index],
+                [field]: value,
+            };
+            return { ...prevData, [costType]: updatedCosts };
+        });
+    };
+
+    const handleRemoveCost = (costType: keyof AccidentClaimFormData, index: number) => {
+        setFormData((prevData) => {
+            const updatedCosts = Array.isArray(prevData[costType])
+                ? (prevData[costType] as CostDetail[]).filter((_, i) => i !== index)
+                : [];
+            return { ...prevData, [costType]: updatedCosts };
+        });
     };
 
     return (
@@ -322,14 +439,6 @@ export default function AccidentClaimForm() {
                                 <Label htmlFor="primary_contact">
                                     Primary Contact Phone Number{" "}
                                 </Label>
-                                {/* <Input
-                                    id="primary_contact"
-                                    name="primary_contact"
-                                    placeholder="+1 234 567 890"
-                                    value={formData.primary_contact}
-                                    onChange={handleInputChange}
-                                    className=""
-                                /> */}
                                 <CustomPhoneInput
                                     id="primary_contact"
                                     value={formData.primary_contact}
@@ -361,23 +470,7 @@ export default function AccidentClaimForm() {
                             </div>
                             <div>
                                 <Label htmlFor="other_contact_phone">Other Contact Phone Number</Label>
-                                {/* <Input
-                                    id="other_contact_phone"
-                                    name="other_contact_phone"
-                                    placeholder="+1 234 567 890"
-                                    value={formData.other_contact_phone}
-                                    onChange={handleInputChange}
-                                    className=""
-                                /> */}
-                                {/* <Input
-                                    id="other_contact_phone"
-                                    name="other_contact_phone"
-                                    isPhone
-                                    placeholder="+1 234 567 890"
-                                    value={formData.other_contact_phone}
-                                    onPhoneChange={handlePhoneChange("other_contact_phone")}
-                                    className=""
-                                /> */}
+
                                 <CustomPhoneInput
                                     id="other_contact_phone"
                                     value={formData.other_contact_phone}
@@ -401,7 +494,7 @@ export default function AccidentClaimForm() {
                                     Date of Accident <span className="text-red-500">*</span>
                                 </Label>
                                 <DatePicker
-                                    selectedDate={new Date(formData.accident_date)}
+                                    selectedDate={formData.accident_date ? new Date(formData.accident_date) : null}
                                     onChange={(date) =>
                                         setFormData({ ...formData, accident_date: date ? date.toISOString() : "" })
                                     }
@@ -440,7 +533,7 @@ export default function AccidentClaimForm() {
                                     </SelectContent>
                                 </Select>
                             </div>
-                            {formData.accident_type && subAccidentOptions.length > 0 && (
+                            {/* {formData.accident_type && subAccidentOptions.length > 0 && (
                                 <div className="md:col-span-2">
                                     <Label>Specific Accident Type</Label>
                                     <Select
@@ -461,37 +554,9 @@ export default function AccidentClaimForm() {
                                         </SelectContent>
                                     </Select>
                                 </div>
-                            )}
+                            )} */}
                         </div>
                     </section>
-
-                    {/* Upload Documents */}
-                    {/* <section className="mb-8 bg-gray-100 dark:bg-gray-700 shadow p-6 rounded-lg flex flex-col md:flex-row w-full gap-4">
-                        <div className="md:w-1/2">
-                            <h2 className="text-xl font-semibold mb-6 flex items-center gap-2 text-gray-800 dark:text-gray-200">
-                                <FaFileUpload />
-                                Upload Your Documents
-                            </h2>
-                            <p className="text-gray-600 dark:text-gray-400 mb-6">
-                                Please upload all the documents related to the accident, such as the police report, rental car agreement, certificate of insurance, traffic exchange, pictures from the accident, or any other relevant documents.
-                            </p>
-                        </div>
-                        <div className="md:w-1/2">
-                            <Label>
-                                Upload Files <span className="text-red-500">*</span>
-                            </Label>
-                            <FileUpload
-                                multiple
-                                onFilesSelected={(files) =>
-                                    setFormData({
-                                        ...formData,
-                                        new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files)],
-                                    })
-                                }
-                                className=""
-                            />
-                        </div>
-                    </section> */}
 
                     {/* Conditional Sections Based on Accident Type */}
                     {formData.accident_type === "motor_vehicle_accidents" && (
@@ -501,11 +566,11 @@ export default function AccidentClaimForm() {
                                 Motor Vehicle Accident Details
                             </h2>
                             <p className="text-gray-600 dark:text-gray-400 mb-6">
-                                In this section, provide all vehicle details such as a automobile descriptions, and insurance certificates.
+                                In this section, provide all vehicle details such as automobile descriptions and insurance certificates.
                             </p>
 
                             {/* MVA Type and Location */}
-                            <div className="grid grid-cols-1  gap-6">
+                            <div className="grid grid-cols-1 gap-6">
                                 <div>
                                     <Label>Motor Vehicle Accident Type</Label>
                                     <Select
@@ -558,35 +623,76 @@ export default function AccidentClaimForm() {
                                     <FaCarSide />
                                     Motor Vehicle Information
                                 </h3>
-                                <p className="text-gray-600 dark:text-gray-400 mb-6">
-                                    In this section, provide the available information for each vehicle involved in the accident.
-                                </p>
+
+                                <div className="flex w-full items-center justify-between">
+
+                                    <p className="text-gray-600 dark:text-gray-400">
+                                        In this section, provide the available information for each vehicle involved in the accident.
+                                    </p>
+
+                                    <Button
+                                        onClick={handleAddVehicle}
+                                        className="hover:underline cursor-pointer"
+                                        type="button"
+                                    >
+                                        <PlusCircle className="h-6 w-6 mr-2" />
+                                        Add New Vehicle
+                                    </Button>
+                                </div>
+
+
                                 <div className="space-y-6 mt-3">
                                     {formData.vehicle_details.map((vehicle, index) => (
                                         <div
                                             key={index}
-                                            className="border p-6 rounded-lg shadow-sm bg-gray-50 dark:bg-gray-600"
+                                            className="border p-6 rounded-lg shadow-sm bg-gray-50 dark:bg-gray-600 mt-6"
                                         >
                                             <h4 className="font-semibold mb-4 text-gray-800 dark:text-gray-200">
                                                 Vehicle #{index + 1} Details
                                             </h4>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div>
-                                                    <Label>Insurance Name</Label>
+                                                    <Label>License Number</Label>
                                                     <Input
-                                                        placeholder="Insurance Name"
+                                                        placeholder="License Number"
+                                                        value={vehicle.licenseNumber}
+                                                        onChange={(e) =>
+                                                            handleVehicleDetailChange(index, 'licenseNumber', e.target.value)
+                                                        }
+                                                        className=""
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <Label>Year of the Vehicle</Label>
+                                                    <Input
+                                                        placeholder="Year"
+                                                        value={vehicle.year}
+                                                        onChange={(e) =>
+                                                            handleVehicleDetailChange(index, 'year', e.target.value)
+                                                        }
+                                                        className=""
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <Label>Model of the Vehicle</Label>
+                                                    <Input
+                                                        placeholder="Model"
+                                                        value={vehicle.model}
+                                                        onChange={(e) =>
+                                                            handleVehicleDetailChange(index, 'model', e.target.value)
+                                                        }
+                                                        className=""
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <Label>Insurance Company Name</Label>
+                                                    <Input
+                                                        placeholder="Insurance Company Name"
                                                         value={vehicle.insuranceName}
                                                         onChange={(e) =>
-                                                            setFormData((prev) => {
-                                                                const updatedDetails = [...prev.vehicle_details];
-                                                                updatedDetails[index] = {
-                                                                    ...updatedDetails[index],
-                                                                    insuranceName: e.target.value,
-                                                                };
-                                                                return { ...prev, vehicle_details: updatedDetails };
-                                                            })
+                                                            handleVehicleDetailChange(index, 'insuranceName', e.target.value)
                                                         }
-                                                        className="mt-1 bg-white dark:bg-gray-700 !dark:text-white"
+                                                        className=""
                                                     />
                                                 </div>
                                                 <div>
@@ -595,21 +701,24 @@ export default function AccidentClaimForm() {
                                                         placeholder="Policy Number"
                                                         value={vehicle.policyNumber}
                                                         onChange={(e) =>
-                                                            setFormData((prev) => {
-                                                                const updatedDetails = [...prev.vehicle_details];
-                                                                updatedDetails[index] = {
-                                                                    ...updatedDetails[index],
-                                                                    policyNumber: e.target.value,
-                                                                };
-                                                                return { ...prev, vehicle_details: updatedDetails };
-                                                            })
+                                                            handleVehicleDetailChange(index, 'policyNumber', e.target.value)
                                                         }
-                                                        className="mt-1 bg-white dark:bg-gray-700 !dark:text-white"
+                                                        className=""
                                                     />
                                                 </div>
                                             </div>
+                                            {/* Add a button to remove the vehicle */}
+                                            <Button
+                                                variant="destructive"
+                                                onClick={() => handleRemoveVehicle(index)}
+                                                className="hover:underline mt-4"
+                                                type="button"
+                                            >
+                                                Remove Vehicle
+                                            </Button>
                                         </div>
                                     ))}
+
                                 </div>
                             </div>
 
@@ -623,14 +732,21 @@ export default function AccidentClaimForm() {
                                         setFormData({ ...formData, selected_vehicle: value })
                                     }
                                     value={formData.selected_vehicle}
+                                    required
                                 >
                                     <SelectTrigger className="">
-                                        <SelectValue placeholder="Vehicle #..." />
+                                        <SelectValue placeholder="Select a vehicle" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem className="hover:bg-slate-500" value="vehicle1">Vehicle #1</SelectItem>
-                                        <SelectItem className="hover:bg-slate-500" value="vehicle2">Vehicle #2</SelectItem>
-                                        <SelectItem className="hover:bg-slate-500" value="vehicle3">Vehicle #3</SelectItem>
+                                        {formData.vehicle_details.map((vehicle, index) => (
+                                            <SelectItem
+                                                key={index}
+                                                value={String(index)}
+                                                className="hover:bg-slate-500"
+                                            >
+                                                Vehicle #{index + 1}: {vehicle.model || "Unnamed Vehicle"}
+                                            </SelectItem>
+                                        ))}
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -647,14 +763,14 @@ export default function AccidentClaimForm() {
                                     value={formData.mva_description}
                                     onChange={handleInputChange}
                                     className=""
+                                    required
                                 />
                             </div>
 
                             <div className="mt-6">
                                 <Label>Upload Documentation</Label>
                                 <FileUpload
-                                    // description="Please upload documents related to the car rental agreement."
-                                    description="Please upload all the documents regarding the motor vehicle accident. Such as police report, rental agreement, certificate of insurrance, traffic exchange, pictures from the accident, or any other relevant documents."
+                                    description="Please upload all the documents regarding the motor vehicle accident. Such as police report, rental agreement, certificate of insurance, traffic exchange, pictures from the accident, or any other relevant documents."
                                     multiple
                                     onFilesSelected={(files) =>
                                         setFormData({
@@ -686,11 +802,12 @@ export default function AccidentClaimForm() {
                                     </Label>
                                     <Textarea
                                         name="slip_description"
-                                        placeholder="Please write a bief description of the accident..."
+                                        placeholder="Please write a brief description of the accident..."
                                         rows={5}
                                         value={formData.slip_description}
                                         onChange={handleInputChange}
                                         className=""
+                                        required
                                     />
                                 </div>
 
@@ -704,6 +821,7 @@ export default function AccidentClaimForm() {
                                             setFormData({ ...formData, slip_accident_type: value })
                                         }
                                         value={formData.slip_accident_type}
+                                        required
                                     >
                                         <SelectTrigger className="">
                                             <SelectValue placeholder="Select an option..." />
@@ -785,7 +903,7 @@ export default function AccidentClaimForm() {
                                     <div className="mt-6">
                                         <Label>Upload Slip & Fall Documents</Label>
                                         <FileUpload
-                                            description="Please upload all the documents related to the slip and fall accident. Such as police report, internal police reports, fotos of the place of the accident, injuries, and/or any other relevant documents."
+                                            description="Please upload all the documents related to the slip and fall accident. Such as police report, internal police reports, photos of the place of the accident, injuries, and/or any other relevant documents."
                                             multiple
                                             onFilesSelected={(files) =>
                                                 setFormData({
@@ -813,16 +931,26 @@ export default function AccidentClaimForm() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <Label>
-                                    Type of Assistance
+                                    Type of Assistance <span className="text-red-500">*</span>
                                 </Label>
-                                <Textarea
-                                    name="medical_assistance_type"
-                                    placeholder="Describe the type of medical assistance provided..."
-                                    rows={3}
+                                <Select
+                                    onValueChange={(value) =>
+                                        setFormData({ ...formData, medical_assistance_type: value })
+                                    }
                                     value={formData.medical_assistance_type}
-                                    onChange={handleInputChange}
-                                    className=""
-                                />
+                                    required
+                                >
+                                    <SelectTrigger className="">
+                                        <SelectValue placeholder="Select type of assistance" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {["Medical Treatment", "Hospitalization", "Surgery", "Physical Therapy", "Psychological Therapy", "Other"].map((option) => (
+                                            <SelectItem className="hover:bg-slate-500" key={option} value={option}>
+                                                {option}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
                             <div>
                                 <Label>
@@ -856,7 +984,7 @@ export default function AccidentClaimForm() {
                                 </Label>
                                 <Input
                                     name="primary_care_provider"
-                                    placeholder="Name of the clinic or hostipal that provided the treatment"
+                                    placeholder="Name of the clinic or hospital that provided the treatment"
                                     value={formData.primary_care_provider}
                                     onChange={handleInputChange}
                                     className=""
@@ -864,7 +992,7 @@ export default function AccidentClaimForm() {
                             </div>
                         </div>
                         <div>
-                            <Label>Upload File</Label>
+                            <Label>Upload Documents</Label>
                             <FileUpload
                                 description="Please upload all the documents related to the medical treatment. Such as medical records, discharge notes, emergency notes, or any other medical document."
                                 multiple
@@ -886,7 +1014,7 @@ export default function AccidentClaimForm() {
                             Cost of Assistance
                         </h2>
                         <p className="text-gray-600 dark:text-gray-400 mb-6">
-                            In this section, fill with all costs recieved related to the claim, even if they are estimated or over the policy limit.
+                            In this section, fill with all costs received related to the claim, even if they are estimated or over the policy limit.
                         </p>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="relative">
@@ -902,6 +1030,7 @@ export default function AccidentClaimForm() {
                                         value={formData.medical_total_cost}
                                         onChange={handleInputChange}
                                         className="pl-10 bg-white dark:bg-gray-600 !dark:text-white"
+                                        required
                                     />
                                 </div>
                             </div>
@@ -945,22 +1074,225 @@ export default function AccidentClaimForm() {
                                     </SelectContent>
                                 </Select>
                             </div>
+                            <Separator className="md:col-span-2" />
                             <div className="md:col-span-2">
-                                <Label>Medical Provider Bills</Label>
-                                <div className="relative mt-1">
-                                    <FaDollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                                    <Input
-                                        type="number"
-                                        name="medical_provider_costs"
-                                        placeholder="Details about medical provider bills..."
-                                        // rows={3}
-                                        value={formData.medical_provider_costs.toString()}
-                                        onChange={handleInputChange}
-                                        className="mt-1 pl-10 bg-white dark:bg-gray-600 !dark:text-white"
-                                    />
+                                <div className="flex justify-between items-start">
+                                    <h3 className="flex items-center text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
+                                        <Hospital className="mr-2 h-5 w-5" />
+                                        Medical Provider Bills
+                                    </h3>
+                                    <Button onClick={handleAddMedicalCost} type="button">
+                                        <PlusCircle className="mr-2 h-5 w-5" />
+                                        Add Medical Provider Bill
+                                    </Button>
                                 </div>
                             </div>
+
+                            {formData.medical_provider_costs.map((cost, index) => (
+                                <div key={index} className="border p-4 rounded mb-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <Label>Name of Provider</Label>
+                                            <Input
+                                                placeholder="Name of provider"
+                                                value={cost.providerName}
+                                                onChange={(e) =>
+                                                    handleCostChange("medical_provider_costs", index, "providerName", e.target.value)
+                                                }
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label>Amount Billed ($)</Label>
+                                            <Input
+                                                type="number"
+                                                placeholder="Amount billed"
+                                                value={cost.amountBilled}
+                                                onChange={(e) =>
+                                                    handleCostChange("medical_provider_costs", index, "amountBilled", parseFloat(e.target.value))
+                                                }
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label>Amount Paid ($)</Label>
+                                            <Input
+                                                type="number"
+                                                placeholder="Amount paid"
+                                                value={cost.amountPaid}
+                                                onChange={(e) =>
+                                                    handleCostChange("medical_provider_costs", index, "amountPaid", parseFloat(e.target.value))
+                                                }
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label>Amount Unpaid ($)</Label>
+                                            <Input
+                                                type="number"
+                                                placeholder="Amount unpaid"
+                                                value={cost.amountUnpaid}
+                                                onChange={(e) =>
+                                                    handleCostChange("medical_provider_costs", index, "amountUnpaid", parseFloat(e.target.value))
+                                                }
+                                            />
+                                        </div>
+                                    </div>
+                                    <Button
+                                        variant="destructive"
+                                        onClick={() => handleRemoveCost("medical_provider_costs", index)}
+                                        className="mt-4"
+                                        type="button"
+                                    >
+                                        Remove
+                                    </Button>
+                                </div>
+                            ))}
+
+                            <Separator className="md:col-span-2" />
                             <div className="md:col-span-2">
+                                <div className="flex justify-between items-start">
+                                    <h3 className="flex items-center text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
+                                        <PlaneTakeoff className="mr-2 h-5 w-5" />
+                                        Repatriation Bills
+                                    </h3>
+                                    <Button onClick={handleAddRepatriationCost} type="button">
+                                        <PlusCircle className="mr-2 h-5 w-5" />
+                                        Add Repatriation Cost
+                                    </Button>
+                                </div>
+                            </div>
+
+                            {formData.repatriation_costs.map((cost, index) => (
+                                <div key={index} className="border p-4 rounded mb-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <Label>Name of Provider</Label>
+                                            <Input
+                                                placeholder="Name of provider"
+                                                value={cost.providerName}
+                                                onChange={(e) =>
+                                                    handleCostChange("repatriation_costs", index, "providerName", e.target.value)
+                                                }
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label>Amount Billed ($)</Label>
+                                            <Input
+                                                type="number"
+                                                placeholder="Amount billed"
+                                                value={cost.amountBilled}
+                                                onChange={(e) =>
+                                                    handleCostChange("repatriation_costs", index, "amountBilled", parseFloat(e.target.value))
+                                                }
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label>Amount Paid ($)</Label>
+                                            <Input
+                                                type="number"
+                                                placeholder="Amount paid"
+                                                value={cost.amountPaid}
+                                                onChange={(e) =>
+                                                    handleCostChange("repatriation_costs", index, "amountPaid", parseFloat(e.target.value))
+                                                }
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label>Amount Unpaid ($)</Label>
+                                            <Input
+                                                type="number"
+                                                placeholder="Amount unpaid"
+                                                value={cost.amountUnpaid}
+                                                onChange={(e) =>
+                                                    handleCostChange("repatriation_costs", index, "amountUnpaid", parseFloat(e.target.value))
+                                                }
+                                            />
+                                        </div>
+                                    </div>
+                                    <Button
+                                        variant="destructive"
+                                        onClick={() => handleRemoveCost("repatriation_costs", index)}
+                                        className="mt-4"
+                                        type="button"
+                                    >
+                                        Remove
+                                    </Button>
+                                </div>
+                            ))}
+
+                            <Separator className="md:col-span-2" />
+                            <div className="md:col-span-2">
+                                <div className="flex justify-between items-start">
+                                    <h3 className="flex  items-center text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
+                                        <Ellipsis className="mr-2 h-5 w-5" />
+                                        Other Bills
+                                    </h3>
+                                    <Button onClick={handleAddOtherCost} type="button">
+                                        <PlusCircle className="mr-2 h-5 w-5" />
+                                        Add Other Cost
+                                    </Button>
+                                </div>
+                            </div>
+
+                            {formData.other_costs.map((cost, index) => (
+                                <div key={index} className="border p-4 rounded mb-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <Label>Name of Provider</Label>
+                                            <Input
+                                                placeholder="Name of provider"
+                                                value={cost.providerName}
+                                                onChange={(e) =>
+                                                    handleCostChange("other_costs", index, "providerName", e.target.value)
+                                                }
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label>Amount Billed ($)</Label>
+                                            <Input
+                                                type="number"
+                                                placeholder="Amount billed"
+                                                value={cost.amountBilled}
+                                                onChange={(e) =>
+                                                    handleCostChange("other_costs", index, "amountBilled", parseFloat(e.target.value))
+                                                }
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label>Amount Paid ($)</Label>
+                                            <Input
+                                                type="number"
+                                                placeholder="Amount paid"
+                                                value={cost.amountPaid}
+                                                onChange={(e) =>
+                                                    handleCostChange("other_costs", index, "amountPaid", parseFloat(e.target.value))
+                                                }
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label>Amount Unpaid ($)</Label>
+                                            <Input
+                                                type="number"
+                                                placeholder="Amount unpaid"
+                                                value={cost.amountUnpaid}
+                                                onChange={(e) =>
+                                                    handleCostChange("other_costs", index, "amountUnpaid", parseFloat(e.target.value))
+                                                }
+                                            />
+                                        </div>
+                                    </div>
+                                    <Button
+                                        variant="destructive"
+                                        onClick={() => handleRemoveCost("other_costs", index)}
+                                        className="mt-4"
+                                        type="button"
+                                    >
+                                        Remove
+                                    </Button>
+                                </div>
+                            ))}
+
+                            <Separator className="md:col-span-2" />
+                            {/* Repatriation Costs */}
+                            {/* <div className="md:col-span-2">
                                 <Label>Repatriation Costs</Label>
 
                                 <div className="relative mt-1">
@@ -968,7 +1300,7 @@ export default function AccidentClaimForm() {
                                     <Input
                                         type="number"
                                         name="repatriation_costs"
-                                        placeholder="Details about repatriation costs..."
+                                        placeholder="Repatriation cost"
                                         // rows={3}
                                         value={formData.repatriation_costs.toString()}
                                         onChange={handleInputChange}
@@ -1000,12 +1332,12 @@ export default function AccidentClaimForm() {
                                     onChange={handleInputChange}
                                     className=""
                                 />
-                            </div>
+                            </div> */}
                             <div className="md:col-span-2">
-                                <Label>Upload Other Files</Label>
+                                <Label>Upload documentation:</Label>
                                 <FileUpload
                                     multiple
-                                    description="Please upload all documents related to the costs of assistance. Such as medical bills, repratriation bills, or any other costs related to the case."
+                                    description="Please upload all documents related to the costs of assistance. Such as medical bills, repatriation bills, or any other costs related to the case."
                                     onFilesSelected={(files) =>
                                         setFormData({
                                             ...formData,
@@ -1025,7 +1357,7 @@ export default function AccidentClaimForm() {
                             Third Party Information
                         </h2>
                         <p className="text-gray-600 dark:text-gray-400 mb-6">
-                            In this section, completed with all details from any other individual, company, or owner involved, such as an inssurance, establishment owner, assistance company or other company on file.
+                            In this section, completed with all details from any other individual, company, or owner involved, such as an insurance, establishment owner, assistance company or other company on file.
                         </p>
                         <div className="space-y-6">
                             {/* Insurance Company Involved */}
@@ -1135,21 +1467,6 @@ export default function AccidentClaimForm() {
                                         <Label>
                                             Phone Number
                                         </Label>
-                                        {/* <Input
-                                            name="owner_phone_number"
-                                            placeholder="+1 234 567 890"
-                                            value={formData.owner_phone_number}
-                                            onChange={handleInputChange}
-                                            className=""
-                                        /> */}
-                                        {/* <Input
-                                            name="owner_phone_number"
-                                            isPhone
-                                            placeholder="+1 234 567 890"
-                                            value={formData.owner_phone_number}
-                                            onPhoneChange={handlePhoneChange("owner_phone_number")}
-                                            className=""
-                                        /> */}
                                         <CustomPhoneInput
                                             value={formData.owner_phone_number}
                                             onChange={handlePhoneChange("owner_phone_number")}
@@ -1237,7 +1554,7 @@ export default function AccidentClaimForm() {
                             Personal Attorney
                         </h2>
                         <p className="text-gray-600 dark:text-gray-400 mb-6">
-                            In this section, request and complete with any possible legal representation, the policy holder may have regarding the accident.
+                            In this section, request and complete with any possible legal representation the policy holder may have regarding the accident.
                         </p>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
@@ -1268,22 +1585,6 @@ export default function AccidentClaimForm() {
                                 <Label>
                                     Attorney Phone{" "}
                                 </Label>
-                                {/* <Input
-                                    name="attorney_phone"
-                                    type="tel"
-                                    placeholder="+1 234 567 890"
-                                    value={formData.attorney_phone}
-                                    onChange={handleInputChange}
-                                    className=""
-                                /> */}
-                                {/* <Input
-                                    name="attorney_phone"
-                                    isPhone
-                                    placeholder="+1 234 567 890"
-                                    value={formData.attorney_phone}
-                                    onPhoneChange={handlePhoneChange("attorney_phone")}
-                                    className=""
-                                /> */}
                                 <CustomPhoneInput
                                     value={formData.attorney_phone}
                                     onChange={handlePhoneChange("attorney_phone")}
@@ -1292,7 +1593,7 @@ export default function AccidentClaimForm() {
                                 />
                             </div>
                             <div className="md:col-span-2">
-                                <Label>Upload all documents regarding the a law firm:</Label>
+                                <Label>Upload All Documents Regarding the Law Firm:</Label>
                                 <FileUpload
                                     multiple
                                     onFilesSelected={(files) =>

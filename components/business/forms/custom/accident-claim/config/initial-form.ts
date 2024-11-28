@@ -24,11 +24,7 @@ export const initialForm: AccidentClaimFormData = {
   // Motor Vehicle Accident Details
   mva_type: "",
   mva_location: "",
-  vehicle_details: [
-    { insuranceName: "", policyNumber: "" },
-    { insuranceName: "", policyNumber: "" },
-    { insuranceName: "", policyNumber: "" },
-  ],
+  vehicle_details: [],
   selected_vehicle: "",
   mva_description: "",
 
@@ -42,9 +38,9 @@ export const initialForm: AccidentClaimFormData = {
   medical_total_cost: 0, // Initialized as number
   policy_limits: 0, // Initialized as number
   assistance_status: "",
-  medical_provider_costs: {}, // Initialized as empty object
-  repatriation_costs: {}, // Initialized as empty object
-  other_costs: {}, // Initialized as empty object
+  medical_provider_costs: [], // Initialized as empty object
+  repatriation_costs: [], // Initialized as empty object
+  other_costs: [], // Initialized as empty object
 
   // Third Party Information
   insurance_company: "",
