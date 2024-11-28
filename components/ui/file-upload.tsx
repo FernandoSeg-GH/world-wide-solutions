@@ -9,9 +9,10 @@ interface FileUploadProps {
     multiple?: boolean;
     onFilesSelected: (files: File[]) => void; // Changed to File[] for flexibility
     className?: string;
+    description?: string;
 }
 
-export function FileUpload({ multiple = false, onFilesSelected, className }: FileUploadProps) {
+export function FileUpload({ multiple = false, onFilesSelected, className, description }: FileUploadProps) {
     const [selectedFiles, setSelectedFiles] = React.useState<File[]>([]);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -67,14 +68,19 @@ export function FileUpload({ multiple = false, onFilesSelected, className }: Fil
 
             {/* Dropzone Area */}
             <div
-                className="dropzone border-2 border-dashed border-gray-300 p-4 rounded-lg text-center cursor-pointer hover:border-blue-500 transition-colors"
+                className="dropzone border-2 border-dashed border-gray-300 p-4 rounded-lg text-center cursor-pointer hover:border-blue-500 transition-colors bg-white dark:bg-muted-dark"
                 onClick={handleButtonClick}
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
             >
                 <div className="flex flex-col items-center">
                     <FaFileUpload className="text-4xl text-gray-400 mb-2" />
-                    <p className="text-gray-600">Drag & drop files here, or click to select</p>
+                    <p className="text-gray-600 max-w-[600px] my-3">
+                        {description ?
+                            description :
+                            "Drag & drop files here, or click to select"
+                        }
+                    </p>
                     <Button type="button" className="mt-2" onClick={handleButtonClick}>
                         Choose File{multiple ? "s" : ""}
                     </Button>

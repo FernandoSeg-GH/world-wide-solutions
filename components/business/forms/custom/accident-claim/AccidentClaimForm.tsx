@@ -44,6 +44,7 @@ import { useSession } from "next-auth/react";
 import { toast } from "@/components/ui/use-toast";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
+import CustomPhoneInput from "@/components/ui/phone-input";
 
 
 export default function AccidentClaimForm() {
@@ -96,6 +97,13 @@ export default function AccidentClaimForm() {
 
             return prevData;
         });
+    };
+
+    const handlePhoneChange = (field: keyof AccidentClaimFormData) => (value: string) => {
+        setFormData((prevData) => ({
+            ...prevData,
+            [field]: value,
+        }));
     };
 
     const handleAccidentTypeChange = (value: string) => {
@@ -231,7 +239,7 @@ export default function AccidentClaimForm() {
                                     placeholder="Enter your first and last name"
                                     value={formData.full_name}
                                     onChange={handleInputChange}
-                                    className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                    className=""
                                     required
                                 />
                             </div>
@@ -247,7 +255,7 @@ export default function AccidentClaimForm() {
                                     placeholder="Enter your email address"
                                     value={formData.email}
                                     onChange={handleInputChange}
-                                    className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                    className=""
                                 />
                             </div>
                             <div>
@@ -263,13 +271,13 @@ export default function AccidentClaimForm() {
                                 >
                                     <SelectTrigger
                                         id="country"
-                                        className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                        className=""
                                     >
                                         <SelectValue placeholder="Select your country" />
                                     </SelectTrigger>
                                     <SelectContent className="max-h-[320px] overflow-y-auto">
                                         {countryOptions.map((country) => (
-                                            <SelectItem className="hover:bg-slate-500" key={country.value} value={country.value}>
+                                            <SelectItem className="" key={country.value} value={country.value}>
                                                 {country.label}
                                             </SelectItem>
                                         ))}
@@ -287,7 +295,7 @@ export default function AccidentClaimForm() {
                                     >
                                         <SelectTrigger
                                             id="state"
-                                            className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                            className=""
                                         >
                                             <SelectValue placeholder="Select your state" />
                                         </SelectTrigger>
@@ -306,7 +314,7 @@ export default function AccidentClaimForm() {
                                         placeholder="Enter your state"
                                         value={formData.state}
                                         onChange={handleInputChange}
-                                        className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                        className=""
                                     />
                                 )}
                             </div>
@@ -314,13 +322,20 @@ export default function AccidentClaimForm() {
                                 <Label htmlFor="primary_contact">
                                     Primary Contact Phone Number{" "}
                                 </Label>
-                                <Input
+                                {/* <Input
                                     id="primary_contact"
                                     name="primary_contact"
                                     placeholder="+1 234 567 890"
                                     value={formData.primary_contact}
                                     onChange={handleInputChange}
-                                    className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                    className=""
+                                /> */}
+                                <CustomPhoneInput
+                                    id="primary_contact"
+                                    value={formData.primary_contact}
+                                    onChange={handlePhoneChange("primary_contact")}
+                                    className=""
+                                    placeholder="+1 234 567 890"
                                 />
                             </div>
                         </div>
@@ -341,18 +356,34 @@ export default function AccidentClaimForm() {
                                     placeholder="Name of your other contact"
                                     value={formData.other_contact_name}
                                     onChange={handleInputChange}
-                                    className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                    className=""
                                 />
                             </div>
                             <div>
                                 <Label htmlFor="other_contact_phone">Other Contact Phone Number</Label>
-                                <Input
+                                {/* <Input
                                     id="other_contact_phone"
                                     name="other_contact_phone"
                                     placeholder="+1 234 567 890"
                                     value={formData.other_contact_phone}
                                     onChange={handleInputChange}
-                                    className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                    className=""
+                                /> */}
+                                {/* <Input
+                                    id="other_contact_phone"
+                                    name="other_contact_phone"
+                                    isPhone
+                                    placeholder="+1 234 567 890"
+                                    value={formData.other_contact_phone}
+                                    onPhoneChange={handlePhoneChange("other_contact_phone")}
+                                    className=""
+                                /> */}
+                                <CustomPhoneInput
+                                    id="other_contact_phone"
+                                    value={formData.other_contact_phone}
+                                    onChange={handlePhoneChange("other_contact_phone")}
+                                    className=""
+                                    placeholder="+1 234 567 890"
                                 />
                             </div>
                         </div>
@@ -386,7 +417,7 @@ export default function AccidentClaimForm() {
                                     placeholder="Address of the accident"
                                     value={formData.accident_place}
                                     onChange={handleInputChange}
-                                    className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                    className=""
                                 />
                             </div>
                             <div className="md:col-span-2">
@@ -397,7 +428,7 @@ export default function AccidentClaimForm() {
                                     onValueChange={handleAccidentTypeChange}
                                     value={formData.accident_type}
                                 >
-                                    <SelectTrigger className="mt-1 bg-white dark:bg-gray-600 !dark:text-white">
+                                    <SelectTrigger className="">
                                         <SelectValue placeholder="Choose an option..." />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -418,7 +449,7 @@ export default function AccidentClaimForm() {
                                         }
                                         value={formData.sub_accident_type}
                                     >
-                                        <SelectTrigger className="mt-1 bg-white dark:bg-gray-600 !dark:text-white">
+                                        <SelectTrigger className="">
                                             <SelectValue placeholder="Select specific type" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -435,7 +466,7 @@ export default function AccidentClaimForm() {
                     </section>
 
                     {/* Upload Documents */}
-                    <section className="mb-8 bg-gray-100 dark:bg-gray-700 shadow p-6 rounded-lg flex flex-col md:flex-row w-full gap-4">
+                    {/* <section className="mb-8 bg-gray-100 dark:bg-gray-700 shadow p-6 rounded-lg flex flex-col md:flex-row w-full gap-4">
                         <div className="md:w-1/2">
                             <h2 className="text-xl font-semibold mb-6 flex items-center gap-2 text-gray-800 dark:text-gray-200">
                                 <FaFileUpload />
@@ -457,10 +488,10 @@ export default function AccidentClaimForm() {
                                         new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files)],
                                     })
                                 }
-                                className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                className=""
                             />
                         </div>
-                    </section>
+                    </section> */}
 
                     {/* Conditional Sections Based on Accident Type */}
                     {formData.accident_type === "motor_vehicle_accidents" && (
@@ -470,11 +501,11 @@ export default function AccidentClaimForm() {
                                 Motor Vehicle Accident Details
                             </h2>
                             <p className="text-gray-600 dark:text-gray-400 mb-6">
-                                If you had a motor vehicle accident, please complete this section.
+                                In this section, provide all vehicle details such as a automobile descriptions, and insurance certificates.
                             </p>
 
                             {/* MVA Type and Location */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1  gap-6">
                                 <div>
                                     <Label>Motor Vehicle Accident Type</Label>
                                     <Select
@@ -483,7 +514,7 @@ export default function AccidentClaimForm() {
                                         }
                                         value={formData.mva_type}
                                     >
-                                        <SelectTrigger className="mt-1 bg-white dark:bg-gray-600 !dark:text-white">
+                                        <SelectTrigger className="">
                                             <SelectValue placeholder="Choose an option..." />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -501,14 +532,14 @@ export default function AccidentClaimForm() {
                                     </Select>
                                 </div>
                                 <div>
-                                    <Label>Location at the Time of the Accident</Label>
+                                    <Label>Where were you located at the time of the accident?</Label>
                                     <Select
                                         onValueChange={(value) =>
                                             setFormData({ ...formData, mva_location: value })
                                         }
                                         value={formData.mva_location}
                                     >
-                                        <SelectTrigger className="mt-1 bg-white dark:bg-gray-600 !dark:text-white">
+                                        <SelectTrigger className="">
                                             <SelectValue placeholder="Select an option..." />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -527,7 +558,10 @@ export default function AccidentClaimForm() {
                                     <FaCarSide />
                                     Motor Vehicle Information
                                 </h3>
-                                <div className="space-y-6">
+                                <p className="text-gray-600 dark:text-gray-400 mb-6">
+                                    In this section, provide the available information for each vehicle involved in the accident.
+                                </p>
+                                <div className="space-y-6 mt-3">
                                     {formData.vehicle_details.map((vehicle, index) => (
                                         <div
                                             key={index}
@@ -582,7 +616,7 @@ export default function AccidentClaimForm() {
                             {/* Vehicle Selector */}
                             <div className="mt-8">
                                 <Label>
-                                    Select a Vehicle <span className="text-red-500">*</span>
+                                    Please select the vehicle that you were in at the time of the accident.<span className="text-red-500">*</span>
                                 </Label>
                                 <Select
                                     onValueChange={(value) =>
@@ -590,7 +624,7 @@ export default function AccidentClaimForm() {
                                     }
                                     value={formData.selected_vehicle}
                                 >
-                                    <SelectTrigger className="mt-1 bg-white dark:bg-gray-600 !dark:text-white">
+                                    <SelectTrigger className="">
                                         <SelectValue placeholder="Vehicle #..." />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -604,7 +638,7 @@ export default function AccidentClaimForm() {
                             {/* Documentation & Accident Description */}
                             <div className="mt-8">
                                 <Label>
-                                    Accident Description <span className="text-red-500">*</span>
+                                    Please write a brief description of the accident.<span className="text-red-500">*</span>
                                 </Label>
                                 <Textarea
                                     name="mva_description"
@@ -612,13 +646,15 @@ export default function AccidentClaimForm() {
                                     rows={5}
                                     value={formData.mva_description}
                                     onChange={handleInputChange}
-                                    className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                    className=""
                                 />
                             </div>
 
                             <div className="mt-6">
                                 <Label>Upload Documentation</Label>
                                 <FileUpload
+                                    // description="Please upload documents related to the car rental agreement."
+                                    description="Please upload all the documents regarding the motor vehicle accident. Such as police report, rental agreement, certificate of insurrance, traffic exchange, pictures from the accident, or any other relevant documents."
                                     multiple
                                     onFilesSelected={(files) =>
                                         setFormData({
@@ -626,7 +662,7 @@ export default function AccidentClaimForm() {
                                             new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files)],
                                         })
                                     }
-                                    className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                    className=""
                                 />
                             </div>
                         </section>
@@ -638,7 +674,11 @@ export default function AccidentClaimForm() {
                                 <FaWalking />
                                 Slip and Fall Accident Details
                             </h2>
-                            <div className="space-y-6">
+
+                            <p className="text-gray-600 dark:text-gray-400 mb-6">
+                                In this section, provide all the details regarding the slip and fall accident.
+                            </p>
+                            <div className="space-y-6 mt-3">
                                 {/* Accident Description */}
                                 <div>
                                     <Label>
@@ -646,11 +686,11 @@ export default function AccidentClaimForm() {
                                     </Label>
                                     <Textarea
                                         name="slip_description"
-                                        placeholder="Describe the accident..."
+                                        placeholder="Please write a bief description of the accident..."
                                         rows={5}
                                         value={formData.slip_description}
                                         onChange={handleInputChange}
-                                        className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                        className=""
                                     />
                                 </div>
 
@@ -665,7 +705,7 @@ export default function AccidentClaimForm() {
                                         }
                                         value={formData.slip_accident_type}
                                     >
-                                        <SelectTrigger className="mt-1 bg-white dark:bg-gray-600 !dark:text-white">
+                                        <SelectTrigger className="">
                                             <SelectValue placeholder="Select an option..." />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -682,14 +722,14 @@ export default function AccidentClaimForm() {
 
                                 {/* Negligence Description */}
                                 <div>
-                                    <Label>Negligence Description</Label>
+                                    <Label>Was there any negligence in the accident?</Label>
                                     <Textarea
                                         name="negligence_description"
-                                        placeholder="Explain if there was any negligence..."
+                                        placeholder="Explain..."
                                         rows={5}
                                         value={formData.negligence_description}
                                         onChange={handleInputChange}
-                                        className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                        className=""
                                     />
                                 </div>
 
@@ -699,17 +739,33 @@ export default function AccidentClaimForm() {
                                         <FaUser />
                                         Witness Information
                                     </h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                        <div>
-                                            <Label htmlFor="witness_name">Full Name</Label>
-                                            <Input
-                                                id="witness_name"
-                                                name="witness_name"
-                                                placeholder="Enter witness's full name"
-                                                value={formData.witness_name}
-                                                onChange={handleInputChange}
-                                                className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
-                                            />
+                                    <p className="text-gray-600 dark:text-gray-400 mb-6">
+                                        Was there any witness in the accident?
+                                    </p>
+                                    <div className="flex flex-col w-full gap-6">
+
+                                        <div className="flex w-full justify-between items-end gap-6">
+                                            <div className="w-full">
+                                                <Label htmlFor="witness_name">Full Name</Label>
+                                                <Input
+                                                    id="witness_name"
+                                                    name="witness_name"
+                                                    placeholder="Enter witness's full name"
+                                                    value={formData.witness_name}
+                                                    onChange={handleInputChange}
+                                                    className=""
+                                                />
+                                            </div>
+                                            <div className="w-full mt-3">
+                                                <Label htmlFor="witness_phone">Phone</Label>
+                                                <CustomPhoneInput
+                                                    id="witness_phone"
+                                                    value={formData.witness_phone}
+                                                    onChange={handlePhoneChange("witness_phone")}
+                                                    className="mt-1 w-full bg-white dark:bg-gray-600 !dark:text-white"
+                                                    placeholder="+1 234 567 890"
+                                                />
+                                            </div>
                                         </div>
                                         <div>
                                             <Label htmlFor="witness_email">Email</Label>
@@ -720,20 +776,25 @@ export default function AccidentClaimForm() {
                                                 placeholder="Enter witness's email"
                                                 value={formData.witness_email}
                                                 onChange={handleInputChange}
-                                                className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                                className=""
                                             />
                                         </div>
-                                        <div>
-                                            <Label htmlFor="witness_phone">Phone</Label>
-                                            <Input
-                                                id="witness_phone"
-                                                name="witness_phone"
-                                                placeholder="+1 234 567 890"
-                                                value={formData.witness_phone}
-                                                onChange={handleInputChange}
-                                                className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
-                                            />
-                                        </div>
+
+                                    </div>
+
+                                    <div className="mt-6">
+                                        <Label>Upload Slip & Fall Documents</Label>
+                                        <FileUpload
+                                            description="Please upload all the documents related to the slip and fall accident. Such as police report, internal police reports, fotos of the place of the accident, injuries, and/or any other relevant documents."
+                                            multiple
+                                            onFilesSelected={(files) =>
+                                                setFormData({
+                                                    ...formData,
+                                                    new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files)],
+                                                })
+                                            }
+                                            className=""
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -746,18 +807,21 @@ export default function AccidentClaimForm() {
                             <FaHeartbeat />
                             Medical Information
                         </h2>
+                        <p className="text-gray-600 dark:text-gray-400 mb-6">
+                            In this section, complete with all ongoing medical treatments, or future medical needs.
+                        </p>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <Label>
-                                    Assistance Type
+                                    Type of Assistance
                                 </Label>
                                 <Textarea
                                     name="medical_assistance_type"
-                                    placeholder="Describe the type of medical assistance received..."
+                                    placeholder="Describe the type of medical assistance provided..."
                                     rows={3}
                                     value={formData.medical_assistance_type}
                                     onChange={handleInputChange}
-                                    className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                    className=""
                                 />
                             </div>
                             <div>
@@ -770,7 +834,7 @@ export default function AccidentClaimForm() {
                                     rows={4}
                                     value={formData.medical_diagnosis}
                                     onChange={handleInputChange}
-                                    className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                    className=""
                                 />
                             </div>
                             <div className="md:col-span-2">
@@ -779,25 +843,39 @@ export default function AccidentClaimForm() {
                                 </Label>
                                 <Textarea
                                     name="medical_treatment"
-                                    placeholder="Describe the treatment received..."
+                                    placeholder="Describe the treatment provided..."
                                     rows={4}
                                     value={formData.medical_treatment}
                                     onChange={handleInputChange}
-                                    className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                    className=""
                                 />
                             </div>
-                            <div className="md:col-span-2">
+                            <div className="md:col-span-2 mb-3">
                                 <Label>
                                     Primary Care Provider{" "}
                                 </Label>
                                 <Input
                                     name="primary_care_provider"
-                                    placeholder="Name of your primary care provider"
+                                    placeholder="Name of the clinic or hostipal that provided the treatment"
                                     value={formData.primary_care_provider}
                                     onChange={handleInputChange}
-                                    className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                    className=""
                                 />
                             </div>
+                        </div>
+                        <div>
+                            <Label>Upload File</Label>
+                            <FileUpload
+                                description="Please upload all the documents related to the medical treatment. Such as medical records, discharge notes, emergency notes, or any other medical document."
+                                multiple
+                                onFilesSelected={(files) =>
+                                    setFormData({
+                                        ...formData,
+                                        new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files)],
+                                    })
+                                }
+                                className=""
+                            />
                         </div>
                     </section>
 
@@ -807,10 +885,13 @@ export default function AccidentClaimForm() {
                             <FaDollarSign />
                             Cost of Assistance
                         </h2>
+                        <p className="text-gray-600 dark:text-gray-400 mb-6">
+                            In this section, fill with all costs recieved related to the claim, even if they are estimated or over the policy limit.
+                        </p>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="relative">
                                 <Label>
-                                    Total Cost ($)
+                                    Estimated Total Cost ($)
                                 </Label>
                                 <div className="relative mt-1">
                                     <FaDollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -853,7 +934,7 @@ export default function AccidentClaimForm() {
                                     }
                                     value={formData.assistance_status}
                                 >
-                                    <SelectTrigger className="mt-1 bg-white dark:bg-gray-600 !dark:text-white">
+                                    <SelectTrigger className="">
                                         <SelectValue placeholder="Select status:" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -865,13 +946,13 @@ export default function AccidentClaimForm() {
                                 </Select>
                             </div>
                             <div className="md:col-span-2">
-                                <Label>Medical Provider Costs</Label>
+                                <Label>Medical Provider Bills</Label>
                                 <div className="relative mt-1">
                                     <FaDollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                                     <Input
                                         type="number"
                                         name="medical_provider_costs"
-                                        placeholder="Details about medical provider costs..."
+                                        placeholder="Details about medical provider bills..."
                                         // rows={3}
                                         value={formData.medical_provider_costs.toString()}
                                         onChange={handleInputChange}
@@ -905,7 +986,7 @@ export default function AccidentClaimForm() {
                                             new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files)],
                                         })
                                     }
-                                    className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                    className=""
                                 />
                             </div>
                             <div className="md:col-span-2">
@@ -917,20 +998,21 @@ export default function AccidentClaimForm() {
                                     // rows={3}
                                     value={formData.other_costs.toString()}
                                     onChange={handleInputChange}
-                                    className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                    className=""
                                 />
                             </div>
                             <div className="md:col-span-2">
                                 <Label>Upload Other Files</Label>
                                 <FileUpload
                                     multiple
+                                    description="Please upload all documents related to the costs of assistance. Such as medical bills, repratriation bills, or any other costs related to the case."
                                     onFilesSelected={(files) =>
                                         setFormData({
                                             ...formData,
                                             new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files)],
                                         })
                                     }
-                                    className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                    className=""
                                 />
                             </div>
                         </div>
@@ -942,12 +1024,15 @@ export default function AccidentClaimForm() {
                             <FaUsers />
                             Third Party Information
                         </h2>
+                        <p className="text-gray-600 dark:text-gray-400 mb-6">
+                            In this section, completed with all details from any other individual, company, or owner involved, such as an inssurance, establishment owner, assistance company or other company on file.
+                        </p>
                         <div className="space-y-6">
                             {/* Insurance Company Involved */}
                             <div className="border p-6 rounded-lg shadow-sm bg-gray-50 dark:bg-gray-600">
                                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-800 dark:text-gray-200">
                                     <FaBuilding />
-                                    Insurance Company Involved
+                                    Insurance Company
                                 </h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
@@ -959,7 +1044,7 @@ export default function AccidentClaimForm() {
                                             placeholder="Enter insurance company name"
                                             value={formData.insurance_company}
                                             onChange={handleInputChange}
-                                            className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                            className=""
                                         />
                                     </div>
                                     <div>
@@ -971,7 +1056,7 @@ export default function AccidentClaimForm() {
                                             placeholder="Enter claim reference number"
                                             value={formData.claim_reference_number}
                                             onChange={handleInputChange}
-                                            className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                            className=""
                                         />
                                     </div>
                                     <div>
@@ -983,7 +1068,7 @@ export default function AccidentClaimForm() {
                                             placeholder="Enter adjuster's name"
                                             value={formData.adjuster_name}
                                             onChange={handleInputChange}
-                                            className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                            className=""
                                         />
                                     </div>
                                     <div>
@@ -996,7 +1081,7 @@ export default function AccidentClaimForm() {
                                             rows={3}
                                             value={formData.adjuster_contact_details}
                                             onChange={handleInputChange}
-                                            className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                            className=""
                                         />
                                     </div>
                                 </div>
@@ -1010,7 +1095,7 @@ export default function AccidentClaimForm() {
                                                 new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files)],
                                             })
                                         }
-                                        className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                        className=""
                                     />
                                 </div>
                             </div>
@@ -1024,38 +1109,52 @@ export default function AccidentClaimForm() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <Label>
-                                            Owner Business Name
+                                            Business Name
                                         </Label>
                                         <Input
                                             name="owner_business_name"
                                             placeholder="Enter owner or company name"
                                             value={formData.owner_business_name}
                                             onChange={handleInputChange}
-                                            className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                            className=""
                                         />
                                     </div>
                                     <div>
                                         <Label>
-                                            Owner Reference Number{" "}
+                                            Reference Number{" "}
                                         </Label>
                                         <Input
                                             name="owner_reference_number"
                                             placeholder="Enter reference number"
                                             value={formData.owner_reference_number}
                                             onChange={handleInputChange}
-                                            className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                            className=""
                                         />
                                     </div>
                                     <div>
                                         <Label>
-                                            Owner Phone Number
+                                            Phone Number
                                         </Label>
-                                        <Input
+                                        {/* <Input
                                             name="owner_phone_number"
                                             placeholder="+1 234 567 890"
                                             value={formData.owner_phone_number}
                                             onChange={handleInputChange}
-                                            className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                            className=""
+                                        /> */}
+                                        {/* <Input
+                                            name="owner_phone_number"
+                                            isPhone
+                                            placeholder="+1 234 567 890"
+                                            value={formData.owner_phone_number}
+                                            onPhoneChange={handlePhoneChange("owner_phone_number")}
+                                            className=""
+                                        /> */}
+                                        <CustomPhoneInput
+                                            value={formData.owner_phone_number}
+                                            onChange={handlePhoneChange("owner_phone_number")}
+                                            className=""
+                                            placeholder="+1 234 567 890"
                                         />
                                     </div>
                                 </div>
@@ -1069,7 +1168,7 @@ export default function AccidentClaimForm() {
                                                 new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files)],
                                             })
                                         }
-                                        className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                        className=""
                                     />
                                 </div>
                             </div>
@@ -1078,22 +1177,23 @@ export default function AccidentClaimForm() {
                             <div className="border p-6 rounded-lg shadow-sm bg-gray-50 dark:bg-gray-600">
                                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-800 dark:text-gray-200">
                                     <FaUserFriends />
-                                    Co-Insured (if any)
+                                    Co-Insurer (if any)
                                 </h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
-                                        <Label>Co-Insured</Label>
+                                        <Label>Co-Insurer</Label>
                                         <Input
                                             name="co_insured_name"
-                                            placeholder="Enter co-insured name"
+                                            placeholder="Other Insurance Name"
                                             value={formData.co_insured_name}
                                             onChange={handleInputChange}
-                                            className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                            className=""
                                         />
                                     </div>
                                     <div>
                                         <Label>Upload File</Label>
                                         <FileUpload
+                                            description="Upload any insurance certification, membership, or other."
                                             multiple
                                             onFilesSelected={(files) =>
                                                 setFormData({
@@ -1101,7 +1201,7 @@ export default function AccidentClaimForm() {
                                                     new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files)],
                                                 })
                                             }
-                                            className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                            className=""
                                         />
                                     </div>
                                 </div>
@@ -1119,11 +1219,11 @@ export default function AccidentClaimForm() {
                                     </Label>
                                     <Textarea
                                         name="other_party_info"
-                                        placeholder="Provide details about the other party involved..."
+                                        placeholder="Please fill with any other third party details..."
                                         rows={4}
                                         value={formData.other_party_info}
                                         onChange={handleInputChange}
-                                        className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                        className=""
                                     />
                                 </div>
                             </div>
@@ -1137,7 +1237,7 @@ export default function AccidentClaimForm() {
                             Personal Attorney
                         </h2>
                         <p className="text-gray-600 dark:text-gray-400 mb-6">
-                            Personal Attorney representing the patient where the accident or loss occurred.
+                            In this section, request and complete with any possible legal representation, the policy holder may have regarding the accident.
                         </p>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
@@ -1149,7 +1249,7 @@ export default function AccidentClaimForm() {
                                     placeholder="Enter law firm name"
                                     value={formData.law_firm_name}
                                     onChange={handleInputChange}
-                                    className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                    className=""
                                 />
                             </div>
                             <div>
@@ -1161,24 +1261,38 @@ export default function AccidentClaimForm() {
                                     placeholder="Enter attorney or paralegal name"
                                     value={formData.attorney_name}
                                     onChange={handleInputChange}
-                                    className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                    className=""
                                 />
                             </div>
                             <div>
                                 <Label>
                                     Attorney Phone{" "}
                                 </Label>
-                                <Input
+                                {/* <Input
                                     name="attorney_phone"
                                     type="tel"
                                     placeholder="+1 234 567 890"
                                     value={formData.attorney_phone}
                                     onChange={handleInputChange}
-                                    className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                    className=""
+                                /> */}
+                                {/* <Input
+                                    name="attorney_phone"
+                                    isPhone
+                                    placeholder="+1 234 567 890"
+                                    value={formData.attorney_phone}
+                                    onPhoneChange={handlePhoneChange("attorney_phone")}
+                                    className=""
+                                /> */}
+                                <CustomPhoneInput
+                                    value={formData.attorney_phone}
+                                    onChange={handlePhoneChange("attorney_phone")}
+                                    className=""
+                                    placeholder="+1 234 567 890"
                                 />
                             </div>
                             <div className="md:col-span-2">
-                                <Label>Attorney Firm Documentation</Label>
+                                <Label>Upload all documents regarding the a law firm:</Label>
                                 <FileUpload
                                     multiple
                                     onFilesSelected={(files) =>
@@ -1187,7 +1301,7 @@ export default function AccidentClaimForm() {
                                             new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files)],
                                         })
                                     }
-                                    className="mt-1 bg-white dark:bg-gray-600 !dark:text-white"
+                                    className=""
                                 />
                             </div>
                         </div>

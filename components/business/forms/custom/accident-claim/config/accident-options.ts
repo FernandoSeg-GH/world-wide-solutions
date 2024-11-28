@@ -3,11 +3,18 @@ export const accidentTypeOptions = [
     label: "Motor Vehicle Accidents",
     value: "motor_vehicle_accidents",
     subOptions: [
-      { label: "Car Accidents", value: "car_accidents" },
-      { label: "Motorcycle Accidents", value: "motorcycle_accidents" },
-      { label: "Truck Accidents", value: "truck_accidents" },
-      { label: "Pedestrian Accidents", value: "pedestrian_accidents" },
-      { label: "Bicycle Accidents", value: "bicycle_accidents" },
+      { label: "Car Accident", value: "car_accidents" },
+      { label: "Motorcycle Accident", value: "motorcycle_accidents" },
+      { label: "Truck Accident", value: "truck_accidents" },
+      {
+        label: "Pedestrian Accidents hit by a vehicle accident",
+        value: "pedestrian_accidents",
+      },
+      {
+        label: "Bicycle Accidents it by a vehicle accident",
+        value: "bicycle_accidents",
+      },
+      { label: "Other", value: "other" },
     ],
   },
   {
@@ -23,6 +30,7 @@ export const accidentTypeOptions = [
         label: "Falls due to poor lighting or inadequate maintenance",
         value: "falls_due_to_poor_lighting_or_maintenance",
       },
+      { label: "Other", value: "other" },
     ],
   },
   {
