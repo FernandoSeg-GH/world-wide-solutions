@@ -46,7 +46,7 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
 
     useEffect(() => {
         if (isSubmitted) {
-            router.push('/dashboard');
+            router.push('/');
         }
     }, [isSubmitted, router]);
 

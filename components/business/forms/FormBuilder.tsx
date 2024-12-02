@@ -176,7 +176,7 @@ function FormBuilder({ shareUrl }: FormBuilderProps) {
                         <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button variant="outline" onClick={() => router.push("/dashboard")}>
+                                    <Button variant="outline" onClick={() => router.push("/")}>
                                         <ChevronLeftCircle />
                                     </Button>
                                 </TooltipTrigger>

@@ -49,7 +49,7 @@ export default function CreateBusinessForm() {
         const success = await createBusiness(dataToSend);
 
         if (success) {
-            router.push("/dashboard");
+            router.push("/");
         }
     };
 

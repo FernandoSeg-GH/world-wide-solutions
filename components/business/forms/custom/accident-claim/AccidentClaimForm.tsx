@@ -190,7 +190,7 @@ export default function AccidentClaimForm() {
             toast({ title: "Success!", description: "Form submitted successfully!" });
             setFormData(initialForm);
             setSuccessMessage(true)
-            router.push("/dashboard")
+            router.push("/")
         } catch (error) {
             console.error("An error occurred while submitting the form:", error);
             toast({ title: "Error", description: "An error occurred while submitting the form.", variant: "destructive", });

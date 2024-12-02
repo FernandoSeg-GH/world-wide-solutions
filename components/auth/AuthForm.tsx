@@ -26,7 +26,7 @@ export function AuthForm() {
                     {isRegistering ? (
                         <SignUp onToggle={() => setIsRegistering(false)} />
                     ) : (
-                        <SignIn onToggle={() => setIsRegistering(true)} callbackUrl={"/dashboard"} />
+                        <SignIn onToggle={() => setIsRegistering(true)} callbackUrl={"/"} />
                     )}
                 </CardContent>
             </Card>

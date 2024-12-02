@@ -44,7 +44,7 @@ export default function UserMenu() {
                     Welcome <span className="capitalize">{session.user.name}</span>!
                 </h2>
                 <DropdownMenuItem>
-                    <a href="/dashboard" className="flex w-full items-center">
+                    <a href="/" className="flex w-full items-center">
                         <HomeIcon className="mr-2" />Dashboard
                     </a>
                 </DropdownMenuItem>
