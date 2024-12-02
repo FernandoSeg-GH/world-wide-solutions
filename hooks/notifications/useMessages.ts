@@ -24,7 +24,20 @@ export const useMessages = () => {
         throw new Error("Failed to fetch conversations");
       }
       const data: ConversationSummary[] = await response.json();
-      setConversations(data);
+      console.log("Fetched Conversations:", data); // Debugging
+      setConversations(
+        data.map((conversation: ConversationSummary) => ({
+          ...conversation,
+          accidentClaim: {
+            claimId: conversation.accidentClaim?.claimId ?? "",
+            fullName: conversation.accidentClaim?.fullName ?? "",
+            status: conversation.accidentClaim?.status ?? "",
+            email: conversation.accidentClaim?.email ?? "",
+            accidentType: conversation.accidentClaim?.accidentType ?? "",
+            accidentDate: conversation.accidentClaim?.accidentDate ?? "",
+          },
+        }))
+      );
     } catch (error) {
       console.error("Error fetching conversations:", error);
     } finally {
@@ -50,6 +63,10 @@ export const useMessages = () => {
           throw new Error("Failed to fetch messages");
         }
         const data: InboxMessage[] = await response.json();
+        console.log(
+          `Fetched Messages for Conversation ${conversationId}:`,
+          data
+        ); // Debugging
         setMessages(data);
       } catch (error) {
         console.error("Error fetching messages:", error);
@@ -85,29 +102,32 @@ export const useMessages = () => {
   );
 
   const sendMessageToUsers = useCallback(
-    async (recipientIds: number[], content: string, readOnly: boolean) => {
-      if (!session?.accessToken) return;
-      try {
-        const response = await fetch("/api/messages/send", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session.accessToken}`,
-          },
-          body: JSON.stringify({
-            recipient_ids: recipientIds,
-            content,
-            read_only: readOnly,
-          }),
-        });
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Failed to send message");
-        }
-      } catch (error) {
-        console.error("Error sending message:", error);
-        throw error;
+    async (
+      recipient_ids: number[],
+      content: string,
+      read_only: boolean,
+      accident_claim_id: number
+    ) => {
+      const response = await fetch("/api/messages/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.accessToken}`, // Ensure Authorization header is set
+        },
+        body: JSON.stringify({
+          recipient_ids,
+          content,
+          read_only,
+          accident_claim_id,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to send message");
       }
+
+      return response.json();
     },
     [session]
   );
@@ -131,9 +151,15 @@ export const useMessages = () => {
         throw new Error("No recipients found in the conversation");
       }
 
+      const accidentClaimId = Number(conversation.accidentClaim?.claimId);
+      if (!accidentClaimId) {
+        throw new Error("No accident claim associated with this conversation");
+      }
+
       try {
-        await sendMessageToUsers(recipientIds, content, false);
+        await sendMessageToUsers(recipientIds, content, false, accidentClaimId);
       } catch (error) {
+        console.error("Error sending message:", error);
         throw error;
       }
     },
@@ -144,7 +170,7 @@ export const useMessages = () => {
     async (messageId: number) => {
       if (!session?.accessToken) return;
       try {
-        const response = await fetch("/api/messages/read", {
+        const response = await fetch("/api/messages/mark_read", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -169,19 +195,48 @@ export const useMessages = () => {
   const fetchInboxMessages = useCallback(async () => {
     if (!session?.accessToken) return;
     setLoading(true);
+
     try {
       const response = await fetch("/api/messages/inbox", {
-        headers: {
-          Authorization: `Bearer ${session.accessToken}`,
-        },
+        headers: { Authorization: `Bearer ${session.accessToken}` },
       });
+
       if (!response.ok) {
-        throw new Error("Failed to fetch inbox messages");
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to fetch inbox messages");
       }
+
       const data: InboxMessage[] = await response.json();
+      console.log("Fetched Inbox Messages:", data); // Debugging
       setMessages(data);
     } catch (error) {
       console.error("Error fetching inbox messages:", error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }, [session]);
+
+  const fetchUsersWithClaims = useCallback(async () => {
+    if (!session?.accessToken) return;
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/messages/users_claims", {
+        headers: { Authorization: `Bearer ${session.accessToken}` },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to fetch users with claims");
+      }
+
+      const data = await response.json();
+      console.log("Fetched Users with Claims:", data); // Debugging
+      return data;
+    } catch (error) {
+      console.error("Error fetching users with claims:", error);
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -200,5 +255,6 @@ export const useMessages = () => {
     sendMessage,
     markAsRead,
     fetchInboxMessages,
+    fetchUsersWithClaims,
   };
 };

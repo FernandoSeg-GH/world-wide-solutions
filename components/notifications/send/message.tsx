@@ -57,7 +57,7 @@ const SendMessage: React.FC = () => {
 
         try {
             setLoading(true);
-            await sendMessageToUsers(recipientIds, messageContent, readOnly);
+            await sendMessageToUsers(recipientIds, messageContent, readOnly, selectedFormId ?? 0);
             toast({
                 title: "Success",
                 description: "Message sent successfully.",

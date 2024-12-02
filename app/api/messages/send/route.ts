@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { getServerSession } from "next-auth";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -11,9 +11,9 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { recipient_ids, content, read_only } = body;
+    const { recipient_ids, content, read_only, accident_claim_id } = body;
 
-    if (!recipient_ids || !content) {
+    if (!recipient_ids || !content || !accident_claim_id) {
       return NextResponse.json(
         { message: "Missing required fields" },
         { status: 400 }
@@ -32,12 +32,13 @@ export async function POST(req: NextRequest) {
           recipient_ids,
           content,
           read_only,
+          accident_claim_id, // Include accident_claim_id here
         }),
       }
     );
 
     const data = await response.json();
-
+    console.log("data", data);
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
     console.error("Error sending message:", error);

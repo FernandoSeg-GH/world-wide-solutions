@@ -35,7 +35,7 @@ function ClaimReports({ }: Props) {
                 </Card>
 
             }
-            {session?.user.role.id === 1 &&
+            {session?.user.role.id !== 5 &&
                 <AccidentClaimsView />
             }
             {session?.user.role.id === 3 &&
@@ -43,7 +43,7 @@ function ClaimReports({ }: Props) {
                     {/* <AccidentClaimForm/> */}
 
                     <Button variant="ghost" onClick={() => setExpanded(!expanded)} className='font-semibold text-lg w-full'>
-                        1) Accident Claim Report {expanded ? <ChevronUp /> : <ChevronDown />}
+                        Submit New Accident Claim Report {expanded ? <ChevronUp /> : <ChevronDown />}
                     </Button>
                     {expanded &&
                         <div className='w-full flex flex-col gap-6'>

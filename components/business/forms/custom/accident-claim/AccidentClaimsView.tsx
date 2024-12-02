@@ -55,7 +55,6 @@ const AccidentClaimsView: React.FC = () => {
                     }))
                     : [];
 
-                console.log("Initialized Claims:", initializedClaims); // Add this line
                 setClaims(initializedClaims);
                 setLoading(false);
             } catch (err: any) {

@@ -13,6 +13,7 @@ import { TelephoneFieldFormElement } from "@/components/builder/fields/Telephone
 import { Dispatch, SetStateAction } from "react";
 import { FileUploadFieldFormElement } from "@/components/builder/fields/FileUploadField";
 import { ExpandableSelectFieldFormElement } from "@/components/builder/fields/ExpandableSelectField";
+import { AccidentClaimFormData } from "@/components/business/forms/custom/accident-claim/config/types";
 
 export enum BrandColors {
   BluePrimary = "#151342",
@@ -187,11 +188,25 @@ export interface Chat {
 
 export interface ConversationSummary {
   conversationId: number;
-  lastMessage: InboxMessage | null;
+  lastMessage?: {
+    messageId: number;
+    senderId: number;
+    senderUsername: string;
+    content: string;
+    timestamp: string;
+  };
   participants: {
     userId: number;
     username: string;
   }[];
+  accidentClaim?: {
+    claimId: string;
+    fullName: string;
+    status: string;
+    email: string;
+    accidentType: string;
+    accidentDate: string; // ISO Date string
+  };
 }
 
 export interface Message {
@@ -222,6 +237,13 @@ export interface InboxMessage {
   timestamp: string;
   read: boolean;
   readOnly: boolean;
+  accidentClaimId?: number;
+  accidentClaimDetails?: {
+    claimId: string;
+    fullName: string;
+    status: string;
+    email: string;
+  }; // Optional detailed accident claim info
 }
 
 export interface UserAICharacter {
@@ -459,7 +481,8 @@ export interface AppContextType {
       sendMessageToUsers: (
         recipientIds: number[],
         content: string,
-        readOnly: boolean
+        readOnly: boolean,
+        accidentClaimId: number
       ) => Promise<void>;
       sendMessage: (conversationId: number, content: string) => Promise<void>;
       markAsRead: (messageId: number) => Promise<void>;
