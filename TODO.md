@@ -84,7 +84,7 @@ SI
 **DONE** - En Treatment, cambiar placeholder a "Describe the treatment provided"
 **DONE** - Primary Care Provider, cambiar placeholder a "Name of the clinic or hostipal that provided the treatment"
 
-- Agregar un "Upload Documents" que diga "Please upload all the documents related to the medical treatment. Such as medical records, discharge notes, emergency notes, or any other medical document."
+**DONE** - Agregar un "Upload Documents" que diga "Please upload all the documents related to the medical treatment. Such as medical records, discharge notes, emergency notes, or any other medical document."
 
 <!-- COST OF ASSISTANCE -->
 
@@ -97,7 +97,7 @@ SI
 **DONE** - En "Repatriation Bills", agregar tal como array de vehicle, un botón de agregar nuevo Cost of Assistance en donde renderizamos un componet (card) con los siguiente inputs: "Name of provider", "Amount Billed", "Amount Paid", "Amount Unpaid" ====> convertimos de input a array de objetos
 **DONE** - En Other Bills, una nueva iteración con "Other Bills" con los siguientes inputs: "Name of provider", "Amount Billed", "Amount Paid", "Amount Unpaid" ====> convertimos de input a array de objetos
 
-- En Documents Upload, cambiar description for "Please upload all documents related to the costs of assistance. Such as medical bills, repratriation bills, or any other costs related to the case."
+**DONE** - - En Documents Upload, cambiar description for "Please upload all documents related to the costs of assistance. Such as medical bills, repratriation bills, or any other costs related to the case."
 
 <!-- THIRD PARTY INFORMATION -->
 

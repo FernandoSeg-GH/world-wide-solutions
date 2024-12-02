@@ -103,7 +103,6 @@ const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
         }
     };
 
-
     return (
         <Disclosure>
             {({ open }) => (

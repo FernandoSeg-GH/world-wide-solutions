@@ -30,7 +30,7 @@ export const formSections: SectionConfig[] = [
       { id: "full_name", label: "Full Name", type: "text", required: true },
       { id: "email", label: "Email", type: "email", required: true },
       { id: "country", label: "Country", type: "select", required: true, options: countryOptions },
-      { id: "state", label: "State", type: "conditionalSelect", required: true, options: usaStates }, // Use a list of options if needed for USA states
+      { id: "state", label: "State", type: "conditionalSelect", required: true, options: usaStates },
       { id: "primary_contact", label: "Primary Contact Phone Number", type: "text", required: true },
       { id: "other_contact_name", label: "Relative or Friend", type: "text", required: false },
       { id: "other_contact_phone", label: "Other Contact Phone Number", type: "text", required: false },
@@ -127,13 +127,97 @@ export const formSections: SectionConfig[] = [
 ];
 
 
-
-
-
 export function mapClaimToFormData(claim: Claim, businessId: string): AccidentClaimFormData {
   return {
+    status: claim.status || "",
+    business_id: claim.business_id || businessId || "",
+    formUrl: claim.formUrl || "",
+    full_name: claim.full_name || "",
+    email: claim.email || "",
+    country: claim.country || "",
+    state: claim.state || "",
+    primary_contact: claim.primary_contact || "",
+    other_contact_name: claim.other_contact_name || "",
+    other_contact_phone: claim.other_contact_phone || "",
+    accident_date: claim.accident_date || "",
+    accident_place: claim.accident_place || "",
+    accident_type: claim.accident_type || "",
+    sub_accident_type: claim.sub_accident_type || "",
+    mva_type: claim.mva_type || "",
+    mva_location: claim.mva_location || "",
+    vehicle_details: typeof claim.vehicle_details === 'string'
+      ? parseJSONField(claim.vehicle_details, "vehicle_details") || []
+      : Array.isArray(claim.vehicle_details) ? claim.vehicle_details : [],
+    selected_vehicle: claim.selected_vehicle || "",
+    mva_description: claim.mva_description || "",
+    medical_assistance_type: claim.medical_assistance_type || "",
+    medical_diagnosis: claim.medical_diagnosis || "",
+    medical_treatment: claim.medical_treatment || "",
+    primary_care_provider: claim.primary_care_provider || "",
+    medical_total_cost: claim.medical_total_cost || 0,
+    policy_limits: claim.policy_limits || 0,
+    assistance_status: claim.assistance_status || "",
+    medical_provider_costs: Array.isArray(claim.medical_provider_costs)
+      ? claim.medical_provider_costs
+      : parseJSONField(claim.medical_provider_costs, "medical_provider_costs") || [],
+    repatriation_costs: Array.isArray(claim.repatriation_costs)
+      ? claim.repatriation_costs
+      : parseJSONField(claim.repatriation_costs, "repatriation_costs") || [],
+    other_costs: Array.isArray(claim.other_costs)
+      ? claim.other_costs
+      : parseJSONField(claim.other_costs, "other_costs") || [],
+    insurance_company: claim.insurance_company || "",
+    claim_reference_number: claim.claim_reference_number || "",
+    adjuster_name: claim.adjuster_name || "",
+    adjuster_contact_details: claim.adjuster_contact_details || "",
+    owner_business_name: claim.owner_business_name || "",
+    owner_reference_number: claim.owner_reference_number || "",
+    owner_phone_number: claim.owner_phone_number || "",
+    co_insured_name: claim.co_insured_name || "",
+    other_party_info: claim.other_party_info || "",
+    law_firm_name: claim.law_firm_name || "",
+    attorney_name: claim.attorney_name || "",
+    attorney_phone: claim.attorney_phone || "",
+    slip_description: claim.slip_description || "",
+    slip_accident_type: claim.slip_accident_type || "",
+    negligence_description: claim.negligence_description || "",
+    witness_name: claim.witness_name || "",
+    witness_email: claim.witness_email || "",
+    witness_phone: claim.witness_phone || "",
+    file_uploads: typeof claim.file_uploads === 'string'
+      ? parseJSONField(claim.file_uploads, "file_uploads") || []
+      : claim.file_uploads || [],
+    new_file_uploads: [],
+    additional_notes: claim.additional_notes || "",
+  };
+}
+
+export function parseJSONField(field: string | any, fieldName: string = ""): any {
+  if (typeof field === "string") {
+    if (field.trim() === "") {
+      return null; // Treat empty strings as null
+    }
+    try {
+      return JSON.parse(field);
+    } catch (error) {
+      console.error(`Failed to parse field "${fieldName}":`, error);
+      return null;
+    }
+  }
+  return field;
+}
+
+/**
+ * Utility to map claim data to form data dynamically.
+ */
+export function dynamicMapClaimToFormData(
+  claim: Claim,
+  businessId: string,
+  defaultData: Partial<AccidentClaimFormData>
+): AccidentClaimFormData {
+  const mappedData: AccidentClaimFormData = {
     status: "",
-    business_id: "",
+    business_id: businessId,
     formUrl: "",
     full_name: "",
     email: "",
@@ -178,15 +262,20 @@ export function mapClaimToFormData(claim: Claim, businessId: string): AccidentCl
     negligence_description: "",
     witness_name: "",
     witness_email: "",
-    witness_phone: ""
+    witness_phone: "",
+    file_uploads: [],
+    new_file_uploads: [],
+    additional_notes: "",
+    ...defaultData,
   };
-}
 
-function parseJSONField(field: string | any, fieldName: string = ""): any {
-  try {
-    return typeof field === 'string' ? JSON.parse(field) : field;
-  } catch (error) {
-    console.error(`Failed to parse field "${fieldName}":`, error);
-    return null;
+  for (const [key, value] of Object.entries(defaultData)) {
+    (mappedData[key as keyof AccidentClaimFormData] as any) =
+      claim[key as keyof Claim] || mappedData[key as keyof AccidentClaimFormData];
   }
+
+  // Handle specific nested or complex fields (e.g., JSON or arrays).
+  mappedData.vehicle_details = parseJSONField(claim.vehicle_details, "vehicle_details");
+
+  return mappedData;
 }

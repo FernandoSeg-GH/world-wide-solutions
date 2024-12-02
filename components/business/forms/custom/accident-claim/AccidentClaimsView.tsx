@@ -1,10 +1,8 @@
-"use client";
-
+"use client"
 import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { FaEdit } from "react-icons/fa";
 import { useRouter } from 'next/navigation';
-
 import { AccidentClaimFormData, Claim, EditableClaim, GroupedClaims } from "./config/types";
 import { mapClaimToFormData, formSections } from "./config/form-config";
 import ClaimAccordion from "./ClaimAccordion";
@@ -17,6 +15,7 @@ import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable, { RowInput } from 'jspdf-autotable';
 import { flattenClaimData } from "@/lib/utils";
+import _ from "lodash";
 
 const AccidentClaimsView: React.FC = () => {
     const { data: session } = useSession();
@@ -27,6 +26,8 @@ const AccidentClaimsView: React.FC = () => {
     const router = useRouter();
     const businessId = String(session?.user?.businessId);
     const [isSpreadsheetView, setIsSpreadsheetView] = useState<boolean>(false);
+
+    // AccidentClaimsView.tsx
 
     useEffect(() => {
         const fetchClaims = async () => {
@@ -54,6 +55,7 @@ const AccidentClaimsView: React.FC = () => {
                     }))
                     : [];
 
+                console.log("Initialized Claims:", initializedClaims); // Add this line
                 setClaims(initializedClaims);
                 setLoading(false);
             } catch (err: any) {
@@ -67,6 +69,7 @@ const AccidentClaimsView: React.FC = () => {
             fetchClaims();
         }
     }, [businessId, session]);
+
 
 
     useEffect(() => {
@@ -97,33 +100,64 @@ const AccidentClaimsView: React.FC = () => {
 
     const toggleEdit = (claim_id: string) => {
         setClaims((prevClaims) =>
-            prevClaims.map((claim) =>
-                claim.claim_id === claim_id
-                    ? {
+            prevClaims.map((claim) => {
+                if (claim.claim_id === claim_id) {
+                    const isNowEditing = !claim.isEditing;
+                    const newEditedData = isNowEditing ? mapClaimToFormData(claim, businessId) : { ...claim.editedData };
+                    console.log(`Toggling edit for claim ${claim_id}. Now editing: ${isNowEditing}`, newEditedData);
+                    return {
                         ...claim,
-                        isEditing: !claim.isEditing,
-                        editedData: !claim.isEditing ? mapClaimToFormData(claim, businessId) : { ...claim.editedData },
-                    }
-                    : claim
-            )
+                        isEditing: isNowEditing,
+                        editedData: newEditedData,
+                    };
+                }
+                return claim;
+            })
         );
     };
 
-    const handleFieldChange = (claim_id: string, fieldId: string, value: any) => {
+    const setNestedValue = (obj: any, path: string[], value: any) => {
+        let current = obj;
+        for (let i = 0; i < path.length - 1; i++) {
+            const part = path[i];
+            // Handle array indices
+            if (part.includes("[")) {
+                const [arrayKey, indexStr] = part.split("[");
+                const index = parseInt(indexStr.replace("]", ""), 10);
+                if (!current[arrayKey]) current[arrayKey] = [];
+                if (!current[arrayKey][index]) current[arrayKey][index] = {};
+                current = current[arrayKey][index];
+            } else {
+                if (!current[part]) current[part] = {};
+                current = current[part];
+            }
+        }
+        const lastPart = path[path.length - 1];
+        if (lastPart.includes("[")) {
+            const [arrayKey, indexStr] = lastPart.split("[");
+            const index = parseInt(indexStr.replace("]", ""), 10);
+            if (!current[arrayKey]) current[arrayKey] = [];
+            current[arrayKey][index] = value;
+        } else {
+            current[lastPart] = value;
+        }
+    };
+
+    const handleFieldChange = (claim_id: string, fieldPath: string, value: any) => {
+        const pathArray = fieldPath.replace(/\[(\d+)\]/g, '.$1').split('.');
         setClaims((prevClaims) =>
             prevClaims.map((claim) => {
                 if (claim.claim_id !== claim_id) return claim;
-
+                const newEditedData = { ...claim.editedData };
+                setNestedValue(newEditedData, pathArray, value);
                 return {
                     ...claim,
-                    editedData: {
-                        ...claim.editedData,
-                        [fieldId]: value,
-                    },
+                    editedData: newEditedData,
                 };
             })
         );
     };
+
 
     const validateForm = (editedData: AccidentClaimFormData): string[] => {
         const errors: string[] = [];
@@ -437,17 +471,19 @@ const AccidentClaimsView: React.FC = () => {
                                     </div>
                                     {/* Claims for the User */}
                                     <div className="space-y-6">
-                                        {group.claims.map((claim) => (
-                                            <ClaimAccordion
-                                                handleStatusChange={handleStatusChange}
-                                                key={claim.claim_id}
-                                                claim={claim}
-                                                toggleEdit={toggleEdit}
-                                                handleFieldChange={handleFieldChange}
-                                                handleSave={handleSave}
-                                                handleCancel={handleCancel}
-                                            />
-                                        ))}
+                                        {group.claims.map((claim) => {
+                                            return (
+                                                <ClaimAccordion
+                                                    handleStatusChange={handleStatusChange}
+                                                    key={claim.claim_id}
+                                                    claim={claim}
+                                                    toggleEdit={toggleEdit}
+                                                    handleFieldChange={handleFieldChange}
+                                                    handleSave={handleSave}
+                                                    handleCancel={handleCancel}
+                                                />
+                                            )
+                                        })}
                                     </div>
                                     {/* Optional: Add a horizontal separator between user groups, except after the last group */}
                                     {/* {index < groupedClaims.length - 1 && (

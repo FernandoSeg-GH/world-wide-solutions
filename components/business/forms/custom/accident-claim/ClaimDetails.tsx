@@ -1,13 +1,35 @@
 // components/ClaimDetails.tsx
 
-import React from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import { formSections } from "./config/form-config";
-import { FaCarSide, FaFileAlt, FaFilePdf, FaTrash, FaUser } from "react-icons/fa";
+import { FaCarSide, FaFileAlt, FaFilePdf, FaUser, FaEdit, FaPlusCircle, FaTrash, FaBuilding, FaUserFriends, FaUserTie, FaMapMarkerAlt, FaHeartbeat, FaDollarSign, FaWalking, } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import FileUpload from "@/components/ui/file-upload";
 import DatePicker from "@/components/ui/date-picker";
-import { EditableClaim } from "./config/types";
+import { AccidentClaimFormData, EditableClaim, VehicleDetail, CostDetail } from "./config/types";
 import { RiAlarmWarningFill } from "react-icons/ri";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Separator } from "@/components/ui/separator";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
+
+// Define the accident icons
+export const accidentIcons = {
+    motor_vehicle_accidents: <FaCarSide />,
+    aviation_accidents: <RiAlarmWarningFill />,
+    slip_and_fall: <FaWalking />, // Example for another type
+    premises_liability: <RiAlarmWarningFill />,
+    dog_bites_or_animal_attacks: <FaUser />, // Example for another type
+    wrongful_death: <RiAlarmWarningFill />,
+    public_transportation_accidents: <FaCarSide />,
+    recreational_accidents: <RiAlarmWarningFill />,
+};
 
 interface ClaimDetailsProps {
     claim: EditableClaim;
@@ -17,7 +39,8 @@ interface ClaimDetailsProps {
     handleFieldChange: (claim_id: string, fieldPath: string, value: any) => void;
 }
 
-export function getNestedValue(obj: any, path: string[]): any {
+export function getNestedValue(obj: any, pathStr: string): any {
+    const path = pathStr.replace(/\[(\d+)\]/g, '.$1').split('.');
     return path.reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : null), obj);
 }
 
@@ -28,18 +51,6 @@ const formatLabel = (field: string) => {
         .replace(/Mva/g, "MVA");
 };
 
-export const accidentIcons = {
-    motor_vehicle_accidents: <FaCarSide />,
-    aviation_accidents: <RiAlarmWarningFill />,
-    slip_and_fall: <FaUser />, // Example for another type
-    premises_liability: <RiAlarmWarningFill />,
-    dog_bites_or_animal_attacks: <FaUser />, // Example for another type
-    wrongful_death: <RiAlarmWarningFill />,
-    public_transportation_accidents: <FaCarSide />,
-    recreational_accidents: <RiAlarmWarningFill />,
-};
-
-
 const ClaimDetails: React.FC<ClaimDetailsProps> = ({
     claim,
     onEdit,
@@ -48,9 +59,9 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
     handleFieldChange,
 }) => {
     const { isEditing, editedData } = claim;
+    const router = useRouter();
 
     const accidentType = (isEditing ? editedData.accident_type : claim.accident_type) as keyof typeof accidentIcons;
-
 
     const renderAccidentTypeSection = () => {
         if (!accidentType) {
@@ -78,27 +89,30 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
 
                         return (
                             <div key={field.id} className="flex flex-col">
-                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    {formatLabel(field.label)}
-                                </label>
+                                <Label className="mb-1">{formatLabel(field.label)}</Label>
+
                                 {isEditing ? (
-                                    <select
-                                        value={typeof value === 'string' || typeof value === 'number' || (Array.isArray(value) && value.every(item => typeof item === 'string')) ? value : ""}
-                                        onChange={(e) =>
-                                            handleFieldChange(claim.claim_id, field.id, e.target.value)
+                                    <Select
+                                        onValueChange={(value) =>
+                                            handleFieldChange(claim.claim_id, field.id, value)
                                         }
-                                        className="w-full border border-gray-300 rounded-md p-2"
+                                        value={editedData[field.id as keyof AccidentClaimFormData] as string}
+                                        required={field.required}
                                     >
-                                        <option value="">Select</option>
-                                        {field.options?.map((option) => (
-                                            <option key={option.value} value={option.value}>
-                                                {option.label}
-                                            </option>
-                                        ))}
-                                    </select>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {field.options?.map((option) => (
+                                                <SelectItem key={option.value} value={option.value}>
+                                                    {option.label}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 ) : (
                                     <span className="text-gray-700 dark:text-gray-300">
-                                        {typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' ? value.toString() : JSON.stringify(value)}
+                                        {accidentType.replace(/_/g, " ").toUpperCase() || "N/A"}
                                     </span>
                                 )}
                             </div>
@@ -115,70 +129,68 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
             return <span className="text-gray-500 dark:text-gray-400">No existing files</span>;
         }
         return (
-            <div className="flex flex-wrap gap-4 w-full">
+            <div className="space-y-2">
                 {validFiles.map((fileUrl, index) => {
                     const fileName = fileUrl.split("/").pop() || "Download";
                     return (
                         <div
                             key={index}
-                            className="flex flex-row gap-2 items-center border w-full p-2 rounded-md overflow-hidden"
+                            className="flex items-center gap-2 bg-gray-200 dark:bg-gray-600 p-2 rounded"
                         >
                             {/* File Icon or Thumbnail */}
-                            <div className="w-12 flex items-center justify-center">
+                            <div className="w-8 h-8 flex items-center justify-center">
                                 {fileUrl.endsWith(".pdf") ? (
-                                    <FaFilePdf size={48} />
+                                    <FaFilePdf className="text-red-500" />
                                 ) : fileUrl.match(/\.(jpeg|jpg|gif|png)$/i) ? (
                                     // eslint-disable-next-line @next/next/no-img-element
                                     <img
                                         src={fileUrl}
                                         alt="File Thumbnail"
-                                        className="min-w-12 h-12 object-cover"
+                                        className="w-8 h-8 object-cover rounded"
                                     />
                                 ) : (
-                                    <FaFileAlt size={48} />
+                                    <FaFileAlt className="text-gray-500" />
                                 )}
                             </div>
 
                             {/* File Name with Link */}
-                            <div className="flex-1">
-                                <a
-                                    href={fileUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-sm mt-2 break-all text-gray-700 dark:text-gray-300"
-                                >
-                                    {fileName}
-                                </a>
-                            </div>
+                            <a
+                                href={fileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex-1 truncate"
+                            >
+                                {fileName}
+                            </a>
 
                             {/* Download Button */}
-                            <div>
-                                <Button
-                                    variant="default"
-                                    onClick={async () => {
-                                        try {
-                                            const response = await fetch(fileUrl);
-                                            if (!response.ok) {
-                                                throw new Error("Failed to fetch file");
-                                            }
-                                            const blob = await response.blob();
-                                            const blobUrl = window.URL.createObjectURL(blob);
-                                            const link = document.createElement("a");
-                                            link.href = blobUrl;
-                                            link.download = fileName;
-                                            document.body.appendChild(link);
-                                            link.click();
-                                            document.body.removeChild(link);
-                                            window.URL.revokeObjectURL(blobUrl); // Clean up
-                                        } catch (error) {
-                                            console.error("Download failed:", error);
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={async () => {
+                                    try {
+                                        const response = await fetch(fileUrl);
+                                        if (!response.ok) {
+                                            throw new Error("Failed to fetch file");
                                         }
-                                    }}
-                                    className="px-2 py-1 text-sm"
-                                >
-                                    Download
-                                </Button>
-                            </div>
+                                        const blob = await response.blob();
+                                        const blobUrl = window.URL.createObjectURL(blob);
+                                        const link = document.createElement("a");
+                                        link.href = blobUrl;
+                                        link.download = fileName;
+                                        document.body.appendChild(link);
+                                        link.click();
+                                        document.body.removeChild(link);
+                                        window.URL.revokeObjectURL(blobUrl); // Clean up
+                                    } catch (error) {
+                                        console.error("Download failed:", error);
+                                        toast({ title: "Error", description: "Failed to download file.", variant: "destructive" });
+                                    }
+                                }}
+                                className="text-gray-500 dark:text-gray-300"
+                            >
+                                Download
+                            </Button>
                         </div>
                     );
                 })}
@@ -186,100 +198,158 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
         );
     };
 
-
-    const renderVehicleDetails = (vehicleDetails: any) => {
+    // **New**: Render Vehicle Details as a Table in View Mode
+    const renderVehicleDetailsTable = (vehicleDetails: VehicleDetail[]) => {
         if (!Array.isArray(vehicleDetails) || vehicleDetails.length === 0) {
-            return <span className="text-gray-500 dark:text-gray-400">No vehicle details provided</span>;
+            return (
+                <div className="text-center py-4 border rounded-md bg-gray-100 dark:bg-gray-700">
+                    <span className="text-gray-500 dark:text-gray-400">
+                        No vehicle details provided
+                    </span>
+                </div>
+            );
         }
 
         return (
-            <div className="space-y-4">
-                {vehicleDetails.map((vehicle: any, index: number) => (
-                    <div
-                        key={index}
-                        className="border p-4 rounded-md bg-red-500 dark:bg-gray-700 shadow-sm"
-                    >
-                        <h4 className="font-semibold mb-4 text-lg text-gray-800 dark:text-gray-200">
-                            Vehicle #{index + 1}
-                        </h4>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    Insurance Name
-                                </label>
-                                <span className="block text-gray-800 dark:text-gray-100">
-                                    {vehicle.insuranceName || "N/A"}
-                                </span>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    Policy Number
-                                </label>
-                                <span className="block text-gray-800 dark:text-gray-100">
-                                    {vehicle.policyNumber || "N/A"}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                ))}
+            <div className="overflow-x-auto">
+                <table className="min-w-full bg-white dark:bg-gray-800 rounded-lg shadow-md">
+                    <thead>
+                        <tr>
+                            <th className="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700 dark:text-gray-200">#</th>
+                            <th className="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Insurance Name</th>
+                            <th className="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700 dark:text-gray-200">License Number</th>
+                            <th className="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Model</th>
+                            <th className="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Policy Number</th>
+                            <th className="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Year</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {vehicleDetails.map((vehicle, index) => (
+                            <tr key={index} className="hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <td className="py-2 px-4 border-b text-sm text-gray-700 dark:text-gray-300">{index + 1}</td>
+                                <td className="py-2 px-4 border-b text-sm text-gray-700 dark:text-gray-300">{vehicle.insuranceName || "N/A"}</td>
+                                <td className="py-2 px-4 border-b text-sm text-gray-700 dark:text-gray-300">{vehicle.licenseNumber || "N/A"}</td>
+                                <td className="py-2 px-4 border-b text-sm text-gray-700 dark:text-gray-300">{vehicle.model || "N/A"}</td>
+                                <td className="py-2 px-4 border-b text-sm text-gray-700 dark:text-gray-300">{vehicle.policyNumber || "N/A"}</td>
+                                <td className="py-2 px-4 border-b text-sm text-gray-700 dark:text-gray-300">{vehicle.year || "N/A"}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
         );
     };
 
-    const renderEditableVehicleDetails = (vehicleDetails: any) => {
-        if (!Array.isArray(vehicleDetails) || vehicleDetails.length === 0) {
-            return <span className="text-gray-500 dark:text-gray-400">No vehicle details provided</span>;
-        }
+    // **New**: Render Editable Vehicle Details as a Table in Edit Mode
+    const renderEditableVehicleDetailsTable = (vehicleDetails: VehicleDetail[]) => {
+        const addVehicle = () => {
+            const newVehicle: VehicleDetail = {
+                licenseNumber: "",
+                year: "",
+                model: "",
+                insuranceName: "",
+                policyNumber: "",
+            };
+            handleFieldChange(claim.claim_id, `vehicle_details`, [...vehicleDetails, newVehicle]);
+        };
+
+        const handleVehicleChange = (index: number, field: keyof VehicleDetail, value: string) => {
+            const updatedVehicles = [...vehicleDetails];
+            updatedVehicles[index] = { ...updatedVehicles[index], [field]: value };
+            handleFieldChange(claim.claim_id, `vehicle_details`, updatedVehicles);
+        };
+
+        const removeVehicle = (index: number) => {
+            if (vehicleDetails.length === 1) {
+                toast({ title: "Error", description: "At least one vehicle must be present.", variant: "destructive" });
+                return;
+            }
+            const updatedVehicles = vehicleDetails.filter((_, i) => i !== index);
+            handleFieldChange(claim.claim_id, `vehicle_details`, updatedVehicles);
+        };
 
         return (
-            <div className="space-y-4">
-                {vehicleDetails.map((vehicle: any, index: number) => (
-                    <div
-                        key={index}
-                        className="border p-4 rounded-md bg-gray-50 dark:bg-gray-700 shadow-sm"
-                    >
-                        <h4 className="font-semibold mb-4 text-lg text-gray-800 dark:text-gray-200">
-                            Vehicle #{index + 1}
-                        </h4>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    Insurance Name
-                                </label>
-                                <input
-                                    type="text"
-                                    value={vehicle.insuranceName || ""}
-                                    onChange={(e) =>
-                                        handleFieldChange(
-                                            claim.claim_id,
-                                            `vehicle_details[${index}].insuranceName`,
-                                            e.target.value
-                                        )
-                                    }
-                                    className="w-full border border-gray-300 dark:border-gray-600 rounded-md p-2"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    Policy Number
-                                </label>
-                                <input
-                                    type="text"
-                                    value={vehicle.policyNumber || ""}
-                                    onChange={(e) =>
-                                        handleFieldChange(
-                                            claim.claim_id,
-                                            `vehicle_details[${index}].policyNumber`,
-                                            e.target.value
-                                        )
-                                    }
-                                    className="w-full border border-gray-300 dark:border-gray-600 rounded-md p-2"
-                                />
-                            </div>
-                            {/* Add more editable fields as necessary */}
-                        </div>
-                    </div>
-                ))}
+            <div className="overflow-x-auto">
+                <table className="min-w-full bg-white dark:bg-gray-800 rounded-lg shadow-md">
+                    <thead>
+                        <tr>
+                            <th className="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700 dark:text-gray-200">#</th>
+                            <th className="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Insurance Name</th>
+                            <th className="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700 dark:text-gray-200">License Number</th>
+                            <th className="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Model</th>
+                            <th className="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Policy Number</th>
+                            <th className="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Year</th>
+                            <th className="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {vehicleDetails.map((vehicle, index) => (
+                            <tr key={index} className="hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <td className="py-2 px-4 border-b text-sm text-gray-700 dark:text-gray-300">{index + 1}</td>
+                                <td className="py-2 px-4 border-b text-sm text-gray-700 dark:text-gray-300">
+                                    <Input
+                                        type="text"
+                                        value={vehicle.insuranceName}
+                                        onChange={(e) => handleVehicleChange(index, 'insuranceName', e.target.value)}
+                                        className="w-full"
+                                        placeholder="Insurance Name"
+                                    />
+                                </td>
+                                <td className="py-2 px-4 border-b text-sm text-gray-700 dark:text-gray-300">
+                                    <Input
+                                        type="text"
+                                        value={vehicle.licenseNumber}
+                                        onChange={(e) => handleVehicleChange(index, 'licenseNumber', e.target.value)}
+                                        className="w-full"
+                                        placeholder="License Number"
+                                    />
+                                </td>
+                                <td className="py-2 px-4 border-b text-sm text-gray-700 dark:text-gray-300">
+                                    <Input
+                                        type="text"
+                                        value={vehicle.model}
+                                        onChange={(e) => handleVehicleChange(index, 'model', e.target.value)}
+                                        className="w-full"
+                                        placeholder="Model"
+                                    />
+                                </td>
+                                <td className="py-2 px-4 border-b text-sm text-gray-700 dark:text-gray-300">
+                                    <Input
+                                        type="text"
+                                        value={vehicle.policyNumber}
+                                        onChange={(e) => handleVehicleChange(index, 'policyNumber', e.target.value)}
+                                        className="w-full"
+                                        placeholder="Policy Number"
+                                    />
+                                </td>
+                                <td className="py-2 px-4 border-b text-sm text-gray-700 dark:text-gray-300">
+                                    <Input
+                                        type="text"
+                                        value={vehicle.year}
+                                        onChange={(e) => handleVehicleChange(index, 'year', e.target.value)}
+                                        className="w-full"
+                                        placeholder="Year"
+                                    />
+                                </td>
+                                <td className="py-2 px-4 border-b text-sm text-gray-700 dark:text-gray-300">
+                                    <Button
+                                        variant="destructive"
+                                        size="sm"
+                                        onClick={() => removeVehicle(index)}
+                                        className="mr-2"
+                                    >
+                                        <FaTrash className="mr-1 h-4 w-4" />
+                                        Remove
+                                    </Button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+                <Button onClick={addVehicle} variant="default" className="mt-4 flex items-center">
+                    <FaPlusCircle className="mr-2 h-5 w-5" />
+                    Add Vehicle
+                </Button>
             </div>
         );
     };
@@ -304,14 +374,14 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                             <Button
                                 variant="default"
                                 onClick={() => handleSave(claim.claim_id)}
-                                className="flex items-center px-4 py-2 rounded-md transition"
+                                className="flex items-center px-4 py-2 rounded-md transition hover:bg-blue-600"
                             >
                                 Save
                             </Button>
                             <Button
                                 variant="secondary"
                                 onClick={() => handleCancel(claim.claim_id)}
-                                className="flex items-center px-4 py-2 rounded-md transition"
+                                className="flex items-center px-4 py-2 rounded-md transition hover:bg-gray-500"
                             >
                                 Cancel
                             </Button>
@@ -320,8 +390,9 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                         <Button
                             variant="default"
                             onClick={() => onEdit(claim.claim_id)}
-                            className="flex items-center px-4 py-2 rounded-md transition"
+                            className="flex items-center px-4 py-2 rounded-md transition hover:bg-blue-600"
                         >
+                            <FaEdit className="mr-2" />
                             Edit Claim
                         </Button>
                     )}
@@ -335,16 +406,14 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                         {section.icon}
                         {section.title}
                     </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {section.fields.map((field) => {
                             // **IMPORTANT**: Ensure that 'file_uploads' field has been removed from formSections in form-config.ts
-                            { renderAccidentTypeSection() }
                             if (field.id === "file_uploads") {
                                 return null; // Skip rendering the 'file_uploads' field to prevent duplication
                             }
 
-                            const path = field.id.split(".");
-                            let value = getNestedValue(isEditing ? editedData : claim, path);
+                            let value = getNestedValue(isEditing ? editedData : claim, field.id);
 
                             const renderValue = () => {
 
@@ -353,17 +422,17 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                                         return (
                                             <div className="space-y-4 w-full">
                                                 <div>
-                                                    <h4 className="font-semibold text-gray-700 dark:text-gray-300">
+                                                    <h4 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                                         Existing Files
                                                     </h4>
                                                     {renderExistingFiles(existingFiles)}
                                                 </div>
                                                 <FileUpload
                                                     multiple
-                                                    onFilesSelected={(files: File[]) =>
+                                                    onFilesSelected={(files) =>
                                                         handleFieldChange(claim.claim_id, "new_file_uploads", files)
                                                     }
-                                                    className="mt-2"
+                                                    className=""
                                                 />
                                             </div>
                                         );
@@ -379,19 +448,24 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                                 if (field.type === "select") {
                                     if (isEditing) {
                                         return (
-                                            <select
-                                                value={value}
-                                                onChange={(e) => handleFieldChange(claim.claim_id, field.id, e.target.value)}
-                                                className="w-full border border-gray-300 rounded-md p-2"
+                                            <Select
+                                                onValueChange={(value) =>
+                                                    handleFieldChange(claim.claim_id, field.id, value)
+                                                }
+                                                value={editedData[field.id as keyof AccidentClaimFormData] as string}
                                                 required={field.required}
                                             >
-                                                <option value="">Select</option>
-                                                {field.options?.map((option) => (
-                                                    <option key={option.value} value={option.value}>
-                                                        {option.label}
-                                                    </option>
-                                                ))}
-                                            </select>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {field.options?.map((option) => (
+                                                        <SelectItem key={option.value} value={option.value}>
+                                                            {option.label}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
                                         );
                                     } else {
                                         const selectedOption = field.options?.find((opt) => opt.value === value);
@@ -402,10 +476,10 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                                 if (field.type === "textarea" || field.type === "text") {
                                     if (isEditing) {
                                         return (
-                                            <textarea
+                                            <Textarea
                                                 value={typeof value === "string" ? value : ""}
                                                 onChange={(e) => handleFieldChange(claim.claim_id, field.id, e.target.value)}
-                                                className="w-full border border-gray-300 rounded-md p-2"
+                                                className="w-full"
                                                 required={field.required}
                                             />
                                         );
@@ -414,7 +488,7 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                                             return <span className="text-gray-700 dark:text-gray-300">{value || "N/A"}</span>;
                                         } else if (typeof value === "object" && value !== null) {
                                             return (
-                                                <ul>
+                                                <ul className="list-disc list-inside">
                                                     {Object.entries(value).map(([key, val], index) => (
                                                         <li key={index} className="text-gray-700 dark:text-gray-300">
                                                             {key}: {JSON.stringify(val)}
@@ -430,7 +504,7 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                                 // Handle generic objects
                                 if (typeof value === "object" && value !== null) {
                                     return (
-                                        <ul>
+                                        <ul className="list-disc list-inside">
                                             {Object.entries(value).map(([key, val], index) => (
                                                 <li key={index} className="text-gray-700 dark:text-gray-300">
                                                     {key}: {JSON.stringify(val)}
@@ -440,20 +514,18 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                                     );
                                 }
 
-
-
                                 if (field.type === "date") {
                                     if (isEditing) {
-                                        const dateValue = typeof value === "string" ? value.split("T")[0] : null;
+                                        const dateValue = typeof value === "string" ? value.split("T")[0] : "";
                                         return (
                                             <DatePicker
-                                                selectedDate={dateValue}
-                                                onChange={(date) => {
+                                                selectedDate={dateValue ? new Date(dateValue) : null}
+                                                onChange={(date: Date | null) => {
                                                     if (date) {
-                                                        const formattedDate = date.toISOString().split("T")[0];
+                                                        const formattedDate = date.toISOString();
                                                         handleFieldChange(claim.claim_id, field.id, formattedDate);
                                                     } else {
-                                                        handleFieldChange(claim.claim_id, field.id, null);
+                                                        handleFieldChange(claim.claim_id, field.id, "");
                                                     }
                                                 }}
                                             />
@@ -470,11 +542,11 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                                 if (field.type === "number") {
                                     if (isEditing) {
                                         return (
-                                            <input
+                                            <Input
                                                 type="number"
                                                 value={value}
                                                 onChange={(e) => handleFieldChange(claim.claim_id, field.id, e.target.value)}
-                                                className="w-full border border-gray-300 rounded-md p-2"
+                                                className="w-full"
                                                 required={field.required}
                                             />
                                         );
@@ -486,11 +558,11 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                                 if (field.type === "text" || field.type === "email") {
                                     if (isEditing) {
                                         return (
-                                            <input
+                                            <Input
                                                 type={field.type}
                                                 value={value}
                                                 onChange={(e) => handleFieldChange(claim.claim_id, field.id, e.target.value)}
-                                                className="w-full border border-gray-300 rounded-md p-2"
+                                                className="w-full"
                                                 required={field.required}
                                             />
                                         );
@@ -501,18 +573,13 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
 
                                 if (field.type === "vehicleDetails") {
                                     return isEditing
-                                        ? renderEditableVehicleDetails(vehicleDetails)
-                                        : renderVehicleDetails(vehicleDetails);
+                                        ? renderEditableVehicleDetailsTable(vehicleDetails)
+                                        : renderVehicleDetailsTable(vehicleDetails);
                                 }
-
-                                // Handle unexpected field types or object structures
-                                // if (typeof value === "object" && value !== null) {
-                                //     return <span className="text-gray-700 dark:text-gray-300">{JSON.stringify(value)}</span>;
-                                // }
 
                                 if (Array.isArray(value)) {
                                     return (
-                                        <ul>
+                                        <ul className="list-disc list-inside">
                                             {value.map((item, index) => (
                                                 <li key={index} className="text-gray-700 dark:text-gray-300">{JSON.stringify(item)}</li>
                                             ))}
@@ -525,9 +592,7 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
 
                             return (
                                 <div key={field.id} className="flex flex-col">
-                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        {formatLabel(field.label)}
-                                    </label>
+                                    <Label className="mb-1">{formatLabel(field.label)}</Label>
                                     {renderValue()}
                                 </div>
                             );
@@ -543,14 +608,14 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                         <Button
                             variant="default"
                             onClick={() => handleSave(claim.claim_id)}
-                            className="flex items-center px-4 py-2 rounded-md transition"
+                            className="flex items-center px-4 py-2 rounded-md transition hover:bg-blue-600"
                         >
                             Save
                         </Button>
                         <Button
                             variant="secondary"
                             onClick={() => handleCancel(claim.claim_id)}
-                            className="flex items-center px-4 py-2 rounded-md transition"
+                            className="flex items-center px-4 py-2 rounded-md transition hover:bg-gray-500"
                         >
                             Cancel
                         </Button>
@@ -559,7 +624,7 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                     <Button
                         variant="default"
                         onClick={() => onEdit(claim.claim_id)}
-                        className="flex items-center px-4 py-2 rounded-md transition"
+                        className="flex items-center px-4 py-2 rounded-md transition hover:bg-blue-600"
                     >
                         Edit Claim
                     </Button>
