@@ -1,11 +1,10 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
+documentation
 # dependencies
 /node_modules
 /.pnp
 .pnp.js
-.env
-env
+.env 
 # testing
 /coverage
 
@@ -15,7 +14,7 @@ env
 
 # production
 /build
-
+temp.md
 # misc
 .DS_Store
 *.pem
@@ -35,3 +34,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+certificates

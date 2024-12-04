@@ -6,32 +6,51 @@ export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
 
   if (!session || !session.accessToken) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  const baseURL =
-    process.env.NEXT_PUBLIC_FLASK_BACKEND_URL || "http://localhost:5000";
+  const url = new URL(req.url);
+  // const businessId = url.searchParams.get("businessId");
+  const businessId = session.user.businessId;
+  const pageParam = url.searchParams.get("page") || "1";
+  const page = parseInt(pageParam, 10);
+
+  if (!businessId) {
+    return NextResponse.json(
+      { message: "Missing businessId" },
+      { status: 400 }
+    );
+  }
 
   try {
-    const response = await fetch(`${baseURL}/forms/submissions`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session.accessToken}`,
-      },
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/forms/submissions?businessId=${businessId}&page=${page}`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      }
+    );
 
     if (!response.ok) {
+      const errorData = await response.json();
       return NextResponse.json(
-        { message: "Failed to fetch submissions" },
+        { message: errorData.message },
         { status: response.status }
       );
     }
+
     const data = await response.json();
-    return NextResponse.json(data);
+
+    return NextResponse.json({
+      submissions: data.submissions,
+      page: data.page,
+      pages: data.pages,
+    });
   } catch (error) {
+    console.error("Error fetching submissions:", error);
     return NextResponse.json(
-      { message: "An error occurred while fetching submissions" },
+      { message: "Internal server error" },
       { status: 500 }
     );
   }

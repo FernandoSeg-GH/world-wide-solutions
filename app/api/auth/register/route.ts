@@ -1,4 +1,3 @@
-// app/api/auth/register/route.ts
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -17,6 +16,7 @@ export async function POST(req: NextRequest) {
           email,
           password,
           role_id: 1,
+          business_id: 2,
         }),
       }
     );

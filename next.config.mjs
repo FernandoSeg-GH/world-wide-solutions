@@ -1,8 +1,18 @@
-// next.config.mjs
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // You can remove the experimental.serverActions since it's no longer needed
-  // Any other configuration can be added here
+  images: {
+    remotePatterns: [
+      {
+        hostname: "images.unsplash.com",
+      },
+      {
+        hostname: "vinci-space-nest.nyc3.digitaloceanspaces.com",
+      },
+      {
+        hostname: "vinci-space-nest.nyc3.cdn.digitaloceanspaces.com",
+      },
+    ],
+  },
 };
 
 export default nextConfig;

@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { useAppContext } from '@/components/context/AppContext'; // Import the AppContext
+import { useAppContext } from '@/context/AppProvider';
 
 export default function CreateBusinessForm() {
     const router = useRouter();
@@ -19,7 +19,7 @@ export default function CreateBusinessForm() {
     const [businessData, setBusinessData] = useState({
         name: "",
         domain: "",
-        subscription_plan_id: "",
+        subscriptionPlanId: "",
         description: "",
         phone: "",
         url_linkedin: "",
@@ -29,27 +29,33 @@ export default function CreateBusinessForm() {
         url_tiktok: "",
         url_youtube: "",
         seo_description: "",
-        business_email: "",
-        profile_image_url: "",
-        background_image_url: "",
+        businessEmail: "",
+        profileImageUrl: "",
+        backgroundImageUrl: "",
     });
 
-    // Fetch subscription plans on component mount
     useEffect(() => {
         fetchSubscriptionPlans();
     }, [fetchSubscriptionPlans]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const success = await createBusiness(businessData);
+
+        const dataToSend = {
+            ...businessData,
+            subscriptionPlanId: Number(businessData.subscriptionPlanId),
+        };
+
+        const success = await createBusiness(dataToSend);
 
         if (success) {
-            router.push("/dashboard");
+            router.push("/");
         }
     };
 
+
     return (
-        <div className="flex items-start justify-start w-full mb-6">
+        <div className="flex items-start justify-start w-full">
             <Card className="w-full lg:max-w-md">
                 <CardHeader>
                     <CardTitle>Create Business</CardTitle>
@@ -81,14 +87,14 @@ export default function CreateBusinessForm() {
                             />
                         </div>
                         <div>
-                            <Label htmlFor="subscription_plan_id">Subscription Plan</Label>
+                            <Label htmlFor="subscriptionPlanId">Subscription Plan</Label>
                             <select
-                                id="subscription_plan_id"
-                                value={businessData.subscription_plan_id}
+                                id="subscriptionPlanId"
+                                value={businessData.subscriptionPlanId}
                                 onChange={(e) =>
                                     setBusinessData({
                                         ...businessData,
-                                        subscription_plan_id: e.target.value,
+                                        subscriptionPlanId: e.target.value,
                                     })
                                 }
                                 required

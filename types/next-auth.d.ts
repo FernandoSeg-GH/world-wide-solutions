@@ -23,7 +23,7 @@ declare module "next-auth" {
     id: number;
     username: string;
     email: string;
-    business_id?: number | null;
+    businessId?: number | null;
     expires_in?: any;
     role: {
       id: number;
@@ -31,7 +31,7 @@ declare module "next-auth" {
     };
   }
 }
-
+export type User = NextAuthUser;
 declare module "next-auth/jwt" {
   interface JWT extends NextAuthJWT {
     accessToken?: string;
@@ -41,7 +41,7 @@ declare module "next-auth/jwt" {
     id?: number;
     username?: string;
     email?: string;
-    businessId?: number | null;
+    business_id?: number | null;
     role?: {
       id: number;
       name: string;

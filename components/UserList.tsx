@@ -1,13 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Spinner from './ui/spinner';
 
 interface User {
     id: number;
     username: string;
     email: string;
-    last_login_at: string;
-    is_active: boolean;
+    lastLoginAt: string;
+    isActive: boolean;
 }
 
 const UsersList = () => {
@@ -38,7 +39,9 @@ const UsersList = () => {
         fetchUsers();
     }, []);
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <div className="flex items-center justify-center w-screen h-screen">
+        <Spinner />
+    </div>;;
     if (error) return <div>Error: {error}</div>;
 
     return (
@@ -49,8 +52,8 @@ const UsersList = () => {
                     <li key={user.id}>
                         <p>Username: {user.username}</p>
                         <p>Email: {user.email}</p>
-                        <p>Last Login: {new Date(user.last_login_at).toLocaleString()}</p>
-                        <p>Status: {user.is_active ? 'Active' : 'Inactive'}</p>
+                        <p>Last Login: {new Date(user.lastLoginAt).toLocaleString()}</p>
+                        <p>Status: {user.isActive ? 'Active' : 'Inactive'}</p>
                     </li>
                 ))}
             </ul>

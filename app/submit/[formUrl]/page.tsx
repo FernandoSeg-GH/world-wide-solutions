@@ -1,33 +1,32 @@
 'use client';
 
-import { useEffect } from "react";
-import FormSubmitComponent from "@/components/forms/FormSubmitComponent";
-import { useAppContext } from "@/components/context/AppContext";
+import { useAppContext } from "@/context/AppProvider";
+import { useSession } from "next-auth/react";
+import { useFormState } from "@/hooks/forms/useFormState";
+import ClientSubmission from "@/components/business/forms/submissions/ClientSubmission";
+import { Header } from "@/components/layout/navbar/Header";
 
 const SubmitPage = ({ params }: { params: { formUrl: string } }) => {
     const { formUrl } = params;
-    const { data, actions } = useAppContext();
-    const { form } = data;
+    const { actions: formActions } = useAppContext();
+    const { data: session } = useSession()
+    const { fetchFormByShareUrlPublic } = useFormState();
 
-    // Destructure the specific functions you need outside of the `useEffect` hook
-    const { fetchFormByShareUrlPublic, fetchSubmissions } = actions;
-
-    // Decode the URL parameter
     const decodedFormUrl = decodeURIComponent(formUrl);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            await fetchFormByShareUrlPublic(decodedFormUrl); // Use decoded URL
-            // await fetchSubmissions(decodedFormUrl); // Use decoded URL
-        };
+    // useEffect(() => {
+    //     if (session?.user.businessId) {
+    //         const fetchData = async () => {
+    //             await fetchFormByShareUrlPublic(decodedFormUrl, Number(session.user.businessId));
+    //         };
+    //         fetchData();
+    //     }
+    // }, [decodedFormUrl, fetchFormByShareUrlPublic, session?.user.businessId]);
 
-        fetchData(); // Fetch data only once
-        // }, [decodedFormUrl, fetchFormByShareUrlPublic, fetchSubmissions]); // Only re-run when `formUrl` changes
-    }, [decodedFormUrl, fetchFormByShareUrlPublic]); // Only re-run when `formUrl` changes
-
-    if (!form) return <div>Form not found</div>;
-
-    return <FormSubmitComponent formUrl={decodedFormUrl} />;
+    return <div className="">
+        {/* <Header currentSection="" isExpanded /> */}
+        <ClientSubmission formUrl={decodedFormUrl} />
+    </div>
 };
 
 export default SubmitPage;

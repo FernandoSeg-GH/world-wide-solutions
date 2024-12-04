@@ -1,35 +1,17 @@
 'use client';
-import React, { useEffect, useState } from 'react';
-import FormBuilder from '@/components/forms/FormBuilder';
-import { useAppContext } from '@/components/context/AppContext';
 
-interface BuilderPageProps {
-  params: {
-    shareUrl: string;
-  };
-}
+import { useEffect } from 'react';
+import FormBuilder from '@/components/business/forms/FormBuilder';
+import { useAppContext } from '@/context/AppProvider';
+import { Form } from '@/types';
+import Spinner from '@/components/ui/spinner';
+import { useSession } from 'next-auth/react';
+import { useFormState } from '@/hooks/forms/useFormState';
 
-export default function BuilderPage({ params }: BuilderPageProps) {
+const BuilderPage = ({ params }: { params: { shareUrl: string } }) => {
   const { shareUrl } = params;
-  const { data, selectors, actions } = useAppContext();
-  const { form, loading, error } = data;
-  const { setForm, setElements } = selectors;
-  const { fetchFormByShareUrl } = actions;
 
-  // Fetch the form using the shareUrl and context actions
-  useEffect(() => {
-    if (shareUrl) {
-      fetchFormByShareUrl(shareUrl);
-    }
-  }, [shareUrl, fetchFormByShareUrl]);
+  return <FormBuilder shareUrl={shareUrl} />;
+};
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-  if (!form) return <div>Form not found</div>;
-
-  return (
-    <div>
-      <FormBuilder formName={form.name} />
-    </div>
-  );
-}
+export default BuilderPage;

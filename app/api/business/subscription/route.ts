@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { getServerSession } from "next-auth/next";
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -10,32 +10,30 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // Fetch subscription plans from Flask backend
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/subscription/`,
+      `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/subscription`,
       {
-        method: "GET",
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.accessToken}`, // Use the user's access token
+          Authorization: `Bearer ${session.accessToken}`,
         },
       }
     );
 
-    const data = await response.json();
-
     if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Error fetching subscription plans:", errorData);
       return NextResponse.json(
-        { message: data.message },
+        { message: errorData.message || "Failed to fetch subscription plans." },
         { status: response.status }
       );
     }
 
+    const data = await response.json();
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
     console.error("Error fetching subscription plans:", error);
     return NextResponse.json(
-      { message: "Internal server error" },
+      { message: "Internal server error." },
       { status: 500 }
     );
   }
