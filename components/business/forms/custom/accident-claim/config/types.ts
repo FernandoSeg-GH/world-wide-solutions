@@ -30,6 +30,8 @@ export interface AccidentClaimFormData {
   business_id: string;
   formUrl: string;
   status: string;
+
+  claim_id: string;
   // Personal Information
   full_name: string;
   email: string;
@@ -103,7 +105,7 @@ export interface AccidentClaimFormData {
 }
 
 export interface Claim extends AccidentClaimFormData {
-  claim_id: string;
+  // claim_id: string;
   user_id: number;
   username: string;
   user_email: string;

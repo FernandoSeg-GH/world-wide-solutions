@@ -27,6 +27,7 @@ export const formSections: SectionConfig[] = [
     title: "Patient Personal Information",
     icon: <FaUser />,
     fields: [
+      { id: "claim_id", label: "Claim Reference Number", type: "text", required: true },
       { id: "full_name", label: "Full Name", type: "text", required: true },
       { id: "email", label: "Email", type: "email", required: true },
       { id: "country", label: "Country", type: "select", required: true, options: countryOptions },
@@ -132,6 +133,7 @@ export function mapClaimToFormData(claim: Claim, businessId: string): AccidentCl
     status: claim.status || "",
     business_id: claim.business_id || businessId || "",
     formUrl: claim.formUrl || "",
+    claim_id: claim.claim_id || "",
     full_name: claim.full_name || "",
     email: claim.email || "",
     country: claim.country || "",
@@ -219,6 +221,7 @@ export function dynamicMapClaimToFormData(
     status: "",
     business_id: businessId,
     formUrl: "",
+    claim_id: "",
     full_name: "",
     email: "",
     country: "",

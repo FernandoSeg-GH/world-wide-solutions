@@ -4,7 +4,7 @@
 
 import React, { useState, useEffect } from "react";
 import { formSections } from "./config/form-config";
-import { FaCarSide, FaFileAlt, FaFilePdf, FaUser, FaEdit, FaPlusCircle, FaTrash, FaBuilding, FaUserFriends, FaUserTie, FaMapMarkerAlt, FaHeartbeat, FaDollarSign, FaWalking, } from "react-icons/fa";
+import { FaCarSide, FaFileAlt, FaFilePdf, FaUser, FaEdit, FaPlusCircle, FaTrash, FaBuilding, FaUserFriends, FaUserTie, FaMapMarkerAlt, FaHeartbeat, FaDollarSign, FaWalking, FaFileUpload, } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import FileUpload from "@/components/ui/file-upload";
 import DatePicker from "@/components/ui/date-picker";
@@ -18,6 +18,7 @@ import { Separator } from "@/components/ui/separator";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 // Define the accident icons
 export const accidentIcons = {
@@ -364,10 +365,8 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
         : Array.isArray(claim.vehicle_details) ? claim.vehicle_details : [];
 
     return (
-        <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
-            {/* Header with Edit/Save/Cancel Buttons */}
-            <div className="flex justify-between items-center mb-8">
-                <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-200">Accident Claim Details</h1>
+        <div className="w-full flex-col">
+            <div className="flex justify-end items-center mb-8">
                 <div className="flex space-x-4">
                     {isEditing ? (
                         <>
@@ -398,237 +397,259 @@ const ClaimDetails: React.FC<ClaimDetailsProps> = ({
                     )}
                 </div>
             </div>
+            <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+                {/* Header with Edit/Save/Cancel Buttons */}
+                <div className="mb-8 flex flex-row items-center justify-between w-full gap-16 text-start">
 
-            {/* Iterate over formSections to display data */}
-            {formSections.map((section) => (
-                <section key={section.title} className="mb-8">
-                    <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2 text-gray-800 dark:text-gray-200">
-                        {section.icon}
-                        {section.title}
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {section.fields.map((field) => {
-                            // **IMPORTANT**: Ensure that 'file_uploads' field has been removed from formSections in form-config.ts
-                            if (field.id === "file_uploads") {
-                                return null; // Skip rendering the 'file_uploads' field to prevent duplication
-                            }
+                    <h1 className="text-navyBlue dark:text-white text-3xl leading-7 font-bold underline flex items-center gap-2 justify-center lg:justify-start">
+                        <FaFileUpload />
+                        Accident Claim Report
+                    </h1>
+                    <Image
+                        src="/assets/vws-hor.png"
+                        alt="Publicuy Logo"
+                        className="h-auto object-contain ml-auto"
+                        width={300}
+                        height={50}
+                    />
 
-                            let value = getNestedValue(isEditing ? editedData : claim, field.id);
+                </div>
+                <p className="text-gray-600 dark:text-gray-400 my-4 mb-6 text- text-justify">
+                    This form is intended to be completed with all the details related to the claim assistance. Use it as a guide to provide all the available data in your file or collect the necessary details from the policyholder. You may not have all the information when uploading the claim for the first time, but you can always access your personal dashboard, to edit and add pending information as soon as you receive it.
+                </p>
 
-                            const renderValue = () => {
 
-                                if (field.type === "file") {
-                                    if (isEditing) {
-                                        return (
-                                            <div className="space-y-4 w-full">
-                                                <div>
-                                                    <h4 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                                                        Existing Files
-                                                    </h4>
+                {/* Iterate over formSections to display data */}
+                {formSections.map((section) => (
+                    <section key={section.title} className="mb-8">
+                        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2 text-gray-800 dark:text-gray-200">
+                            {section.icon}
+                            {section.title}
+                        </h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {section.fields.map((field) => {
+                                // **IMPORTANT**: Ensure that 'file_uploads' field has been removed from formSections in form-config.ts
+                                if (field.id === "file_uploads") {
+                                    return null; // Skip rendering the 'file_uploads' field to prevent duplication
+                                }
+
+                                let value = getNestedValue(isEditing ? editedData : claim, field.id);
+
+                                const renderValue = () => {
+
+                                    if (field.type === "file") {
+                                        if (isEditing) {
+                                            return (
+                                                <div className="space-y-4 w-full">
+                                                    <div>
+                                                        <h4 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                                                            Existing Files
+                                                        </h4>
+                                                        {renderExistingFiles(existingFiles)}
+                                                    </div>
+                                                    <FileUpload
+                                                        multiple
+                                                        onFilesSelected={(files) =>
+                                                            handleFieldChange(claim.claim_id, "new_file_uploads", files)
+                                                        }
+                                                        className=""
+                                                    />
+                                                </div>
+                                            );
+                                        } else {
+                                            return (
+                                                <div className="space-y-2 w-full">
                                                     {renderExistingFiles(existingFiles)}
                                                 </div>
-                                                <FileUpload
-                                                    multiple
-                                                    onFilesSelected={(files) =>
-                                                        handleFieldChange(claim.claim_id, "new_file_uploads", files)
-                                                    }
-                                                    className=""
-                                                />
-                                            </div>
-                                        );
-                                    } else {
-                                        return (
-                                            <div className="space-y-2 w-full">
-                                                {renderExistingFiles(existingFiles)}
-                                            </div>
-                                        );
-                                    }
-                                }
-
-                                if (field.type === "select") {
-                                    if (isEditing) {
-                                        return (
-                                            <Select
-                                                onValueChange={(value) =>
-                                                    handleFieldChange(claim.claim_id, field.id, value)
-                                                }
-                                                value={editedData[field.id as keyof AccidentClaimFormData] as string}
-                                                required={field.required}
-                                            >
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {field.options?.map((option) => (
-                                                        <SelectItem key={option.value} value={option.value}>
-                                                            {option.label}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        );
-                                    } else {
-                                        const selectedOption = field.options?.find((opt) => opt.value === value);
-                                        return <span className="text-gray-700 dark:text-gray-300">{selectedOption?.label || "N/A"}</span>;
-                                    }
-                                }
-
-                                if (field.type === "textarea" || field.type === "text") {
-                                    if (isEditing) {
-                                        return (
-                                            <Textarea
-                                                value={typeof value === "string" ? value : ""}
-                                                onChange={(e) => handleFieldChange(claim.claim_id, field.id, e.target.value)}
-                                                className="w-full"
-                                                required={field.required}
-                                            />
-                                        );
-                                    } else {
-                                        if (typeof value === "string") {
-                                            return <span className="text-gray-700 dark:text-gray-300">{value || "N/A"}</span>;
-                                        } else if (typeof value === "object" && value !== null) {
-                                            return (
-                                                <ul className="list-disc list-inside">
-                                                    {Object.entries(value).map(([key, val], index) => (
-                                                        <li key={index} className="text-gray-700 dark:text-gray-300">
-                                                            {key}: {JSON.stringify(val)}
-                                                        </li>
-                                                    ))}
-                                                </ul>
                                             );
                                         }
-                                        return <span className="text-gray-700 dark:text-gray-300">N/A</span>;
                                     }
-                                }
 
-                                // Handle generic objects
-                                if (typeof value === "object" && value !== null) {
-                                    return (
-                                        <ul className="list-disc list-inside">
-                                            {Object.entries(value).map(([key, val], index) => (
-                                                <li key={index} className="text-gray-700 dark:text-gray-300">
-                                                    {key}: {JSON.stringify(val)}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    );
-                                }
-
-                                if (field.type === "date") {
-                                    if (isEditing) {
-                                        const dateValue = typeof value === "string" ? value.split("T")[0] : "";
-                                        return (
-                                            <DatePicker
-                                                selectedDate={dateValue ? new Date(dateValue) : null}
-                                                onChange={(date: Date | null) => {
-                                                    if (date) {
-                                                        const formattedDate = date.toISOString();
-                                                        handleFieldChange(claim.claim_id, field.id, formattedDate);
-                                                    } else {
-                                                        handleFieldChange(claim.claim_id, field.id, "");
+                                    if (field.type === "select") {
+                                        if (isEditing) {
+                                            return (
+                                                <Select
+                                                    onValueChange={(value) =>
+                                                        handleFieldChange(claim.claim_id, field.id, value)
                                                     }
-                                                }}
-                                            />
-                                        );
-                                    } else {
-                                        const date = new Date(value as string);
-                                        if (isNaN(date.getTime())) {
-                                            return <span className="text-gray-700 dark:text-gray-300">Invalid Date</span>;
+                                                    value={editedData[field.id as keyof AccidentClaimFormData] as string}
+                                                    required={field.required}
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {field.options?.map((option) => (
+                                                            <SelectItem key={option.value} value={option.value}>
+                                                                {option.label}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            );
+                                        } else {
+                                            const selectedOption = field.options?.find((opt) => opt.value === value);
+                                            return <span className="text-gray-700 dark:text-gray-300">{selectedOption?.label || "N/A"}</span>;
                                         }
-                                        return <span className="text-gray-700 dark:text-gray-300">{date.toLocaleDateString()}</span>;
                                     }
-                                }
 
-                                if (field.type === "number") {
-                                    if (isEditing) {
+                                    if (field.type === "textarea" || field.type === "text") {
+                                        if (isEditing) {
+                                            return (
+                                                <Textarea
+                                                    value={typeof value === "string" ? value : ""}
+                                                    onChange={(e) => handleFieldChange(claim.claim_id, field.id, e.target.value)}
+                                                    className="w-full"
+                                                    required={field.required}
+                                                />
+                                            );
+                                        } else {
+                                            if (typeof value === "string") {
+                                                return <span className="text-gray-700 dark:text-gray-300">{value || "N/A"}</span>;
+                                            } else if (typeof value === "object" && value !== null) {
+                                                return (
+                                                    <ul className="list-disc list-inside">
+                                                        {Object.entries(value).map(([key, val], index) => (
+                                                            <li key={index} className="text-gray-700 dark:text-gray-300">
+                                                                {key}: {JSON.stringify(val)}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                );
+                                            }
+                                            return <span className="text-gray-700 dark:text-gray-300">N/A</span>;
+                                        }
+                                    }
+
+                                    // Handle generic objects
+                                    if (typeof value === "object" && value !== null) {
                                         return (
-                                            <Input
-                                                type="number"
-                                                value={value}
-                                                onChange={(e) => handleFieldChange(claim.claim_id, field.id, e.target.value)}
-                                                className="w-full"
-                                                required={field.required}
-                                            />
+                                            <ul className="list-disc list-inside">
+                                                {Object.entries(value).map(([key, val], index) => (
+                                                    <li key={index} className="text-gray-700 dark:text-gray-300">
+                                                        {key}: {JSON.stringify(val)}
+                                                    </li>
+                                                ))}
+                                            </ul>
                                         );
-                                    } else {
-                                        return <span className="text-gray-700 dark:text-gray-300">{value || "N/A"}</span>;
                                     }
-                                }
 
-                                if (field.type === "text" || field.type === "email") {
-                                    if (isEditing) {
+                                    if (field.type === "date") {
+                                        if (isEditing) {
+                                            const dateValue = typeof value === "string" ? value.split("T")[0] : "";
+                                            return (
+                                                <DatePicker
+                                                    selectedDate={dateValue ? new Date(dateValue) : null}
+                                                    onChange={(date: Date | null) => {
+                                                        if (date) {
+                                                            const formattedDate = date.toISOString();
+                                                            handleFieldChange(claim.claim_id, field.id, formattedDate);
+                                                        } else {
+                                                            handleFieldChange(claim.claim_id, field.id, "");
+                                                        }
+                                                    }}
+                                                />
+                                            );
+                                        } else {
+                                            const date = new Date(value as string);
+                                            if (isNaN(date.getTime())) {
+                                                return <span className="text-gray-700 dark:text-gray-300">Invalid Date</span>;
+                                            }
+                                            return <span className="text-gray-700 dark:text-gray-300">{date.toLocaleDateString()}</span>;
+                                        }
+                                    }
+
+                                    if (field.type === "number") {
+                                        if (isEditing) {
+                                            return (
+                                                <Input
+                                                    type="number"
+                                                    value={value}
+                                                    onChange={(e) => handleFieldChange(claim.claim_id, field.id, e.target.value)}
+                                                    className="w-full"
+                                                    required={field.required}
+                                                />
+                                            );
+                                        } else {
+                                            return <span className="text-gray-700 dark:text-gray-300">{value || "N/A"}</span>;
+                                        }
+                                    }
+
+                                    if (field.type === "text" || field.type === "email") {
+                                        if (isEditing) {
+                                            return (
+                                                <Input
+                                                    type={field.type}
+                                                    value={value}
+                                                    onChange={(e) => handleFieldChange(claim.claim_id, field.id, e.target.value)}
+                                                    className="w-full"
+                                                    required={field.required}
+                                                />
+                                            );
+                                        } else {
+                                            return <span className="text-gray-700 dark:text-gray-300">{value || "N/A"}</span>;
+                                        }
+                                    }
+
+                                    if (field.type === "vehicleDetails") {
+                                        return isEditing
+                                            ? renderEditableVehicleDetailsTable(vehicleDetails)
+                                            : renderVehicleDetailsTable(vehicleDetails);
+                                    }
+
+                                    if (Array.isArray(value)) {
                                         return (
-                                            <Input
-                                                type={field.type}
-                                                value={value}
-                                                onChange={(e) => handleFieldChange(claim.claim_id, field.id, e.target.value)}
-                                                className="w-full"
-                                                required={field.required}
-                                            />
+                                            <ul className="list-disc list-inside">
+                                                {value.map((item, index) => (
+                                                    <li key={index} className="text-gray-700 dark:text-gray-300">{JSON.stringify(item)}</li>
+                                                ))}
+                                            </ul>
                                         );
-                                    } else {
-                                        return <span className="text-gray-700 dark:text-gray-300">{value || "N/A"}</span>;
                                     }
-                                }
 
-                                if (field.type === "vehicleDetails") {
-                                    return isEditing
-                                        ? renderEditableVehicleDetailsTable(vehicleDetails)
-                                        : renderVehicleDetailsTable(vehicleDetails);
-                                }
+                                    return <span className="text-gray-700 dark:text-gray-300">{value !== null && value !== undefined ? value.toString() : "N/A"}</span>;
+                                };
 
-                                if (Array.isArray(value)) {
-                                    return (
-                                        <ul className="list-disc list-inside">
-                                            {value.map((item, index) => (
-                                                <li key={index} className="text-gray-700 dark:text-gray-300">{JSON.stringify(item)}</li>
-                                            ))}
-                                        </ul>
-                                    );
-                                }
+                                return (
+                                    <div key={field.id} className="flex flex-col">
+                                        <Label className="mb-1">{formatLabel(field.label)}</Label>
+                                        {renderValue()}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </section>
+                ))}
 
-                                return <span className="text-gray-700 dark:text-gray-300">{value !== null && value !== undefined ? value.toString() : "N/A"}</span>;
-                            };
-
-                            return (
-                                <div key={field.id} className="flex flex-col">
-                                    <Label className="mb-1">{formatLabel(field.label)}</Label>
-                                    {renderValue()}
-                                </div>
-                            );
-                        })}
-                    </div>
-                </section>
-            ))}
-
-            {/* Footer with Save/Cancel Buttons */}
-            <div className="flex space-x-4">
-                {isEditing ? (
-                    <>
+                {/* Footer with Save/Cancel Buttons */}
+                <div className="flex space-x-4">
+                    {isEditing ? (
+                        <>
+                            <Button
+                                variant="default"
+                                onClick={() => handleSave(claim.claim_id)}
+                                className="flex items-center px-4 py-2 rounded-md transition hover:bg-blue-600"
+                            >
+                                Save
+                            </Button>
+                            <Button
+                                variant="secondary"
+                                onClick={() => handleCancel(claim.claim_id)}
+                                className="flex items-center px-4 py-2 rounded-md transition hover:bg-gray-500"
+                            >
+                                Cancel
+                            </Button>
+                        </>
+                    ) : (
                         <Button
                             variant="default"
-                            onClick={() => handleSave(claim.claim_id)}
+                            onClick={() => onEdit(claim.claim_id)}
                             className="flex items-center px-4 py-2 rounded-md transition hover:bg-blue-600"
                         >
-                            Save
+                            Edit Claim
                         </Button>
-                        <Button
-                            variant="secondary"
-                            onClick={() => handleCancel(claim.claim_id)}
-                            className="flex items-center px-4 py-2 rounded-md transition hover:bg-gray-500"
-                        >
-                            Cancel
-                        </Button>
-                    </>
-                ) : (
-                    <Button
-                        variant="default"
-                        onClick={() => onEdit(claim.claim_id)}
-                        className="flex items-center px-4 py-2 rounded-md transition hover:bg-blue-600"
-                    >
-                        Edit Claim
-                    </Button>
-                )}
+                    )}
+                </div>
             </div>
         </div>
     );

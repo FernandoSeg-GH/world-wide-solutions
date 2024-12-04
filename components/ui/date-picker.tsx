@@ -16,12 +16,13 @@ interface DatePickerProps {
 }
 
 export function DatePicker({ selectedDate, onChange }: DatePickerProps) {
+    const [isOpen, setIsOpen] = React.useState(false);
 
     const isValidDate = selectedDate && !isNaN(new Date(selectedDate).getTime());
     const selectedDateAsDate = isValidDate ? new Date(selectedDate) : undefined;
 
     return (
-        <Popover>
+        <Popover open={isOpen} onOpenChange={setIsOpen}>
             <PopoverTrigger asChild>
                 <Button
                     variant={"outline"}
@@ -41,7 +42,8 @@ export function DatePicker({ selectedDate, onChange }: DatePickerProps) {
                     mode="single"
                     selected={selectedDateAsDate}
                     onSelect={(date) => {
-                        onChange(date ?? null);
+                        onChange(date ?? null); // Update the selected date
+                        setIsOpen(false); // Close the popover
                     }}
                     initialFocus
                 />

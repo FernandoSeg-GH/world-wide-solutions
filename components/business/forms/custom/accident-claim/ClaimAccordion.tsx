@@ -164,11 +164,11 @@ const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
                                                 <SelectValue placeholder="Select status" className="text-center" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem className="text-center" value="received">Received</SelectItem>
-                                                <SelectItem className="text-center" value="approved">Approved</SelectItem>
-                                                <SelectItem className="text-center" value="in progress">In Progress</SelectItem>
-                                                <SelectItem className="text-center" value="documentation missing">Documentation Missing</SelectItem>
-                                                <SelectItem className="text-center" value="reviewing">Reviewing</SelectItem>
+                                                <SelectItem className="text-center" value="Under Review">Under Review</SelectItem>
+                                                <SelectItem className="text-center" value="Pending Documentation">Pending Documentation</SelectItem>
+                                                <SelectItem className="text-center" value="Settle">Settle</SelectItem>
+                                                <SelectItem className="text-center" value="Closed">Closed</SelectItem>
+                                                <SelectItem className="text-center" value="Denied">Denied</SelectItem>
                                             </SelectContent>
                                         </Select>
                                     )}
@@ -188,6 +188,7 @@ const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
                                     Submitted At: {new Date(claim.created_at).toLocaleDateString()}
                                 </p>
                             </div>
+
                         </div>
                     </DisclosureButton>
 

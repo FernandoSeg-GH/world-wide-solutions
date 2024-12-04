@@ -6,6 +6,7 @@ export const initialForm: AccidentClaimFormData = {
   business_id: "",
   formUrl: "",
   status: "",
+  claim_id: "",
   // Personal Information
   full_name: "",
   email: "",

@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import DatePicker from "@/components/ui/date-picker";
-import FileUpload from "@/components/ui/file-upload";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -46,6 +45,7 @@ import { useRouter } from "next/navigation";
 import CustomPhoneInput from "@/components/ui/phone-input";
 import { Ellipsis, Hospital, PlaneTakeoff, PlusCircle } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { FileUpload } from "@/components/ui/file-upload";
 
 export default function AccidentClaimForm() {
     const [formData, setFormData] = useState<AccidentClaimFormData>(initialForm);
@@ -117,7 +117,6 @@ export default function AccidentClaimForm() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-
         if (session?.error) {
             toast({ title: "Session Error", description: "Please sign in again.", variant: "destructive" });
             router.push("/auth/sign-in");
@@ -129,10 +128,17 @@ export default function AccidentClaimForm() {
             return;
         }
 
+        if (!formData.claim_id) {
+            toast({ title: "Error - Missing Claim Reference Number.", description: "Claim Reference Number is required.", variant: "destructive" });
+            return;
+        }
+
         const submitData = new FormData();
 
         Object.entries(formData).forEach(([key, value]) => {
-            if (typeof value === "object" && value !== null && !(value instanceof FileList)) {
+            if (key === "claim_id") {
+                submitData.append(key, value as string);
+            } else if (typeof value === "object" && value !== null && !(value instanceof FileList)) {
                 submitData.append(key, JSON.stringify(value));
             } else if (
                 key === 'vehicle_details' ||
@@ -318,18 +324,12 @@ export default function AccidentClaimForm() {
                     {/* <ProgressBar currentStep={1} totalSteps={10} /> */}
 
                     {/* Title */}
-                    <div className="mb-8 flex flex-row items-start justify-between w-full gap-16 text-start">
-                        <div className="lg:text-left">
-                            <h1 className="text-navyBlue dark:text-white text-3xl leading-7 font-bold underline flex items-center gap-2 justify-center lg:justify-start">
-                                <FaFileUpload />
-                                Accident Claim Report
-                            </h1>
-                            <p className="text-gray-600 dark:text-gray-400 mt-4">
-                                Please complete the form below to report your accident.
-                                <br />
-                                Ensure all fields are filled out accurately.
-                            </p>
-                        </div>
+                    <div className="mb-8 flex flex-row items-center justify-between w-full gap-16 text-start">
+
+                        <h1 className="text-navyBlue dark:text-white text-3xl leading-7 font-bold underline flex items-center gap-2 justify-center lg:justify-start">
+                            <FaFileUpload />
+                            Accident Claim Report
+                        </h1>
                         <Image
                             src="/assets/vws-hor.png"
                             alt="Publicuy Logo"
@@ -337,7 +337,11 @@ export default function AccidentClaimForm() {
                             width={300}
                             height={50}
                         />
+
                     </div>
+                    <p className="text-gray-600 dark:text-gray-400 my-4 mb-6 text- text-justify">
+                        This form is intended to be completed with all the details related to the claim assistance. Use it as a guide to provide all the available data in your file or collect the necessary details from the policyholder. You may not have all the information when uploading the claim for the first time, but you can always access your personal dashboard, to edit and add pending information as soon as you receive it.
+                    </p>
 
                     {/* Patient Personal Information */}
                     <section className="mb-8 bg-gray-100 dark:bg-gray-700 shadow p-6 rounded-lg">
@@ -345,10 +349,28 @@ export default function AccidentClaimForm() {
                             <FaUser />
                             Patient Personal Information
                         </h2>
+
+                        <p className="text-gray-600 dark:text-gray-400 mb-6">
+                            In this section, you must complete with all of your policyholder personal information.
+                        </p>
+                        <div className="mb-4">
+                            <Label htmlFor="claim_id">
+                                Claim Reference Number <span className="text-red-500">*</span>
+                            </Label>
+                            <Input
+                                id="claim_id"
+                                name="claim_id"
+                                placeholder="Enter your claim reference number"
+                                value={formData.claim_id}
+                                onChange={handleInputChange}
+                                className=""
+                                required
+                            />
+                        </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <Label htmlFor="full_name">
-                                    Full Name <span className="text-red-500">*</span>
+                                    Full Name
                                 </Label>
                                 <Input
                                     id="full_name"
@@ -357,18 +379,18 @@ export default function AccidentClaimForm() {
                                     value={formData.full_name}
                                     onChange={handleInputChange}
                                     className=""
-                                    required
+
                                 />
                             </div>
                             <div>
                                 <Label htmlFor="email">
-                                    Email <span className="text-red-500">*</span>
+                                    Email
                                 </Label>
                                 <Input
                                     id="email"
                                     name="email"
                                     type="email"
-                                    required
+
                                     placeholder="Enter your email address"
                                     value={formData.email}
                                     onChange={handleInputChange}
@@ -377,14 +399,14 @@ export default function AccidentClaimForm() {
                             </div>
                             <div>
                                 <Label htmlFor="country">
-                                    Country <span className="text-red-500">*</span>
+                                    Country of residence
                                 </Label>
                                 <Select
                                     onValueChange={(value) =>
                                         setFormData({ ...formData, country: value })
                                     }
                                     value={formData.country}
-                                    required
+
                                 >
                                     <SelectTrigger
                                         id="country"
@@ -488,10 +510,13 @@ export default function AccidentClaimForm() {
                             <FaMapMarkerAlt />
                             Accident Information
                         </h2>
+                        <p className="text-gray-600 dark:text-gray-400 mb-6">
+                            In this section, complete with the most important accident details and select the type of accident that will guide you through specific requirements for that incident.
+                        </p>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <Label htmlFor="accident_date">
-                                    Date of Accident <span className="text-red-500">*</span>
+                                    Date of Accident
                                 </Label>
                                 <DatePicker
                                     selectedDate={formData.accident_date ? new Date(formData.accident_date) : null}
@@ -502,12 +527,12 @@ export default function AccidentClaimForm() {
                             </div>
                             <div>
                                 <Label htmlFor="accident_place">
-                                    Place of Accident <span className="text-red-500">*</span>
+                                    Place of Accident
                                 </Label>
                                 <Input
                                     id="accident_place"
                                     name="accident_place"
-                                    placeholder="Address of the accident"
+                                    placeholder="Place where the accident occur"
                                     value={formData.accident_place}
                                     onChange={handleInputChange}
                                     className=""
@@ -515,7 +540,7 @@ export default function AccidentClaimForm() {
                             </div>
                             <div className="md:col-span-2">
                                 <Label>
-                                    Type of Accident <span className="text-red-500">*</span>
+                                    Type of Accident
                                 </Label>
                                 <Select
                                     onValueChange={handleAccidentTypeChange}
@@ -725,14 +750,14 @@ export default function AccidentClaimForm() {
                             {/* Vehicle Selector */}
                             <div className="mt-8">
                                 <Label>
-                                    Please select the vehicle that you were in at the time of the accident.<span className="text-red-500">*</span>
+                                    Please select the vehicle that you were in at the time of the accident.
                                 </Label>
                                 <Select
                                     onValueChange={(value) =>
                                         setFormData({ ...formData, selected_vehicle: value })
                                     }
                                     value={formData.selected_vehicle}
-                                    required
+
                                 >
                                     <SelectTrigger className="">
                                         <SelectValue placeholder="Select a vehicle" />
@@ -754,7 +779,7 @@ export default function AccidentClaimForm() {
                             {/* Documentation & Accident Description */}
                             <div className="mt-8">
                                 <Label>
-                                    Please write a brief description of the accident.<span className="text-red-500">*</span>
+                                    Please write a brief description of the accident.
                                 </Label>
                                 <Textarea
                                     name="mva_description"
@@ -763,7 +788,7 @@ export default function AccidentClaimForm() {
                                     value={formData.mva_description}
                                     onChange={handleInputChange}
                                     className=""
-                                    required
+
                                 />
                             </div>
 
@@ -772,10 +797,10 @@ export default function AccidentClaimForm() {
                                 <FileUpload
                                     description="Please upload all the documents regarding the motor vehicle accident. Such as police report, rental agreement, certificate of insurance, traffic exchange, pictures from the accident, or any other relevant documents."
                                     multiple
-                                    onFilesSelected={(files) =>
+                                    onFilesSelected={(files: File[]) =>
                                         setFormData({
                                             ...formData,
-                                            new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files)],
+                                            new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files)], // This converts FileList to File[]
                                         })
                                     }
                                     className=""
@@ -798,7 +823,7 @@ export default function AccidentClaimForm() {
                                 {/* Accident Description */}
                                 <div>
                                     <Label>
-                                        Slip Description <span className="text-red-500">*</span>
+                                        Slip Description
                                     </Label>
                                     <Textarea
                                         name="slip_description"
@@ -807,21 +832,21 @@ export default function AccidentClaimForm() {
                                         value={formData.slip_description}
                                         onChange={handleInputChange}
                                         className=""
-                                        required
+
                                     />
                                 </div>
 
                                 {/* Accident Type */}
                                 <div>
                                     <Label>
-                                        Slip Accident Type <span className="text-red-500">*</span>
+                                        Slip Accident Type
                                     </Label>
                                     <Select
                                         onValueChange={(value) =>
                                             setFormData({ ...formData, slip_accident_type: value })
                                         }
                                         value={formData.slip_accident_type}
-                                        required
+
                                     >
                                         <SelectTrigger className="">
                                             <SelectValue placeholder="Select an option..." />
@@ -905,10 +930,10 @@ export default function AccidentClaimForm() {
                                         <FileUpload
                                             description="Please upload all the documents related to the slip and fall accident. Such as police report, internal police reports, photos of the place of the accident, injuries, and/or any other relevant documents."
                                             multiple
-                                            onFilesSelected={(files) =>
+                                            onFilesSelected={(files: File[]) =>
                                                 setFormData({
                                                     ...formData,
-                                                    new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files)],
+                                                    new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files) as File[]],
                                                 })
                                             }
                                             className=""
@@ -931,14 +956,14 @@ export default function AccidentClaimForm() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <Label>
-                                    Type of Assistance <span className="text-red-500">*</span>
+                                    Type of Assistance
                                 </Label>
                                 <Select
                                     onValueChange={(value) =>
                                         setFormData({ ...formData, medical_assistance_type: value })
                                     }
                                     value={formData.medical_assistance_type}
-                                    required
+
                                 >
                                     <SelectTrigger className="">
                                         <SelectValue placeholder="Select type of assistance" />
@@ -996,10 +1021,10 @@ export default function AccidentClaimForm() {
                             <FileUpload
                                 description="Please upload all the documents related to the medical treatment. Such as medical records, discharge notes, emergency notes, or any other medical document."
                                 multiple
-                                onFilesSelected={(files) =>
+                                onFilesSelected={(files: File[]) =>
                                     setFormData({
                                         ...formData,
-                                        new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files)],
+                                        new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files) as File[]],
                                     })
                                 }
                                 className=""
@@ -1030,7 +1055,7 @@ export default function AccidentClaimForm() {
                                         value={formData.medical_total_cost}
                                         onChange={handleInputChange}
                                         className="pl-10 bg-white dark:bg-gray-600 !dark:text-white"
-                                        required
+
                                     />
                                 </div>
                             </div>
@@ -1338,10 +1363,10 @@ export default function AccidentClaimForm() {
                                 <FileUpload
                                     multiple
                                     description="Please upload all documents related to the costs of assistance. Such as medical bills, repatriation bills, or any other costs related to the case."
-                                    onFilesSelected={(files) =>
+                                    onFilesSelected={(files: File[]) =>
                                         setFormData({
                                             ...formData,
-                                            new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files)],
+                                            new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files) as File[]],
                                         })
                                     }
                                     className=""
@@ -1385,7 +1410,7 @@ export default function AccidentClaimForm() {
                                         </Label>
                                         <Input
                                             name="claim_reference_number"
-                                            placeholder="Enter claim reference number"
+                                            placeholder=" Enter the claim reference number related to the patient"
                                             value={formData.claim_reference_number}
                                             onChange={handleInputChange}
                                             className=""
@@ -1421,10 +1446,10 @@ export default function AccidentClaimForm() {
                                     <Label>Insurance Company Documentation</Label>
                                     <FileUpload
                                         multiple
-                                        onFilesSelected={(files) =>
+                                        onFilesSelected={(files: File[]) =>
                                             setFormData({
                                                 ...formData,
-                                                new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files)],
+                                                new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files) as File[]],
                                             })
                                         }
                                         className=""
@@ -1479,10 +1504,10 @@ export default function AccidentClaimForm() {
                                     <Label>Business Documentation</Label>
                                     <FileUpload
                                         multiple
-                                        onFilesSelected={(files) =>
+                                        onFilesSelected={(files: File[]) =>
                                             setFormData({
                                                 ...formData,
-                                                new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files)],
+                                                new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files) as File[]],
                                             })
                                         }
                                         className=""
@@ -1512,10 +1537,10 @@ export default function AccidentClaimForm() {
                                         <FileUpload
                                             description="Upload any insurance certification, membership, or other."
                                             multiple
-                                            onFilesSelected={(files) =>
+                                            onFilesSelected={(files: File[]) =>
                                                 setFormData({
                                                     ...formData,
-                                                    new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files)],
+                                                    new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files) as File[]],
                                                 })
                                             }
                                             className=""
@@ -1554,7 +1579,7 @@ export default function AccidentClaimForm() {
                             Personal Attorney
                         </h2>
                         <p className="text-gray-600 dark:text-gray-400 mb-6">
-                            In this section, request and complete with any possible legal representation the policy holder may have regarding the accident.
+                            In this section, request and complete with any possible legal representation the policyholder may have regarding the accident.
                         </p>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
@@ -1596,10 +1621,10 @@ export default function AccidentClaimForm() {
                                 <Label>Upload All Documents Regarding the Law Firm:</Label>
                                 <FileUpload
                                     multiple
-                                    onFilesSelected={(files) =>
+                                    onFilesSelected={(files: File[]) =>
                                         setFormData({
                                             ...formData,
-                                            new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files)],
+                                            new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files) as File[]],
                                         })
                                     }
                                     className=""
