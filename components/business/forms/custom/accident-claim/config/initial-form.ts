@@ -1,5 +1,3 @@
-// src/components/business/forms/custom/accident-claim/config/formConfig.ts
-
 import { AccidentClaimFormData } from "./types";
 
 export const initialForm: AccidentClaimFormData = {
@@ -7,7 +5,7 @@ export const initialForm: AccidentClaimFormData = {
   formUrl: "",
   status: "",
   claim_id: "",
-  // Personal Information
+
   full_name: "",
   email: "",
   country: "",
@@ -16,13 +14,11 @@ export const initialForm: AccidentClaimFormData = {
   other_contact_name: "",
   other_contact_phone: "",
 
-  // Accident Information
-  accident_date: "", // Should be ISO Date string
+  accident_date: "",
   accident_place: "",
   accident_type: "",
   sub_accident_type: "",
 
-  // Motor Vehicle Accident Details
   mva_type: "",
   mva_location: "",
   vehicle_details: [
@@ -37,21 +33,18 @@ export const initialForm: AccidentClaimFormData = {
   selected_vehicle: "",
   mva_description: "",
 
-  // Medical Information (Flat Fields)
   medical_assistance_type: "",
   medical_diagnosis: "",
   medical_treatment: "",
   primary_care_provider: "",
 
-  // Cost of Assistance
-  medical_total_cost: 0, // Initialized as number
-  policy_limits: 0, // Initialized as number
+  medical_total_cost: 0,
+  policy_limits: 0,
   assistance_status: "",
-  medical_provider_costs: [], // Initialized as empty object
-  repatriation_costs: [], // Initialized as empty object
-  other_costs: [], // Initialized as empty object
+  medical_provider_costs: [],
+  repatriation_costs: [],
+  other_costs: [],
 
-  // Third Party Information
   insurance_company: "",
   claim_reference_number: "",
   adjuster_name: "",
@@ -62,12 +55,10 @@ export const initialForm: AccidentClaimFormData = {
   co_insured_name: "",
   other_party_info: "",
 
-  // Attorney Information
   law_firm_name: "",
   attorney_name: "",
   attorney_phone: "",
 
-  // Slip and Fall Accident Details
   slip_description: "",
   slip_accident_type: "",
   negligence_description: "",
@@ -75,10 +66,8 @@ export const initialForm: AccidentClaimFormData = {
   witness_email: "",
   witness_phone: "",
 
-  // File Uploads
-  file_uploads: null, // Initially no uploads
-  new_file_uploads: null, // Initially no new uploads
+  file_uploads: null,
+  new_file_uploads: null,
 
-  // Additional Notes (if any)
   additional_notes: "",
 };
