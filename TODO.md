@@ -2,15 +2,15 @@
 
 FER ACA TE DEJO EL ULTIMO RECAP, CUALQUIER COSA AVISAME
 
-- En Cost of Assistance: add currency selector
-  ﻿- En el Edit: tiene que tener el mismo formato que el form..
-  • ⁃ Qeu el vehículo uno aparézcales por defecto y después que se pueda agregar - ademas apa
-  Sigue habiendo error al cargar documento
-  Al cargar form me tira error
-  No salen los users y sale error
-  Como elimina un user para sacarle el acceso
-  En place of accident (accident information) there has to have the country and state function \_ here is where is important!!!!
+- En el Edit: tiene que tener el mismo formato que el form..
+• ⁃ Qeu el vehículo uno aparézcales por defecto y después que se pueda agregar - ademas apa
+Sigue habiendo error al cargar documento
+Al cargar form me tira error
+Como elimina un user para sacarle el acceso
+En place of accident (accident information) there has to have the country and state function \_ here is where is important!!!!
 
+**DONE** - No salen los users y sale error
+**DONE** - En Cost of Assistance: add currency selector
 **DONE** - en cost of assistance falta poner la currency para saber en que moneda est bille
 **DONE** - No se prude poner me olvide mi contraseña
 **DONE** - Company reference number para agregar en seccion de paciente \_ enter the claim reference number, related to the patient

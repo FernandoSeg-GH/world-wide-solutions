@@ -409,9 +409,9 @@ const AccidentClaimsView: React.FC = () => {
                         </p>
                     </div>
 
-                    <div className="flex items-center gap-4">
+                    <div className="flex flex-col items-end gap-4">
                         <div className="flex items-center">
-                            <span className="mr-2 text-gray-700 dark:text-gray-200">
+                            <span className="mr-2 text-gray-700 dark:text-gray-200 whitespace-nowrap">
                                 {isSpreadsheetView ? "Spreadsheet View" : "Card View"}
                             </span>
                             <Switch
@@ -420,17 +420,17 @@ const AccidentClaimsView: React.FC = () => {
                             />
                         </div>
                         {/* Download Buttons */}
-                        <div className="flex items-center gap-2">
-                            <Button onClick={() => handleDownloadAllClaims('csv')} variant="outline">
-                                <FaEdit className="mr-2" /> Download CSV
-                            </Button>
-                            {/* <Button onClick={() => handleDownloadAllClaims('excel')} variant="outline">
-                                <FaEdit className="mr-2" /> Download Excel
-                            </Button> */}
-                            <Button onClick={() => handleDownloadAllClaims('pdf')} variant="outline">
-                                <FaEdit className="mr-2" /> Download PDF
-                            </Button>
-                        </div>
+                        {isSpreadsheetView && (
+                            <div className="flex items-center gap-2">
+                                <Button onClick={() => handleDownloadAllClaims('csv')} variant="outline">
+                                    <FaEdit className="mr-2" /> Download CSV
+                                </Button>
+                                {/* <Button onClick={() => handleDownloadAllClaims('pdf')} variant="outline">
+                                    <FaEdit className="mr-2" /> Download PDF
+                                </Button> */}
+                            </div>
+                        )}
+
                     </div>
 
                 </div>

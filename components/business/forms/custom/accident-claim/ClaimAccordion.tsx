@@ -212,14 +212,14 @@ const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
                                         <FaDownload />
                                         Download CSV
                                     </Button>
-                                    <Button
+                                    {/* <Button
                                         onClick={() => handleDownloadClaim('excel')}
                                         variant="outline"
                                         className="flex items-center gap-2"
                                     >
                                         <FaDownload />
                                         Download Excel
-                                    </Button>
+                                    </Button> */}
                                     <Button
                                         onClick={() => handleDownloadClaim('pdf')}
                                         variant="outline"
