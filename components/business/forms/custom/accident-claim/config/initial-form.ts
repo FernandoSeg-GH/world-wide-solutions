@@ -25,7 +25,15 @@ export const initialForm: AccidentClaimFormData = {
   // Motor Vehicle Accident Details
   mva_type: "",
   mva_location: "",
-  vehicle_details: [],
+  vehicle_details: [
+    {
+      licenseNumber: "",
+      year: "",
+      model: "",
+      insuranceName: "",
+      policyNumber: "",
+    },
+  ],
   selected_vehicle: "",
   mva_description: "",
 

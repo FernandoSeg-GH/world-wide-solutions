@@ -5,14 +5,14 @@ FER ACA TE DEJO EL ULTIMO RECAP, CUALQUIER COSA AVISAME
 - En Cost of Assistance: add currency selector
   ﻿- En el Edit: tiene que tener el mismo formato que el form..
   • ⁃ Qeu el vehículo uno aparézcales por defecto y después que se pueda agregar - ademas apa
-  No se prude poner me olvide mi contraseña
   Sigue habiendo error al cargar documento
   Al cargar form me tira error
   No salen los users y sale error
   Como elimina un user para sacarle el acceso
-  -en cost of assistance falta poner la currency para saber en que moneda est bille
   En place of accident (accident information) there has to have the country and state function \_ here is where is important!!!!
 
+**DONE** - en cost of assistance falta poner la currency para saber en que moneda est bille
+**DONE** - No se prude poner me olvide mi contraseña
 **DONE** - Company reference number para agregar en seccion de paciente \_ enter the claim reference number, related to the patient
 **DONE** - Patient personal Information: en country aclarar. que es pais de residency
 **DONE** - En place of accident: place where the accident occur
