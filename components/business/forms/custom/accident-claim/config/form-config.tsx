@@ -64,7 +64,7 @@ export const formSections: SectionConfig[] = [
         ],
       },
       { id: "mva_location", label: "Location of Accident", type: "text" },
-      { id: "vehicle_details", label: "Vehicle Details", type: "vehicleDetails" },
+      { id: "vehicle_details", label: "Vehicle Details", type: "nested" },
       {
         id: "selected_vehicle",
         label: "Selected Vehicle",
@@ -97,9 +97,9 @@ export const formSections: SectionConfig[] = [
           { value: "closed", label: "Closed" },
         ],
       },
-      { id: "medical_provider_costs", label: "Medical Provider Costs", type: "number" },
-      { id: "repatriation_costs", label: "Repatriation Costs", type: "number" },
-      { id: "other_costs", label: "Other Costs", type: "number" },
+      { id: "medical_provider_costs", label: "Medical Provider Costs", type: "nested" },
+      { id: "repatriation_costs", label: "Repatriation Costs", type: "nested" },
+      { id: "other_costs", label: "Other Costs", type: "nested" },
 
       // Third Party Info - Flat Fields
       { id: "insurance_company", label: "Insurance Company", type: "text" },

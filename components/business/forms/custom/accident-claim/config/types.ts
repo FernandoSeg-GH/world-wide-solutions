@@ -1,4 +1,13 @@
-// src/components/business/forms/custom/accident-claim/
+// src/components/business/forms/custom/accident-claim/types.ts
+
+export interface CostDetail {
+  providerName: string;
+  amountBilled: number;
+  amountPaid: number;
+  amountUnpaid: number;
+  currency: string;
+}
+
 export interface VehicleDetail {
   licenseNumber: string;
   year: string;
@@ -19,20 +28,13 @@ export interface OtherCosts {
   [item: string]: number;
 }
 
-export interface CostDetail {
-  providerName: string;
-  amountBilled: number;
-  amountPaid: number;
-  amountUnpaid: number;
-}
-
 export interface AccidentClaimFormData {
   business_id: string;
   formUrl: string;
   status: string;
 
-  claim_id: string;
   // Personal Information
+  claim_id: string;
   full_name: string;
   email: string;
   country: string;
@@ -63,6 +65,8 @@ export interface AccidentClaimFormData {
   // Cost of Assistance
   medical_total_cost: number;
   policy_limits: number;
+  total_cost_currency?: string; // Add this field
+  policy_limit_currency?: string;
   assistance_status: string;
   medical_provider_costs: CostDetail[];
   repatriation_costs: CostDetail[];
@@ -105,7 +109,6 @@ export interface AccidentClaimFormData {
 }
 
 export interface Claim extends AccidentClaimFormData {
-  // claim_id: string;
   user_id: number;
   username: string;
   user_email: string;

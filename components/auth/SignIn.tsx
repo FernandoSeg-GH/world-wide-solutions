@@ -1,3 +1,5 @@
+// src/components/auth/SignIn.tsx
+
 "use client";
 
 import { useState } from "react";
@@ -11,10 +13,11 @@ import { toast } from "@/components/ui/use-toast";
 
 interface SignInProps {
     onToggle: () => void;
+    onForgotPassword: () => void; // Added this line
     callbackUrl: string;
 }
 
-export default function SignIn({ onToggle, callbackUrl }: SignInProps) {
+export default function SignIn({ onToggle, onForgotPassword, callbackUrl }: SignInProps) {
     const [loading, setLoading] = useState(false);
     const [isRouting, setIsRouting] = useState(false);
     const router = useRouter();
@@ -29,28 +32,38 @@ export default function SignIn({ onToggle, callbackUrl }: SignInProps) {
         e.preventDefault();
         setLoading(true);
 
-        const res = await signIn("credentials", {
-            redirect: false,
-            username: credentials.username,
-            password: credentials.password,
-            callbackUrl,
-        });
+        try {
+            const res = await signIn("credentials", {
+                redirect: false,
+                username: credentials.username,
+                password: credentials.password,
+                callbackUrl,
+            });
 
-        if (res?.error) {
+            if (res?.error) {
+                toast({
+                    title: "Error",
+                    description: res.error,
+                    variant: "destructive",
+                });
+                setLoading(false);
+            } else {
+                toast({
+                    title: "Success",
+                    description: "You have successfully signed in.",
+                });
+                setLoading(false);
+                setIsRouting(true);
+                router.push(callbackUrl);
+            }
+        } catch (error: any) {
             toast({
                 title: "Error",
-                description: res.error,
+                description: "An unexpected error occurred.",
                 variant: "destructive",
             });
+            console.error("SignIn error:", error);
             setLoading(false);
-        } else {
-            toast({
-                title: "Success",
-                description: "You have successfully signed in.",
-            });
-            setLoading(false);
-            setIsRouting(true);
-            router.push(callbackUrl);
         }
     };
 
@@ -82,20 +95,21 @@ export default function SignIn({ onToggle, callbackUrl }: SignInProps) {
                     required
                 />
             </div>
-            <Button
-                type="submit"
-                className="w-full"
-                disabled={loading || isRouting}
-            >
-                {loading ? "Signing in..." : isRouting ? "Redirecting..." : "Sign In"}
-            </Button>
+            <div className="flex items-center justify-between">
+                <Button type="submit" disabled={loading || isRouting}>
+                    {loading ? "Signing in..." : isRouting ? "Redirecting..." : "Sign In"}
+                </Button>
+                <Button variant="link" type="button" onClick={onForgotPassword}>
+                    Forgot Password?
+                </Button>
+            </div>
             <Separator />
-            <p className="text-sm text-center">
+            {/* <p className="text-sm text-center">
                 Don&apos;t have an account?{" "}
-                <Button variant="link" onClick={onToggle}>
+                <Button variant="link" type="button" onClick={onToggle}>
                     Sign Up
                 </Button>
-            </p>
+            </p> */}
         </form>
     );
 }

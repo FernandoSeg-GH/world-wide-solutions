@@ -46,6 +46,7 @@ import CustomPhoneInput from "@/components/ui/phone-input";
 import { Ellipsis, Hospital, PlaneTakeoff, PlusCircle } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { FileUpload } from "@/components/ui/file-upload";
+import { currencyOptions } from "./config/currencies";
 
 export default function AccidentClaimForm() {
     const [formData, setFormData] = useState<AccidentClaimFormData>(initialForm);
@@ -138,6 +139,13 @@ export default function AccidentClaimForm() {
         Object.entries(formData).forEach(([key, value]) => {
             if (key === "claim_id") {
                 submitData.append(key, value as string);
+            } else if (
+                key === "medical_provider_costs" ||
+                key === "repatriation_costs" ||
+                key === "other_costs" ||
+                key === "vehicle_details"
+            ) {
+                submitData.append(key, JSON.stringify(value));
             } else if (typeof value === "object" && value !== null && !(value instanceof FileList)) {
                 submitData.append(key, JSON.stringify(value));
             } else if (
@@ -162,15 +170,11 @@ export default function AccidentClaimForm() {
             }
         });
 
-
         if (formData.new_file_uploads) {
             formData.new_file_uploads.forEach((file) => {
                 submitData.append("new_file_uploads", file);
             });
         }
-
-
-        // submitData.append("business_id", formData.business_id || "default");
 
         try {
             const response = await fetch(
@@ -253,6 +257,7 @@ export default function AccidentClaimForm() {
                     amountBilled: 0,
                     amountPaid: 0,
                     amountUnpaid: 0,
+                    currency: "USD", // Default currency
                 },
             ],
         }));
@@ -268,6 +273,7 @@ export default function AccidentClaimForm() {
                     amountBilled: 0,
                     amountPaid: 0,
                     amountUnpaid: 0,
+                    currency: "USD", // Default currency
                 },
             ],
         }));
@@ -283,6 +289,7 @@ export default function AccidentClaimForm() {
                     amountBilled: 0,
                     amountPaid: 0,
                     amountUnpaid: 0,
+                    currency: "USD", // Default currency
                 },
             ],
         }));
@@ -296,10 +303,18 @@ export default function AccidentClaimForm() {
     ) => {
         setFormData((prevData) => {
             const updatedCosts = [...(prevData[costType] as CostDetail[])];
-            updatedCosts[index] = {
-                ...updatedCosts[index],
-                [field]: value,
-            };
+            const cost = updatedCosts[index];
+
+            // Update the field value
+            (cost[field] as string | number) = value;
+
+            // Recalculate the unpaid amount if relevant fields change
+            if (field === "amountBilled" || field === "amountPaid") {
+                const billed = parseFloat(cost.amountBilled as unknown as string) || 0;
+                const paid = parseFloat(cost.amountPaid as unknown as string) || 0;
+                cost.amountUnpaid = billed - paid;
+            }
+
             return { ...prevData, [costType]: updatedCosts };
         });
     };
@@ -379,7 +394,6 @@ export default function AccidentClaimForm() {
                                     value={formData.full_name}
                                     onChange={handleInputChange}
                                     className=""
-
                                 />
                             </div>
                             <div>
@@ -788,7 +802,6 @@ export default function AccidentClaimForm() {
                                     value={formData.mva_description}
                                     onChange={handleInputChange}
                                     className=""
-
                                 />
                             </div>
 
@@ -832,7 +845,6 @@ export default function AccidentClaimForm() {
                                         value={formData.slip_description}
                                         onChange={handleInputChange}
                                         className=""
-
                                     />
                                 </div>
 
@@ -846,7 +858,6 @@ export default function AccidentClaimForm() {
                                             setFormData({ ...formData, slip_accident_type: value })
                                         }
                                         value={formData.slip_accident_type}
-
                                     >
                                         <SelectTrigger className="">
                                             <SelectValue placeholder="Select an option..." />
@@ -963,7 +974,6 @@ export default function AccidentClaimForm() {
                                         setFormData({ ...formData, medical_assistance_type: value })
                                     }
                                     value={formData.medical_assistance_type}
-
                                 >
                                     <SelectTrigger className="">
                                         <SelectValue placeholder="Select type of assistance" />
@@ -1031,7 +1041,6 @@ export default function AccidentClaimForm() {
                             />
                         </div>
                     </section>
-
                     {/* Cost of Assistance */}
                     <section className="mb-8 bg-gray-100 dark:bg-gray-700 shadow p-6 rounded-lg">
                         <h2 className="text-xl font-semibold mb-6 flex items-center gap-2 text-gray-800 dark:text-gray-200">
@@ -1039,341 +1048,263 @@ export default function AccidentClaimForm() {
                             Cost of Assistance
                         </h2>
                         <p className="text-gray-600 dark:text-gray-400 mb-6">
-                            In this section, fill with all costs received related to the claim, even if they are estimated or over the policy limit.
+                            Fill in all costs received related to the claim, even if they are estimated or exceed the policy limit.
                         </p>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                        {/* Estimated Total Cost */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
                             <div className="relative">
-                                <Label>
-                                    Estimated Total Cost ($)
-                                </Label>
-                                <div className="relative mt-1">
-                                    <FaDollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                                <Label>Estimated Total Cost</Label>
+                                <div className="flex items-center gap-2">
+                                    <Select
+                                        onValueChange={(value) =>
+                                            setFormData({ ...formData, total_cost_currency: value })
+                                        }
+                                        value={formData.total_cost_currency || "USD"}
+                                    >
+                                        <SelectTrigger className="w-24">
+                                            <SelectValue placeholder="Currency" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {currencyOptions.map((currency) => (
+                                                <SelectItem key={currency.value} value={currency.value}>
+                                                    {currency.label}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                     <Input
                                         name="medical_total_cost"
                                         type="number"
                                         placeholder="Enter total cost"
                                         value={formData.medical_total_cost}
                                         onChange={handleInputChange}
-                                        className="pl-10 bg-white dark:bg-gray-600 !dark:text-white"
-
+                                        className="flex-grow bg-white dark:bg-gray-600 !dark:text-white"
                                     />
                                 </div>
-                            </div>
-                            <div className="relative">
-                                <Label>
-                                    Policy Limits of Assistance Coverage{" "}
-                                </Label>
-                                <div className="relative mt-1">
-                                    <FaDollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                                    <Input
-                                        name="policy_limits"
-                                        type="number"
-                                        placeholder="Enter policy limits"
-                                        value={formData.policy_limits}
-                                        onChange={handleInputChange}
-                                        className="pl-10 bg-white dark:bg-gray-600 !dark:text-white"
-                                    />
-                                </div>
-                            </div>
-                            <div>
-                                <Label>
-                                    Assistance Status{" "}
-                                </Label>
-                                <Select
-                                    onValueChange={(value) =>
-                                        setFormData({
-                                            ...formData,
-                                            assistance_status: value,
-                                        })
-                                    }
-                                    value={formData.assistance_status}
-                                >
-                                    <SelectTrigger className="">
-                                        <SelectValue placeholder="Select status:" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem className="hover:bg-slate-500" value="open">Open</SelectItem>
-                                        <SelectItem className="hover:bg-slate-500" value="under_review">Under Review</SelectItem>
-                                        <SelectItem className="hover:bg-slate-500" value="approved">Approved</SelectItem>
-                                        <SelectItem className="hover:bg-slate-500" value="closed">Closed</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <Separator className="md:col-span-2" />
-                            <div className="md:col-span-2">
-                                <div className="flex justify-between items-start">
-                                    <h3 className="flex items-center text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
-                                        <Hospital className="mr-2 h-5 w-5" />
-                                        Medical Provider Bills
-                                    </h3>
-                                    <Button onClick={handleAddMedicalCost} type="button">
-                                        <PlusCircle className="mr-2 h-5 w-5" />
-                                        Add Medical Provider Bill
-                                    </Button>
-                                </div>
-                            </div>
-
-                            {formData.medical_provider_costs.map((cost, index) => (
-                                <div key={index} className="border p-4 rounded mb-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <Label>Name of Provider</Label>
-                                            <Input
-                                                placeholder="Name of provider"
-                                                value={cost.providerName}
-                                                onChange={(e) =>
-                                                    handleCostChange("medical_provider_costs", index, "providerName", e.target.value)
-                                                }
-                                            />
-                                        </div>
-                                        <div>
-                                            <Label>Amount Billed ($)</Label>
-                                            <Input
-                                                type="number"
-                                                placeholder="Amount billed"
-                                                value={cost.amountBilled}
-                                                onChange={(e) =>
-                                                    handleCostChange("medical_provider_costs", index, "amountBilled", parseFloat(e.target.value))
-                                                }
-                                            />
-                                        </div>
-                                        <div>
-                                            <Label>Amount Paid ($)</Label>
-                                            <Input
-                                                type="number"
-                                                placeholder="Amount paid"
-                                                value={cost.amountPaid}
-                                                onChange={(e) =>
-                                                    handleCostChange("medical_provider_costs", index, "amountPaid", parseFloat(e.target.value))
-                                                }
-                                            />
-                                        </div>
-                                        <div>
-                                            <Label>Amount Unpaid ($)</Label>
-                                            <Input
-                                                type="number"
-                                                placeholder="Amount unpaid"
-                                                value={cost.amountUnpaid}
-                                                onChange={(e) =>
-                                                    handleCostChange("medical_provider_costs", index, "amountUnpaid", parseFloat(e.target.value))
-                                                }
-                                            />
-                                        </div>
-                                    </div>
-                                    <Button
-                                        variant="destructive"
-                                        onClick={() => handleRemoveCost("medical_provider_costs", index)}
-                                        className="mt-4"
-                                        type="button"
-                                    >
-                                        Remove
-                                    </Button>
-                                </div>
-                            ))}
-
-                            <Separator className="md:col-span-2" />
-                            <div className="md:col-span-2">
-                                <div className="flex justify-between items-start">
-                                    <h3 className="flex items-center text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
-                                        <PlaneTakeoff className="mr-2 h-5 w-5" />
-                                        Repatriation Bills
-                                    </h3>
-                                    <Button onClick={handleAddRepatriationCost} type="button">
-                                        <PlusCircle className="mr-2 h-5 w-5" />
-                                        Add Repatriation Cost
-                                    </Button>
-                                </div>
-                            </div>
-
-                            {formData.repatriation_costs.map((cost, index) => (
-                                <div key={index} className="border p-4 rounded mb-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <Label>Name of Provider</Label>
-                                            <Input
-                                                placeholder="Name of provider"
-                                                value={cost.providerName}
-                                                onChange={(e) =>
-                                                    handleCostChange("repatriation_costs", index, "providerName", e.target.value)
-                                                }
-                                            />
-                                        </div>
-                                        <div>
-                                            <Label>Amount Billed ($)</Label>
-                                            <Input
-                                                type="number"
-                                                placeholder="Amount billed"
-                                                value={cost.amountBilled}
-                                                onChange={(e) =>
-                                                    handleCostChange("repatriation_costs", index, "amountBilled", parseFloat(e.target.value))
-                                                }
-                                            />
-                                        </div>
-                                        <div>
-                                            <Label>Amount Paid ($)</Label>
-                                            <Input
-                                                type="number"
-                                                placeholder="Amount paid"
-                                                value={cost.amountPaid}
-                                                onChange={(e) =>
-                                                    handleCostChange("repatriation_costs", index, "amountPaid", parseFloat(e.target.value))
-                                                }
-                                            />
-                                        </div>
-                                        <div>
-                                            <Label>Amount Unpaid ($)</Label>
-                                            <Input
-                                                type="number"
-                                                placeholder="Amount unpaid"
-                                                value={cost.amountUnpaid}
-                                                onChange={(e) =>
-                                                    handleCostChange("repatriation_costs", index, "amountUnpaid", parseFloat(e.target.value))
-                                                }
-                                            />
-                                        </div>
-                                    </div>
-                                    <Button
-                                        variant="destructive"
-                                        onClick={() => handleRemoveCost("repatriation_costs", index)}
-                                        className="mt-4"
-                                        type="button"
-                                    >
-                                        Remove
-                                    </Button>
-                                </div>
-                            ))}
-
-                            <Separator className="md:col-span-2" />
-                            <div className="md:col-span-2">
-                                <div className="flex justify-between items-start">
-                                    <h3 className="flex  items-center text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
-                                        <Ellipsis className="mr-2 h-5 w-5" />
-                                        Other Bills
-                                    </h3>
-                                    <Button onClick={handleAddOtherCost} type="button">
-                                        <PlusCircle className="mr-2 h-5 w-5" />
-                                        Add Other Cost
-                                    </Button>
-                                </div>
-                            </div>
-
-                            {formData.other_costs.map((cost, index) => (
-                                <div key={index} className="border p-4 rounded mb-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <Label>Name of Provider</Label>
-                                            <Input
-                                                placeholder="Name of provider"
-                                                value={cost.providerName}
-                                                onChange={(e) =>
-                                                    handleCostChange("other_costs", index, "providerName", e.target.value)
-                                                }
-                                            />
-                                        </div>
-                                        <div>
-                                            <Label>Amount Billed ($)</Label>
-                                            <Input
-                                                type="number"
-                                                placeholder="Amount billed"
-                                                value={cost.amountBilled}
-                                                onChange={(e) =>
-                                                    handleCostChange("other_costs", index, "amountBilled", parseFloat(e.target.value))
-                                                }
-                                            />
-                                        </div>
-                                        <div>
-                                            <Label>Amount Paid ($)</Label>
-                                            <Input
-                                                type="number"
-                                                placeholder="Amount paid"
-                                                value={cost.amountPaid}
-                                                onChange={(e) =>
-                                                    handleCostChange("other_costs", index, "amountPaid", parseFloat(e.target.value))
-                                                }
-                                            />
-                                        </div>
-                                        <div>
-                                            <Label>Amount Unpaid ($)</Label>
-                                            <Input
-                                                type="number"
-                                                placeholder="Amount unpaid"
-                                                value={cost.amountUnpaid}
-                                                onChange={(e) =>
-                                                    handleCostChange("other_costs", index, "amountUnpaid", parseFloat(e.target.value))
-                                                }
-                                            />
-                                        </div>
-                                    </div>
-                                    <Button
-                                        variant="destructive"
-                                        onClick={() => handleRemoveCost("other_costs", index)}
-                                        className="mt-4"
-                                        type="button"
-                                    >
-                                        Remove
-                                    </Button>
-                                </div>
-                            ))}
-
-                            <Separator className="md:col-span-2" />
-                            {/* Repatriation Costs */}
-                            {/* <div className="md:col-span-2">
-                                <Label>Repatriation Costs</Label>
-
-                                <div className="relative mt-1">
-                                    <FaDollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                                    <Input
-                                        type="number"
-                                        name="repatriation_costs"
-                                        placeholder="Repatriation cost"
-                                        // rows={3}
-                                        value={formData.repatriation_costs.toString()}
-                                        onChange={handleInputChange}
-                                        className="mt-1 pl-10 bg-white dark:bg-gray-600 !dark:text-white"
-                                    />
-                                </div>
-                            </div>
-                            <div className="md:col-span-2">
-                                <Label>Upload Repatriation Bills</Label>
-                                <FileUpload
-                                    multiple
-                                    onFilesSelected={(files) =>
-                                        setFormData({
-                                            ...formData,
-                                            new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files)],
-                                        })
-                                    }
-                                    className=""
-                                />
-                            </div>
-                            <div className="md:col-span-2">
-                                <Label>Other Costs</Label>
-                                <Input
-                                    type="number"
-                                    name="other_costs"
-                                    placeholder="Details about other costs..."
-                                    // rows={3}
-                                    value={formData.other_costs.toString()}
-                                    onChange={handleInputChange}
-                                    className=""
-                                />
-                            </div> */}
-                            <div className="md:col-span-2">
-                                <Label>Upload documentation:</Label>
-                                <FileUpload
-                                    multiple
-                                    description="Please upload all documents related to the costs of assistance. Such as medical bills, repatriation bills, or any other costs related to the case."
-                                    onFilesSelected={(files: File[]) =>
-                                        setFormData({
-                                            ...formData,
-                                            new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files) as File[]],
-                                        })
-                                    }
-                                    className=""
-                                />
                             </div>
                         </div>
+
+                        <Separator className="md:col-span-2" />
+
+                        {/* Dynamic Cost Sections */}
+                        {[
+                            {
+                                title: "Medical Provider Bills",
+                                icon: <Hospital className="mr-2 h-5 w-5" />,
+                                costs: formData.medical_provider_costs,
+                                handleAdd: handleAddMedicalCost,
+                                handleRemove: handleRemoveCost,
+                                costType: "medical_provider_costs",
+                            },
+                            {
+                                title: "Repatriation Bills",
+                                icon: <PlaneTakeoff className="mr-2 h-5 w-5" />,
+                                costs: formData.repatriation_costs,
+                                handleAdd: handleAddRepatriationCost,
+                                handleRemove: handleRemoveCost,
+                                costType: "repatriation_costs",
+                            },
+                            {
+                                title: "Other Bills",
+                                icon: <Ellipsis className="mr-2 h-5 w-5" />,
+                                costs: formData.other_costs,
+                                handleAdd: handleAddOtherCost,
+                                handleRemove: handleRemoveCost,
+                                costType: "other_costs",
+                            },
+                        ].map(({ title, icon, costs, handleAdd, handleRemove, costType }) => (
+                            <div key={costType}>
+                                <div className="md:col-span-2 my-4 border-b">
+                                    <div className="flex justify-between items-start">
+                                        <h3 className="flex items-center text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
+                                            {icon}
+                                            {title}
+                                        </h3>
+                                        <Button onClick={handleAdd} type="button">
+                                            <PlusCircle className="mr-2 h-5 w-5" />
+                                            Add {title.split(" ")[0]} Bill
+                                        </Button>
+                                    </div>
+                                </div>
+
+                                {costs.map((cost, index) => (
+                                    <div key={index} className="border p-4 my-4 rounded mb-4">
+                                        <div className="grid grid-cols-1 gap-4">
+                                            <div>
+                                                <Label>Name of Provider</Label>
+                                                <Input
+                                                    placeholder="Name of provider"
+                                                    value={cost.providerName}
+                                                    onChange={(e) =>
+                                                        handleCostChange(
+                                                            costType as keyof AccidentClaimFormData,
+                                                            index,
+                                                            "providerName",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                />
+                                            </div>
+
+                                            {/* Amount Billed */}
+                                            <div>
+                                                <Label>Amount Billed</Label>
+                                                <div className="flex items-center gap-2">
+                                                    <Select
+                                                        onValueChange={(value) =>
+                                                            handleCostChange(
+                                                                costType as keyof AccidentClaimFormData,
+                                                                index,
+                                                                "currency",
+                                                                value
+                                                            )
+                                                        }
+                                                        value={cost.currency || "USD"}
+                                                    >
+                                                        <SelectTrigger className="w-24">
+                                                            <SelectValue placeholder="Currency" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {currencyOptions.map((currency) => (
+                                                                <SelectItem key={currency.value} value={currency.value}>
+                                                                    {currency.label}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="Amount billed"
+                                                        value={cost.amountBilled}
+                                                        onChange={(e) =>
+                                                            handleCostChange(
+                                                                costType as keyof AccidentClaimFormData,
+                                                                index,
+                                                                "amountBilled",
+                                                                parseFloat(e.target.value)
+                                                            )
+                                                        }
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* Amount Paid */}
+                                            <div>
+                                                <Label>Amount Paid</Label>
+                                                <div className="flex items-center gap-2">
+                                                    <Select
+                                                        onValueChange={(value) =>
+                                                            handleCostChange(
+                                                                costType as keyof AccidentClaimFormData,
+                                                                index,
+                                                                "currency",
+                                                                value
+                                                            )
+                                                        }
+                                                        value={cost.currency || "USD"}
+                                                    >
+                                                        <SelectTrigger className="w-24">
+                                                            <SelectValue placeholder="Currency" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {currencyOptions.map((currency) => (
+                                                                <SelectItem key={currency.value} value={currency.value}>
+                                                                    {currency.label}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="Amount paid"
+                                                        value={cost.amountPaid}
+                                                        onChange={(e) =>
+                                                            handleCostChange(
+                                                                costType as keyof AccidentClaimFormData,
+                                                                index,
+                                                                "amountPaid",
+                                                                parseFloat(e.target.value)
+                                                            )
+                                                        }
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* Amount Unpaid */}
+                                            <div>
+                                                <Label>Amount Unpaid</Label>
+                                                <div className="flex items-center gap-2">
+                                                    <Select
+                                                        onValueChange={(value) =>
+                                                            handleCostChange(
+                                                                costType as keyof AccidentClaimFormData,
+                                                                index,
+                                                                "currency",
+                                                                value
+                                                            )
+                                                        }
+                                                        value={cost.currency || "USD"}
+                                                    >
+                                                        <SelectTrigger className="w-24">
+                                                            <SelectValue placeholder="Currency" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {currencyOptions.map((currency) => (
+                                                                <SelectItem key={currency.value} value={currency.value}>
+                                                                    {currency.label}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="Amount unpaid"
+                                                        value={cost.amountUnpaid}
+                                                        readOnly
+                                                        className="bg-gray-100 cursor-not-allowed flex-grow"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <Button
+                                            variant="destructive"
+                                            onClick={() => handleRemove(costType as keyof AccidentClaimFormData, index)}
+                                            className="mt-4"
+                                            type="button"
+                                        >
+                                            Remove
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                        ))}
                     </section>
+
+
+                    <Separator className="md:col-span-2" />
+
+                    {/* File Upload */}
+                    <section className="mb-8 bg-gray-100 dark:bg-gray-700 shadow p-6 rounded-lg">
+
+                        <Separator className="md:col-span-2" />
+                        <div className="md:col-span-2">
+                            <Label>Upload documentation:</Label>
+                            <FileUpload
+                                multiple
+                                description="Please upload all documents related to the costs of assistance. Such as medical bills, repatriation bills, or any other costs related to the case."
+                                onFilesSelected={(files: File[]) =>
+                                    setFormData({
+                                        ...formData,
+                                        new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files) as File[]],
+                                    })
+                                }
+                                className=""
+                            />
+                        </div>
+
+                    </section>
+
 
                     {/* Third Party Information */}
                     <section className="mb-8 bg-gray-100 dark:bg-gray-700 shadow p-6 rounded-lg">
