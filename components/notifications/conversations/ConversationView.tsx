@@ -24,6 +24,8 @@ const ConversationView: React.FC<ConversationViewProps> = ({ conversationId }) =
     const [sending, setSending] = useState<boolean>(false);
 
     useEffect(() => {
+
+        console.log("Fetching messages for:", conversationId);
         fetchMessages(conversationId);
     }, [conversationId, fetchMessages]);
 

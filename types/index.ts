@@ -192,7 +192,8 @@ export interface Chat {
 }
 
 export interface ConversationSummary {
-  conversationId: number;
+  accidentClaimId?: string;
+  conversationId?: number;
   lastMessage?: {
     messageId: number;
     senderId: number;
@@ -205,7 +206,8 @@ export interface ConversationSummary {
     username: string;
   }[];
   accidentClaim?: {
-    claimId: string;
+    accidentClaimId: string;
+    claimId?: string;
     fullName: string;
     status: string;
     email: string;

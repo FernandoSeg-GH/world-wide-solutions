@@ -202,12 +202,16 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         toggleGodMode,
         switchSection: layoutState.switchSection,
         messageActions: {
-            fetchConversations: messageState.fetchConversations,
+            fetchConversations: async () => {
+                await messageState.fetchConversations();
+            },
             fetchMessages: messageState.fetchMessages,
             setConversations: messageState.setConversations,
             setMessages: messageState.setMessages,
             replyToMessage: messageState.replyToMessage,
-            sendMessageToUsers: messageState.sendMessageToUsers,
+            sendMessageToUsers: (recipientIds: number[], content: string, readOnly: boolean, accidentClaimId: number) => {
+                return messageState.sendMessageToUsers(recipientIds, content, readOnly, accidentClaimId.toString());
+            },
             sendMessage: messageState.sendMessage,
             markAsRead: messageState.markAsRead,
             fetchInboxMessages: messageState.fetchInboxMessages,

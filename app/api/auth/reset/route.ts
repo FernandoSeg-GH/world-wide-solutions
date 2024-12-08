@@ -5,8 +5,6 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    console.log("Received body:", body);
-
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/auth/forgot_password`,
       {
@@ -17,8 +15,6 @@ export async function POST(req: NextRequest) {
     );
 
     const data = await response.json();
-    console.log("Backend response:", data);
-
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
     console.error("Error in forgot password handler:", error);

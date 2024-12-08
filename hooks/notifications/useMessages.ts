@@ -11,35 +11,24 @@ export const useMessages = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const fetchConversations = useCallback(async () => {
-    if (!session?.accessToken) return;
-    setLoading(true);
+    if (!session?.accessToken) return [];
 
+    setLoading(true);
     try {
       const response = await fetch("/api/messages/conversations", {
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
         },
       });
-      if (!response.ok) {
-        throw new Error("Failed to fetch conversations");
-      }
+      if (!response.ok) throw new Error("Failed to fetch conversations");
+
       const data: ConversationSummary[] = await response.json();
-      console.log("Fetched Conversations:", data); // Debugging
-      setConversations(
-        data.map((conversation: ConversationSummary) => ({
-          ...conversation,
-          accidentClaim: {
-            claimId: conversation.accidentClaim?.claimId ?? "",
-            fullName: conversation.accidentClaim?.fullName ?? "",
-            status: conversation.accidentClaim?.status ?? "",
-            email: conversation.accidentClaim?.email ?? "",
-            accidentType: conversation.accidentClaim?.accidentType ?? "",
-            accidentDate: conversation.accidentClaim?.accidentDate ?? "",
-          },
-        }))
-      );
+      console.log("Fetched Conversations:", data);
+      setConversations(data); // Update conversations state
+      return data;
     } catch (error) {
       console.error("Error fetching conversations:", error);
+      return [];
     } finally {
       setLoading(false);
     }
@@ -106,7 +95,7 @@ export const useMessages = () => {
       recipient_ids: number[],
       content: string,
       read_only: boolean,
-      accident_claim_id: number
+      accident_claim_id: string
     ) => {
       const response = await fetch("/api/messages/send", {
         method: "POST",
@@ -151,7 +140,7 @@ export const useMessages = () => {
         throw new Error("No recipients found in the conversation");
       }
 
-      const accidentClaimId = Number(conversation.accidentClaim?.claimId);
+      const accidentClaimId = String(conversation.accidentClaim?.claimId);
       if (!accidentClaimId) {
         throw new Error("No accident claim associated with this conversation");
       }

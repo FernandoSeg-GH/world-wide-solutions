@@ -71,7 +71,6 @@ export default function ForgotPassword({ onToggle }: ForgotPasswordProps) {
             confirm_password: confirmPassword.trim(),
         };
 
-        console.log("Submitting payload:", payload);
         setIsLoading(true);
 
         try {
@@ -82,7 +81,6 @@ export default function ForgotPassword({ onToggle }: ForgotPasswordProps) {
             });
 
             const data = await response.json();
-            console.log("Backend response:", data);
 
             if (response.ok) {
                 toast({ title: "Success", description: data.message, variant: "default" });

@@ -103,7 +103,6 @@ const AccidentClaimsView: React.FC = () => {
                 if (claim.claim_id === claim_id) {
                     const isNowEditing = !claim.isEditing;
                     const newEditedData = isNowEditing ? mapClaimToFormData(claim, businessId) : { ...claim.editedData };
-                    console.log(`Toggling edit for claim ${claim_id}. Now editing: ${isNowEditing}`, newEditedData);
                     return {
                         ...claim,
                         isEditing: isNowEditing,

@@ -27,7 +27,6 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await response.json();
-    console.log("data", data);
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
     console.error("Error fetching users with claims:", error);

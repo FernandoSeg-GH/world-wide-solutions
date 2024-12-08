@@ -20,8 +20,10 @@ import {
 } from "@/components/ui/dialog";
 import { useSession } from "next-auth/react";
 import { useMessages } from "@/hooks/notifications/useMessages";
+import { ConversationSummary as ConversationType } from "@/types";
+import { PlusIcon } from "lucide-react";
 
-// Define TypeScript interfaces for better type safety
+// TypeScript Interfaces
 interface Claim {
     claimId: number;
     claimantName: string;
@@ -35,27 +37,38 @@ interface UserWithClaims {
 }
 
 const ConversationList: React.FC<{
-    onSelectConversation: (conversationId: number) => void;
+    onSelectConversation: (conversationId: string | number) => void;
 }> = ({ onSelectConversation }) => {
     const { toast } = useToast();
     const { data: session } = useSession();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
-    const [selectedClaimId, setSelectedClaimId] = useState<number | null>(null);
+    const [selectedClaimId, setSelectedClaimId] = useState<string | null>(null);
     const [messageContent, setMessageContent] = useState<string>("");
     const [usersWithClaims, setUsersWithClaims] = useState<UserWithClaims[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const { sendMessageToUsers, fetchConversations, fetchUsersWithClaims } = useMessages();
+    const {
+        sendMessageToUsers,
+        fetchConversations,
+        fetchUsersWithClaims,
+        conversations,
+        setConversations,
+    } = useMessages();
 
     useEffect(() => {
         setIsLoading(true);
         fetchConversations();
+
         (async () => {
             try {
                 const data = await fetchUsersWithClaims();
                 setUsersWithClaims(data || []);
-                console.log("Fetched Users with Claims:", data);
+
+                if (session?.user?.role?.id === 1) {
+                    setSelectedUserId(session.user.id);
+                }
+
             } catch (error: any) {
                 toast({
                     title: "Error",
@@ -67,44 +80,27 @@ const ConversationList: React.FC<{
                 setIsLoading(false);
             }
         })();
-    }, [fetchConversations, fetchUsersWithClaims, toast]);
+    }, [fetchConversations, fetchUsersWithClaims, session, toast]);
 
-    const handleOpenModal = () => {
-        if (session?.user?.role?.id !== 1) {
-            setIsModalOpen(true);
-        } else {
-            toast({
-                title: "Action Not Allowed",
-                description: "Only privileged users can start new conversations.",
-                variant: "destructive",
-            });
-        }
-    };
+    const handleOpenModal = () => setIsModalOpen(true);
 
     const handleSendMessage = async () => {
         if (!selectedUserId || !selectedClaimId || !messageContent.trim()) {
             toast({
                 title: "Missing Information",
-                description: "Please select a user, claim, and enter a message.",
+                description: "Please select a claim and enter a message.",
                 variant: "destructive",
             });
             return;
         }
 
         try {
-            const claimId = Number(selectedClaimId);
-            if (isNaN(claimId) || claimId <= 0) {
-                throw new Error("Invalid claim ID.");
-            }
-
             const payload = {
                 recipient_ids: [selectedUserId],
                 content: messageContent.trim(),
                 read_only: false,
-                accident_claim_id: claimId,
+                accident_claim_id: selectedClaimId,
             };
-
-            console.log("Sending message with payload:", payload); // Debugging
 
             await sendMessageToUsers(
                 payload.recipient_ids,
@@ -120,7 +116,8 @@ const ConversationList: React.FC<{
             });
 
             setIsModalOpen(false);
-            await fetchConversations(); // Refresh conversations
+            const updatedConversations = await fetchConversations();
+            setConversations(updatedConversations);
         } catch (error: any) {
             toast({
                 title: "Error",
@@ -131,57 +128,78 @@ const ConversationList: React.FC<{
         }
     };
 
-
-
-    // Extract unique users using useMemo for optimization
-    const uniqueUsers = useMemo(() => {
-        return usersWithClaims.map((user) => ({
-            userId: user.userId,
-            username: user.username,
-        }));
-    }, [usersWithClaims]);
-
-    // Log uniqueUsers for debugging
-    useEffect(() => {
-        console.log("Unique Users:", uniqueUsers);
-    }, [uniqueUsers]);
+    const uniqueUsers = useMemo(
+        () =>
+            usersWithClaims.map((user) => ({
+                userId: user.userId,
+                username: user.username,
+            })),
+        [usersWithClaims]
+    );
 
     return (
         <div>
-            <h2 className="text-xl font-semibold mb-4">Your Conversations</h2>
-            <Button
-                onClick={handleOpenModal}
-                className="mb-4 bg-primary hover:bg-primary-dark text-white"
-            >
-                Start New Conversation
-            </Button>
+            <div className="flex border-b pb-3 items-center justify-between">
+                <h2 className="text-xl font-semibold">Your Conversations</h2>
+
+                <Button
+                    onClick={handleOpenModal}
+                    variant="outline"
+                    className="text-xs"
+                >
+                    <PlusIcon className="mr-2" size={16} />
+                    New Conversation
+                </Button>
+            </div>
+
+            {conversations.length > 0 ? (
+                conversations.map((conversation) => (
+                    <ConversationSummary
+                        key={conversation.conversationId}
+                        conversation={conversation}
+                        onClick={() => onSelectConversation(String(conversation.accidentClaimId))}
+                    />
+                ))
+            ) : (
+                <p className="text-gray-500">No conversations found</p>
+            )}
+
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Start New Conversation</DialogTitle>
+                        <DialogTitle>New Conversation</DialogTitle>
                     </DialogHeader>
                     <DialogDescription className="space-y-4">
                         {isLoading ? (
                             <div>Loading users...</div>
                         ) : (
                             <>
-                                {/* Users Dropdown */}
-                                <Select onValueChange={(value) => setSelectedUserId(Number(value))}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select a user" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {uniqueUsers.map((user) => (
-                                            <SelectItem key={user.userId} value={String(user.userId)}>
-                                                {user.username}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                {session?.user?.role?.id !== 1 && (
+                                    <Select
+                                        onValueChange={(value) =>
+                                            setSelectedUserId(Number(value))
+                                        }
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a user" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {uniqueUsers.map((user) => (
+                                                <SelectItem
+                                                    key={user.userId}
+                                                    value={String(user.userId)}
+                                                >
+                                                    {user.username}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                )}
 
-                                {/* Claims Dropdown */}
                                 <Select
-                                    onValueChange={(value) => setSelectedClaimId(Number(value))}
+                                    onValueChange={(value) =>
+                                        setSelectedClaimId(value)
+                                    }
                                     disabled={!selectedUserId}
                                 >
                                     <SelectTrigger>
@@ -191,35 +209,40 @@ const ConversationList: React.FC<{
                                         {selectedUserId ? (
                                             usersWithClaims.some(
                                                 (user) =>
-                                                    user.userId === selectedUserId && user.claims.length > 0
+                                                    user.userId === selectedUserId &&
+                                                    user.claims.length > 0
                                             ) ? (
                                                 usersWithClaims
-                                                    .find((user) => user.userId === selectedUserId)
-                                                    ?.claims.map((claim) => (
-                                                        <SelectItem
-                                                            key={claim.claimId}
-                                                            value={String(claim.claimId)}
-                                                        >
-                                                            {`Claim #${claim.claimId} - ${claim.claimantName} (${claim.status})`}
-                                                        </SelectItem>
-                                                    ))
+                                                    .find(
+                                                        (user) =>
+                                                            user.userId === selectedUserId
+                                                    )
+                                                    ?.claims.map((claim) => {
+                                                        return (
+                                                            <SelectItem
+                                                                key={claim.claimId}
+                                                                value={String(claim.claimId)}
+                                                            >
+                                                                {`Claim #${claim.claimId} - ${claim.claimantName} (${claim.status})`}
+                                                            </SelectItem>
+                                                        )
+                                                    })
                                             ) : (
-                                                <p >
-                                                    No claims available for this user
-                                                </p>
+                                                <p>No claims available for this user</p>
                                             )
                                         ) : (
-                                            <p >Select a user first</p>
+                                            <p>Select a user first</p>
                                         )}
                                     </SelectContent>
                                 </Select>
 
-                                {/* Message Textarea */}
                                 <textarea
                                     className="w-full border rounded-md p-2"
                                     placeholder="Enter your message..."
                                     value={messageContent}
-                                    onChange={(e) => setMessageContent(e.target.value)}
+                                    onChange={(e) =>
+                                        setMessageContent(e.target.value)
+                                    }
                                 />
                             </>
                         )}
@@ -249,3 +272,57 @@ const ConversationList: React.FC<{
 };
 
 export default ConversationList;
+
+
+export function ConversationSummary({
+    conversation,
+    onClick,
+}: {
+    conversation: ConversationType;
+    onClick: () => void;
+}) {
+    const { accidentClaimId, lastMessage, participants } = conversation;
+
+    // Format the timestamp to a readable date/time (optional)
+    const formattedTimestamp = lastMessage?.timestamp
+        ? new Date(lastMessage.timestamp).toLocaleString()
+        : null;
+
+    return (
+        <div
+            className="flex flex-col p-4 border-b cursor-pointer hover:bg-gray-50 transition-colors duration-150"
+            onClick={onClick}
+        >
+            {/* Subject line - Using the Accident Claim ID as the "Subject" */}
+            <div className="flex justify-between items-center w-full">
+                <h3 className="text-md font-semibold text-gray-800 truncate">
+                    Subject: Claim #{accidentClaimId}
+                </h3>
+                {formattedTimestamp && (
+                    <span className="text-xs text-gray-400">
+                        {formattedTimestamp}
+                    </span>
+                )}
+            </div>
+
+            {/* From line - Show last message sender */}
+            <div className="text-sm text-gray-700">
+                <span className="font-medium">From:</span>{" "}
+                {lastMessage?.senderUsername || "Unknown Sender"}
+            </div>
+
+            {/* To line - List participants other than the lastMessage sender, if any */}
+            <div className="text-sm text-gray-700">
+                <span className="font-medium">To:</span>{" "}
+                {participants && participants.length > 0
+                    ? participants.map((p) => p.username).join(", ")
+                    : "N/A"}
+            </div>
+
+            {/* Message snippet - Display a preview of the last message content */}
+            <div className="mt-1 text-sm text-gray-600 line-clamp-1">
+                {lastMessage?.content || "No messages yet"}
+            </div>
+        </div>
+    );
+}
