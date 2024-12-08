@@ -1,31 +1,44 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { getToken, JWT } from "next-auth/jwt";
 import { jwtDecode } from "jwt-decode";
+import jwt from "jsonwebtoken";
 
 const TOKEN_EXPIRATION_THRESHOLD = 60 * 1000; // 1 minute
 
-export async function refreshAccessToken(refreshToken: string): Promise<any> {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/auth/refresh`,
-    {
+export async function refreshAccessToken(token: JWT) {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
+    const response = await fetch(`${baseUrl}/api/auth/refresh`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${refreshToken}`,
+        Authorization: `Bearer ${token.refreshToken}`,
       },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to refresh access token");
     }
-  );
 
-  if (!response.ok) {
-    throw new Error(
-      `Failed to refresh token: ${response.status} - ${response.statusText}`
-    );
+    const refreshedTokens = await response.json();
+    const decodedAccessToken = jwt.decode(
+      refreshedTokens.access_token
+    ) as jwt.JwtPayload;
+
+    if (!decodedAccessToken || !decodedAccessToken.exp) {
+      throw new Error("Access token missing exp claim");
+    }
+
+    return {
+      ...token,
+      accessToken: refreshedTokens.access_token,
+      accessTokenExpires: decodedAccessToken.exp * 1000, // ms
+      refreshToken: refreshedTokens.refresh_token || token.refreshToken,
+    };
+  } catch (error) {
+    console.error("Error refreshing access token:", error);
+    return { ...token, error: "RefreshAccessTokenError" };
   }
-
-  const data = await response.json();
-  console.log("Token refreshed successfully:", data);
-  return data;
 }
 
 export async function middleware(req: NextRequest) {
@@ -41,12 +54,13 @@ export async function middleware(req: NextRequest) {
   if (timeUntilExpiration < TOKEN_EXPIRATION_THRESHOLD) {
     try {
       const refreshedTokens = await refreshAccessToken(
-        String(token.refreshToken)
+        token.refreshToken as unknown as JWT
       );
 
-      token.accessToken = refreshedTokens.access_token;
-      token.refreshToken = refreshedTokens.refresh_token ?? token.refreshToken;
-      token.accessTokenExpires = Date.now() + refreshedTokens.expires_in * 1000;
+      token.accessToken = refreshedTokens.accessToken;
+      token.refreshToken = refreshedTokens.refreshToken || token.refreshToken;
+      token.accessTokenExpires =
+        Date.now() + Number(refreshedTokens.accessTokenExpires) * 1000;
 
       return NextResponse.next();
     } catch (error) {
