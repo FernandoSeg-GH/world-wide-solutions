@@ -1,5 +1,3 @@
-// components/ForgotPassword.tsx
-
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -13,50 +11,37 @@ interface ForgotPasswordProps {
 }
 
 export default function ForgotPassword({ onToggle }: ForgotPasswordProps) {
-    const [identifier, setIdentifier] = useState(""); // Username or Email
+    const [identifier, setIdentifier] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [captchaQuestion, setCaptchaQuestion] = useState("");
-    const [captchaToken, setCaptchaToken] = useState(""); // Store the CAPTCHA token
+    const [expectedAnswer, setExpectedAnswer] = useState(""); // Store answer here
     const [userCaptchaInput, setUserCaptchaInput] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        generateCaptcha();
+        generateCaptcha(); // Pseudo-CAPTCHA on page load
     }, []);
 
-    const generateCaptcha = async () => {
-        try {
-            const response = await fetch(`/api/auth/captcha`);
-            if (!response.ok) {
-                throw new Error("Failed to generate CAPTCHA");
-            }
+    const generateCaptcha = () => {
+        const num1 = Math.floor(Math.random() * 10) + 1;
+        const num2 = Math.floor(Math.random() * 10) + 1;
+        const operator = Math.random() > 0.5 ? "+" : "-";
 
-            const data = await response.json();
+        const question = operator === "+"
+            ? `What is ${num1} + ${num2}?`
+            : `What is ${num1} - ${num2}?`;
 
-            setCaptchaQuestion(data.captcha_question); // Set CAPTCHA question
-            setCaptchaToken(data.captcha_token); // Save the CAPTCHA token
+        const answer = operator === "+" ? num1 + num2 : num1 - num2;
 
-            console.log("Generated CAPTCHA:", data);
-        } catch (error) {
-            console.error("Failed to generate CAPTCHA:", error);
-            toast({ title: "Error", description: "Failed to load CAPTCHA.", variant: "destructive" });
-        }
+        setCaptchaQuestion(question);
+        setExpectedAnswer(answer.toString());
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const payload = {
-            identifier,
-            new_password: newPassword,
-            confirm_password: confirmPassword,
-            captcha_token: captchaToken,
-            captcha_answer: userCaptchaInput,
-        };
-
-        console.log("Payload:", payload);
-
+        // Validate form fields
         if (!identifier || !newPassword || !confirmPassword || !userCaptchaInput) {
             toast({ title: "Error", description: "All fields are required.", variant: "destructive" });
             return;
@@ -72,6 +57,21 @@ export default function ForgotPassword({ onToggle }: ForgotPasswordProps) {
             return;
         }
 
+        // Verify CAPTCHA before making the request
+        if (userCaptchaInput.trim() !== expectedAnswer) {
+            toast({ title: "Error", description: "Incorrect CAPTCHA answer.", variant: "destructive" });
+            generateCaptcha(); // Reset CAPTCHA
+            setUserCaptchaInput("");
+            return;
+        }
+
+        const payload = {
+            identifier: identifier.trim(),
+            new_password: newPassword.trim(),
+            confirm_password: confirmPassword.trim(),
+        };
+
+        console.log("Submitting payload:", payload);
         setIsLoading(true);
 
         try {
@@ -82,22 +82,21 @@ export default function ForgotPassword({ onToggle }: ForgotPasswordProps) {
             });
 
             const data = await response.json();
-            console.log("Response:", data);
+            console.log("Backend response:", data);
 
             if (response.ok) {
                 toast({ title: "Success", description: data.message, variant: "default" });
-                onToggle();
+                onToggle(); // Redirect to Sign In page
             } else {
-                // Only regenerate CAPTCHA if the error is related to an invalid CAPTCHA token
-                if (data.message === "Invalid or expired CAPTCHA token.") {
-                    generateCaptcha();
-                    setUserCaptchaInput(""); // Clear the user's input
-                }
                 toast({ title: "Error", description: data.message || "Failed to reset password.", variant: "destructive" });
             }
         } catch (error) {
-            toast({ title: "Error", description: "An unexpected error occurred.", variant: "destructive" });
             console.error("Forgot Password error:", error);
+            toast({
+                title: "Error",
+                description: "An unexpected error occurred.",
+                variant: "destructive",
+            });
         } finally {
             setIsLoading(false);
         }
@@ -116,6 +115,7 @@ export default function ForgotPassword({ onToggle }: ForgotPasswordProps) {
                     required
                 />
             </div>
+
             <div>
                 <Label htmlFor="new_password">New Password</Label>
                 <Input
@@ -127,6 +127,7 @@ export default function ForgotPassword({ onToggle }: ForgotPasswordProps) {
                     required
                 />
             </div>
+
             <div>
                 <Label htmlFor="confirm_password">Confirm New Password</Label>
                 <Input
@@ -138,17 +139,19 @@ export default function ForgotPassword({ onToggle }: ForgotPasswordProps) {
                     required
                 />
             </div>
+
             <div>
                 <Label htmlFor="captcha">{captchaQuestion}</Label>
                 <Input
                     id="captcha"
-                    type="number"
+                    type="text"
                     placeholder="Enter your answer"
                     value={userCaptchaInput}
                     onChange={(e) => setUserCaptchaInput(e.target.value)}
                     required
                 />
             </div>
+
             <div className="flex items-center justify-between">
                 <Button type="submit" disabled={isLoading}>
                     {isLoading ? "Resetting..." : "Reset Password"}

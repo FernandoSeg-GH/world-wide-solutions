@@ -13,7 +13,7 @@ MVA ficha:
 
 - Upload docs: no parecen subir…no se ven adjuntos
 
-* Donde? En que parte?
+* Donde pasó? Hice actulizciones, intentar de vuelta.
 
 - Cifras….no funciona……como deberia ser? Aclarar como escribir ese numero ? - Con punto.
 
