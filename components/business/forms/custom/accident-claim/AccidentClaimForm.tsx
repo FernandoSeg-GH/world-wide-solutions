@@ -56,6 +56,7 @@ export default function AccidentClaimForm() {
     >([]);
 
     const [isUSA, setIsUSA] = useState<boolean>(false);
+    const [isUSAbis, setIsUSAbis] = useState<boolean>(false);
     const [successMessage, setSuccessMessage] = useState<boolean>(false);
     const router = useRouter()
 
@@ -69,6 +70,16 @@ export default function AccidentClaimForm() {
             setIsUSA(false);
         }
     }, [formData.country]);
+    useEffect(() => {
+        if (
+            formData.accident_country.toLowerCase() === "usa" ||
+            formData.accident_country.toLowerCase() === "united_states"
+        ) {
+            setIsUSAbis(true);
+        } else {
+            setIsUSAbis(false);
+        }
+    }, [formData.accident_country, formData.accident_state]);
 
     const handleInputChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -385,15 +396,16 @@ export default function AccidentClaimForm() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <Label htmlFor="full_name">
-                                    Full Name
+                                    Full Name <span className="text-red-500">*</span>
                                 </Label>
                                 <Input
                                     id="full_name"
                                     name="full_name"
-                                    placeholder="Enter your first and last name"
+                                    placeholder="er patient first and last name."
                                     value={formData.full_name}
                                     onChange={handleInputChange}
                                     className=""
+                                    required
                                 />
                             </div>
                             <div>
@@ -405,7 +417,7 @@ export default function AccidentClaimForm() {
                                     name="email"
                                     type="email"
 
-                                    placeholder="Enter your email address"
+                                    placeholder="Enter patient email address"
                                     value={formData.email}
                                     onChange={handleInputChange}
                                     className=""
@@ -426,7 +438,7 @@ export default function AccidentClaimForm() {
                                         id="country"
                                         className=""
                                     >
-                                        <SelectValue placeholder="Select your country" />
+                                        <SelectValue placeholder="Select country" />
                                     </SelectTrigger>
                                     <SelectContent className="max-h-[320px] overflow-y-auto">
                                         {countryOptions.map((country) => (
@@ -450,7 +462,7 @@ export default function AccidentClaimForm() {
                                             id="state"
                                             className=""
                                         >
-                                            <SelectValue placeholder="Select your state" />
+                                            <SelectValue placeholder="Select state" />
                                         </SelectTrigger>
                                         <SelectContent className="max-h-[320px] overflow-y-auto">
                                             {usaStates.map((state) => (
@@ -528,31 +540,7 @@ export default function AccidentClaimForm() {
                             In this section, complete with the most important accident details and select the type of accident that will guide you through specific requirements for that incident.
                         </p>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <Label htmlFor="accident_date">
-                                    Date of Accident
-                                </Label>
-                                <DatePicker
-                                    selectedDate={formData.accident_date ? new Date(formData.accident_date) : null}
-                                    onChange={(date) =>
-                                        setFormData({ ...formData, accident_date: date ? date.toISOString() : "" })
-                                    }
-                                />
-                            </div>
-                            <div>
-                                <Label htmlFor="accident_place">
-                                    Place of Accident
-                                </Label>
-                                <Input
-                                    id="accident_place"
-                                    name="accident_place"
-                                    placeholder="Place where the accident occur"
-                                    value={formData.accident_place}
-                                    onChange={handleInputChange}
-                                    className=""
-                                />
-                            </div>
-                            <div className="md:col-span-2">
+                            <div className="">
                                 <Label>
                                     Type of Accident
                                 </Label>
@@ -572,6 +560,84 @@ export default function AccidentClaimForm() {
                                     </SelectContent>
                                 </Select>
                             </div>
+                            <div>
+                                <Label htmlFor="accident_date">
+                                    Date of Accident <span className="text-red-500">*</span>
+                                </Label>
+                                <DatePicker
+                                    selectedDate={formData.accident_date ? new Date(formData.accident_date) : null}
+                                    onChange={(date) =>
+                                        setFormData({ ...formData, accident_date: date ? date.toISOString() : "" })
+                                    }
+                                />
+                            </div>
+                            {/* <div>
+                                <Label htmlFor="accident_place">
+                                    Place of Accident
+                                </Label>
+                                <Input
+                                    id="accident_place"
+                                    name="accident_place"
+                                    placeholder="Place where the accident occurred"
+                                    value={formData.accident_place}
+                                    onChange={handleInputChange}
+                                    className=""
+                                />
+                            </div> */}
+                            <div>
+                                <Label htmlFor="accident_country">
+                                    Country of Accident
+                                </Label>
+                                <Select
+                                    onValueChange={(value) =>
+                                        setFormData({ ...formData, accident_country: value, accident_state: "" })
+                                    }
+                                    value={formData.accident_country}
+                                >
+                                    <SelectTrigger id="accident_country" className="">
+                                        <SelectValue placeholder="Select country" />
+                                    </SelectTrigger>
+                                    <SelectContent className="max-h-[320px] overflow-y-auto">
+                                        {countryOptions.map((country) => (
+                                            <SelectItem key={country.value} value={country.value}>
+                                                {country.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div>
+                                <Label htmlFor="accident_state">State of Accident</Label>
+                                {isUSA ? (
+                                    <Select
+                                        onValueChange={(value) =>
+                                            setFormData({ ...formData, accident_state: value })
+                                        }
+                                        value={formData.accident_state}
+                                    >
+                                        <SelectTrigger id="accident_state" className="">
+                                            <SelectValue placeholder="Select state" />
+                                        </SelectTrigger>
+                                        <SelectContent className="max-h-[320px] overflow-y-auto">
+                                            {usaStates.map((state) => (
+                                                <SelectItem key={state.value} value={state.value}>
+                                                    {state.label}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                ) : (
+                                    <Input
+                                        id="accident_state"
+                                        name="accident_state"
+                                        placeholder="Enter your state"
+                                        value={formData.accident_state}
+                                        onChange={handleInputChange}
+                                        className=""
+                                    />
+                                )}
+                            </div>
+
                             {/* {formData.accident_type && subAccidentOptions.length > 0 && (
                                 <div className="md:col-span-2">
                                     <Label>Specific Accident Type</Label>
@@ -939,7 +1005,7 @@ export default function AccidentClaimForm() {
                                     <div className="mt-6">
                                         <Label>Upload Slip & Fall Documents</Label>
                                         <FileUpload
-                                            description="Please upload all the documents related to the slip and fall accident. Such as police report, internal police reports, photos of the place of the accident, injuries, and/or any other relevant documents."
+                                            description="Please upload all the documents related to the slip and fall accident. Such as police report, internal accident reports, photos of the place of the accident, photos of injuries, and/or any other relevant documents."
                                             multiple
                                             onFilesSelected={(files: File[]) =>
                                                 setFormData({
@@ -1292,7 +1358,7 @@ export default function AccidentClaimForm() {
                             <Label>Upload documentation:</Label>
                             <FileUpload
                                 multiple
-                                description="Please upload all documents related to the costs of assistance. Such as medical bills, repatriation bills, or any other costs related to the case."
+                                description="Please upload all documents related to the costs of assistance. Such as medical bills, repatriation bills, funeral costs, or any other costs related to the case."
                                 onFilesSelected={(files: File[]) =>
                                     setFormData({
                                         ...formData,
@@ -1353,7 +1419,7 @@ export default function AccidentClaimForm() {
                                         </Label>
                                         <Input
                                             name="adjuster_name"
-                                            placeholder="Enter adjuster's name"
+                                            placeholder="Enter claim adjuster's name"
                                             value={formData.adjuster_name}
                                             onChange={handleInputChange}
                                             className=""

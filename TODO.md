@@ -1,14 +1,58 @@
+Cambio 6 dic24
+
+En patient info
+**DONE** - Enter patient first and last name.-…not yours
+**DONE** - En gral todos your cambiarlos
+
+MVA ficha:
+
+- Vehicle where were u located…
+- Posibilidad de poner “none”. Cuando sos un pedestrian
+
+* No se entiende. Esto implica un cambio, no entra en el scope
+
+- Upload docs: no parecen subir…no se ven adjuntos
+
+* Donde? En que parte?
+
+- Cifras….no funciona……como deberia ser? Aclarar como escribir ese numero ? - Con punto.
+
+- La cuenta de amount unpaid no sirve
+
+* Si sirve, ejemplo: si pones 1000 and amount billed, 500 en amount paid, automaticamente queda 500 en amount unpaid
+
+- Me sale error si elegies un numero poniendo comas…
+- Tiene que ser facil como poner la cifra
+
+* No se ponen comas, solo puntos
+
+- En la parte de upload bills tiene que decir también…en vez de:
+  **DONE** - Please upload all documents related to the costs of assistance. Such as medical bills, repatriation bills, funeral costs, or any other costs related to the case
+
+**DONE** - El botón choose files….no seria mejor upload files?
+
+**DONE** - Los unicos campos obligatorios si tiene que haber algunos son:
+
+- Claim ref number
+- Patient name
+- Date of accident
+- Place of accident with country and estate
+- (Solo esos…el resto no obligatorio…no email…no nada mas que eso)
+
+En la parte de slip and fall de cargar documento deberia decir:
+**DONE** - Please upload all the documents related to the slip and fall accident. Such as police report, internal accident reports, photos of the place of the accident, photos of injuries, and/or any other relevant documents
+
 ### NUEVO
 
 FER ACA TE DEJO EL ULTIMO RECAP, CUALQUIER COSA AVISAME
 
 - En el Edit: tiene que tener el mismo formato que el form..
-• ⁃ Qeu el vehículo uno aparézcales por defecto y después que se pueda agregar - ademas apa
-Sigue habiendo error al cargar documento
-Al cargar form me tira error
-Como elimina un user para sacarle el acceso
-En place of accident (accident information) there has to have the country and state function \_ here is where is important!!!!
+  Sigue habiendo error al cargar documento
+- Al cargar form me tira error
+- Como elimina un user para sacarle el acceso
+- En place of accident (accident information) there has to have the country and state function \_ here is where is important!!!!
 
+**DONE** - Que el vehículo uno aparézcales por defecto y después que se pueda agregar
 **DONE** - No salen los users y sale error
 **DONE** - En Cost of Assistance: add currency selector
 **DONE** - en cost of assistance falta poner la currency para saber en que moneda est bille
@@ -27,8 +71,8 @@ En place of accident (accident information) there has to have the country and st
 **DONE** - Cuando completas la fecha cuando se despliega la fecha y clickear la fecha, no se cierra solo…. Que se cierre solo.
 **DONE** - Cuando se pone submit al hacer click no pasa nada, y cuando clickear de vuelta sale error
 **DONE** - Al inicio para explicar antes de llenar el formulario hay que acalrar esto ":﻿This form is intended to be completed with all the details related to the claim assistance. Use it as a guide to provide all the available data in your file or collect the necessary details from the policyholder. You may not have all the information when uploading the claim for the first time, but you can always edit the file and add the pending information as soon as you receive it."
-﻿- CUando hacers el downliad del pdf aparece en blanco, no con los datos
-En Insurance Company section, change "Enter Claims Adjusters name"
+**DONE** - CUando hacers el downliad del pdf aparece en blanco, no con los datos
+**DONE** - En Insurance Company section, change "Enter Claims Adjusters name"
 
 <!-- ==================================================================================== -->
 <!-- ==================================================================================== -->

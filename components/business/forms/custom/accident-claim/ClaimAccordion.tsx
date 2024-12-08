@@ -195,7 +195,7 @@ const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
                     {/* Disclosure Panel */}
                     <DisclosurePanel className="text-sm text-gray-500 bg-gray-100 dark:bg-gray-700" data-claim-id={claim.claim_id}>
                         <Card className="p-0">
-                            <CardContent className="pt-6">
+                            <CardContent className=" flex flex-col items-center justify-center w-full">
                                 <ClaimDetails
                                     claim={claim}
                                     onEdit={toggleEdit}

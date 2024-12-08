@@ -50,7 +50,7 @@ interface SubmissionCardProps {
 
 const SubmissionCard: React.FC<SubmissionCardProps> = ({ submission, form }) => {
     const { content } = submission;
-    const fields = form.fields || [];
+    const fields = React.useMemo(() => form.fields || [], [form.fields]);
     const { updateSubmissionContent } = useSubmissions();
     const { data: session } = useSession()
     const [isEditing, setIsEditing] = useState(false);

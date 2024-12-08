@@ -14,12 +14,14 @@ export interface FieldConfig {
   options?: { value: string; label: string }[]; // For select fields
   nestedSection?: string; // For nested objects
   multiple?: boolean; // For file uploads
+  description?: string;
 }
 
 export interface SectionConfig {
   title: string;
   icon: JSX.Element;
   fields: FieldConfig[];
+  description?: string;
 }
 
 export const formSections: SectionConfig[] = [
@@ -28,24 +30,26 @@ export const formSections: SectionConfig[] = [
     icon: <FaUser />,
     fields: [
       { id: "claim_id", label: "Claim Reference Number", type: "text", required: true },
-      { id: "full_name", label: "Full Name", type: "text", required: true },
-      { id: "email", label: "Email", type: "email", required: true },
+      { id: "full_name", label: "Patient Full Name", type: "text", required: true },
+      { id: "email", label: "Email", type: "email", required: false },
       { id: "country", label: "Country", type: "select", required: true, options: countryOptions },
       { id: "state", label: "State", type: "conditionalSelect", required: true, options: usaStates },
-      { id: "primary_contact", label: "Primary Contact Phone Number", type: "text", required: true },
+      { id: "primary_contact", label: "Primary Contact Phone Number", type: "text", required: false },
       { id: "other_contact_name", label: "Relative or Friend", type: "text", required: false },
       { id: "other_contact_phone", label: "Other Contact Phone Number", type: "text", required: false },
     ],
+    description: "In this section, you must complete with all of your policyholder personal information."
   },
   {
     title: "Accident Information",
     icon: <RiAlarmWarningFill />,
     fields: [
-      { id: "accident_date", label: "Accident Date", type: "date", required: true },
-      { id: "accident_place", label: "Accident Place", type: "text", required: true },
-      { id: "accident_type", label: "Accident Type", type: "select", required: true, options: accidentTypeOptions },
+      { id: "accident_date", label: "Accident Date", type: "date", required: false },
+      { id: "accident_place", label: "Accident Place", type: "text", required: false },
+      { id: "accident_type", label: "Accident Type", type: "select", required: false, options: accidentTypeOptions },
       { id: "sub_accident_type", label: "Sub Accident Type", type: "text" },
     ],
+    description: "In this section, complete the most important accident details and select the type of accident that will guide you through specific requirements for that incident."
   },
   {
     title: "Motor Vehicle Accident Details",
@@ -78,7 +82,7 @@ export const formSections: SectionConfig[] = [
       { id: "mva_description", label: "Description of Accident", type: "textarea" },
 
       // Medical Info - Flat Fields
-      { id: "medical_assistance_type", label: "Assistance Type", type: "text" },
+      { id: "medical_assistance_type", label: "Assistance Type", type: "text", description: "In this section, complete with all ongoing medical treatments, or future medical needs." },
       { id: "medical_diagnosis", label: "Diagnosis", type: "text" },
       { id: "medical_treatment", label: "Treatment", type: "text" },
       { id: "primary_care_provider", label: "Primary Care Provider", type: "text" },
@@ -122,7 +126,7 @@ export const formSections: SectionConfig[] = [
     title: "File Uploads",
     icon: <FaFileAlt />,
     fields: [
-      { id: "new_file_uploads", label: "Upload Files", type: "file", multiple: true },
+      { id: "new_file_uploads", label: "Upload Files", type: "file", multiple: false },
     ],
   },
 ];
@@ -143,6 +147,8 @@ export function mapClaimToFormData(claim: Claim, businessId: string): AccidentCl
     other_contact_phone: claim.other_contact_phone || "",
     accident_date: claim.accident_date || "",
     accident_place: claim.accident_place || "",
+    accident_country: claim.accident_country || "",
+    accident_state: claim.accident_state || "",
     accident_type: claim.accident_type || "",
     sub_accident_type: claim.sub_accident_type || "",
     mva_type: claim.mva_type || "",
@@ -231,6 +237,8 @@ export function dynamicMapClaimToFormData(
     other_contact_phone: "",
     accident_date: "",
     accident_place: "",
+    accident_country: "",
+    accident_state: "",
     accident_type: "",
     sub_accident_type: "",
     mva_type: "",

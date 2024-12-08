@@ -15,7 +15,11 @@ export const initialForm: AccidentClaimFormData = {
   other_contact_phone: "",
 
   accident_date: "",
+
   accident_place: "",
+  accident_country: "",
+  accident_state: "",
+
   accident_type: "",
   sub_accident_type: "",
 

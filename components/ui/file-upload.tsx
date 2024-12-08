@@ -82,7 +82,7 @@ export function FileUpload({ multiple = false, onFilesSelected, className, descr
                         }
                     </p>
                     <Button type="button" className="mt-2" onClick={handleButtonClick}>
-                        Choose File{multiple ? "s" : ""}
+                        Upload File{multiple ? "s" : ""}
                     </Button>
                 </div>
             </div>

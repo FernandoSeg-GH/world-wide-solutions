@@ -1,3 +1,5 @@
+// components/ForgotPassword.tsx
+
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -25,7 +27,7 @@ export default function ForgotPassword({ onToggle }: ForgotPasswordProps) {
 
     const generateCaptcha = async () => {
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/auth/generate_captcha`);
+            const response = await fetch(`/api/auth/captcha`);
             if (!response.ok) {
                 throw new Error("Failed to generate CAPTCHA");
             }
@@ -34,6 +36,8 @@ export default function ForgotPassword({ onToggle }: ForgotPasswordProps) {
 
             setCaptchaQuestion(data.captcha_question); // Set CAPTCHA question
             setCaptchaToken(data.captcha_token); // Save the CAPTCHA token
+
+            console.log("Generated CAPTCHA:", data);
         } catch (error) {
             console.error("Failed to generate CAPTCHA:", error);
             toast({ title: "Error", description: "Failed to load CAPTCHA.", variant: "destructive" });
@@ -42,6 +46,16 @@ export default function ForgotPassword({ onToggle }: ForgotPasswordProps) {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        const payload = {
+            identifier,
+            new_password: newPassword,
+            confirm_password: confirmPassword,
+            captcha_token: captchaToken,
+            captcha_answer: userCaptchaInput,
+        };
+
+        console.log("Payload:", payload);
 
         if (!identifier || !newPassword || !confirmPassword || !userCaptchaInput) {
             toast({ title: "Error", description: "All fields are required.", variant: "destructive" });
@@ -61,29 +75,25 @@ export default function ForgotPassword({ onToggle }: ForgotPasswordProps) {
         setIsLoading(true);
 
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/auth/forgot_password`, {
+            const response = await fetch(`/api/auth/reset`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    identifier,
-                    new_password: newPassword,
-                    confirm_password: confirmPassword,
-                    captcha_token: captchaToken, // Include the token
-                    captcha_answer: userCaptchaInput, // Use user input for CAPTCHA
-                }),
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
             });
 
             const data = await response.json();
+            console.log("Response:", data);
 
             if (response.ok) {
                 toast({ title: "Success", description: data.message, variant: "default" });
-                onToggle(); // Redirect or close modal
+                onToggle();
             } else {
+                // Only regenerate CAPTCHA if the error is related to an invalid CAPTCHA token
+                if (data.message === "Invalid or expired CAPTCHA token.") {
+                    generateCaptcha();
+                    setUserCaptchaInput(""); // Clear the user's input
+                }
                 toast({ title: "Error", description: data.message || "Failed to reset password.", variant: "destructive" });
-                generateCaptcha(); // Regenerate CAPTCHA
-                setUserCaptchaInput("");
             }
         } catch (error) {
             toast({ title: "Error", description: "An unexpected error occurred.", variant: "destructive" });

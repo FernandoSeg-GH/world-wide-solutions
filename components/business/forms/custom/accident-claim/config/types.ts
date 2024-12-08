@@ -44,8 +44,14 @@ export interface AccidentClaimFormData {
   other_contact_phone: string;
 
   // Accident Information
-  accident_date: string; // ISO Date string
+  accident_date: string;
+
+  // ========================
   accident_place: string;
+  // ========================
+  accident_country: string;
+  accident_state: string;
+  // ========================
   accident_type: string;
   sub_accident_type: string;
 
