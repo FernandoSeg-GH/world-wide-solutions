@@ -157,7 +157,7 @@ const ConversationList: React.FC<{
                     <ConversationSummary
                         key={conversation.conversationId}
                         conversation={conversation}
-                        onClick={() => onSelectConversation(String(conversation.accidentClaimId))}
+                        onClick={() => onSelectConversation(String(conversation.conversationId))}
                     />
                 ))
             ) : (
