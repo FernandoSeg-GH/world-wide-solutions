@@ -48,6 +48,9 @@ import { Separator } from "@/components/ui/separator";
 import { FileUpload } from "@/components/ui/file-upload";
 import { currencyOptions } from "./config/currencies";
 
+type AccidentType = "motor_vehicle_accidents" | "pedestrian_accidents";
+
+
 export default function AccidentClaimForm() {
     const [formData, setFormData] = useState<AccidentClaimFormData>(initialForm);
     const { data: session } = useSession();
@@ -386,7 +389,7 @@ export default function AccidentClaimForm() {
                             <Input
                                 id="claim_id"
                                 name="claim_id"
-                                placeholder="Enter your claim reference number"
+                                placeholder="Enter patient claim reference number"
                                 value={formData.claim_id}
                                 onChange={handleInputChange}
                                 className=""
@@ -401,7 +404,7 @@ export default function AccidentClaimForm() {
                                 <Input
                                     id="full_name"
                                     name="full_name"
-                                    placeholder="er patient first and last name."
+                                    placeholder="Enter patient first and last name."
                                     value={formData.full_name}
                                     onChange={handleInputChange}
                                     className=""
@@ -476,7 +479,7 @@ export default function AccidentClaimForm() {
                                     <Input
                                         id="state"
                                         name="state"
-                                        placeholder="Enter your state"
+                                        placeholder="State"
                                         value={formData.state}
                                         onChange={handleInputChange}
                                         className=""
@@ -510,7 +513,7 @@ export default function AccidentClaimForm() {
                                 <Input
                                     id="other_contact_name"
                                     name="other_contact_name"
-                                    placeholder="Name of your other contact"
+                                    placeholder="Name of other contact..."
                                     value={formData.other_contact_name}
                                     onChange={handleInputChange}
                                     className=""
@@ -630,7 +633,7 @@ export default function AccidentClaimForm() {
                                     <Input
                                         id="accident_state"
                                         name="accident_state"
-                                        placeholder="Enter your state"
+                                        placeholder="Enter state"
                                         value={formData.accident_state}
                                         onChange={handleInputChange}
                                         className=""
@@ -837,12 +840,13 @@ export default function AccidentClaimForm() {
                                         setFormData({ ...formData, selected_vehicle: value })
                                     }
                                     value={formData.selected_vehicle}
-
                                 >
                                     <SelectTrigger className="">
                                         <SelectValue placeholder="Select a vehicle" />
                                     </SelectTrigger>
                                     <SelectContent>
+                                        {/* Conditionally add "None" if mva_type is pedestrian accidents */}
+
                                         {formData.vehicle_details.map((vehicle, index) => (
                                             <SelectItem
                                                 key={index}
@@ -852,9 +856,15 @@ export default function AccidentClaimForm() {
                                                 Vehicle #{index + 1}: {vehicle.model || "Unnamed Vehicle"}
                                             </SelectItem>
                                         ))}
+                                        {formData.mva_type === "pedestrian_accidents" && (
+                                            <SelectItem key="none" value="none" className="hover:bg-slate-500">
+                                                None
+                                            </SelectItem>
+                                        )}
                                     </SelectContent>
                                 </Select>
                             </div>
+
 
                             {/* Documentation & Accident Description */}
                             <div className="mt-8">
@@ -1114,7 +1124,7 @@ export default function AccidentClaimForm() {
                             Cost of Assistance
                         </h2>
                         <p className="text-gray-600 dark:text-gray-400 mb-6">
-                            Fill in all costs received related to the claim, even if they are estimated or exceed the policy limit.
+                            Fill in all costs received related to the claim, even if they are estimated or exceed the policy limit. <br />Cost are submittied in the standard USD$ currency<i>(e.g. $1,000.00)</i>.
                         </p>
 
                         {/* Estimated Total Cost */}
@@ -1197,6 +1207,8 @@ export default function AccidentClaimForm() {
                                 {costs.map((cost, index) => (
                                     <div key={index} className="border p-4 my-4 rounded mb-4">
                                         <div className="grid grid-cols-1 gap-4">
+
+                                            {/* Name of Provider */}
                                             <div>
                                                 <Label>Name of Provider</Label>
                                                 <Input
@@ -1215,7 +1227,7 @@ export default function AccidentClaimForm() {
 
                                             {/* Amount Billed */}
                                             <div>
-                                                <Label>Amount Billed</Label>
+                                                <Label>Amount Billed <i className="text-xs">(e.g. $1,000.00)</i></Label>
                                                 <div className="flex items-center gap-2">
                                                     <Select
                                                         onValueChange={(value) =>
@@ -1241,7 +1253,7 @@ export default function AccidentClaimForm() {
                                                     </Select>
                                                     <Input
                                                         type="number"
-                                                        placeholder="Amount billed"
+                                                        placeholder="1,000.00"
                                                         value={cost.amountBilled}
                                                         onChange={(e) =>
                                                             handleCostChange(
@@ -1257,7 +1269,7 @@ export default function AccidentClaimForm() {
 
                                             {/* Amount Paid */}
                                             <div>
-                                                <Label>Amount Paid</Label>
+                                                <Label>Amount Paid <i className="text-xs">(e.g. $1,000.00)</i></Label>
                                                 <div className="flex items-center gap-2">
                                                     <Select
                                                         onValueChange={(value) =>
@@ -1283,7 +1295,7 @@ export default function AccidentClaimForm() {
                                                     </Select>
                                                     <Input
                                                         type="number"
-                                                        placeholder="Amount paid"
+                                                        placeholder="1,000.00"
                                                         value={cost.amountPaid}
                                                         onChange={(e) =>
                                                             handleCostChange(
@@ -1299,7 +1311,7 @@ export default function AccidentClaimForm() {
 
                                             {/* Amount Unpaid */}
                                             <div>
-                                                <Label>Amount Unpaid</Label>
+                                                <Label>Amount Unpaid <i className="text-xs">(e.g. $1,000.00)</i></Label>
                                                 <div className="flex items-center gap-2">
                                                     <Select
                                                         onValueChange={(value) =>
@@ -1325,17 +1337,25 @@ export default function AccidentClaimForm() {
                                                     </Select>
                                                     <Input
                                                         type="number"
-                                                        placeholder="Amount unpaid"
+                                                        placeholder="1,000.00"
                                                         value={cost.amountUnpaid}
-                                                        readOnly
-                                                        className="bg-gray-100 cursor-not-allowed flex-grow"
+                                                        onChange={(e) =>
+                                                            handleCostChange(
+                                                                costType as keyof AccidentClaimFormData,
+                                                                index,
+                                                                "amountUnpaid",
+                                                                parseFloat(e.target.value)
+                                                            )
+                                                        }
                                                     />
                                                 </div>
                                             </div>
                                         </div>
                                         <Button
                                             variant="destructive"
-                                            onClick={() => handleRemove(costType as keyof AccidentClaimFormData, index)}
+                                            onClick={() =>
+                                                handleRemove(costType as keyof AccidentClaimFormData, index)
+                                            }
                                             className="mt-4"
                                             type="button"
                                         >
@@ -1343,6 +1363,7 @@ export default function AccidentClaimForm() {
                                         </Button>
                                     </div>
                                 ))}
+
                             </div>
                         ))}
                     </section>

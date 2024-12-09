@@ -110,18 +110,17 @@ const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
                     {/* Disclosure Button */}
                     <DisclosureButton
                         className={cn(
-                            "flex justify-between w-full text-sm font-medium text-left text-white bg-navyBlue rounded-t-lg focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75",
-                            !open && "hover:bg-navyBlue-dark rounded-b-lg"
+                            "flex justify-between w-full text-sm font-medium text-left ",
                         )}
                     >
-                        <div className="w-full ">
-                            <div className="flex items-center justify-between w-full px-4 py-3 ">
-                                <div className="flex flex-col items-start w-full justify-between">
+                        <div className="w-full rounded-lg">
+                            <div className="flex items-center justify-between w-full px-4 py-3 bg-navyBlue">
+                                <div className="flex flex-col items-start w-full justify-between text-white">
                                     <span className="font-semibold">
-                                        {claim.full_name} - {new Date(claim.created_at).toLocaleDateString()}
+                                        Patient:    {claim.full_name}
                                     </span>
                                     <span className="text-sm text-gray-200">
-                                        Submitted by: {claim.username} ({claim.user_email})
+                                        Submitted by: <span className="capitalize">{claim.username}</span> ({claim.user_email})
                                     </span>
                                 </div>
                                 <div>
@@ -175,9 +174,7 @@ const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
                                 </div>
                             </div>
                             <div className="w-full bg-white px-4 py-3 ">
-                                <CardTitle className="text-lg font-bold text-navyBlue dark:text-white">
-                                    Accident Claim Report
-                                </CardTitle>
+
                                 <p className="mt-2 text-gray-600 dark:text-gray-400">
                                     Patient: <strong>{claim.full_name}</strong>
                                 </p>

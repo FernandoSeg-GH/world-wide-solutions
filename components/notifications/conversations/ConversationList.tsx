@@ -153,16 +153,19 @@ const ConversationList: React.FC<{
             </div>
 
             {conversations.length > 0 ? (
-                conversations.map((conversation) => (
-                    <ConversationSummary
-                        key={conversation.conversationId}
-                        conversation={conversation}
-                        onClick={() => onSelectConversation(String(conversation.conversationId))}
-                    />
-                ))
+                conversations.map((conversation) =>
+                    conversation.conversationId !== undefined ? (
+                        <ConversationSummary
+                            key={conversation.conversationId}
+                            conversation={conversation}
+                            onClick={() => onSelectConversation(conversation.conversationId!)}
+                        />
+                    ) : null
+                )
             ) : (
                 <p className="text-gray-500">No conversations found</p>
             )}
+
 
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                 <DialogContent>
