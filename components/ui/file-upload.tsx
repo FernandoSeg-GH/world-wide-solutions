@@ -69,7 +69,7 @@ export function FileUpload({ multiple = false, onFilesSelected, className, descr
             {/* Dropzone Area */}
             <div
                 className="dropzone border-2 border-dashed border-gray-300 p-4 rounded-lg text-center cursor-pointer hover:border-blue-500 transition-colors bg-white dark:bg-muted-dark"
-                onClick={handleButtonClick}
+                // onClick={handleButtonClick}
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
             >
