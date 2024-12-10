@@ -36,6 +36,7 @@ const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
 }) => {
     const { data: session } = useSession();
     const userRole = session?.user?.role.id;
+
     const handleDownloadClaim = async (format: 'csv' | 'excel' | 'pdf') => {
         const flatClaim = flattenClaimData(claim);
 
@@ -54,45 +55,41 @@ const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
                 saveAs(blob, `claim_${claim.claim_id}.csv`);
             }
         } else if (format === 'pdf') {
-            const element = document.querySelector(`[data-claim-id="${claim.claim_id}"]`);
+            // const element = document.querySelector(`[data-claim-id="${claim.claim_id}"]`);
+            const element = document.querySelector(`[data-claim-id="${claim.claim_id}"] .claim-content`);
 
             if (element) {
                 try {
-
                     const canvas = await html2canvas(element as HTMLElement, {
-                        scale: 2,
+                        scale: 1.5, // Lower scale for smaller file size
                         useCORS: true,
+                        logging: false,
+                        // ignoreElements: (el) => el.classList.contains("exclude-pdf"),
                     });
 
-                    const imgData = canvas.toDataURL("image/png");
+                    const imgData = canvas.toDataURL("image/jpeg", 0.6); // Compression
                     const pdf = new jsPDF("p", "mm", "a4");
                     const pageWidth = pdf.internal.pageSize.getWidth();
                     const pageHeight = pdf.internal.pageSize.getHeight();
 
-
-                    const canvasWidth = canvas.width;
-                    const canvasHeight = canvas.height;
-                    const ratio = canvasHeight / canvasWidth;
-                    const imgHeight = pageWidth * ratio;
-
-                    let heightLeft = imgHeight;
+                    let imgWidth = pageWidth - 20; // Margins
+                    let imgHeight = (canvas.height * imgWidth) / canvas.width;
                     let position = 10;
+                    let heightLeft = imgHeight;
 
                     while (heightLeft > 0) {
                         pdf.addImage(
                             imgData,
-                            "PNG",
+                            "JPEG",
                             10,
                             position,
-                            pageWidth - 20,
-                            pageWidth * ratio
+                            imgWidth,
+                            imgHeight
                         );
                         heightLeft -= pageHeight - 20;
-                        position = -pageHeight + 30;
+                        position = heightLeft > 0 ? position - pageHeight + 30 : 0;
 
-                        if (heightLeft > 0) {
-                            pdf.addPage();
-                        }
+                        if (heightLeft > 0) pdf.addPage();
                     }
 
                     pdf.save(`claim_${claim.claim_id}.pdf`);
@@ -199,6 +196,7 @@ const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
                                     handleSave={handleSave}
                                     handleCancel={handleCancel}
                                     handleFieldChange={handleFieldChange}
+                                    pdf="claim-content"
                                 />
                                 <div className="flex justify-end mt-4 space-x-2">
                                     <Button

@@ -35,9 +35,11 @@ import { toast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import CustomPhoneInput from "@/components/ui/phone-input";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 
 interface ClaimDetailsProps {
     claim: EditableClaim;
+    pdf: string;
     onEdit: (claim_id: string) => void;
     handleSave: (claim_id: string) => void;
     handleCancel: (claim_id: string) => void;
@@ -50,7 +52,8 @@ export default function ClaimDetails({
     handleSave,
     handleCancel,
     handleFieldChange,
-}: ClaimDetailsProps) {
+    pdf
+}: ClaimDetailsProps): React.JSX.Element {
     const { isEditing, editedData } = claim;
     const [isSaving, setIsSaving] = useState(false);
 
@@ -432,7 +435,7 @@ export default function ClaimDetails({
     };
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-start pt-12">
+        <div className={cn("min-h-screen flex flex-col items-center justify-start pt-12")}>
             {/* Edit/Save/Cancel Buttons outside the form */}
             <div className="w-full max-w-5xl flex justify-end items-center mb-8">
                 {isEditing ? (
@@ -465,7 +468,7 @@ export default function ClaimDetails({
                 )}
             </div>
 
-            <div className="w-full max-w-5xl bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 xl:p-16 overflow-y-auto">
+            <div className={cn("w-full max-w-5xl bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 xl:p-16 overflow-y-auto", pdf)}>
                 {/* Header */}
                 <div className="mb-8 flex flex-row items-center justify-between w-full gap-16 text-start">
                     <h1 className="text-navyBlue dark:text-white text-3xl leading-7 font-bold underline flex items-center gap-2 justify-center lg:justify-start">
