@@ -9,7 +9,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { useMessages } from "@/hooks/notifications/useMessages";
 import { useSession } from 'next-auth/react';
 import Submissions from '@/components/business/forms/submissions';
-// Example of a spinner (You can use a library spinner or create a custom one)
 import { Loader2 } from 'lucide-react';
 
 interface ConversationViewProps {
@@ -76,10 +75,9 @@ const ConversationView: React.FC<ConversationViewProps> = ({ conversationId }) =
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-2xl font-semibold">Conversation</h2>
             </div>
-            {/* Message list area - maintain layout and show spinner if loading */}
+
             <div className="flex-1 overflow-y-auto p-2 bg-gray-50 rounded-md relative">
                 {loading ? (
-                    // Show a loading state without removing the container
                     <div className="flex items-center justify-center h-full">
                         <Loader2 className="animate-spin w-6 h-6 text-gray-500" />
                         <span className="ml-2 text-gray-600">Loading conversation...</span>
@@ -90,7 +88,7 @@ const ConversationView: React.FC<ConversationViewProps> = ({ conversationId }) =
                             messages.map((msg: InboxMessage) => (
                                 <div
                                     key={msg.messageId}
-                                    className={`flex flex-col mb-4 p-3 rounded-md max-w-lg ${msg.senderId === session?.user.id
+                                    className={`flex flex-col mb-4 p-3 rounded-md max-w-lg break-words ${msg.senderId === session?.user.id
                                         ? 'bg-blue-100 text-right ml-auto'
                                         : 'bg-gray-200 text-left mr-auto'
                                         }`}
@@ -112,7 +110,7 @@ const ConversationView: React.FC<ConversationViewProps> = ({ conversationId }) =
                                 </div>
                             ))
                         ) : (
-                            <div className="text-gray-500 flex items-center justify-center h-full">
+                            <div className="text-gray-500 flex items-center justify-center h-full text-center">
                                 No messages found in this conversation.
                             </div>
                         )}
@@ -120,7 +118,6 @@ const ConversationView: React.FC<ConversationViewProps> = ({ conversationId }) =
                 )}
             </div>
 
-            {/* Input area: keep it visible but maybe disable while loading */}
             <div className="mt-4">
                 <Textarea
                     value={content}

@@ -23,7 +23,6 @@ import { useMessages } from "@/hooks/notifications/useMessages";
 import { ConversationSummary as ConversationType } from "@/types";
 import { PlusIcon } from "lucide-react";
 
-// TypeScript Interfaces
 interface Claim {
     claimId: number;
     claimantName: string;
@@ -56,6 +55,8 @@ const ConversationList: React.FC<{
         setConversations,
     } = useMessages();
 
+    const role_id = session?.user?.role?.id;
+
     useEffect(() => {
         setIsLoading(true);
         fetchConversations();
@@ -65,8 +66,8 @@ const ConversationList: React.FC<{
                 const data = await fetchUsersWithClaims();
                 setUsersWithClaims(data || []);
 
-                if (session?.user?.role?.id === 1) {
-                    setSelectedUserId(session.user.id);
+                if (role_id === 1) {
+                    setSelectedUserId(Number(session?.user?.id));
                 }
 
             } catch (error: any) {
@@ -80,27 +81,76 @@ const ConversationList: React.FC<{
                 setIsLoading(false);
             }
         })();
-    }, [fetchConversations, fetchUsersWithClaims, session, toast]);
+    }, [fetchConversations, fetchUsersWithClaims, session, toast, role_id]);
 
-    const handleOpenModal = () => setIsModalOpen(true);
+    const handleOpenModal = () => {
+        setSelectedClaimId(null);
+        setMessageContent("");
+        // If role 1, user is already known (themselves)
+        // If role 2,3,4, clear the selectedUserId
+        if (role_id !== 1) {
+            setSelectedUserId(null);
+        }
+        setIsModalOpen(true);
+    };
 
     const handleSendMessage = async () => {
-        if (!selectedUserId || !selectedClaimId || !messageContent.trim()) {
-            toast({
-                title: "Missing Information",
-                description: "Please select a claim and enter a message.",
-                variant: "destructive",
-            });
-            return;
+        // Validation
+        if (role_id === 1) {
+            // Role 1: must have a claim and a message
+            if (!selectedClaimId || !messageContent.trim()) {
+                toast({
+                    title: "Missing Information",
+                    description: "Please select a claim and enter a message.",
+                    variant: "destructive",
+                });
+                return;
+            }
+        } else {
+            // Roles 2,3,4: must have both a user and a claim
+            if (!selectedUserId || !selectedClaimId || !messageContent.trim()) {
+                toast({
+                    title: "Missing Information",
+                    description: "Please select a user, a claim, and enter a message.",
+                    variant: "destructive",
+                });
+                return;
+            }
         }
 
         try {
             const payload = {
-                recipient_ids: [selectedUserId],
+                recipient_ids: [selectedUserId!],
                 content: messageContent.trim(),
                 read_only: false,
                 accident_claim_id: selectedClaimId,
             };
+
+            // For role 1, selectedUserId is themselves, so we need to pick another participant?
+            // Actually, if role 1 starts a conversation, we need at least one recipient_id different from themselves.
+            // Adjust logic: For role 1, we must choose from the claims that belong to them. 
+            // The "recipient_ids" here is a bit ambiguous. 
+            // Let's clarify the logic:
+            // If role 1 is starting a conversation, who are they messaging to?
+            // The UI currently only sets recipient_ids from selectedUserId.
+            // For role 1, we should provide a default "recipient" that would be from "uniqueUsers" 
+            // Actually, for role 1 scenario:
+            // If role 1 is messaging, they must be able to pick a claim and maybe the admin user that the message is going to.
+            // Let's force a scenario:
+            // If role 1 is starting a conversation, since they see only their claims, 
+            // we can show all admins in the user dropdown (like for roles 2,3,4) but disabled if we don't want that?
+            // The problem states: 
+            // "if user role 1 start the conversation, user role2,3,4 doesn't see it."
+            // We must ensure that user role 2,3,4 are always participants or can see all conversations.
+
+            // Let's just ensure that for role 1, they must also pick the user (like roles 2,3,4 do), 
+            // since otherwise who are they messaging to?
+            // This gives user 1 the ability to pick from the uniqueUsers and a claim they own.
+            // If we want user 1 to skip user selection, we must define a default recipient (like a system user).
+
+            // To keep consistent, let's require user selection for everyone. 
+            // If the product requires otherwise, we can adjust. For now, let's unify logic:
+            // Everyone picks user and claim.
 
             await sendMessageToUsers(
                 payload.recipient_ids,
@@ -137,8 +187,15 @@ const ConversationList: React.FC<{
         [usersWithClaims]
     );
 
+    // Filter claims of the selected user
+    const selectedUserClaims = useMemo(() => {
+        if (!selectedUserId) return [];
+        const userObj = usersWithClaims.find((u) => u.userId === selectedUserId);
+        return userObj?.claims || [];
+    }, [selectedUserId, usersWithClaims]);
+
     return (
-        <div>
+        <div className="h-full flex flex-col">
             <div className="flex border-b pb-3 items-center justify-between">
                 <h2 className="text-xl font-semibold">Your Conversations</h2>
 
@@ -152,20 +209,21 @@ const ConversationList: React.FC<{
                 </Button>
             </div>
 
-            {conversations.length > 0 ? (
-                conversations.map((conversation) =>
-                    conversation.conversationId !== undefined ? (
-                        <ConversationSummary
-                            key={conversation.conversationId}
-                            conversation={conversation}
-                            onClick={() => onSelectConversation(conversation.conversationId!)}
-                        />
-                    ) : null
-                )
-            ) : (
-                <p className="text-gray-500">No conversations found</p>
-            )}
-
+            <div className="flex-1 overflow-auto mt-4">
+                {conversations.length > 0 ? (
+                    conversations.map((conversation) =>
+                        conversation.conversationId !== undefined ? (
+                            <ConversationSummary
+                                key={conversation.conversationId}
+                                conversation={conversation}
+                                onClick={() => onSelectConversation(conversation.conversationId!)}
+                            />
+                        ) : null
+                    )
+                ) : (
+                    <p className="text-gray-500 mt-4">No conversations found</p>
+                )}
+            </div>
 
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                 <DialogContent>
@@ -177,64 +235,58 @@ const ConversationList: React.FC<{
                             <div>Loading users...</div>
                         ) : (
                             <>
-                                {session?.user?.role?.id !== 1 && (
-                                    <Select
-                                        onValueChange={(value) =>
-                                            setSelectedUserId(Number(value))
-                                        }
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select a user" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {uniqueUsers.map((user) => (
-                                                <SelectItem
-                                                    key={user.userId}
-                                                    value={String(user.userId)}
-                                                >
-                                                    {user.username}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                )}
+                                {/* Everyone picks a user and a claim now for clarity */}
+                                <Select
+                                    onValueChange={(value) =>
+                                        setSelectedUserId(Number(value))
+                                    }
+                                    value={
+                                        selectedUserId
+                                            ? String(selectedUserId)
+                                            : undefined
+                                    }
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a user" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {uniqueUsers.map((user) => (
+                                            <SelectItem
+                                                key={user.userId}
+                                                value={String(user.userId)}
+                                            >
+                                                {user.username}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
 
                                 <Select
                                     onValueChange={(value) =>
                                         setSelectedClaimId(value)
                                     }
                                     disabled={!selectedUserId}
+                                    value={selectedClaimId || undefined}
                                 >
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select a claim" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {selectedUserId ? (
-                                            usersWithClaims.some(
-                                                (user) =>
-                                                    user.userId === selectedUserId &&
-                                                    user.claims.length > 0
-                                            ) ? (
-                                                usersWithClaims
-                                                    .find(
-                                                        (user) =>
-                                                            user.userId === selectedUserId
-                                                    )
-                                                    ?.claims.map((claim) => {
-                                                        return (
-                                                            <SelectItem
-                                                                key={claim.claimId}
-                                                                value={String(claim.claimId)}
-                                                            >
-                                                                {`Claim #${claim.claimId} - ${claim.claimantName} (${claim.status})`}
-                                                            </SelectItem>
-                                                        )
-                                                    })
+                                            selectedUserClaims.length > 0 ? (
+                                                selectedUserClaims.map((claim) => (
+                                                    <SelectItem
+                                                        key={claim.claimId}
+                                                        value={String(claim.claimId)}
+                                                    >
+                                                        {`Claim #${claim.claimId} - ${claim.claimantName} (${claim.status})`}
+                                                    </SelectItem>
+                                                ))
                                             ) : (
-                                                <p>No claims available for this user</p>
+                                                <p className="p-2">No claims available for this user</p>
                                             )
                                         ) : (
-                                            <p>Select a user first</p>
+                                            <p className="p-2">Select a user first</p>
                                         )}
                                     </SelectContent>
                                 </Select>
@@ -286,7 +338,6 @@ export function ConversationSummary({
 }) {
     const { accidentClaimId, lastMessage, participants } = conversation;
 
-    // Format the timestamp to a readable date/time (optional)
     const formattedTimestamp = lastMessage?.timestamp
         ? new Date(lastMessage.timestamp).toLocaleString()
         : null;
@@ -296,7 +347,6 @@ export function ConversationSummary({
             className="flex flex-col p-4 border-b cursor-pointer hover:bg-gray-50 transition-colors duration-150"
             onClick={onClick}
         >
-            {/* Subject line - Using the Accident Claim ID as the "Subject" */}
             <div className="flex justify-between items-center w-full">
                 <h3 className="text-md font-semibold text-gray-800 truncate">
                     Subject: Claim #{accidentClaimId}
@@ -308,13 +358,11 @@ export function ConversationSummary({
                 )}
             </div>
 
-            {/* From line - Show last message sender */}
             <div className="text-sm text-gray-700">
                 <span className="font-medium">From:</span>{" "}
                 {lastMessage?.senderUsername || "Unknown Sender"}
             </div>
 
-            {/* To line - List participants other than the lastMessage sender, if any */}
             <div className="text-sm text-gray-700">
                 <span className="font-medium">To:</span>{" "}
                 {participants && participants.length > 0
@@ -322,7 +370,6 @@ export function ConversationSummary({
                     : "N/A"}
             </div>
 
-            {/* Message snippet - Display a preview of the last message content */}
             <div className="mt-1 text-sm text-gray-600 line-clamp-1">
                 {lastMessage?.content || "No messages yet"}
             </div>
