@@ -67,25 +67,27 @@ export const useMessages = () => {
   );
 
   const replyToMessage = useCallback(
-    async (messageId: number, content: string) => {
-      if (!session?.accessToken) return;
-      try {
-        const response = await fetch("/api/messages/reply", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session.accessToken}`,
-          },
-          body: JSON.stringify({ message_id: messageId, content }),
-        });
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Failed to send reply");
-        }
-      } catch (error) {
-        console.error("Error replying to message:", error);
-        throw error;
+    async (originalMessageId: number, content: string) => {
+      if (!session?.accessToken) throw new Error("Unauthorized");
+
+      const response = await fetch("/api/messages/reply", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+        body: JSON.stringify({
+          message_id: originalMessageId,
+          content,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to send reply");
       }
+
+      return response.json();
     },
     [session]
   );

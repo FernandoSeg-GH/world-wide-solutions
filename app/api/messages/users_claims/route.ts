@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
+import { getServerSession } from "next-auth";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -14,12 +14,13 @@ export async function GET(request: NextRequest) {
 
     const response = await fetch(fetchUrl, {
       headers: {
-        Authorization: `Bearer ${session.accessToken}`,
+        Authorization: `Bearer ${session.accessToken}`, // Double-check this value
       },
     });
 
     if (!response.ok) {
       const errorData = await response.json();
+      console.error("Fetch Error:", errorData);
       return NextResponse.json(
         { message: errorData.message || "Failed to fetch users with claims" },
         { status: response.status }
@@ -29,9 +30,9 @@ export async function GET(request: NextRequest) {
     const data = await response.json();
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
-    console.error("Error fetching users with claims:", error);
+    console.error("Server Fetch Error:", error);
     return NextResponse.json(
-      { message: "Internal server error" },
+      { message: "Internal Server Error" },
       { status: 500 }
     );
   }

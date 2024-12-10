@@ -151,13 +151,12 @@ export default function AccidentClaimForm() {
             !formData.accident_date ||
             !formData.accident_country ||
             !formData.accident_state ||
-            !formData.full_name ||
-            !formData.claim_id
+            !formData.full_name
         ) {
             toast({
                 title: "Missing Required Fields",
                 description: "Please fill in all required fields before submitting.",
-                variant: "destructive",
+                variant: "default",
             });
             return;
         }
@@ -175,7 +174,7 @@ export default function AccidentClaimForm() {
         }
 
         if (!formData.claim_id) {
-            toast({ title: "Error - Missing Claim Reference Number.", description: "Claim Reference Number is required.", variant: "destructive" });
+            toast({ title: "Error - Missing Claim Reference Number.", description: "Claim Reference Number is required.", variant: "default" });
             return;
         }
 
@@ -1189,9 +1188,10 @@ export default function AccidentClaimForm() {
                                         placeholder="1,000.00"
                                         value={formData.medical_total_cost || ''}
                                         onChange={(e) => {
+                                            const value = e.target.value.replace(/[^0-9.]/g, '');
                                             setFormData({
                                                 ...formData,
-                                                medical_total_cost: e.target.value,  // No formatting applied
+                                                medical_total_cost: value || '',
                                             });
                                         }}
                                         className="flex-grow bg-white dark:bg-gray-600 !dark:text-white"
