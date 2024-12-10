@@ -1,7 +1,7 @@
 // components/ClaimDetails.tsx
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { EditableClaim, AccidentClaimFormData, VehicleDetail, CostDetail } from "./config/types";
 import {
     FaUser,
@@ -19,7 +19,7 @@ import {
     FaWalking,
     FaPlusCircle,
 } from "react-icons/fa";
-import { Ellipsis, Hospital, PlaneTakeoff } from "lucide-react";
+import { Ellipsis, Hospital, LoaderCircle, PlaneTakeoff } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -52,6 +52,8 @@ export default function ClaimDetails({
     handleFieldChange,
 }: ClaimDetailsProps) {
     const { isEditing, editedData } = claim;
+    const [isSaving, setIsSaving] = useState(false);
+
     const router = useRouter();
     const data = isEditing ? editedData : claim;
 
@@ -173,23 +175,26 @@ export default function ClaimDetails({
         const addCost = () => {
             const newCost: CostDetail = {
                 providerName: "",
-                amountBilled: 0,
-                amountPaid: 0,
-                amountUnpaid: 0,
+                amountBilled: "",
+                amountPaid: "",
+                amountUnpaid: "",
                 currency: "USD",
             };
             handleFieldChange(claim.claim_id, costType as string, [...costs, newCost]);
         };
-        const handleCostChange = (index: number, field: keyof CostDetail, value: string | number) => {
+
+        const handleCostChange = (index: number, field: keyof CostDetail, value: string) => {
             const updated = [...costs];
             updated[index] = { ...updated[index], [field]: value };
+
             if (field === "amountBilled" || field === "amountPaid") {
-                const billed = parseFloat(updated[index].amountBilled.toString()) || 0;
-                const paid = parseFloat(updated[index].amountPaid.toString()) || 0;
-                updated[index].amountUnpaid = billed - paid;
+                const billed = parseFloat(updated[index].amountBilled || "");
+                const paid = parseFloat(updated[index].amountPaid || "");
+                updated[index].amountUnpaid = (billed - paid).toString();
             }
             handleFieldChange(claim.claim_id, costType as string, updated);
         };
+
         const removeCost = (index: number) => {
             const updated = costs.filter((_, i) => i !== index);
             handleFieldChange(claim.claim_id, costType as string, updated);
@@ -237,10 +242,9 @@ export default function ClaimDetails({
                                         ))}
                                     </select>
                                     <Input
-                                        type="number"
                                         placeholder="Amount billed"
                                         value={cost.amountBilled}
-                                        onChange={(e) => handleCostChange(index, 'amountBilled', parseFloat(e.target.value) || 0)}
+                                        onChange={(e) => handleCostChange(index, 'amountBilled', e.target.value)}
                                     />
                                 </div>
 
@@ -256,10 +260,9 @@ export default function ClaimDetails({
                                         ))}
                                     </select>
                                     <Input
-                                        type="number"
                                         placeholder="Amount paid"
                                         value={cost.amountPaid}
-                                        onChange={(e) => handleCostChange(index, 'amountPaid', parseFloat(e.target.value) || 0)}
+                                        onChange={(e) => handleCostChange(index, 'amountPaid', e.target.value)}
                                     />
                                 </div>
 
@@ -275,11 +278,9 @@ export default function ClaimDetails({
                                         ))}
                                     </select>
                                     <Input
-                                        type="number"
                                         placeholder="Amount unpaid"
                                         value={cost.amountUnpaid}
-                                        readOnly
-                                        className="bg-gray-100 cursor-not-allowed flex-grow"
+                                        onChange={(e) => handleCostChange(index, 'amountUnpaid', e.target.value)}
                                     />
                                 </div>
                                 <Button
@@ -423,9 +424,11 @@ export default function ClaimDetails({
         return true;
     };
 
-    const handleSaveClick = () => {
+    const handleSaveClick = async () => {
         if (!validateRequiredFields()) return;
-        handleSave(claim.claim_id);
+        setIsSaving(true);
+        await handleSave(claim.claim_id);
+        setIsSaving(false);
     };
 
     return (
@@ -437,13 +440,15 @@ export default function ClaimDetails({
                         <Button
                             variant="default"
                             onClick={handleSaveClick}
-                            className="flex items-center px-4 py-2 rounded-md transition hover:bg-blue-600"
+                            disabled={isSaving}
+                            className="flex items-center px-4 py-2 rounded-md transition hover:bg-blue-600 min-w-32"
                         >
-                            Save
+                            {isSaving ? <LoaderCircle className="animate-spin h-5 w-5" /> : "Save Changes"}
                         </Button>
                         <Button
                             variant="secondary"
                             onClick={() => handleCancel(claim.claim_id)}
+                            disabled={isSaving}
                             className="flex items-center px-4 py-2 rounded-md transition hover:bg-gray-500"
                         >
                             Cancel
@@ -453,7 +458,7 @@ export default function ClaimDetails({
                     <Button
                         variant="default"
                         onClick={() => onEdit(claim.claim_id)}
-                        className="flex items-center px-4 py-2 rounded-md transition hover:bg-blue-600"
+                        className="flex items-center px-4 py-2 rounded-md transition hover:bg-blue-600 min-w-32"
                     >
                         Edit Claim
                     </Button>
@@ -968,7 +973,6 @@ export default function ClaimDetails({
                                     </select>
                                     <Input
                                         name="medical_total_cost"
-                                        type="number"
                                         placeholder="Enter total cost"
                                         value={data.medical_total_cost || ""}
                                         onChange={(e) => handleFieldChange(claim.claim_id, "medical_total_cost", e.target.value)}
@@ -1082,9 +1086,9 @@ export default function ClaimDetails({
                                     />
                                 </div>
                                 <div>
-                                    <Label>Reference Number</Label>
+                                    <Label>Internal Report Number</Label>
                                     <Input
-                                        placeholder="Enter reference number"
+                                        placeholder="Enter internal report number"
                                         value={data.owner_reference_number || ""}
                                         onChange={(e) => handleFieldChange(claim.claim_id, "owner_reference_number", e.target.value)}
                                     />

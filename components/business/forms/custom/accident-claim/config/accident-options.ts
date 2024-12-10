@@ -7,11 +7,11 @@ export const accidentTypeOptions = [
       { label: "Motorcycle Accident", value: "motorcycle_accidents" },
       { label: "Truck Accident", value: "truck_accidents" },
       {
-        label: "Pedestrian Accidents hit by a vehicle accident",
+        label: "Pedestrian hit by a vehicle",
         value: "pedestrian_accidents",
       },
       {
-        label: "Bicycle Accidents it by a vehicle accident",
+        label: "Bicycle by a vehicle",
         value: "bicycle_accidents",
       },
       { label: "Other", value: "other" },

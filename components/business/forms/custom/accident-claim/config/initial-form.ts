@@ -42,7 +42,7 @@ export const initialForm: AccidentClaimFormData = {
   medical_treatment: "",
   primary_care_provider: "",
 
-  medical_total_cost: 0,
+  medical_total_cost: "",
   policy_limits: 0,
   assistance_status: "",
   medical_provider_costs: [],

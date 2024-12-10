@@ -48,8 +48,24 @@ import { Separator } from "@/components/ui/separator";
 import { FileUpload } from "@/components/ui/file-upload";
 import { currencyOptions } from "./config/currencies";
 
-type AccidentType = "motor_vehicle_accidents" | "pedestrian_accidents";
+export function formatCurrency(value: string) {
+    // Allow only digits, commas, and periods
+    const cleanedValue = value.replace(/[^\d.,]/g, '');
 
+    // Allow the user to type commas naturally
+    const parts = cleanedValue.split('.');
+
+    // Ensure no more than 2 decimal places
+    if (parts.length > 2 || parts[0] === '') return cleanedValue;
+
+    const integerPart = parts[0].replace(/,/g, '');
+    const decimalPart = parts[1]?.substring(0, 2);
+
+    // Format integer part with commas
+    const formattedInteger = parseInt(integerPart || '0', 10).toLocaleString('en-US');
+
+    return decimalPart !== undefined ? `${formattedInteger}.${decimalPart}` : formattedInteger;
+}
 
 export default function AccidentClaimForm() {
     const [formData, setFormData] = useState<AccidentClaimFormData>(initialForm);
@@ -131,6 +147,21 @@ export default function AccidentClaimForm() {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (
+            !formData.accident_date ||
+            !formData.accident_country ||
+            !formData.accident_state ||
+            !formData.full_name ||
+            !formData.claim_id
+        ) {
+            toast({
+                title: "Missing Required Fields",
+                description: "Please fill in all required fields before submitting.",
+                variant: "destructive",
+            });
+            return;
+        }
+
 
         if (session?.error) {
             toast({ title: "Session Error", description: "Please sign in again.", variant: "destructive" });
@@ -268,9 +299,9 @@ export default function AccidentClaimForm() {
                 ...prevData.medical_provider_costs,
                 {
                     providerName: "",
-                    amountBilled: 0,
-                    amountPaid: 0,
-                    amountUnpaid: 0,
+                    amountBilled: "",
+                    amountPaid: "",
+                    amountUnpaid: "",
                     currency: "USD", // Default currency
                 },
             ],
@@ -284,9 +315,9 @@ export default function AccidentClaimForm() {
                 ...prevData.repatriation_costs,
                 {
                     providerName: "",
-                    amountBilled: 0,
-                    amountPaid: 0,
-                    amountUnpaid: 0,
+                    amountBilled: "",
+                    amountPaid: "",
+                    amountUnpaid: "",
                     currency: "USD", // Default currency
                 },
             ],
@@ -300,9 +331,9 @@ export default function AccidentClaimForm() {
                 ...prevData.other_costs,
                 {
                     providerName: "",
-                    amountBilled: 0,
-                    amountPaid: 0,
-                    amountUnpaid: 0,
+                    amountBilled: "",
+                    amountPaid: "",
+                    amountUnpaid: "",
                     currency: "USD", // Default currency
                 },
             ],
@@ -326,7 +357,7 @@ export default function AccidentClaimForm() {
             if (field === "amountBilled" || field === "amountPaid") {
                 const billed = parseFloat(cost.amountBilled as unknown as string) || 0;
                 const paid = parseFloat(cost.amountPaid as unknown as string) || 0;
-                cost.amountUnpaid = billed - paid;
+                cost.amountUnpaid = String(billed - paid);
             }
 
             return { ...prevData, [costType]: updatedCosts };
@@ -399,7 +430,7 @@ export default function AccidentClaimForm() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <Label htmlFor="full_name">
-                                    Full Name <span className="text-red-500">*</span>
+                                    Patient Full Name <span className="text-red-500">*</span>
                                 </Label>
                                 <Input
                                     id="full_name"
@@ -573,6 +604,7 @@ export default function AccidentClaimForm() {
                                         setFormData({ ...formData, accident_date: date ? date.toISOString() : "" })
                                     }
                                 />
+                                {!formData.accident_date && <p className="text-red-500 text-sm">This field is required.</p>}
                             </div>
                             {/* <div>
                                 <Label htmlFor="accident_place">
@@ -608,6 +640,7 @@ export default function AccidentClaimForm() {
                                         ))}
                                     </SelectContent>
                                 </Select>
+                                {!formData.accident_country && <p className="text-red-500 text-sm">This field is required.</p>}
                             </div>
                             <div>
                                 <Label htmlFor="accident_state">State of Accident</Label>
@@ -639,8 +672,8 @@ export default function AccidentClaimForm() {
                                         className=""
                                     />
                                 )}
+                                {!formData.accident_state && <p className="text-red-500 text-sm">This field is required.</p>}
                             </div>
-
                             {/* {formData.accident_type && subAccidentOptions.length > 0 && (
                                 <div className="md:col-span-2">
                                     <Label>Specific Accident Type</Label>
@@ -1117,6 +1150,7 @@ export default function AccidentClaimForm() {
                             />
                         </div>
                     </section>
+
                     {/* Cost of Assistance */}
                     <section className="mb-8 bg-gray-100 dark:bg-gray-700 shadow p-6 rounded-lg">
                         <h2 className="text-xl font-semibold mb-6 flex items-center gap-2 text-gray-800 dark:text-gray-200">
@@ -1151,12 +1185,18 @@ export default function AccidentClaimForm() {
                                     </Select>
                                     <Input
                                         name="medical_total_cost"
-                                        type="number"
-                                        placeholder="Enter total cost"
-                                        value={formData.medical_total_cost}
-                                        onChange={handleInputChange}
+                                        type="text"
+                                        placeholder="1,000.00"
+                                        value={formData.medical_total_cost || ''}
+                                        onChange={(e) => {
+                                            setFormData({
+                                                ...formData,
+                                                medical_total_cost: e.target.value,  // No formatting applied
+                                            });
+                                        }}
                                         className="flex-grow bg-white dark:bg-gray-600 !dark:text-white"
                                     />
+
                                 </div>
                             </div>
                         </div>
@@ -1252,15 +1292,15 @@ export default function AccidentClaimForm() {
                                                         </SelectContent>
                                                     </Select>
                                                     <Input
-                                                        type="number"
-                                                        placeholder="1,000.00"
-                                                        value={cost.amountBilled}
+                                                        type="text"
+                                                        placeholder="Enter amount"
+                                                        value={cost.amountBilled || ''}
                                                         onChange={(e) =>
                                                             handleCostChange(
                                                                 costType as keyof AccidentClaimFormData,
                                                                 index,
                                                                 "amountBilled",
-                                                                parseFloat(e.target.value)
+                                                                e.target.value
                                                             )
                                                         }
                                                     />
@@ -1294,15 +1334,15 @@ export default function AccidentClaimForm() {
                                                         </SelectContent>
                                                     </Select>
                                                     <Input
-                                                        type="number"
-                                                        placeholder="1,000.00"
-                                                        value={cost.amountPaid}
+                                                        type="text"
+                                                        placeholder="Enter amount"
+                                                        value={cost.amountPaid || ''}
                                                         onChange={(e) =>
                                                             handleCostChange(
                                                                 costType as keyof AccidentClaimFormData,
                                                                 index,
                                                                 "amountPaid",
-                                                                parseFloat(e.target.value)
+                                                                e.target.value
                                                             )
                                                         }
                                                     />
@@ -1336,15 +1376,15 @@ export default function AccidentClaimForm() {
                                                         </SelectContent>
                                                     </Select>
                                                     <Input
-                                                        type="number"
-                                                        placeholder="1,000.00"
-                                                        value={cost.amountUnpaid}
+                                                        type="text"
+                                                        placeholder="Enter amount"
+                                                        value={cost.amountUnpaid || ''}
                                                         onChange={(e) =>
                                                             handleCostChange(
                                                                 costType as keyof AccidentClaimFormData,
                                                                 index,
                                                                 "amountUnpaid",
-                                                                parseFloat(e.target.value)
+                                                                e.target.value
                                                             )
                                                         }
                                                     />
@@ -1496,11 +1536,11 @@ export default function AccidentClaimForm() {
                                     </div>
                                     <div>
                                         <Label>
-                                            Reference Number{" "}
+                                            Internal Report Number{" "}
                                         </Label>
                                         <Input
                                             name="owner_reference_number"
-                                            placeholder="Enter reference number"
+                                            placeholder="Enter the internal report number"
                                             value={formData.owner_reference_number}
                                             onChange={handleInputChange}
                                             className=""

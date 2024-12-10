@@ -2,9 +2,9 @@
 
 export interface CostDetail {
   providerName: string;
-  amountBilled: number;
-  amountPaid: number;
-  amountUnpaid: number;
+  amountBilled: string;
+  amountPaid: string;
+  amountUnpaid: string;
   currency: string;
 }
 
@@ -69,7 +69,7 @@ export interface AccidentClaimFormData {
   primary_care_provider: string;
 
   // Cost of Assistance
-  medical_total_cost: number;
+  medical_total_cost: string;
   policy_limits: number;
   total_cost_currency?: string; // Add this field
   policy_limit_currency?: string;

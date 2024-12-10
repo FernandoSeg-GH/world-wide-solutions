@@ -162,7 +162,7 @@ export function mapClaimToFormData(claim: Claim, businessId: string): AccidentCl
     medical_diagnosis: claim.medical_diagnosis || "",
     medical_treatment: claim.medical_treatment || "",
     primary_care_provider: claim.primary_care_provider || "",
-    medical_total_cost: claim.medical_total_cost || 0,
+    medical_total_cost: claim.medical_total_cost || "",
     policy_limits: claim.policy_limits || 0,
     assistance_status: claim.assistance_status || "",
     medical_provider_costs: Array.isArray(claim.medical_provider_costs)
@@ -250,7 +250,7 @@ export function dynamicMapClaimToFormData(
     medical_diagnosis: "",
     medical_treatment: "",
     primary_care_provider: "",
-    medical_total_cost: 0,
+    medical_total_cost: "",
     policy_limits: 0,
     assistance_status: "",
     medical_provider_costs: [],

@@ -4,69 +4,59 @@ import { getToken, JWT } from "next-auth/jwt";
 import { jwtDecode } from "jwt-decode";
 import jwt from "jsonwebtoken";
 
-const TOKEN_EXPIRATION_THRESHOLD = 60 * 1000; // 1 minute
+const TOKEN_EXPIRATION_THRESHOLD = 5 * 60 * 1000; // 5 minutes
 
-export async function refreshAccessToken(token: JWT) {
+async function refreshAccessToken(refreshToken: string) {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
     const response = await fetch(`${baseUrl}/api/auth/refresh`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${token.refreshToken}`,
+        Authorization: `Bearer ${refreshToken}`,
       },
     });
 
-    if (!response.ok) {
-      throw new Error("Failed to refresh access token");
-    }
+    if (!response.ok) throw new Error("Failed to refresh access token");
 
     const refreshedTokens = await response.json();
     const decodedAccessToken = jwt.decode(
-      refreshedTokens.access_token
+      refreshedTokens.accessToken
     ) as jwt.JwtPayload;
 
-    if (!decodedAccessToken || !decodedAccessToken.exp) {
-      throw new Error("Access token missing exp claim");
-    }
+    if (!decodedAccessToken || !decodedAccessToken.exp)
+      throw new Error("Access token missing expiration claim");
 
     return {
-      ...token,
-      accessToken: refreshedTokens.access_token,
-      accessTokenExpires: decodedAccessToken.exp * 1000, // ms
-      refreshToken: refreshedTokens.refresh_token || token.refreshToken,
+      accessToken: refreshedTokens.accessToken,
+      refreshToken: refreshedTokens.refreshToken || refreshToken,
+      accessTokenExpires: decodedAccessToken.exp * 1000,
     };
   } catch (error) {
     console.error("Error refreshing access token:", error);
-    return { ...token, error: "RefreshAccessTokenError" };
+    return null;
   }
 }
 
 export async function middleware(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
-  if (!token) {
-    return NextResponse.next();
+  if (!token || !token.accessTokenExpires) {
+    return NextResponse.next(); // Skip if token or expiration is undefined
   }
 
-  const accessTokenExpires = token.accessTokenExpires as number;
-  const timeUntilExpiration = accessTokenExpires - Date.now();
+  const timeUntilExpiration = token.accessTokenExpires - Date.now();
 
   if (timeUntilExpiration < TOKEN_EXPIRATION_THRESHOLD) {
-    try {
-      const refreshedTokens = await refreshAccessToken(
-        token.refreshToken as unknown as JWT
-      );
+    const refreshedTokens = await refreshAccessToken(
+      token.refreshToken as string
+    );
 
-      token.accessToken = refreshedTokens.accessToken;
-      token.refreshToken = refreshedTokens.refreshToken || token.refreshToken;
-      token.accessTokenExpires =
-        Date.now() + Number(refreshedTokens.accessTokenExpires) * 1000;
-
-      return NextResponse.next();
-    } catch (error) {
-      console.error("Error refreshing token:", error);
+    if (!refreshedTokens) {
+      console.error("Failed to refresh tokens.");
       return NextResponse.redirect(new URL("/auth/sign-in", req.url));
     }
+
+    req.cookies.set("next-auth.session-token", refreshedTokens.accessToken);
   }
 
   return NextResponse.next();
