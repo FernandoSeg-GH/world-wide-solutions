@@ -348,15 +348,15 @@ export function ConversationSummary({
             onClick={onClick}
         >
             <div className="flex justify-between items-center w-full">
-                <h3 className="text-md font-semibold text-gray-800 truncate">
-                    Subject: Claim #{accidentClaimId}
+                <h3 className="text-md font-medium text-gray-800 truncate">
+                    Subject: <span className="font-semibold">Claim #{accidentClaimId}</span>
                 </h3>
-                {formattedTimestamp && (
-                    <span className="text-xs text-gray-400">
-                        {formattedTimestamp}
-                    </span>
-                )}
             </div>
+            {formattedTimestamp && (
+                <span className="text-xs text-gray-400 my-1 underline">
+                    {formattedTimestamp}
+                </span>
+            )}
 
             <div className="text-sm text-gray-700">
                 <span className="font-medium">From:</span>{" "}

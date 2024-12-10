@@ -41,9 +41,9 @@ export default function Main() {
                 {session?.user.role.id === 3 && (
                     <ClaimReports />
                 )}
-                {session?.user.role.id === 3 && (
+                {/* {session?.user.role.id === 3 && (
                     <AccidentClaimsView />
-                )}
+                )} */}
                 {/* {session?.user.role.id === 1 && (
                     <Submissions />
                 )} */}

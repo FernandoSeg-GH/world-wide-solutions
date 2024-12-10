@@ -23,6 +23,22 @@ function ClaimReports({ }: Props) {
                 title={<p className="capitalize">Claim Reports Area</p>}
                 subtitle="View your submitted claims, and update with any new documentation."
             />
+
+            {session?.user.role.id === 3 &&
+                <div className='bg-white dark:bg-gray-800 p-4 rounded-lg shadow'>
+                    {/* <AccidentClaimForm/> */}
+
+                    <Button variant="ghost" onClick={() => setExpanded(!expanded)} className='font-semibold text-lg w-full'>
+                        Submit New Accident Claim Report {expanded ? <ChevronUp /> : <ChevronDown />}
+                    </Button>
+                    {expanded &&
+                        <div className='w-full flex flex-col gap-6'>
+
+                            <AccidentClaimForm />
+                        </div>
+                    }
+                </div>
+            }
             {session?.user.role.id === 1 &&
                 <Card>
                     <CardHeader>
@@ -37,21 +53,6 @@ function ClaimReports({ }: Props) {
             }
             {session?.user.role.id !== 5 &&
                 <AccidentClaimsView />
-            }
-            {session?.user.role.id === 3 &&
-                <div className='bg-white dark:bg-gray-800 p-4 rounded-lg shadow'>
-                    {/* <AccidentClaimForm/> */}
-
-                    <Button variant="ghost" onClick={() => setExpanded(!expanded)} className='font-semibold text-lg w-full'>
-                        Submit New Accident Claim Report {expanded ? <ChevronUp /> : <ChevronDown />}
-                    </Button>
-                    {expanded &&
-                        <div className='w-full flex flex-col gap-6'>
-                            <h3 className='text-lg font-semibold text-center'>Submit a new Accident Claim Report:</h3>
-                            <AccidentClaimForm />
-                        </div>
-                    }
-                </div>
             }
         </div>
     )
