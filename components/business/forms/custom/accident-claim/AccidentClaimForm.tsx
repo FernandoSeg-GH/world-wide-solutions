@@ -352,13 +352,6 @@ export default function AccidentClaimForm() {
             // Update the field value
             (cost[field] as string | number) = value;
 
-            // Recalculate the unpaid amount if relevant fields change
-            if (field === "amountBilled" || field === "amountPaid") {
-                const billed = parseFloat(cost.amountBilled as unknown as string) || 0;
-                const paid = parseFloat(cost.amountPaid as unknown as string) || 0;
-                cost.amountUnpaid = String(billed - paid);
-            }
-
             return { ...prevData, [costType]: updatedCosts };
         });
     };

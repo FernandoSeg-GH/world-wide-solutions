@@ -79,7 +79,7 @@ export default function ClaimDetails({
         return (
             <div className="flex items-baseline flex-wrap mb-2">
                 <span className="font-semibold text-gray-800 dark:text-gray-200 mr-2">{label}:</span>
-                <span className="text-gray-700 dark:text-gray-300">{(value || value === 0) ? String(value) : placeholder}</span>
+                <span className="text-gray-700 dark:text-gray-300 capitalize">{(value || value === 0) ? String(value) : placeholder}</span>
             </div>
         );
     };
@@ -493,6 +493,10 @@ export default function ClaimDetails({
                         <FaUser />
                         Patient Personal Information
                     </h2>
+
+                    <p className="text-gray-600 dark:text-gray-400 mb-6">
+                        In this section, you must complete with all of your policyholder personal information.
+                    </p>
                     {isEditing ? (
                         <>
                             <div className="mb-4">
@@ -618,9 +622,12 @@ export default function ClaimDetails({
                         <FaMapMarkerAlt />
                         Accident Information
                     </h2>
+                    <p className="text-gray-600 dark:text-gray-400 mb-6">
+                        In this section, complete with the most important accident details and select the type of accident that will guide you through specific requirements for that incident.
+                    </p>
                     {isEditing ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
+                            <div className="">
                                 <Label>Type of Accident</Label>
                                 <select
                                     value={data.accident_type || ""}
@@ -694,6 +701,10 @@ export default function ClaimDetails({
                             <FaCar />
                             Motor Vehicle Accident Details
                         </h2>
+
+                        <p className="text-gray-600 dark:text-gray-400 mb-6">
+                            In this section, provide all vehicle details such as automobile descriptions and insurance certificates.
+                        </p>
                         {isEditing ? (
                             <>
                                 <div className="grid grid-cols-1 gap-6">
@@ -733,6 +744,10 @@ export default function ClaimDetails({
                                         <FaCarSide />
                                         Motor Vehicle Information
                                     </h3>
+
+                                    <p className="text-gray-600 dark:text-gray-400">
+                                        In this section, provide the available information for each vehicle involved in the accident.
+                                    </p>
                                     {renderVehicleSection()}
                                 </div>
 
@@ -779,6 +794,7 @@ export default function ClaimDetails({
                                     Motor Vehicle Information
                                 </h3>
                                 {renderVehicleSection()}
+                                <div className="my-4" />
                                 {renderViewField("Selected Vehicle", data.selected_vehicle !== undefined && data.selected_vehicle !== null
                                     ? `Vehicle #${Number(data.selected_vehicle) + 1}`
                                     : "N/A")}
@@ -794,6 +810,9 @@ export default function ClaimDetails({
                             <FaWalking />
                             Slip and Fall Accident Details
                         </h2>
+                        <p className="text-gray-600 dark:text-gray-400 mb-6">
+                            In this section, provide all the details regarding the slip and fall accident.
+                        </p>
                         {isEditing ? (
                             <>
                                 <div>
@@ -895,6 +914,13 @@ export default function ClaimDetails({
                         <FaHeartbeat />
                         Medical Information
                     </h2>
+                    {/* <p className="text-gray-600 dark:text-gray-400 mb-6">
+                        In this section, complete with the most important accident details and select the type of accident that will guide you through specific requirements for that incident.
+                    </p> */}
+                    <p className="text-gray-600 dark:text-gray-400 mb-6">
+                        In this section, complete with all ongoing medical treatments, or future medical needs.
+                    </p>
+                    <div className="my-4" />
                     {isEditing ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
@@ -960,6 +986,10 @@ export default function ClaimDetails({
                         <FaDollarSign />
                         Cost of Assistance
                     </h2>
+                    <p className="text-gray-600 dark:text-gray-400 mb-6">
+                        Fill in all costs received related to the claim, even if they are estimated or exceed the policy limit. <br />Cost are submittied in the standard USD$ currency<i>(e.g. $1,000.00)</i>.
+                    </p>
+
                     {isEditing ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
                             <div className="relative">
@@ -1013,6 +1043,9 @@ export default function ClaimDetails({
                         <FaUsers />
                         Third Party Information
                     </h2>
+                    <p className="text-gray-600 dark:text-gray-400 mb-6">
+                        In this section, completed with all details from any other individual, company, or owner involved, such as an insurance, establishment owner, assistance company or other company on file.
+                    </p>
                     {/* Insurance Company */}
                     <div className="border p-6 rounded-lg shadow-sm bg-gray-50 dark:bg-gray-600">
                         <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-800 dark:text-gray-200">
@@ -1175,6 +1208,9 @@ export default function ClaimDetails({
                         <FaUserTie />
                         Personal Attorney
                     </h2>
+                    <p className="text-gray-600 dark:text-gray-400 mb-6">
+                        In this section, request and complete with any possible legal representation the policyholder may have regarding the accident.
+                    </p>
                     {isEditing ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
