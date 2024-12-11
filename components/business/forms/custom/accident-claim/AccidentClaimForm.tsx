@@ -220,6 +220,13 @@ export default function AccidentClaimForm() {
             });
         }
 
+
+        submitData.append("accident_country", formData.accident_country || "");
+        submitData.append("accident_state", formData.accident_state || "");
+        submitData.append("total_cost_currency", formData.total_cost_currency || "USD");
+        submitData.append("policy_limit_currency", formData.policy_limit_currency || "USD");
+
+
         try {
             const response = await fetch(
                 `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/custom/forms/accident-claim/submit`,
@@ -458,7 +465,6 @@ export default function AccidentClaimForm() {
                                         setFormData({ ...formData, country: value })
                                     }
                                     value={formData.country}
-
                                 >
                                     <SelectTrigger
                                         id="country"
@@ -635,8 +641,8 @@ export default function AccidentClaimForm() {
                                 {!formData.accident_country && <p className="text-red-500 text-sm">This field is required.</p>}
                             </div>
                             <div>
-                                <Label htmlFor="accident_state">State of Accident</Label>
-                                {isUSA ? (
+                                <Label htmlFor="accident_state">State or City of Accident</Label>
+                                {isUSAbis ? (
                                     <Select
                                         onValueChange={(value) =>
                                             setFormData({ ...formData, accident_state: value })

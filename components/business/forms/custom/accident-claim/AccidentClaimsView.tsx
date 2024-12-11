@@ -171,7 +171,8 @@ const AccidentClaimsView: React.FC = () => {
                         value === null ||
                         value === undefined ||
                         value === "" ||
-                        (Array.isArray(value) && value.length === 0)
+                        (Array.isArray(value) && value.length === 0) ||
+                        (typeof value === "object" && !Object.keys(value).length)
                     ) {
                         errors.push(`${field.label} is required.`);
                     }
@@ -181,6 +182,7 @@ const AccidentClaimsView: React.FC = () => {
 
         return errors;
     };
+
 
     const handleSave = async (claim_id: string) => {
         const claimToUpdate = claims.find((claim) => claim.claim_id === claim_id);
@@ -197,14 +199,13 @@ const AccidentClaimsView: React.FC = () => {
 
         const submitData = new FormData();
 
+        // Append all fields except file uploads
         Object.entries(claimToUpdate.editedData).forEach(([key, value]) => {
             if (key === 'new_file_uploads') return;
 
             if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-                // For JSON fields
                 submitData.append(key, JSON.stringify(value));
             } else if (Array.isArray(value)) {
-                // For array fields like vehicle_details
                 submitData.append(key, JSON.stringify(value));
             } else if (typeof value === "string" || typeof value === "number") {
                 submitData.append(key, value.toString());
@@ -212,14 +213,17 @@ const AccidentClaimsView: React.FC = () => {
         });
 
         // Handle new file uploads
-        if (
-            claimToUpdate.editedData.new_file_uploads &&
-            claimToUpdate.editedData.new_file_uploads.length > 0
-        ) {
+        if (claimToUpdate.editedData.new_file_uploads?.length) {
             claimToUpdate.editedData.new_file_uploads.forEach((file) => {
-                submitData.append("new_file_uploads", file);
+                if (file instanceof File) {
+                    submitData.append("new_file_uploads", file);
+                } else {
+                    console.warn("Invalid file type, skipping:", file);
+                }
             });
         }
+
+        submitData.append("business_id", businessId);
 
         try {
             const response = await fetch(
@@ -248,7 +252,7 @@ const AccidentClaimsView: React.FC = () => {
                                 isEditing: false,
                                 editedData: mapClaimToFormData(updatedClaim, businessId),
                                 user: {
-                                    user_id: String(updatedClaim.user_id),          // Ensure these fields are present
+                                    user_id: String(updatedClaim.user_id),
                                     username: updatedClaim.username,
                                     user_email: updatedClaim.user_email,
                                 },
@@ -277,7 +281,6 @@ const AccidentClaimsView: React.FC = () => {
                 description: "Form submitted successfully!",
             });
 
-
         } catch (err: any) {
             console.error("Submission Error:", err);
             toast({
@@ -287,6 +290,7 @@ const AccidentClaimsView: React.FC = () => {
             });
         }
     };
+
 
     const handleCancel = (claim_id: string) => {
         setClaims((prevClaims) =>

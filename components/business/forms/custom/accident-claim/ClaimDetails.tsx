@@ -36,6 +36,9 @@ import { useRouter } from "next/navigation";
 import CustomPhoneInput from "@/components/ui/phone-input";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { Select, SelectContent, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { SelectItem } from "@radix-ui/react-select";
+import JSZip from "jszip";
 
 interface ClaimDetailsProps {
     claim: EditableClaim;
@@ -70,7 +73,18 @@ export default function ClaimDetails({
         return ac === "usa" || ac === "united_states";
     }, [data.accident_country]);
 
-    const existingFiles = Array.isArray(data.file_uploads) ? data.file_uploads : [];
+    const existingFiles = useMemo(() => {
+        if (!data.file_uploads) return [];
+        if (Array.isArray(data.file_uploads)) return data.file_uploads;
+        try {
+            return JSON.parse(data.file_uploads);
+        } catch (e) {
+            console.error("Error parsing file uploads:", e);
+            return [];
+        }
+    }, [data.file_uploads]);
+
+
     const vehicleDetails = Array.isArray(data.vehicle_details) ? data.vehicle_details : [];
     const selectedAccidentType = accidentTypeOptions.find((opt) => opt.value === data.accident_type);
 
@@ -110,11 +124,84 @@ export default function ClaimDetails({
         }
     };
 
-    const renderExistingFiles = (files?: string[] | null) => {
-        const validFiles = Array.isArray(files) ? files : [];
+
+    const handleDownloadAll = async (fileUrls: string[]) => {
+        try {
+            if (!fileUrls || fileUrls.length === 0) {
+                throw new Error("No files available for download.");
+            }
+
+            const zip = new JSZip();
+
+            for (const fileUrl of fileUrls) {
+                try {
+                    const response = await fetch(fileUrl);
+                    if (!response.ok) {
+                        console.error(`Failed to fetch ${fileUrl}:`, response.statusText);
+                        throw new Error(`Failed to fetch file: ${fileUrl}`);
+                    }
+
+                    const blob = await response.blob();
+                    const fileName = fileUrl.split("/").pop() || "file";
+                    zip.file(fileName, blob);
+                } catch (innerError) {
+                    console.error("Error processing file:", fileUrl, innerError);
+                    toast({
+                        title: "File Download Error",
+                        description: `Failed to download: ${fileUrl}`,
+                        variant: "destructive",
+                    });
+                }
+            }
+
+            const zipBlob = await zip.generateAsync({ type: "blob" });
+            const zipUrl = window.URL.createObjectURL(zipBlob);
+            const link = document.createElement("a");
+            link.href = zipUrl;
+            link.download = "all_files.zip";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(zipUrl);
+
+            toast({
+                title: "Success",
+                description: "Files downloaded successfully!",
+            });
+        } catch (error) {
+            console.error("Download All Error:", error);
+            toast({
+                title: "Download Error",
+                description: "Failed to download files.",
+                variant: "destructive",
+            });
+        }
+    };
+
+
+    const renderExistingFiles = (files?: string[] | string | null) => {
+        let validFiles: string[] = [];
+
+        // Handle different file formats: empty array, stringified array, or null
+        if (Array.isArray(files)) {
+            validFiles = files;
+        } else if (typeof files === "string" && files.trim().length > 0) {
+            try {
+                const parsedFiles = JSON.parse(files);
+                if (Array.isArray(parsedFiles)) {
+                    validFiles = parsedFiles;
+                } else {
+                    console.error("Expected an array but got:", parsedFiles);
+                }
+            } catch (e) {
+                console.error("Failed to parse file_uploads as JSON:", files, e);
+            }
+        }
+
         if (validFiles.length === 0) {
             return <span className="text-gray-500 dark:text-gray-400">No existing files</span>;
         }
+
         return (
             <div className="space-y-2">
                 {validFiles.map((fileUrl, index) => {
@@ -143,9 +230,18 @@ export default function ClaimDetails({
                         </div>
                     );
                 })}
+                {/* {validFiles.length > 1 && (
+                    <Button
+                        onClick={() => handleDownloadAll(validFiles)}
+                        className="hover:underline text-blue-600 dark:text-blue-400"
+                    >
+                        Download All Files
+                    </Button>
+                )} */}
             </div>
         );
     };
+
 
     // Vehicle details editing
     const addVehicle = () => {
@@ -168,13 +264,17 @@ export default function ClaimDetails({
         handleFieldChange(claim.claim_id, `vehicle_details`, updated);
     };
 
+
     // Costs
     const renderCostSection = (
         costType: keyof AccidentClaimFormData,
         title: string,
         icon: React.ReactNode
     ) => {
-        const costs = Array.isArray(data[costType]) ? (data[costType] as CostDetail[]) : [];
+        const costs: CostDetail[] = Array.isArray(data[costType])
+            ? (data[costType] as CostDetail[])
+            : [];
+
         const addCost = () => {
             const newCost: CostDetail = {
                 providerName: "",
@@ -235,7 +335,7 @@ export default function ClaimDetails({
                                 />
                                 <Label>Amount Billed</Label>
                                 <div className="flex items-center gap-2 mb-2">
-                                    <select
+                                    {/* <select
                                         className="border rounded p-2"
                                         value={cost.currency}
                                         onChange={(e) => handleCostChange(index, 'currency', e.target.value)}
@@ -243,7 +343,18 @@ export default function ClaimDetails({
                                         {currencyOptions.map((c) => (
                                             <option key={c.value} value={c.value}>{c.label}</option>
                                         ))}
-                                    </select>
+                                    </select> */}
+                                    <Select value={cost.currency} onValueChange={(val) => handleCostChange(index, 'currency', val)}>
+                                        <SelectTrigger className="w-24">
+                                            <SelectValue className="">{cost.currency}</SelectValue>
+                                        </SelectTrigger>
+                                        <SelectContent className="max-h-[320px] overflow-y-auto">
+
+                                            {currencyOptions.map((c) => (
+                                                <SelectItem className="hover:bg-slate-100 cursor-pointer text-sm px-2" key={c.value} value={c.value}>{c.label}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                     <Input
                                         placeholder="Amount billed"
                                         value={cost.amountBilled}
@@ -253,7 +364,7 @@ export default function ClaimDetails({
 
                                 <Label>Amount Paid</Label>
                                 <div className="flex items-center gap-2 mb-2">
-                                    <select
+                                    {/* <select
                                         className="border rounded p-2"
                                         value={cost.currency}
                                         onChange={(e) => handleCostChange(index, 'currency', e.target.value)}
@@ -261,7 +372,18 @@ export default function ClaimDetails({
                                         {currencyOptions.map((c) => (
                                             <option key={c.value} value={c.value}>{c.label}</option>
                                         ))}
-                                    </select>
+                                    </select> */}
+                                    <Select value={cost.currency} onValueChange={(val) => handleCostChange(index, 'currency', val)}>
+                                        <SelectTrigger className="w-24">
+                                            <SelectValue className="">{cost.currency}</SelectValue>
+                                        </SelectTrigger>
+                                        <SelectContent className="max-h-[320px] overflow-y-auto">
+                                            {currencyOptions.map((c) => (
+                                                <SelectItem className="hover:bg-slate-100 cursor-pointer text-sm px-2" key={c.value} value={c.value}>{c.label}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+
+                                    </Select>
                                     <Input
                                         placeholder="Amount paid"
                                         value={cost.amountPaid}
@@ -271,7 +393,7 @@ export default function ClaimDetails({
 
                                 <Label>Amount Unpaid</Label>
                                 <div className="flex items-center gap-2 mb-2">
-                                    <select
+                                    {/* <select
                                         className="border rounded p-2"
                                         value={cost.currency}
                                         onChange={(e) => handleCostChange(index, 'currency', e.target.value)}
@@ -279,7 +401,17 @@ export default function ClaimDetails({
                                         {currencyOptions.map((c) => (
                                             <option key={c.value} value={c.value}>{c.label}</option>
                                         ))}
-                                    </select>
+                                    </select> */}
+                                    <Select value={cost.currency} onValueChange={(val) => handleCostChange(index, 'currency', val)}>
+                                        <SelectTrigger className="w-24">
+                                            <SelectValue className="">{cost.currency}</SelectValue>
+                                        </SelectTrigger>
+                                        <SelectContent className="max-h-[320px] overflow-y-auto">
+                                            {currencyOptions.map((c) => (
+                                                <SelectItem className="hover:bg-slate-100 cursor-pointer text-sm px-2" key={c.value} value={c.value}>{c.label}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                     <Input
                                         placeholder="Amount unpaid"
                                         value={cost.amountUnpaid}
@@ -411,8 +543,8 @@ export default function ClaimDetails({
         if (!data.claim_id) errors.push("Claim Reference Number");
         if (!data.full_name) errors.push("Patient name");
         if (!data.accident_date) errors.push("Date of accident");
-        if (!data.country) errors.push("Country of patient's residency");
-        if (!data.state) errors.push("State of patient's residency");
+        if (!data.accident_country) errors.push("Country of Accident");
+        if (!data.accident_state) errors.push("State/City of Accident");
 
         // if (!data.accident_country) errors.push("Country of accident");
         // if (!data.accident_state) errors.push("State of accident");
@@ -420,7 +552,7 @@ export default function ClaimDetails({
             toast({
                 title: "Missing Required Fields",
                 description: `Please fill in: ${errors.join(", ")}`,
-                variant: "destructive",
+                variant: "default",
             });
             return false;
         }
@@ -528,8 +660,8 @@ export default function ClaimDetails({
                                     />
                                 </div>
                                 <div>
-                                    <Label>Country of residence <span className="text-red-500">*</span></Label>
-                                    <select
+                                    <Label>Country of residence</Label>
+                                    {/* <select
                                         value={data.country || ""}
                                         onChange={(e) => handleFieldChange(claim.claim_id, "country", e.target.value)}
                                         className="border rounded p-2 w-full"
@@ -538,21 +670,32 @@ export default function ClaimDetails({
                                         {countryOptions.map((country) => (
                                             <option key={country.value} value={country.value}>{country.label}</option>
                                         ))}
-                                    </select>
+                                    </select> */}
+                                    <Select value={data.country || ""} onValueChange={(val) => handleFieldChange(claim.claim_id, "country", val)}>
+                                        <SelectTrigger className="w-full capitalize">
+                                            <SelectValue className="">{data.country || ""}</SelectValue>
+                                        </SelectTrigger>
+                                        <SelectContent className="max-h-[320px] overflow-y-auto">
+                                            {countryOptions.map((country) => (
+                                                <SelectItem className="hover:bg-slate-100 cursor-pointer text-sm px-2" key={country.value} value={country.value}>{country.label}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                                 <div>
-                                    <Label>State <span className="text-red-500">*</span> </Label>
+                                    <Label>State</Label>
                                     {isUSA ? (
-                                        <select
-                                            value={data.state || ""}
-                                            onChange={(e) => handleFieldChange(claim.claim_id, "state", e.target.value)}
-                                            className="border rounded p-2 w-full"
-                                        >
-                                            <option value="">Select state</option>
-                                            {usaStates.map((st) => (
-                                                <option key={st.value} value={st.value}>{st.label}</option>
-                                            ))}
-                                        </select>
+                                        <Select value={data.state || ""} onValueChange={(val) => handleFieldChange(claim.claim_id, "state", val)}>
+                                            <SelectTrigger className="w-full capitalize">
+                                                <SelectValue className="">{data.state || ""}</SelectValue>
+                                            </SelectTrigger>
+                                            <SelectContent className="max-h-[320px] overflow-y-auto">
+                                                {usaStates.map((st) => (
+                                                    <SelectItem className="hover:bg-slate-100 cursor-pointer text-sm px-2" key={st.value} value={st.value}>{st.label}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+
                                     ) : (
                                         <Input
                                             placeholder="Enter state"
@@ -629,7 +772,7 @@ export default function ClaimDetails({
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
                             <div className="">
                                 <Label>Type of Accident</Label>
-                                <select
+                                {/* <select
                                     value={data.accident_type || ""}
                                     onChange={(e) => handleFieldChange(claim.claim_id, "accident_type", e.target.value)}
                                     className="border rounded p-2 w-full"
@@ -638,7 +781,17 @@ export default function ClaimDetails({
                                     {accidentTypeOptions.map((opt) => (
                                         <option key={opt.value} value={opt.value}>{opt.label}</option>
                                     ))}
-                                </select>
+                                </select> */}
+                                <Select value={data.accident_type || ""} onValueChange={(val) => handleFieldChange(claim.claim_id, "accident_type", val)}>
+                                    <SelectTrigger className="w-full capitalize">
+                                        <SelectValue className="">{data.accident_type || ""}</SelectValue>
+                                    </SelectTrigger>
+                                    <SelectContent className="max-h-[320px] overflow-y-auto">
+                                        {accidentTypeOptions.map((opt) => (
+                                            <SelectItem className="hover:bg-slate-100 cursor-pointer text-sm px-2" key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
                             <div>
                                 <Label>Date of Accident <span className="text-red-500">*</span></Label>
@@ -650,8 +803,8 @@ export default function ClaimDetails({
                                 />
                             </div>
                             <div>
-                                <Label>Country of Accident</Label>
-                                <select
+                                <Label>Country of Accident <span className="text-red-500">*</span></Label>
+                                {/* <select
                                     value={data.accident_country || ""}
                                     onChange={(e) => handleFieldChange(claim.claim_id, "accident_country", e.target.value)}
                                     className="border rounded p-2 w-full"
@@ -660,21 +813,31 @@ export default function ClaimDetails({
                                     {countryOptions.map((country) => (
                                         <option key={country.value} value={country.value}>{country.label}</option>
                                     ))}
-                                </select>
+                                </select> */}
+                                <Select value={data.accident_country || ""} onValueChange={(val) => handleFieldChange(claim.claim_id, "accident_country", val)}>
+                                    <SelectTrigger className="w-full capitalize">
+                                        <SelectValue className="">{data.accident_country || "Select Country of Accident"}</SelectValue>
+                                    </SelectTrigger>
+                                    <SelectContent className="max-h-[320px] overflow-y-auto">
+                                        {countryOptions.map((country) => (
+                                            <SelectItem className="hover:bg-slate-100 cursor-pointer text-sm px-2" key={country.value} value={country.value}>{country.label}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
                             <div>
-                                <Label>State of Accident</Label>
+                                <Label>State or City of Accident <span className="text-red-500">*</span></Label>
                                 {isUSAbis ? (
-                                    <select
-                                        value={data.accident_state || ""}
-                                        onChange={(e) => handleFieldChange(claim.claim_id, "accident_state", e.target.value)}
-                                        className="border rounded p-2 w-full"
-                                    >
-                                        <option value="">Select state</option>
-                                        {usaStates.map((st) => (
-                                            <option key={st.value} value={st.value}>{st.label}</option>
-                                        ))}
-                                    </select>
+                                    <Select value={data.accident_state || ""} onValueChange={(val) => handleFieldChange(claim.claim_id, "accident_state", val)}>
+                                        <SelectTrigger className="w-full capitalize">
+                                            <SelectValue className="">{data.accident_state || "City or State of the Accident"}</SelectValue>
+                                        </SelectTrigger>
+                                        <SelectContent className="max-h-[320px] overflow-y-auto">
+                                            {usaStates.map((st) => (
+                                                <SelectItem className="hover:bg-slate-100 cursor-pointer text-sm px-2" key={st.value} value={st.value}>{st.label}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 ) : (
                                     <Input
                                         placeholder="Enter state"
@@ -710,7 +873,7 @@ export default function ClaimDetails({
                                 <div className="grid grid-cols-1 gap-6">
                                     <div>
                                         <Label>Motor Vehicle Accident Type</Label>
-                                        <select
+                                        {/* <select
                                             value={data.mva_type || ""}
                                             onChange={(e) => handleFieldChange(claim.claim_id, "mva_type", e.target.value)}
                                             className="border rounded p-2 w-full"
@@ -721,11 +884,23 @@ export default function ClaimDetails({
                                                 ?.subOptions.map((o) => (
                                                     <option key={o.value} value={o.value}>{o.label}</option>
                                                 ))}
-                                        </select>
+                                        </select> */}
+                                        <Select value={data.mva_type || ""} onValueChange={(val) => handleFieldChange(claim.claim_id, "mva_type", val)}>
+                                            <SelectTrigger className="w-full capitalize">
+                                                <SelectValue className="">{data.mva_type || ""}</SelectValue>
+                                            </SelectTrigger>
+                                            <SelectContent className="max-h-[320px] overflow-y-auto">
+                                                {accidentTypeOptions
+                                                    .find(opt => opt.value === "motor_vehicle_accidents")
+                                                    ?.subOptions.map((o) => (
+                                                        <SelectItem className="hover:bg-slate-100 cursor-pointer text-sm px-2" key={o.value} value={o.value}>{o.label}</SelectItem>
+                                                    ))}
+                                            </SelectContent>
+                                        </Select>
                                     </div>
                                     <div>
                                         <Label>Where were you located at the time of the accident?</Label>
-                                        <select
+                                        {/* <select
                                             value={data.mva_location || ""}
                                             onChange={(e) => handleFieldChange(claim.claim_id, "mva_location", e.target.value)}
                                             className="border rounded p-2 w-full"
@@ -735,7 +910,18 @@ export default function ClaimDetails({
                                             <option value="driver">Driver</option>
                                             <option value="pedestrian">Pedestrian</option>
                                             <option value="bicycle">Bicycle</option>
-                                        </select>
+                                        </select> */}
+                                        <Select value={data.mva_location || ""} onValueChange={(val) => handleFieldChange(claim.claim_id, "mva_location", val)}>
+                                            <SelectTrigger className="w-full capitalize">
+                                                <SelectValue className="">{data.mva_location || ""}</SelectValue>
+                                            </SelectTrigger>
+                                            <SelectContent className="max-h-[320px] overflow-y-auto">
+                                                <SelectItem className="hover:bg-slate-100 cursor-pointer text-sm px-2" value="passenger">Passenger</SelectItem>
+                                                <SelectItem className="hover:bg-slate-100 cursor-pointer text-sm px-2" value="driver">Driver</SelectItem>
+                                                <SelectItem className="hover:bg-slate-100 cursor-pointer text-sm px-2" value="pedestrian">Pedestrian</SelectItem>
+                                                <SelectItem className="hover:bg-slate-100 cursor-pointer text-sm px-2" value="bicycle">Bicycle</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </div>
                                 </div>
 
@@ -753,7 +939,7 @@ export default function ClaimDetails({
 
                                 <div className="mt-8">
                                     <Label>Please select the vehicle that you were in at the time of the accident.</Label>
-                                    <select
+                                    {/* <select
                                         value={data.selected_vehicle || ""}
                                         onChange={(e) => handleFieldChange(claim.claim_id, "selected_vehicle", e.target.value)}
                                         className="border rounded p-2 w-full"
@@ -764,7 +950,19 @@ export default function ClaimDetails({
                                                 Vehicle #{i + 1}: {v.model || "Unnamed Vehicle"}
                                             </option>
                                         ))}
-                                    </select>
+                                    </select> */}
+                                    <Select value={data.selected_vehicle || ""} onValueChange={(val) => handleFieldChange(claim.claim_id, "selected_vehicle", val)}>
+                                        <SelectTrigger className="w-full capitalize">
+                                            <SelectValue className="">{data.selected_vehicle || ""}</SelectValue>
+                                        </SelectTrigger>
+                                        <SelectContent className="max-h-[320px] overflow-y-auto">
+                                            {vehicleDetails.map((v, i) => (
+                                                <SelectItem className="hover:bg-slate-100 cursor-pointer text-sm px-2" key={i} value={String(i)}>
+                                                    Vehicle #{i + 1}: {v.model || "Unnamed Vehicle"}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 </div>
 
                                 <div className="mt-8">
@@ -781,7 +979,11 @@ export default function ClaimDetails({
                                     <Label>Upload Documentation</Label>
                                     <FileUpload
                                         multiple
-                                        onFilesSelected={(files) => handleFieldChange(claim.claim_id, "new_file_uploads", files)}
+                                        onFilesSelected={(files) => {
+                                            console.log('files', files)
+                                            handleFieldChange(claim.claim_id, "new_file_uploads", files)
+                                        }
+                                        }
                                     />
                                 </div>
                             </>
@@ -826,7 +1028,7 @@ export default function ClaimDetails({
                                 </div>
                                 <div className="mt-4">
                                     <Label>Slip Accident Type</Label>
-                                    <select
+                                    {/* <select
                                         value={data.slip_accident_type || ""}
                                         onChange={(e) => handleFieldChange(claim.claim_id, "slip_accident_type", e.target.value)}
                                         className="border rounded p-2 w-full"
@@ -837,7 +1039,20 @@ export default function ClaimDetails({
                                             ?.subOptions.map((o) => (
                                                 <option key={o.value} value={o.value}>{o.label}</option>
                                             ))}
-                                    </select>
+                                    </select> */}
+                                    <Select value={data.slip_accident_type || ""} onValueChange={(val) => handleFieldChange(claim.claim_id, "slip_accident_type", val)}>
+                                        <SelectTrigger className="w-full capitalize">
+                                            <SelectValue className="">{data.slip_accident_type || ""}</SelectValue>
+                                        </SelectTrigger>
+                                        <SelectContent className="max-h-[320px] overflow-y-auto">
+                                            {accidentTypeOptions
+                                                .find((opt) => opt.value === "slip_and_fall")
+                                                ?.subOptions.map((o) => (
+                                                    <SelectItem className="hover:bg-slate-100 cursor-pointer text-sm px-2" key={o.value} value={o.value}>{o.label}</SelectItem>
+                                                ))}
+                                        </SelectContent>
+                                    </Select>
+
                                 </div>
                                 <div className="mt-4">
                                     <Label>Negligence Description</Label>
@@ -886,7 +1101,11 @@ export default function ClaimDetails({
                                         <Label>Upload Slip & Fall Documents</Label>
                                         <FileUpload
                                             multiple
-                                            onFilesSelected={(files) => handleFieldChange(claim.claim_id, "new_file_uploads", files)}
+                                            onFilesSelected={(files) => {
+                                                console.log('files', files)
+                                                handleFieldChange(claim.claim_id, "new_file_uploads", files)
+                                            }
+                                            }
                                         />
                                     </div>
                                 </div>
@@ -925,7 +1144,7 @@ export default function ClaimDetails({
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <Label>Type of Assistance</Label>
-                                <select
+                                {/* <select
                                     value={data.medical_assistance_type || ""}
                                     onChange={(e) => handleFieldChange(claim.claim_id, "medical_assistance_type", e.target.value)}
                                     className="border rounded p-2 w-full"
@@ -934,7 +1153,17 @@ export default function ClaimDetails({
                                     {["Medical Treatment", "Hospitalization", "Surgery", "Physical Therapy", "Psychological Therapy", "Other"].map((o) => (
                                         <option key={o} value={o}>{o}</option>
                                     ))}
-                                </select>
+                                </select> */}
+                                <Select value={data.medical_assistance_type || ""} onValueChange={(val) => handleFieldChange(claim.claim_id, "medical_assistance_type", val)}>
+                                    <SelectTrigger className="w-full capitalize">
+                                        <SelectValue className="">{data.medical_assistance_type || ""}</SelectValue>
+                                    </SelectTrigger>
+                                    <SelectContent className="max-h-[320px] overflow-y-auto">
+                                        {["Medical Treatment", "Hospitalization", "Surgery", "Physical Therapy", "Psychological Therapy", "Other"].map((o) => (
+                                            <SelectItem className="hover:bg-slate-100 cursor-pointer text-sm px-2" key={o} value={o}>{o}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
                             <div>
                                 <Label>Diagnosis</Label>
@@ -966,7 +1195,11 @@ export default function ClaimDetails({
                                 <Label>Upload Documents</Label>
                                 <FileUpload
                                     multiple
-                                    onFilesSelected={(files) => handleFieldChange(claim.claim_id, "new_file_uploads", files)}
+                                    onFilesSelected={(files) => {
+                                        console.log('files', files)
+                                        handleFieldChange(claim.claim_id, "new_file_uploads", files)
+                                    }
+                                    }
                                 />
                             </div>
                         </div>
@@ -995,7 +1228,7 @@ export default function ClaimDetails({
                             <div className="relative">
                                 <Label>Estimated Total Cost</Label>
                                 <div className="flex items-center gap-2">
-                                    <select
+                                    {/* <select
                                         value={data.total_cost_currency || "USD"}
                                         onChange={(e) => handleFieldChange(claim.claim_id, "total_cost_currency", e.target.value)}
                                         className="border rounded p-2 w-24"
@@ -1003,7 +1236,18 @@ export default function ClaimDetails({
                                         {currencyOptions.map((c) => (
                                             <option key={c.value} value={c.value}>{c.label}</option>
                                         ))}
-                                    </select>
+                                    </select> */}
+                                    <Select value={data.total_cost_currency || "USD"} onValueChange={(val) => handleFieldChange(claim.claim_id, "total_cost_currency", val)}>
+                                        <SelectTrigger className="w-24">
+                                            <SelectValue className="">{data.total_cost_currency || "USD"}</SelectValue>
+                                        </SelectTrigger>
+                                        <SelectContent className="max-h-[320px] overflow-y-auto">
+                                            {currencyOptions.map((c) => (
+                                                <SelectItem className="hover:bg-slate-100 cursor-pointer text-sm px-2" key={c.value} value={c.value}>{c.label}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+
+                                    </Select>
                                     <Input
                                         name="medical_total_cost"
                                         placeholder="Enter total cost"
@@ -1031,7 +1275,11 @@ export default function ClaimDetails({
                             <Label>Upload documentation:</Label>
                             <FileUpload
                                 multiple
-                                onFilesSelected={(files) => handleFieldChange(claim.claim_id, "new_file_uploads", files)}
+                                onFilesSelected={(files) => {
+                                    console.log('files', files)
+                                    handleFieldChange(claim.claim_id, "new_file_uploads", files)
+                                }
+                                }
                             />
                         </div>
                     )}
@@ -1091,7 +1339,11 @@ export default function ClaimDetails({
                                     <Label>Insurance Company Documentation</Label>
                                     <FileUpload
                                         multiple
-                                        onFilesSelected={(files) => handleFieldChange(claim.claim_id, "new_file_uploads", files)}
+                                        onFilesSelected={(files) => {
+                                            console.log('files', files)
+                                            handleFieldChange(claim.claim_id, "new_file_uploads", files)
+                                        }
+                                        }
                                     />
                                 </div>
                             </div>
@@ -1141,7 +1393,11 @@ export default function ClaimDetails({
                                     <Label>Business Documentation</Label>
                                     <FileUpload
                                         multiple
-                                        onFilesSelected={(files) => handleFieldChange(claim.claim_id, "new_file_uploads", files)}
+                                        onFilesSelected={(files) => {
+                                            console.log('files', files)
+                                            handleFieldChange(claim.claim_id, "new_file_uploads", files)
+                                        }
+                                        }
                                     />
                                 </div>
                             </div>
@@ -1174,7 +1430,11 @@ export default function ClaimDetails({
                                     <Label>Upload File</Label>
                                     <FileUpload
                                         multiple
-                                        onFilesSelected={(files) => handleFieldChange(claim.claim_id, "new_file_uploads", files)}
+                                        onFilesSelected={(files) => {
+                                            console.log('files', files)
+                                            handleFieldChange(claim.claim_id, "new_file_uploads", files)
+                                        }
+                                        }
                                     />
                                 </div>
                             </div>
@@ -1241,7 +1501,11 @@ export default function ClaimDetails({
                                 <Label>Upload All Documents Regarding the Law Firm:</Label>
                                 <FileUpload
                                     multiple
-                                    onFilesSelected={(files) => handleFieldChange(claim.claim_id, "new_file_uploads", files)}
+                                    onFilesSelected={(files) => {
+                                        console.log('files', files)
+                                        handleFieldChange(claim.claim_id, "new_file_uploads", files)
+                                    }
+                                    }
                                 />
                             </div>
                         </div>
