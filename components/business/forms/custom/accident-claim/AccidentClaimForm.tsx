@@ -670,6 +670,9 @@ export default function AccidentClaimForm() {
                                         className=""
                                     />
                                 )}
+                                <span className="text-xs text-gray-500 italic dark:text-gray-400">
+                                    If you don&apos;t know the state or city add &quot;N/A&quot;
+                                </span>
                                 {!formData.accident_state && <p className="text-red-500 text-sm">This field is required.</p>}
                             </div>
                             {/* {formData.accident_type && subAccidentOptions.length > 0 && (

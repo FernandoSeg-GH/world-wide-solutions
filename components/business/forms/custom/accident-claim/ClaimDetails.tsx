@@ -834,7 +834,7 @@ export default function ClaimDetails({
                                         </SelectTrigger>
                                         <SelectContent className="max-h-[320px] overflow-y-auto">
                                             {usaStates.map((st) => (
-                                                <SelectItem className="hover:bg-slate-100 cursor-pointer text-sm px-2" key={st.value} value={st.value}>{st.label}</SelectItem>
+                                                <SelectItem className="hover:bg-slate-100 cursor-pointer text-sm px-2" key={st.label} value={st.value}>{st.label}</SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
@@ -845,6 +845,9 @@ export default function ClaimDetails({
                                         onChange={(e) => handleFieldChange(claim.claim_id, "accident_state", e.target.value)}
                                     />
                                 )}
+                                <span className="text-xs text-gray-500 italic dark:text-gray-400">
+                                    If you don&apos;t know the state or city add &quot;N/A&quot;
+                                </span>
                             </div>
                         </div>
                     ) : (

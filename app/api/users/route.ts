@@ -20,7 +20,6 @@ export async function GET(req: NextRequest) {
         },
       }
     );
-
     if (!response.ok) {
       const errorData = await response.text();
       console.error("Error response from backend:", errorData);
@@ -40,6 +39,7 @@ export async function GET(req: NextRequest) {
       businessId: user.business_id,
       businessName: user.business_name,
       lastLoginAt: user.last_login_at,
+      isActive: user.is_active,
     }));
     return NextResponse.json(users);
   } catch (error) {

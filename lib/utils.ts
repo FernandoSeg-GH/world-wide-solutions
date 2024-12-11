@@ -8,6 +8,16 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export const formatDate = (dateString?: string) => {
+  if (!dateString) return "Never";
+  const date = new Date(dateString);
+  return new Intl.DateTimeFormat("en-GB", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "UTC",
+  }).format(date);
+};
+
 export function deepEqual(obj1: any, obj2: any): boolean {
   if (obj1 === obj2) return true;
 

@@ -106,6 +106,7 @@ const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
                 <div className="border border-gray-300 rounded-lg">
                     {/* Disclosure Button */}
                     <DisclosureButton
+                        as="div"
                         className={cn(
                             "flex justify-between w-full text-sm font-medium text-left ",
                         )}

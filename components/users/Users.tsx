@@ -70,7 +70,11 @@ const Users: React.FC = () => {
                     />
                 )}
 
-                <UserTable users={users} currentUserRole={Number(currentUser?.roleId)} selectedBusiness={selectedBusiness} />
+                {users.length > 0 ? (
+                    <UserTable users={users} currentUserRole={Number(currentUser?.roleId)} selectedBusiness={selectedBusiness} />
+                ) : (
+                    <p>No users found.</p>
+                )}
             </div>
         </div>
     );

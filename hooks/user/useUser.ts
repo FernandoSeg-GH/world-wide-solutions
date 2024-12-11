@@ -11,7 +11,7 @@ export const useUser = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
-  const fetchAllUsers = useCallback(async () => {
+  const fetchAllUsers = useCallback(async (): Promise<User[] | null> => {
     if (
       !session ||
       !session.accessToken ||
@@ -27,12 +27,13 @@ export const useUser = () => {
           Authorization: `Bearer ${session.accessToken}`,
         },
       });
+
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.message || "Failed to fetch users");
       }
 
-      const data = await res.json();
+      const data: User[] = await res.json();
       setUsers(data);
       return data;
     } catch (error) {
@@ -42,6 +43,7 @@ export const useUser = () => {
         description: "An error occurred while fetching users.",
         variant: "destructive",
       });
+      return null;
     } finally {
       setLoading(false);
     }

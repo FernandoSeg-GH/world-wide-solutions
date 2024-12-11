@@ -31,7 +31,6 @@ const AccidentClaimsView: React.FC = () => {
     const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
     // AccidentClaimsView.tsx
-
     useEffect(() => {
         const fetchClaims = async () => {
             try {
@@ -47,7 +46,9 @@ const AccidentClaimsView: React.FC = () => {
                 const initializedClaims: EditableClaim[] = Array.isArray(data.claims)
                     ? data.claims.map((claim: Claim) => ({
                         ...claim,
-                        accident_date: claim.accident_date ? new Date(claim.accident_date).toISOString() : "",
+                        accident_date: claim.accident_date
+                            ? new Date(claim.accident_date).toISOString()
+                            : "",
                         isEditing: false,
                         editedData: mapClaimToFormData(claim, businessId),
                         user: {
@@ -57,6 +58,11 @@ const AccidentClaimsView: React.FC = () => {
                         },
                     }))
                     : [];
+
+                // Sort claims by accident_date (newest first)
+                initializedClaims.sort((a, b) =>
+                    new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime()
+                );
 
                 setClaims(initializedClaims);
                 setLoading(false);
@@ -71,8 +77,6 @@ const AccidentClaimsView: React.FC = () => {
             fetchClaims();
         }
     }, [businessId, session]);
-
-
 
     useEffect(() => {
         // Group claims by user for roles 2,3,4
