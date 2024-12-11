@@ -16,6 +16,8 @@ import jsPDF from "jspdf";
 import autoTable, { RowInput } from 'jspdf-autotable';
 import { flattenClaimData } from "@/lib/utils";
 import _ from "lodash";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { LoaderCircle } from "lucide-react";
 
 const AccidentClaimsView: React.FC = () => {
     const { data: session } = useSession();
@@ -26,6 +28,7 @@ const AccidentClaimsView: React.FC = () => {
     const router = useRouter();
     const businessId = String(session?.user?.businessId);
     const [isSpreadsheetView, setIsSpreadsheetView] = useState<boolean>(false);
+    const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
     // AccidentClaimsView.tsx
 
@@ -379,8 +382,11 @@ const AccidentClaimsView: React.FC = () => {
     };
     if (loading)
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
-                <div className="text-center text-white">Loading...</div>
+            <div className="min-h-screen flex-col gap-2 flex items-center justify-center bg-gray-100 dark:bg-gray-900">
+                <LoaderCircle className="animate-spin h-8 w-8 text-navyBlue dark:text-white" />
+                <p className="animate-pulse text-xs">
+                    LOADING CLAIMS
+                </p>
             </div>
         );
 
@@ -419,20 +425,45 @@ const AccidentClaimsView: React.FC = () => {
                             />
                         </div>
                         {/* Download Buttons */}
-                        {isSpreadsheetView && (
-                            <div className="flex items-center gap-2">
-                                <Button onClick={() => handleDownloadAllClaims('csv')} variant="outline">
-                                    <FaEdit className="mr-2" /> Download CSV
-                                </Button>
-                                {/* <Button onClick={() => handleDownloadAllClaims('pdf')} variant="outline">
-                                    <FaEdit className="mr-2" /> Download PDF
-                                </Button> */}
-                            </div>
-                        )}
+                        {/* {isSpreadsheetView && (
+                                <div className="flex items-center gap-2">
+                                    <Button onClick={() => handleDownloadAllClaims('csv')} variant="outline">
+                                        <FaEdit className="mr-2" /> Download CSV
+                                    </Button>
+                                <Button onClick={() => handleDownloadAllClaims('pdf')} variant="outline">
+                                        <FaEdit className="mr-2" /> Download PDF
+                                    </Button>  
+                                </div>
+                            )} 
+                        */}
 
                     </div>
 
                 </div>
+                {[2, 3, 4].includes(Number(session?.user?.role.id)) && (
+                    <div className="mb-4">
+                        <Select
+                            onValueChange={setSelectedUserId}
+                            value={selectedUserId || undefined}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select a user" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All Users</SelectItem>
+                                {groupedClaims.map((group) => (
+                                    <SelectItem
+                                        key={group.user.user_id}
+                                        value={group.user.user_id}
+                                    >
+                                        {group.user.username} ({group.user.user_email})
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                )}
+
 
                 {/* Claims List */}
                 {claims.length === 0 ? (
@@ -456,44 +487,49 @@ const AccidentClaimsView: React.FC = () => {
                             ))
                         ) : (
                             // Roles 2,3,4: Business/Admin - Group claims by user
-                            groupedClaims.map((group, index) => (
-                                <div key={group.user.user_id} className="border-t border-gray-300 dark:border-gray-600 pt-6">
-                                    {/* User Subheader */}
-                                    <div className="mb-4">
-                                        <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
-                                            Submitted by: <span className="capitalize">{group.user.username}</span>
-                                        </h2>
-                                        <p className="text-gray-600 dark:text-gray-400">
-                                            {group.user.user_email}
-                                        </p>
-                                    </div>
-                                    {/* Claims for the User */}
-                                    <div className="space-y-6">
-                                        {group.claims.map((claim) => {
-                                            return (
-                                                <ClaimAccordion
-                                                    handleStatusChange={handleStatusChange}
-                                                    key={claim.claim_id}
-                                                    claim={claim}
-                                                    toggleEdit={toggleEdit}
-                                                    handleFieldChange={handleFieldChange}
-                                                    handleSave={handleSave}
-                                                    handleCancel={handleCancel}
-                                                />
-                                            )
-                                        })}
-                                    </div>
-                                    {/* Optional: Add a horizontal separator between user groups, except after the last group */}
-                                    {/* {index < groupedClaims.length - 1 && (
+                            groupedClaims
+                                .filter((group) =>
+                                    selectedUserId === "all" || !selectedUserId
+                                        ? true
+                                        : group.user.user_id === selectedUserId
+                                ).map((group) => (
+                                    <div key={group.user.user_id} className="border-t border-gray-300 dark:border-gray-600 pt-6">
+                                        {/* User Subheader */}
+                                        <div className="mb-4">
+                                            <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
+                                                Submitted by: <span className="capitalize">{group.user.username}</span>
+                                            </h2>
+                                            <p className="text-gray-600 dark:text-gray-400">
+                                                {group.user.user_email}
+                                            </p>
+                                        </div>
+                                        {/* Claims for the User */}
+                                        <div className="space-y-6">
+                                            {group.claims.map((claim) => {
+                                                return (
+                                                    <ClaimAccordion
+                                                        handleStatusChange={handleStatusChange}
+                                                        key={claim.claim_id}
+                                                        claim={claim}
+                                                        toggleEdit={toggleEdit}
+                                                        handleFieldChange={handleFieldChange}
+                                                        handleSave={handleSave}
+                                                        handleCancel={handleCancel}
+                                                    />
+                                                )
+                                            })}
+                                        </div>
+                                        {/* Optional: Add a horizontal separator between user groups, except after the last group */}
+                                        {/* {index < groupedClaims.length - 1 && (
                                         <hr className="mt-6 border-gray-300 dark:border-gray-600" />
                                     )} */}
-                                </div>
-                            ))
+                                    </div>
+                                ))
                         )}
                     </div>
                 )}
             </div>
-        </div>
+        </div >
     );
 
 };

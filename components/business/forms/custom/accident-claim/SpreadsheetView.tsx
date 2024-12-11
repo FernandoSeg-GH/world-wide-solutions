@@ -58,9 +58,9 @@ const SpreadsheetView: React.FC<SpreadsheetViewProps> = ({ claims }) => {
                 {/* <Button onClick={() => handleDownload('excel')} className="mr-2">
                     <FaDownload className="mr-2" /> Download Excel
                 </Button> */}
-                <Button onClick={() => handleDownload('pdf')}>
+                {/* <Button onClick={() => handleDownload('pdf')}>
                     <FaDownload className="mr-2" /> Download PDF
-                </Button>
+                </Button> */}
             </div>
             {/* Table */}
             <div className="overflow-x-auto">

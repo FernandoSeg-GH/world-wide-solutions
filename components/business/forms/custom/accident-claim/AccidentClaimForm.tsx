@@ -929,7 +929,6 @@ export default function AccidentClaimForm() {
                                 <FaWalking />
                                 Slip and Fall Accident Details
                             </h2>
-
                             <p className="text-gray-600 dark:text-gray-400 mb-6">
                                 In this section, provide all the details regarding the slip and fall accident.
                             </p>
