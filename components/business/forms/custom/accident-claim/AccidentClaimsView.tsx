@@ -469,7 +469,7 @@ const AccidentClaimsView: React.FC = () => {
                 {claims.length === 0 ? (
                     <p className="text-center text-gray-500 dark:text-gray-400">No claims found.</p>
                 ) : isSpreadsheetView ? (
-                    <SpreadsheetView claims={claims} />
+                    <SpreadsheetView claims={claims} selectedUserId={selectedUserId} />
                 ) : (
                     <div className="space-y-6">
                         {session?.user?.role.id === 1 ? (
