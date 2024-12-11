@@ -14,7 +14,7 @@ export default function DashboardPage() {
     }
 
     if (!session?.accessToken) {
-        router.push("/login");
+        router.push("/auth/sign-in");
     }
 
     return <Dashboard />;
