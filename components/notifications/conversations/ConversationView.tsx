@@ -1,15 +1,15 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { InboxMessage } from '@/types';
-import { useLayout } from '@/hooks/layout/useLayout';
+import React, { useEffect, useState } from "react";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { InboxMessage } from "@/types";
+import { useLayout } from "@/hooks/layout/useLayout";
 import { useToast } from "@/components/ui/use-toast";
 import { useMessages } from "@/hooks/notifications/useMessages";
-import { useSession } from 'next-auth/react';
-import Submissions from '@/components/business/forms/submissions';
-import { Loader2 } from 'lucide-react';
+import { useSession } from "next-auth/react";
+import Submissions from "@/components/business/forms/submissions";
+import { Loader2 } from "lucide-react";
 
 interface ConversationViewProps {
     conversationId: number;
@@ -21,11 +21,10 @@ const ConversationView: React.FC<ConversationViewProps> = ({ conversationId }) =
     const { fetchMessages, messages, replyToMessage, loading } = useMessages();
     const { switchSection, currentSection } = useLayout();
 
-    const [content, setContent] = useState<string>('');
+    const [content, setContent] = useState<string>("");
     const [sending, setSending] = useState<boolean>(false);
 
     useEffect(() => {
-        console.log("Fetching messages for:", conversationId);
         fetchMessages(conversationId);
     }, [conversationId, fetchMessages]);
 
@@ -50,21 +49,22 @@ const ConversationView: React.FC<ConversationViewProps> = ({ conversationId }) =
             toast({
                 title: "Success",
                 description: "Reply sent successfully.",
-                variant: "default",
             });
             setContent("");
             fetchMessages(conversationId);
         } catch (error: any) {
-            console.error("Error sending reply:", error);
             toast({
                 title: "Error",
                 description: error.message || "Error sending reply.",
                 variant: "destructive",
             });
+            console.error("Error sending reply:", error);
         } finally {
             setSending(false);
         }
     };
+
+    const getUserInitial = (username: string) => username.charAt(0).toUpperCase();
 
     if (currentSection === "Submissions") {
         return <Submissions />;
@@ -72,45 +72,69 @@ const ConversationView: React.FC<ConversationViewProps> = ({ conversationId }) =
 
     return (
         <div className="flex flex-col h-full">
+            {/* Header */}
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-2xl font-semibold">Conversation</h2>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-2 bg-gray-50 rounded-md relative">
+            {/* Messages Container */}
+            <div className="flex-1 overflow-y-auto p-4 bg-gray-50 rounded-md relative">
                 {loading ? (
-                    <div className="flex items-center justify-center h-full">
+                    <div className="flex items-center justify-center h-full text-gray-500">
                         <Loader2 className="animate-spin w-6 h-6 text-gray-500" />
-                        <span className="ml-2 text-gray-600">Loading conversation...</span>
+                        <span className="ml-2">Loading your messages...</span>
                     </div>
                 ) : (
                     <>
                         {Array.isArray(messages) && messages.length > 0 ? (
-                            messages.map((msg: InboxMessage) => (
-                                <div
-                                    key={msg.messageId}
-                                    className={`flex flex-col mb-4 p-3 rounded-md max-w-lg break-words ${msg.senderId === session?.user.id
-                                        ? 'bg-blue-100 text-right ml-auto'
-                                        : 'bg-gray-200 text-left mr-auto'
-                                        }`}
-                                >
-                                    <div className='flex flex-col'>
-                                        <p>{msg.content}</p>
-                                        <small className="text-gray-500">
-                                            {new Date(msg.timestamp).toLocaleString()}
-                                        </small>
-                                        {msg.senderId !== session?.user.id && hasSpecificForm(msg) && (
-                                            <Button
-                                                onClick={() => switchSection("Submissions")}
-                                                className="mt-2 bg-primary hover:bg-primary-dark text-white text-sm"
-                                            >
-                                                View Submissions
-                                            </Button>
+                            messages.map((msg: InboxMessage) => {
+                                const isUserMessage = msg.senderId === session?.user.id;
+
+                                return (
+                                    <div
+                                        key={msg.messageId}
+                                        className={`flex items-start mb-4 ${isUserMessage ? "justify-end" : "justify-start"
+                                            }`}
+                                    >
+                                        {/* Left Bubble for Incoming Message */}
+                                        {!isUserMessage && (
+                                            <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-white bg-gray-500 mr-4 shadow-md mt-4">
+                                                {getUserInitial(msg.senderUsername || "U")}
+                                            </div>
+                                        )}
+
+                                        {/* Message Content */}
+                                        <div
+                                            className={`max-w-xl p-3 rounded-md shadow-md break-words ${isUserMessage
+                                                ? "bg-blue-100 text-right"
+                                                : "bg-gray-200 text-left"
+                                                }`}
+                                        >
+                                            <p>{msg.content}</p>
+                                            <small className="text-gray-500 block mt-1">
+                                                {new Date(msg.timestamp).toLocaleString()}
+                                            </small>
+                                            {!isUserMessage && hasSpecificForm(msg) && (
+                                                <Button
+                                                    onClick={() => switchSection("Submissions")}
+                                                    className="mt-2 bg-primary hover:bg-primary-dark text-white text-sm"
+                                                >
+                                                    View Submissions
+                                                </Button>
+                                            )}
+                                        </div>
+
+                                        {/* Right Bubble for Outgoing Message */}
+                                        {isUserMessage && (
+                                            <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-white bg-blue-500 ml-4 shadow-md mt-4">
+                                                {getUserInitial(msg.senderUsername || "U")}
+                                            </div>
                                         )}
                                     </div>
-                                </div>
-                            ))
+                                );
+                            })
                         ) : (
-                            <div className="text-gray-500 flex items-center justify-center h-full text-center">
+                            <div className="flex items-center justify-center h-full text-gray-500 text-center">
                                 No messages found in this conversation.
                             </div>
                         )}
@@ -118,10 +142,13 @@ const ConversationView: React.FC<ConversationViewProps> = ({ conversationId }) =
                 )}
             </div>
 
-            <div className="mt-4">
+            {/* Reply Section */}
+            <div className="mt-4 flex flex-col">
                 <Textarea
                     value={content}
-                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setContent(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                        setContent(e.target.value)
+                    }
                     placeholder="Type your reply..."
                     rows={3}
                     className="block w-full mt-1 border border-gray-300 rounded-md p-2"
@@ -141,8 +168,7 @@ const ConversationView: React.FC<ConversationViewProps> = ({ conversationId }) =
     );
 };
 
-const hasSpecificForm = (message: InboxMessage) => {
-    return message.content.includes('patient-personal-information');
-};
+const hasSpecificForm = (message: InboxMessage) =>
+    message.content.includes("patient-personal-information");
 
 export default ConversationView;

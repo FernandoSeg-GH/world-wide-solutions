@@ -20,24 +20,20 @@ import {
 } from "@/components/ui/dialog";
 import { useSession } from "next-auth/react";
 import { useMessages } from "@/hooks/notifications/useMessages";
-import { ConversationSummary as ConversationType } from "@/types";
-import { PlusIcon } from "lucide-react";
+import { ConversationSummary as ConversationType, UserWithClaims } from "@/types";
+import { Loader2, PlusIcon } from "lucide-react";
+import ConversationSummary from "./ConversationSummary";
+import { Claim } from "@/components/business/forms/custom/accident-claim/config/types";
 
-interface Claim {
-    claimId: number;
-    claimantName: string;
-    status: string;
+interface ConversationListProps {
+    onSelectConversation: (conversationId: number) => void;
+    selectedConversationId: number | null;
 }
 
-interface UserWithClaims {
-    userId: number;
-    username: string;
-    claims: Claim[];
-}
-
-const ConversationList: React.FC<{
-    onSelectConversation: (conversationId: string | number) => void;
-}> = ({ onSelectConversation }) => {
+const ConversationList: React.FC<ConversationListProps> = ({
+    onSelectConversation,
+    selectedConversationId,
+}) => {
     const { toast } = useToast();
     const { data: session } = useSession();
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -58,18 +54,16 @@ const ConversationList: React.FC<{
     const role_id = session?.user?.role?.id;
 
     useEffect(() => {
-        setIsLoading(true);
-        fetchConversations();
-
-        (async () => {
+        const loadData = async () => {
+            setIsLoading(true);
             try {
+                await fetchConversations();
                 const data = await fetchUsersWithClaims();
                 setUsersWithClaims(data || []);
 
-                if (role_id === 1) {
-                    setSelectedUserId(Number(session?.user?.id));
+                if (role_id === 1 && session?.user?.id) {
+                    setSelectedUserId(Number(session.user.id));
                 }
-
             } catch (error: any) {
                 toast({
                     title: "Error",
@@ -80,14 +74,14 @@ const ConversationList: React.FC<{
             } finally {
                 setIsLoading(false);
             }
-        })();
+        };
+
+        loadData();
     }, [fetchConversations, fetchUsersWithClaims, session, toast, role_id]);
 
     const handleOpenModal = () => {
         setSelectedClaimId(null);
         setMessageContent("");
-        // If role 1, user is already known (themselves)
-        // If role 2,3,4, clear the selectedUserId
         if (role_id !== 1) {
             setSelectedUserId(null);
         }
@@ -95,9 +89,7 @@ const ConversationList: React.FC<{
     };
 
     const handleSendMessage = async () => {
-        // Validation
         if (role_id === 1) {
-            // Role 1: must have a claim and a message
             if (!selectedClaimId || !messageContent.trim()) {
                 toast({
                     title: "Missing Information",
@@ -107,7 +99,6 @@ const ConversationList: React.FC<{
                 return;
             }
         } else {
-            // Roles 2,3,4: must have both a user and a claim
             if (!selectedUserId || !selectedClaimId || !messageContent.trim()) {
                 toast({
                     title: "Missing Information",
@@ -125,32 +116,6 @@ const ConversationList: React.FC<{
                 read_only: false,
                 accident_claim_id: selectedClaimId,
             };
-
-            // For role 1, selectedUserId is themselves, so we need to pick another participant?
-            // Actually, if role 1 starts a conversation, we need at least one recipient_id different from themselves.
-            // Adjust logic: For role 1, we must choose from the claims that belong to them. 
-            // The "recipient_ids" here is a bit ambiguous. 
-            // Let's clarify the logic:
-            // If role 1 is starting a conversation, who are they messaging to?
-            // The UI currently only sets recipient_ids from selectedUserId.
-            // For role 1, we should provide a default "recipient" that would be from "uniqueUsers" 
-            // Actually, for role 1 scenario:
-            // If role 1 is messaging, they must be able to pick a claim and maybe the admin user that the message is going to.
-            // Let's force a scenario:
-            // If role 1 is starting a conversation, since they see only their claims, 
-            // we can show all admins in the user dropdown (like for roles 2,3,4) but disabled if we don't want that?
-            // The problem states: 
-            // "if user role 1 start the conversation, user role2,3,4 doesn't see it."
-            // We must ensure that user role 2,3,4 are always participants or can see all conversations.
-
-            // Let's just ensure that for role 1, they must also pick the user (like roles 2,3,4 do), 
-            // since otherwise who are they messaging to?
-            // This gives user 1 the ability to pick from the uniqueUsers and a claim they own.
-            // If we want user 1 to skip user selection, we must define a default recipient (like a system user).
-
-            // To keep consistent, let's require user selection for everyone. 
-            // If the product requires otherwise, we can adjust. For now, let's unify logic:
-            // Everyone picks user and claim.
 
             await sendMessageToUsers(
                 payload.recipient_ids,
@@ -187,7 +152,6 @@ const ConversationList: React.FC<{
         [usersWithClaims]
     );
 
-    // Filter claims of the selected user
     const selectedUserClaims = useMemo(() => {
         if (!selectedUserId) return [];
         const userObj = usersWithClaims.find((u) => u.userId === selectedUserId);
@@ -196,26 +160,30 @@ const ConversationList: React.FC<{
 
     return (
         <div className="h-full flex flex-col">
-            <div className="flex border-b pb-3 items-center justify-between">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold">Your Conversations</h2>
-
-                <Button
-                    onClick={handleOpenModal}
-                    variant="outline"
-                    className="text-xs"
-                >
-                    <PlusIcon className="mr-2" size={16} />
-                    New Conversation
-                </Button>
+                <div className="md:hidden">
+                    <Button onClick={handleOpenModal} variant="outline" size="sm">
+                        <PlusIcon className="mr-2" size={16} />
+                        New Conversation
+                    </Button>
+                </div>
             </div>
 
-            <div className="flex-1 overflow-auto mt-4">
-                {conversations.length > 0 ? (
+            {/* Conversations List */}
+            <div className="flex-1 overflow-auto mt-2">
+                {isLoading ? (
+                    <div className="flex items-center justify-center h-full text-gray-500">
+                        Loading conversations...
+                    </div>
+                ) : conversations.length > 0 ? (
                     conversations.map((conversation) =>
                         conversation.conversationId !== undefined ? (
                             <ConversationSummary
                                 key={conversation.conversationId}
                                 conversation={conversation}
+                                isSelected={conversation.conversationId === selectedConversationId}
                                 onClick={() => onSelectConversation(conversation.conversationId!)}
                             />
                         ) : null
@@ -225,6 +193,15 @@ const ConversationList: React.FC<{
                 )}
             </div>
 
+            {/* New Conversation Button for Desktop */}
+            <div className="mt-4 hidden md:block">
+                <Button onClick={handleOpenModal} variant="outline" >
+                    <PlusIcon className="mr-2" size={16} />
+                    New Conversation
+                </Button>
+            </div>
+
+            {/* New Conversation Modal */}
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                 <DialogContent>
                     <DialogHeader>
@@ -232,39 +209,32 @@ const ConversationList: React.FC<{
                     </DialogHeader>
                     <DialogDescription className="space-y-4">
                         {isLoading ? (
-                            <div>Loading users...</div>
+                            <div className="flex items-center justify-center">
+                                <Loader2 className="animate-spin w-6 h-6 text-gray-500" />
+                                <span className="ml-2 text-gray-600">Loading users...</span>
+                            </div>
                         ) : (
                             <>
-                                {/* Everyone picks a user and a claim now for clarity */}
+                                {/* User Selection */}
                                 <Select
-                                    onValueChange={(value) =>
-                                        setSelectedUserId(Number(value))
-                                    }
-                                    value={
-                                        selectedUserId
-                                            ? String(selectedUserId)
-                                            : undefined
-                                    }
+                                    onValueChange={(value) => setSelectedUserId(Number(value))}
+                                    value={selectedUserId ? String(selectedUserId) : undefined}
                                 >
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select a user" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {uniqueUsers.map((user) => (
-                                            <SelectItem
-                                                key={user.userId}
-                                                value={String(user.userId)}
-                                            >
+                                            <SelectItem key={user.userId} value={String(user.userId)}>
                                                 {user.username}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
 
+                                {/* Claim Selection */}
                                 <Select
-                                    onValueChange={(value) =>
-                                        setSelectedClaimId(value)
-                                    }
+                                    onValueChange={(value) => setSelectedClaimId(value)}
                                     disabled={!selectedUserId}
                                     value={selectedClaimId || undefined}
                                 >
@@ -274,12 +244,9 @@ const ConversationList: React.FC<{
                                     <SelectContent>
                                         {selectedUserId ? (
                                             selectedUserClaims.length > 0 ? (
-                                                selectedUserClaims.map((claim) => (
-                                                    <SelectItem
-                                                        key={claim.claimId}
-                                                        value={String(claim.claimId)}
-                                                    >
-                                                        {`Claim #${claim.claimId} - ${claim.claimantName} (${claim.status})`}
+                                                selectedUserClaims.map((claim: Claim) => (
+                                                    <SelectItem key={claim.claim_id} value={claim.claim_id}>
+                                                        {`Claim #${claim.claim_id} - ${claim.full_name} (${claim.status})`}
                                                     </SelectItem>
                                                 ))
                                             ) : (
@@ -291,30 +258,25 @@ const ConversationList: React.FC<{
                                     </SelectContent>
                                 </Select>
 
+
+                                {/* Message Content */}
                                 <textarea
                                     className="w-full border rounded-md p-2"
                                     placeholder="Enter your message..."
                                     value={messageContent}
-                                    onChange={(e) =>
-                                        setMessageContent(e.target.value)
-                                    }
+                                    onChange={(e) => setMessageContent(e.target.value)}
                                 />
                             </>
                         )}
                     </DialogDescription>
                     <DialogFooter>
-                        <Button
-                            variant="secondary"
-                            onClick={() => setIsModalOpen(false)}
-                        >
+                        <Button variant="secondary" onClick={() => setIsModalOpen(false)}>
                             Cancel
                         </Button>
                         <Button
                             onClick={handleSendMessage}
                             disabled={
-                                !selectedUserId ||
-                                !selectedClaimId ||
-                                !messageContent.trim()
+                                !selectedUserId || !selectedClaimId || !messageContent.trim()
                             }
                         >
                             Send Message
@@ -327,52 +289,3 @@ const ConversationList: React.FC<{
 };
 
 export default ConversationList;
-
-
-export function ConversationSummary({
-    conversation,
-    onClick,
-}: {
-    conversation: ConversationType;
-    onClick: () => void;
-}) {
-    const { accidentClaimId, lastMessage, participants } = conversation;
-
-    const formattedTimestamp = lastMessage?.timestamp
-        ? new Date(lastMessage.timestamp).toLocaleString()
-        : null;
-
-    return (
-        <div
-            className="flex flex-col p-4 border-b cursor-pointer hover:bg-gray-50 transition-colors duration-150"
-            onClick={onClick}
-        >
-            <div className="flex justify-between items-center w-full">
-                <h3 className="text-md font-medium text-gray-800 truncate">
-                    Subject: <span className="font-semibold">Claim #{accidentClaimId}</span>
-                </h3>
-            </div>
-            {formattedTimestamp && (
-                <span className="text-xs text-gray-400 my-1 underline">
-                    {formattedTimestamp}
-                </span>
-            )}
-
-            <div className="text-sm text-gray-700">
-                <span className="font-medium">From:</span>{" "}
-                {lastMessage?.senderUsername || "Unknown Sender"}
-            </div>
-
-            <div className="text-sm text-gray-700">
-                <span className="font-medium">To:</span>{" "}
-                {participants && participants.length > 0
-                    ? participants.map((p) => p.username).join(", ")
-                    : "N/A"}
-            </div>
-
-            <div className="mt-1 text-sm text-gray-600 line-clamp-1">
-                {lastMessage?.content || "No messages yet"}
-            </div>
-        </div>
-    );
-}

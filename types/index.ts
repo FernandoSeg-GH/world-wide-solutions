@@ -13,7 +13,10 @@ import { TelephoneFieldFormElement } from "@/components/builder/fields/Telephone
 import { Dispatch, SetStateAction } from "react";
 import { FileUploadFieldFormElement } from "@/components/builder/fields/FileUploadField";
 import { ExpandableSelectFieldFormElement } from "@/components/builder/fields/ExpandableSelectField";
-import { AccidentClaimFormData } from "@/components/business/forms/custom/accident-claim/config/types";
+import {
+  AccidentClaimFormData,
+  Claim,
+} from "@/components/business/forms/custom/accident-claim/config/types";
 
 export enum BrandColors {
   BluePrimary = "#151342",
@@ -52,6 +55,11 @@ export interface User {
   aiCharacters?: UserAICharacter[];
 }
 
+export type UserWithClaims = {
+  userId: number;
+  username: string;
+  claims: Claim[];
+};
 export interface Business {
   id: number;
   name: string;

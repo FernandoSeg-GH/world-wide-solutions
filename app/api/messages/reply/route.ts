@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { last } from "lodash";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -29,14 +30,13 @@ export async function POST(req: NextRequest) {
           Authorization: `Bearer ${session.accessToken}`,
         },
         body: JSON.stringify({
-          message_id,
-          content,
+          message_id, // Correct variable usage
+          content, // Correct variable usage
         }),
       }
     );
 
     const data = await response.json();
-
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
     console.error("Error replying to message:", error);
