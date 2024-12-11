@@ -15,7 +15,8 @@ interface SpreadsheetViewProps {
 }
 
 const SpreadsheetView: React.FC<SpreadsheetViewProps> = ({ claims }) => {
-    const headers = Object.keys(flattenClaimData(claims[0])); // Get headers from the first claim
+    const headers = Object.keys(flattenClaimData(claims[0]))
+        .filter(header => !header.includes('file_uploads')); // Exclude file uploads
 
     const handleDownload = (format: 'csv' | 'excel' | 'pdf') => {
         const worksheetData = claims.map(claim => flattenClaimData(claim));
@@ -37,7 +38,9 @@ const SpreadsheetView: React.FC<SpreadsheetViewProps> = ({ claims }) => {
         } else if (format === 'pdf') {
             const doc = new jsPDF();
             const tableColumn = headers;
-            const tableRows = worksheetData.map(data => Object.values(data));
+            const tableRows = worksheetData.map(data =>
+                headers.map(header => data[header])
+            );
 
             autoTable(doc, {
                 head: [tableColumn],
@@ -83,7 +86,7 @@ const SpreadsheetView: React.FC<SpreadsheetViewProps> = ({ claims }) => {
                                 <tr key={claim.claim_id}>
                                     {headers.map((header) => (
                                         <td key={header} className="border px-4 py-2  whitespace-nowrap">
-                                            {String(flatClaim[header] || '')}
+                                            {header.includes('date') ? new Date(flatClaim[header]).toLocaleDateString() : flatClaim[header]}
                                         </td>
                                     ))}
                                 </tr>
