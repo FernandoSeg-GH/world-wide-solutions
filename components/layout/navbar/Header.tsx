@@ -83,7 +83,7 @@ export function Header({ currentSection, isExpanded }: HeaderProps) {
             )}
 
             <div className="flex gap-4 items-center">
-                <ThemeSwitcher />
+                {/* <ThemeSwitcher /> */}
                 <UserMenu />
 
             </div>
