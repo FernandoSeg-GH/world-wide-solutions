@@ -20,44 +20,39 @@ interface SpreadsheetViewProps {
 const flattenClaim = (claim: EditableClaim) => {
     const flatClaim: Record<string, any> = { ...claim };
 
+    // Format date fields
     ["accident_date", "created_at", "updated_at"].forEach((dateField) => {
         if (flatClaim[dateField]) {
             flatClaim[dateField] = formatDate(flatClaim[dateField]);
         }
     });
-    // Expand vehicle_details array
-    try {
-        const vehicles = typeof claim.vehicle_details === 'string' ? JSON.parse(claim.vehicle_details) : [];
-        vehicles.forEach((vehicle: Record<string, any>, index: number) => {
-            Object.entries(vehicle).forEach(([key, value]: [string, any]) => {
-                flatClaim[`vehicle_${index + 1}_${key}`] = value;
-            });
-        });
-    } catch (error) {
-        console.error("Error parsing vehicle_details:", error);
-    }
 
-    // Expand costs arrays
-    ["medical_provider_costs", "repatriation_costs", "other_costs"].forEach((costType) => {
+    // Safely parse JSON-like fields
+    ["vehicle_details", "medical_provider_costs", "repatriation_costs", "other_costs"].forEach((key) => {
         try {
-            const costs = JSON.parse((claim as Record<string, any>)[costType] || "[]");
-            costs.forEach((cost: Record<string, any>, index: number) => {
-                Object.entries(cost).forEach(([key, value]: [string, any]) => {
-                    flatClaim[`${costType}_${index + 1}_${key}`] = value;
+            const parsed = typeof flatClaim[key] === "string" ? JSON.parse(flatClaim[key]) : flatClaim[key];
+            if (Array.isArray(parsed)) {
+                parsed.forEach((item: Record<string, any>, idx: number) => {
+                    Object.entries(item).forEach(([subKey, value]) => {
+                        flatClaim[`${key}_${idx + 1}_${subKey}`] = typeof value === "object"
+                            ? JSON.stringify(value)
+                            : value;
+                    });
                 });
-            });
+            }
         } catch (error) {
-            console.error(`Error parsing ${costType}:`, error);
+            console.error(`Error parsing ${key}:`, error);
         }
     });
 
-    // Remove unwanted columns explicitly
+    // Remove unwanted keys
     ["file_uploads", "vehicle_details", "medical_provider_costs", "repatriation_costs", "other_costs"].forEach((key) => {
         delete flatClaim[key];
     });
 
     return flatClaim;
 };
+
 
 const expandClaims = (claims: EditableClaim[]) => {
     const expandedClaims = claims.map(flattenClaim);
@@ -144,14 +139,13 @@ const SpreadsheetView: React.FC<SpreadsheetViewProps> = ({ claims, selectedUserI
                             <tr key={index}>
                                 {headers.map((header) => (
                                     <td key={header} className="border px-4 py-2 whitespace-nowrap">
-                                        {header.includes("date") && claim[header]
-                                            ? new Date(claim[header]).toLocaleDateString()
-                                            : claim[header] || ""}
+                                        {typeof claim[header] === "object" ? JSON.stringify(claim[header]) : claim[header] || ""}
                                     </td>
                                 ))}
                             </tr>
                         ))}
                     </tbody>
+
                 </table>
             </div>
         </div>
