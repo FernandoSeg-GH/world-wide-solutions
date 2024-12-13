@@ -1,4 +1,4 @@
-"use client";
+// ConversationList.tsx
 
 import React, { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,7 @@ import {
     DialogDescription,
 } from "@/components/ui/dialog";
 import { useSession } from "next-auth/react";
-import { useMessages } from "@/hooks/notifications/useMessages";
+import { useMessagesContext } from "@/context/MessagesContext"; // Import the context hook
 import { ConversationSummary as ConversationType, UserWithClaims } from "@/types";
 import { Loader2, PlusIcon } from "lucide-react";
 import ConversationSummary from "./ConversationSummary";
@@ -48,8 +48,9 @@ const ConversationList: React.FC<ConversationListProps> = ({
         fetchConversations,
         fetchUsersWithClaims,
         conversations,
+        markMessagesAsRead,
         setConversations,
-    } = useMessages();
+    } = useMessagesContext(); // Use the context
 
     const role_id = session?.user?.role?.id;
 
@@ -111,9 +112,9 @@ const ConversationList: React.FC<ConversationListProps> = ({
 
         try {
             const payload = {
-                recipient_ids: [selectedUserId!],
+                recipient_ids: role_id !== 1 ? [selectedUserId!] : [Number(session?.user.id)],
                 content: messageContent.trim(),
-                read_only: false,
+                read_only: false, // If applicable
                 accident_claim_id: selectedClaimId,
             };
 
@@ -121,7 +122,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
                 payload.recipient_ids,
                 payload.content,
                 payload.read_only,
-                payload.accident_claim_id
+                Number(payload.accident_claim_id)
             );
 
             toast({
@@ -158,6 +159,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
         return userObj?.claims || [];
     }, [selectedUserId, usersWithClaims]);
 
+    console.log('conversations', conversations)
     return (
         <div className="h-full flex flex-col">
             {/* Header */}
@@ -184,7 +186,12 @@ const ConversationList: React.FC<ConversationListProps> = ({
                                 key={conversation.conversationId}
                                 conversation={conversation}
                                 isSelected={conversation.conversationId === selectedConversationId}
-                                onClick={() => onSelectConversation(conversation.conversationId!)}
+                                onClick={() => {
+                                    onSelectConversation(conversation.conversationId!);
+                                    markMessagesAsRead(conversation.conversationId!); // Mark as read on click
+                                }}
+                                unreadCount={conversation.unreadCount}
+                                onMarkAsRead={(id: number) => markMessagesAsRead(id)}
                             />
                         ) : null
                     )
@@ -219,6 +226,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
                                 <Select
                                     onValueChange={(value) => setSelectedUserId(Number(value))}
                                     value={selectedUserId ? String(selectedUserId) : undefined}
+                                    disabled={role_id === 1} // Disable for Role 1
                                 >
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select a user" />
@@ -235,7 +243,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
                                 {/* Claim Selection */}
                                 <Select
                                     onValueChange={(value) => setSelectedClaimId(value)}
-                                    disabled={!selectedUserId}
+                                    disabled={(role_id !== 1 && !selectedUserId) || isLoading}
                                     value={selectedClaimId || undefined}
                                 >
                                     <SelectTrigger>
@@ -246,14 +254,23 @@ const ConversationList: React.FC<ConversationListProps> = ({
                                             selectedUserClaims.length > 0 ? (
                                                 selectedUserClaims.map((claim: Claim) => (
                                                     <SelectItem key={claim.claim_id} value={claim.claim_id}>
-                                                        {`Claim #${claim.claim_id} - ${claim.full_name} (${claim.status})`}
+                                                        {`Claim #${claim.claim_id || "N/A"} - ${claim.full_name || "Unknown"} (${claim.status || "Unknown"})`}
                                                     </SelectItem>
                                                 ))
                                             ) : (
-                                                <p className="p-2">No claims available for this user</p>
+                                                <div className="p-2">No claims available for this user</div>
                                             )
+                                        ) : role_id === 1 ? (
+                                            usersWithClaims
+                                                .filter(user => user.userId === Number(session?.user?.id))
+                                                .flatMap(user => user.claims)
+                                                .map((claim) => (
+                                                    <SelectItem key={claim.claim_id} value={claim.claim_id}>
+                                                        {`Claim #${claim.claim_id || "N/A"} - ${claim.full_name || "Unknown"} (${claim.status || "Unknown"})`}
+                                                    </SelectItem>
+                                                ))
                                         ) : (
-                                            <p className="p-2">Select a user first</p>
+                                            <div className="p-2">Select a user first</div>
                                         )}
                                     </SelectContent>
                                 </Select>
@@ -276,7 +293,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
                         <Button
                             onClick={handleSendMessage}
                             disabled={
-                                !selectedUserId || !selectedClaimId || !messageContent.trim()
+                                (role_id !== 1 && (!selectedUserId || !selectedClaimId)) || !messageContent.trim()
                             }
                         >
                             Send Message
@@ -286,6 +303,6 @@ const ConversationList: React.FC<ConversationListProps> = ({
             </Dialog>
         </div>
     );
-};
+}
 
 export default ConversationList;

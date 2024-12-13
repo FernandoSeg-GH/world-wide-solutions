@@ -61,7 +61,7 @@ const AccidentClaimsView: React.FC = () => {
 
                 // Sort claims by accident_date (newest first)
                 initializedClaims.sort((a, b) =>
-                    new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime()
+                    new Date(a.updated_at || "").getTime() - new Date(b.updated_at || "").getTime()
                 );
 
                 setClaims(initializedClaims);
@@ -114,6 +114,11 @@ const AccidentClaimsView: React.FC = () => {
                         ...claim,
                         isEditing: isNowEditing,
                         editedData: newEditedData,
+                        user: {
+                            ...claim.user,
+                            username: claim.user.username || "",
+                            user_email: claim.user.user_email || "",
+                        } as { user_id: string; username: string; user_email: string },
                     };
                 }
                 return claim;
@@ -207,7 +212,7 @@ const AccidentClaimsView: React.FC = () => {
         Object.entries(claimToUpdate.editedData).forEach(([key, value]) => {
             if (key === 'new_file_uploads') return;
 
-            if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+            if (typeof value === "object" && value !== null) {
                 submitData.append(key, JSON.stringify(value));
             } else if (Array.isArray(value)) {
                 submitData.append(key, JSON.stringify(value));
@@ -257,8 +262,8 @@ const AccidentClaimsView: React.FC = () => {
                                 editedData: mapClaimToFormData(updatedClaim, businessId),
                                 user: {
                                     user_id: String(updatedClaim.user_id),
-                                    username: updatedClaim.username,
-                                    user_email: updatedClaim.user_email,
+                                    username: updatedClaim.username || "", // Provide default
+                                    user_email: updatedClaim.user_email || "", // Provide default
                                 },
                             }
                             : claim

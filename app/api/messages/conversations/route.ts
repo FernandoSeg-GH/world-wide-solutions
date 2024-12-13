@@ -13,6 +13,7 @@ export async function GET(req: NextRequest) {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/messages/conversations`,
       {
+        method: "GET",
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
         },

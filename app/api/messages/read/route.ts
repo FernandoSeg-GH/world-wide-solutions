@@ -1,3 +1,4 @@
+// /app/api/messages/read/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
@@ -34,14 +35,12 @@ export async function POST(req: NextRequest) {
       }
     );
 
-    const contentType = response.headers.get("Content-Type");
-    let data;
-    if (contentType && contentType.includes("application/json")) {
-      data = await response.json();
-    } else {
-      data = await response.text();
+    if (!response.ok) {
+      const errorData = await response.json();
+      return NextResponse.json(errorData, { status: response.status });
     }
 
+    const data = await response.json();
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
     console.error("Error marking message as read:", error);

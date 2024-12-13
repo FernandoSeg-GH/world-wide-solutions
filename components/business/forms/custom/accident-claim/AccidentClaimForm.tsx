@@ -1189,7 +1189,7 @@ export default function AccidentClaimForm() {
                                         placeholder="1,000.00"
                                         value={formData.medical_total_cost || ''}
                                         onChange={(e) => {
-                                            const value = e.target.value.replace(/[^0-9.]/g, '');
+                                            const value = e.target.value as string;
                                             setFormData({
                                                 ...formData,
                                                 medical_total_cost: value || '',
@@ -1197,7 +1197,6 @@ export default function AccidentClaimForm() {
                                         }}
                                         className="flex-grow bg-white dark:bg-gray-600 !dark:text-white"
                                     />
-
                                 </div>
                             </div>
                         </div>

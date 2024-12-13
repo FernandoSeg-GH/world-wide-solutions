@@ -34,11 +34,11 @@ export default function EditBusinessForm({ businessId }: { businessId: number | 
     });
 
 
-    useEffect(() => {
-        if (businessId) {
-            getBusinessById(Number(businessId));
-        }
-    }, [businessId, getBusinessById]);
+    // useEffect(() => {
+    //     if (businessId) {
+    //         getBusinessById(Number(businessId));
+    //     }
+    // }, [businessId, getBusinessById]);
 
     useEffect(() => {
         fetchSubscriptionPlans();

@@ -46,8 +46,8 @@ export const RenderComponent = (currentSection: string) => {
             return <Businesses />;
         case "AI Characters":
             return <Leo />;
-        case "Vinci":
-            return <Vinci />;
+        // case "Vinci":
+        //     return <Vinci />;
         default:
             return <></>;
     }

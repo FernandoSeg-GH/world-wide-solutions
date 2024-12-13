@@ -116,10 +116,12 @@ export interface AccidentClaimFormData {
 
 export interface Claim extends AccidentClaimFormData {
   user_id: number;
-  username: string;
-  user_email: string;
-  created_at: string;
-  updated_at: string;
+  full_name: string;
+  status: string;
+  username?: string;
+  user_email?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export type VehicleKey = "vehicle1" | "vehicle2" | "vehicle3";

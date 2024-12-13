@@ -200,36 +200,24 @@ export interface Chat {
 }
 
 export interface ConversationSummary {
-  accidentClaimId?: string;
-  conversationId?: number;
-  lastMessage?: {
-    messageId: number;
-    senderId: number;
-    senderUsername: string;
-    content: string;
-    timestamp: string;
-  };
-  participants: {
-    userId: number;
-    username: string;
-  }[];
-  accidentClaim?: {
-    accidentClaimId: string;
-    claimId?: string;
-    fullName: string;
-    status: string;
-    email: string;
-    accidentType: string;
-    accidentDate: string; // ISO Date string
-  };
+  conversationId: number;
+  claimId: string;
+  fullName: string;
+  accidentType: string;
+  messageCount: number;
+  lastMessageTime: string | null;
+  unreadCount: number;
+  lastMessage: LastMessage;
+  participants: Participant[];
 }
 
 export interface Message {
   id: number;
   senderId: number;
+  senderUsername?: string; // Make optional if not always available
   content: string;
   timestamp: string;
-
+  read?: boolean; // Make optional if not always applicable
   sender?: User;
   recipients?: MessageRecipient[];
 }
@@ -251,16 +239,7 @@ export interface InboxMessage {
   content: string;
   timestamp: string;
   read: boolean;
-  readOnly: boolean;
-  accidentClaimId?: number;
-  accidentClaimDetails?: {
-    claimId: string;
-    fullName: string;
-    status: string;
-    email: string;
-  }; // Optional detailed accident claim info
 }
-
 export interface UserAICharacter {
   userId: number;
   aiCharacterId: number;
@@ -465,11 +444,14 @@ export interface AppContextType {
       newStatus: string
     ) => Promise<void>;
     getFormSubmissionByCaseId: (caseId: string) => Promise<Submission | null>;
-    getMissingFields: (submission: Submission, form: Form) => Promise<string[]>;
-    fetchClientSubmissions: () => Promise<void>;
+    getMissingFields?: (
+      submission: Submission,
+      form: Form
+    ) => Promise<string[]>;
+    fetchClientSubmissions?: () => Promise<void>;
     fetchSubscriptionPlans: () => Promise<void>;
-    getAllBusinesses: () => Promise<void>;
-    getBusinessById: (businessId: number) => Promise<void>;
+    getAllBusinesses?: () => Promise<void>;
+    getBusinessById?: (businessId: number) => Promise<void>;
     editBusiness: (
       businessId: number,
       businessData: Partial<Business>
@@ -486,7 +468,7 @@ export interface AppContextType {
     fetchAllLandingPages?: () => Promise<LandingPage[] | null>;
     fetchAllSocialMediaPosts?: () => Promise<SocialMediaPost[] | null>;
     messageActions: {
-      fetchConversations: () => Promise<void>;
+      fetchConversations: () => Promise<ConversationSummary[]>;
       fetchMessages: (conversationId: number) => Promise<void>;
       setConversations: React.Dispatch<
         React.SetStateAction<ConversationSummary[]>
@@ -603,4 +585,16 @@ export interface Business {
   aiCharacters?: AICharacter[];
   landingPages?: LandingPage[];
   socialMediaPosts?: SocialMediaPost[];
+}
+
+export interface LastMessage {
+  id: number;
+  senderUsername: string;
+  content: string;
+  timestamp: string;
+}
+
+export interface Participant {
+  userId: number;
+  username: string;
 }

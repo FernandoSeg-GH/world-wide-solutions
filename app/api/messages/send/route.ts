@@ -1,8 +1,8 @@
+// pages/api/messages/send.ts
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
-// Define request body type for TypeScript support
 interface SendMessageRequest {
   recipient_ids: number[];
   content: string;
@@ -22,8 +22,8 @@ export async function POST(req: NextRequest) {
     const {
       recipient_ids,
       content,
-      read_only = false,
       accident_claim_id,
+      read_only = false,
     } = body;
 
     if (!recipient_ids?.length || !content || !accident_claim_id) {
@@ -33,6 +33,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Send the message directly via Flask's /messages/send
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/messages/send`,
       {
@@ -51,12 +52,6 @@ export async function POST(req: NextRequest) {
     );
 
     const data = await response.json();
-    if (!response.ok) {
-      return NextResponse.json(
-        { message: data.message || "Failed to send message" },
-        { status: response.status }
-      );
-    }
 
     return NextResponse.json(data, { status: response.status });
   } catch (error) {

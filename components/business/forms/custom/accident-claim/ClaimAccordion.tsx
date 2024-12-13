@@ -180,7 +180,7 @@ const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
                                     Submission ID: <span className="font-medium">{claim.claim_id}</span>
                                 </CardDescription>
                                 <p className="text-sm text-gray-500 dark:text-gray-300">
-                                    Submitted At: {new Date(claim.created_at).toLocaleDateString()}
+                                    Submitted At: {new Date(String(claim.created_at)).toLocaleString()}
                                 </p>
                             </div>
 

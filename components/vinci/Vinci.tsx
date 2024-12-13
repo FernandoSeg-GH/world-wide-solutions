@@ -61,37 +61,37 @@ export default function Vinci() {
         // fetchAllSocialMediaPosts,
     } = actions;
 
-    useEffect(() => {
-        if (godMode) {
-            actions.fetchAllSubmissions();
-            fetchAllForms();
-            getAllBusinesses();
-            fetchAllUsers();
-            fetchSubscriptionPlans();
-            // fetchAllRoles();
-            // fetchAllTasks();
-            // fetchAllMessages();
-            // fetchAllChats();
-            // fetchAllAICharacters();
-            // fetchAllLandingPages();
-            // fetchAllSocialMediaPosts();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [
-        godMode,
-        /*   fetchAllUsers,
-          getAllBusinesses,
-          fetchAllForms,
-          fetchAllSubmissions,
-          fetchSubscriptionPlans, */
-        // fetchAllRoles,
-        // fetchAllTasks,
-        // fetchAllMessages,
-        // fetchAllChats,
-        // fetchAllAICharacters,
-        // fetchAllLandingPages,
-        // fetchAllSocialMediaPosts,
-    ]);
+    // useEffect(() => {
+    //     if (godMode) {
+    //         actions.fetchAllSubmissions();
+    //         fetchAllForms();
+    //         getAllBusinesses();
+    //         fetchAllUsers();
+    //         fetchSubscriptionPlans();
+    //         // fetchAllRoles();
+    //         // fetchAllTasks();
+    //         // fetchAllMessages();
+    //         // fetchAllChats();
+    //         // fetchAllAICharacters();
+    //         // fetchAllLandingPages();
+    //         // fetchAllSocialMediaPosts();
+    //     }
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [
+    //     godMode,
+    //     /*   fetchAllUsers,
+    //       getAllBusinesses,
+    //       fetchAllForms,
+    //       fetchAllSubmissions,
+    //       fetchSubscriptionPlans, */
+    //     // fetchAllRoles,
+    //     // fetchAllTasks,
+    //     // fetchAllMessages,
+    //     // fetchAllChats,
+    //     // fetchAllAICharacters,
+    //     // fetchAllLandingPages,
+    //     // fetchAllSocialMediaPosts,
+    // ]);
 
     if (!godMode) {
         return null;

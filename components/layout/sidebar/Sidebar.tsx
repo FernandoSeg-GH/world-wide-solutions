@@ -1,28 +1,24 @@
-"use client"
+// Sidebar.tsx
+
+"use client";
+
 import React, { useEffect, useState } from "react";
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-    ChevronLeft,
-    ChevronsRight,
-    ChevronRight,
-} from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { ChevronLeft, ChevronsRight, ChevronRight } from "lucide-react";
 import { useAppContext } from "@/context/AppProvider";
 import { cn } from "@/lib/utils";
 import Logo from "@/components/Logo";
 import { useFormState } from "@/hooks/forms/useFormState";
 import { useSession } from "next-auth/react";
 import { getSidebarItems, SidebarItem } from "./SidebarItems";
+import { Badge } from "@/components/ui/badge"; // Import Badge component
+import { useMessagesContext } from "@/context/MessagesContext"; // Import the context hook
+import { Button } from "@/components/ui/button";
 
 interface SidebarProps {
     isExpanded: boolean;
     setIsExpanded: (value: boolean) => void;
 }
-
 
 export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
     const { actions: layoutState, data, selectors } = useAppContext();
@@ -32,6 +28,8 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
     const { data: session } = useSession();
     const { setForm } = selectors;
     const [openSubmenus, setOpenSubmenus] = useState<Set<string>>(new Set());
+
+    const { fetchConversations, conversations, totalUnread, markAllMessagesAsRead } = useMessagesContext(); // Use the context
 
     useEffect(() => {
         if (session?.user.businessId && session.user.role.id !== 1) {
@@ -93,13 +91,33 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
                                     >
                                         {item.icon &&
                                             React.createElement(item.icon, {
-                                                className: "h-5 w-5",
-                                            })}
+                                                className: cn(
+                                                    "h-5 w-5",
+                                                    isExpanded
+                                                        ? "text-current"
+                                                        : (item.label === "Messages" ? "text-gray-400 animate-pulse animation-delay-400" : "text-primary-500")
+                                                ),
+                                            })
+                                        }
                                         {isExpanded && (
                                             <span className="ml-2 whitespace-nowrap">
                                                 {item.label}
                                             </span>
                                         )}
+                                        {/* Display Badge if the item is Messages */}
+
+                                        {isExpanded && item.label === "Messages" && totalUnread > 0 && (
+                                            <Badge
+                                                className="ml-auto cursor-pointer"
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); // Prevent triggering the button's onClick
+                                                    markAllMessagesAsRead();
+                                                }}
+                                            >
+                                                {totalUnread}
+                                            </Badge>
+                                        )}
+
                                         {isExpanded && item.subItems && item.subItems.length > 0 && (
                                             <span className="ml-auto">
                                                 {openSubmenus.has(item.label) ? <ChevronLeft /> : <ChevronRight />}
@@ -180,4 +198,5 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
         </aside>
     );
 }
-export default Sidebar
+
+export default Sidebar;

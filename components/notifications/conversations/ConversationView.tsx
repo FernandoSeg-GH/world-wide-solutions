@@ -3,23 +3,27 @@
 import React, { useEffect, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { InboxMessage } from "@/types";
+import { Loader2 } from "lucide-react";
+import { useMessagesContext } from "@/context/MessagesContext";
 import { useLayout } from "@/hooks/layout/useLayout";
 import { useToast } from "@/components/ui/use-toast";
-import { useMessages } from "@/hooks/notifications/useMessages";
-import { useSession } from "next-auth/react";
 import Submissions from "@/components/business/forms/submissions";
-import { Loader2 } from "lucide-react";
 
 interface ConversationViewProps {
     conversationId: number;
 }
 
 const ConversationView: React.FC<ConversationViewProps> = ({ conversationId }) => {
-    const { data: session } = useSession();
-    const { toast } = useToast();
-    const { fetchMessages, messages, replyToMessage, loading } = useMessages();
+    const {
+        messages,
+        fetchMessages,
+        replyToMessage,
+        setMessages, // Corrected type usage
+        loading
+    } = useMessagesContext();
+
     const { switchSection, currentSection } = useLayout();
+    const { toast } = useToast();
 
     const [content, setContent] = useState<string>("");
     const [sending, setSending] = useState<boolean>(false);
@@ -51,14 +55,13 @@ const ConversationView: React.FC<ConversationViewProps> = ({ conversationId }) =
                 description: "Reply sent successfully.",
             });
             setContent("");
-            fetchMessages(conversationId);
+            await fetchMessages(conversationId); // Let context handle message updates
         } catch (error: any) {
             toast({
                 title: "Error",
                 description: error.message || "Error sending reply.",
                 variant: "destructive",
             });
-            console.error("Error sending reply:", error);
         } finally {
             setSending(false);
         }
@@ -72,12 +75,10 @@ const ConversationView: React.FC<ConversationViewProps> = ({ conversationId }) =
 
     return (
         <div className="flex flex-col h-full">
-            {/* Header */}
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-2xl font-semibold">Conversation</h2>
             </div>
 
-            {/* Messages Container */}
             <div className="flex-1 overflow-y-auto p-4 bg-gray-50 rounded-md relative">
                 {loading ? (
                     <div className="flex items-center justify-center h-full text-gray-500">
@@ -85,81 +86,56 @@ const ConversationView: React.FC<ConversationViewProps> = ({ conversationId }) =
                         <span className="ml-2">Loading your messages...</span>
                     </div>
                 ) : (
-                    <>
-                        {Array.isArray(messages) && messages.length > 0 ? (
-                            messages.map((msg: InboxMessage) => {
-                                const isUserMessage = msg.senderId === session?.user.id;
-
-                                return (
-                                    <div
-                                        key={msg.messageId}
-                                        className={`flex items-start mb-4 ${isUserMessage ? "justify-end" : "justify-start"
-                                            }`}
-                                    >
-                                        {/* Left Bubble for Incoming Message */}
-                                        {!isUserMessage && (
-                                            <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-white bg-gray-500 mr-4 shadow-md mt-4">
-                                                {getUserInitial(msg.senderUsername || "U")}
-                                            </div>
-                                        )}
-
-                                        {/* Message Content */}
-                                        <div
-                                            className={`max-w-xl p-3 rounded-md shadow-md break-words ${isUserMessage
-                                                ? "bg-blue-100 text-right"
-                                                : "bg-gray-200 text-left"
-                                                }`}
-                                        >
-                                            <p>{msg.content}</p>
-                                            <small className="text-gray-500 block mt-1">
-                                                {new Date(msg.timestamp).toLocaleString()}
-                                            </small>
-                                            {!isUserMessage && hasSpecificForm(msg) && (
-                                                <Button
-                                                    onClick={() => switchSection("Submissions")}
-                                                    className="mt-2 bg-primary hover:bg-primary-dark text-white text-sm"
-                                                >
-                                                    View Submissions
-                                                </Button>
-                                            )}
+                    messages.length > 0 ? (
+                        messages.map((msg) => {
+                            const isUserMessage = msg.senderId === conversationId;
+                            return (
+                                <div
+                                    key={msg.messageId}
+                                    className={`flex items-start mb-4 ${isUserMessage ? "justify-end" : "justify-start"}`}
+                                >
+                                    {!isUserMessage && (
+                                        <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-white bg-gray-500 mr-4 shadow-md mt-4">
+                                            {getUserInitial(msg.senderUsername || "U")}
                                         </div>
+                                    )}
 
-                                        {/* Right Bubble for Outgoing Message */}
-                                        {isUserMessage && (
-                                            <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-white bg-blue-500 ml-4 shadow-md mt-4">
-                                                {getUserInitial(msg.senderUsername || "U")}
-                                            </div>
-                                        )}
+                                    <div className={`max-w-xl p-3 rounded-md shadow-md break-words ${isUserMessage ? "bg-blue-100 text-right" : "bg-gray-200 text-left"}`}>
+                                        <p>{msg.content}</p>
+                                        <small className="text-gray-500 block mt-1">
+                                            {new Date(msg.timestamp).toLocaleString()}
+                                        </small>
                                     </div>
-                                );
-                            })
-                        ) : (
-                            <div className="flex items-center justify-center h-full text-gray-500 text-center">
-                                No messages found in this conversation.
-                            </div>
-                        )}
-                    </>
+
+                                    {isUserMessage && (
+                                        <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-white bg-blue-500 ml-4 shadow-md mt-4">
+                                            {getUserInitial(msg.senderUsername || "U")}
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })
+                    ) : (
+                        <div className="flex items-center justify-center h-full text-gray-500 text-center">
+                            No messages found in this conversation.
+                        </div>
+                    )
                 )}
             </div>
 
-            {/* Reply Section */}
             <div className="mt-4 flex flex-col">
                 <Textarea
                     value={content}
-                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                        setContent(e.target.value)
-                    }
+                    onChange={(e) => setContent(e.target.value)}
                     placeholder="Type your reply..."
                     rows={3}
                     className="block w-full mt-1 border border-gray-300 rounded-md p-2"
-                    aria-label="Type your reply"
                     disabled={loading || sending}
                 />
                 <Button
                     onClick={handleSendReply}
                     disabled={sending || !content.trim() || loading}
                     className="mt-2 bg-primary hover:bg-primary-dark text-white"
-                    aria-label="Send Reply"
                 >
                     {sending ? "Sending..." : "Send Reply"}
                 </Button>
@@ -167,8 +143,5 @@ const ConversationView: React.FC<ConversationViewProps> = ({ conversationId }) =
         </div>
     );
 };
-
-const hasSpecificForm = (message: InboxMessage) =>
-    message.content.includes("patient-personal-information");
 
 export default ConversationView;
