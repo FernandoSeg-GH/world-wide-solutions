@@ -17,7 +17,7 @@ interface MessagesContextProps {
         recipientIds: number[],
         content: string,
         readOnly: boolean,
-        accidentClaimId: number
+        accidentClaimId: string
     ) => Promise<void>;
     markAsRead: (messageId: number) => Promise<void>;
     fetchInboxMessages: () => Promise<void>;
@@ -128,7 +128,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             recipientIds: number[],
             content: string,
             readOnly: boolean,
-            accidentClaimId: number
+            accidentClaimId: string
         ): Promise<void> => {
             const response = await fetch("/api/messages/send", {
                 method: "POST",
@@ -183,36 +183,23 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     // Mark a single message as read
     const markAsRead = useCallback(
         async (messageId: number): Promise<void> => {
-            if (!session?.accessToken) return;
-            try {
-                const response = await fetch("/api/messages/read", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${session.accessToken}`,
-                    },
-                    body: JSON.stringify({ message_id: messageId }),
-                });
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || "Failed to mark message as read");
-                }
+            const response = await fetch("/api/messages/read", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${session?.accessToken}`,
+                },
+                body: JSON.stringify({ message_id: messageId }),
+            });
 
-                // Optionally, update local state
-                setConversations((prev) =>
-                    prev.map((convo) =>
-                        convo.conversationId === messageId
-                            ? { ...convo, unreadCount: (convo.unreadCount || 1) - 1 }
-                            : convo
-                    )
-                );
-            } catch (error) {
-                console.error("Error marking message as read:", error);
-                throw error;
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || "Failed to mark message as read");
             }
         },
         [session]
     );
+
 
     // Fetch inbox messages
     const fetchInboxMessages = useCallback(async (): Promise<void> => {
@@ -271,30 +258,9 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         async (conversationId: number): Promise<void> => {
             if (!session?.accessToken) return;
 
-            // Optimistically update the state
-            setConversations((prev) =>
-                prev.map((convo) =>
-                    convo.conversationId === conversationId
-                        ? { ...convo, unreadCount: 0 }
-                        : convo
-                )
-            );
+            const unreadMessages = messages.filter((msg) => !msg.read);
 
             try {
-                // Proceed with the server request
-                const response = await fetch(`/api/messages/conversations/${conversationId}`, {
-                    headers: {
-                        Authorization: `Bearer ${session.accessToken}`,
-                    },
-                });
-
-                if (!response.ok)
-                    throw new Error("Failed to fetch messages for marking as read");
-
-                const data: InboxMessage[] = await response.json();
-                const unreadMessages = data.filter((message) => !message.read);
-
-                // Mark each unread message as read
                 await Promise.all(
                     unreadMessages.map(async (msg) => {
                         const res = await fetch("/api/messages/read", {
@@ -305,23 +271,25 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                             },
                             body: JSON.stringify({ message_id: msg.messageId }),
                         });
+
                         if (!res.ok) throw new Error("Failed to mark message as read");
                     })
                 );
 
+                setConversations((prev) =>
+                    prev.map((convo) =>
+                        convo.conversationId === conversationId
+                            ? { ...convo, unreadCount: 0 }
+                            : convo
+                    )
+                );
             } catch (error) {
                 console.error("Error marking messages as read:", error);
-                // Revert the optimistic update
-                await fetchConversations();
-                toast({
-                    title: "Error",
-                    description: "Failed to mark messages as read.",
-                    variant: "destructive",
-                });
             }
         },
-        [session, fetchConversations]
+        [messages, session, setConversations]
     );
+
 
     // Mark all messages as read across all conversations
     const markAllMessagesAsRead = useCallback(async (): Promise<void> => {

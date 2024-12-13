@@ -1,3 +1,4 @@
+// Updated MessagingLayout.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -9,9 +10,9 @@ const MessagingLayout: React.FC = () => {
     const [selectedConversationId, setSelectedConversationId] = useState<number | null>(null);
 
     return (
-        <div className="flex flex-col md:flex-row h-full w-full gap-4 flex-grow p-4">
+        <div className="flex flex-col lg:flex-row h-[calc(100vh-120px)] w-full  dark:bg-gray-900 gap-4 lg:gap-6">
             {/* Conversation List */}
-            <Card className="w-full md:w-1/3 p-4 shadow-lg mb-4 md:mb-0 overflow-auto dark:bg-card-dark dark:text-white">
+            <Card className="w-full lg:w-1/3 h-full shadow-lg overflow-y-auto dark:bg-gray-800 px-4">
                 <ConversationList
                     selectedConversationId={selectedConversationId}
                     onSelectConversation={(id: number) => setSelectedConversationId(id)}
@@ -19,11 +20,11 @@ const MessagingLayout: React.FC = () => {
             </Card>
 
             {/* Conversation View */}
-            <Card className="w-full md:w-2/3 p-4 shadow-lg overflow-auto dark:bg-card-dark flex flex-col">
+            <Card className="w-full lg:w-2/3 h-full shadow-lg flex flex-col overflow-y-auto dark:bg-gray-800">
                 {selectedConversationId ? (
                     <ConversationView conversationId={selectedConversationId} />
                 ) : (
-                    <div className="flex items-center justify-center h-full text-gray-500 text-center">
+                    <div className="flex items-center justify-center h-full min-h-40 text-gray-500 dark:text-gray-300 text-center">
                         Select a conversation to view messages
                     </div>
                 )}

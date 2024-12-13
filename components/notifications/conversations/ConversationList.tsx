@@ -90,39 +90,27 @@ const ConversationList: React.FC<ConversationListProps> = ({
     };
 
     const handleSendMessage = async () => {
-        if (role_id === 1) {
-            if (!selectedClaimId || !messageContent.trim()) {
-                toast({
-                    title: "Missing Information",
-                    description: "Please select a claim and enter a message.",
-                    variant: "destructive",
-                });
-                return;
-            }
-        } else {
-            if (!selectedUserId || !selectedClaimId || !messageContent.trim()) {
-                toast({
-                    title: "Missing Information",
-                    description: "Please select a user, a claim, and enter a message.",
-                    variant: "destructive",
-                });
-                return;
-            }
+        if (!selectedClaimId || !messageContent.trim()) {
+            toast({
+                title: "Missing Information",
+                description: "Please select a claim and enter a message.",
+                variant: "destructive",
+            });
+            return;
         }
 
-        try {
-            const payload = {
-                recipient_ids: role_id !== 1 ? [selectedUserId!] : [Number(session?.user.id)],
-                content: messageContent.trim(),
-                read_only: false, // If applicable
-                accident_claim_id: selectedClaimId,
-            };
+        const payload = {
+            recipient_ids: role_id !== 1 ? [selectedUserId!] : [Number(session?.user.id)],
+            content: messageContent.trim(),
+            accident_claim_id: selectedClaimId,
+        };
 
+        try {
             await sendMessageToUsers(
                 payload.recipient_ids,
                 payload.content,
-                payload.read_only,
-                Number(payload.accident_claim_id)
+                false, // readOnly
+                String(payload.accident_claim_id)
             );
 
             toast({
@@ -163,7 +151,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
     return (
         <div className="h-full flex flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-2 pt-4 pb-2">
                 <h2 className="text-xl font-semibold">Your Conversations</h2>
                 <div className="md:hidden">
                     <Button onClick={handleOpenModal} variant="outline" size="sm">
@@ -174,7 +162,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
             </div>
 
             {/* Conversations List */}
-            <div className="flex-1 overflow-auto mt-2">
+            <div className="flex-1 overflow-auto flex flex-col gap-4">
                 {isLoading ? (
                     <div className="flex items-center justify-center h-full text-gray-500">
                         Loading conversations...
@@ -201,8 +189,8 @@ const ConversationList: React.FC<ConversationListProps> = ({
             </div>
 
             {/* New Conversation Button for Desktop */}
-            <div className="mt-4 hidden md:block">
-                <Button onClick={handleOpenModal} variant="outline" >
+            <div className="my-4 hidden md:block w-full">
+                <Button onClick={handleOpenModal} variant="outline" className="w-full">
                     <PlusIcon className="mr-2" size={16} />
                     New Conversation
                 </Button>
@@ -242,7 +230,10 @@ const ConversationList: React.FC<ConversationListProps> = ({
 
                                 {/* Claim Selection */}
                                 <Select
-                                    onValueChange={(value) => setSelectedClaimId(value)}
+                                    onValueChange={(value) => {
+                                        console.log("Claim selected:", value);  // Debug log
+                                        setSelectedClaimId(value);
+                                    }}
                                     disabled={(role_id !== 1 && !selectedUserId) || isLoading}
                                     value={selectedClaimId || undefined}
                                 >

@@ -64,23 +64,23 @@ const UserTable: React.FC<UserTableProps> = ({
         <Table>
             <TableHeader>
                 <TableRow>
-                    <TableHead>Username</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead>Business</TableHead>
-                    <TableHead>Last Login</TableHead>
-                    <TableHead>Is Active</TableHead>
+                    <TableHead className="whitespace-nowrap text-left">Username</TableHead>
+                    <TableHead className="whitespace-nowrap text-leftr">Email</TableHead>
+                    <TableHead className="whitespace-nowrap text-center">Role</TableHead>
+                    <TableHead className="whitespace-nowrap text-center">Business</TableHead>
+                    <TableHead className="whitespace-nowrap text-center">Last Login</TableHead>
+                    <TableHead className="whitespace-nowrap text-center">Is Active</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
                 {filteredUsers.map((user) => (
                     <TableRow key={user.id}>
-                        <TableCell className="bg-gray-50">{user.username}</TableCell>
-                        <TableCell className="bg-gray-50">{user.email}</TableCell>
-                        <TableCell className="bg-gray-50">{user.role_name}</TableCell>
-                        <TableCell className="bg-gray-50">{user.business_name}</TableCell>
-                        <TableCell className="bg-gray-50">{formatDate(user.last_login_at)}</TableCell>
-                        <TableCell className="bg-gray-50">
+                        <TableCell className="bg-gray-50 whitespace-nowrap">{user.username}</TableCell>
+                        <TableCell className="bg-gray-50 whitespace-nowrap">{user.email}</TableCell>
+                        <TableCell className="bg-gray-50 whitespace-nowrap text-center">{user.role_name}</TableCell>
+                        <TableCell className="bg-gray-50 whitespace-nowrap text-center">{user.business_name}</TableCell>
+                        <TableCell className="bg-gray-50 whitespace-nowrap text-right">{formatDate(user.last_login_at)}</TableCell>
+                        <TableCell className="bg-gray-50 whitespace-nowrap text-center">
                             <Select
                                 value={user.is_active ? "yes" : "no"}
                                 onValueChange={(value) =>

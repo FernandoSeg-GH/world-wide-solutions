@@ -100,6 +100,8 @@ const UserForm: React.FC<UserFormProps> = ({ onSubmit, businesses, currentUserRo
 
             <div>
                 <Label htmlFor="password">Password</Label>
+
+                <p className="text-sm text-gray-600">Must be at least 8 characters long.</p>
                 <Input
                     id="password"
                     type="password"

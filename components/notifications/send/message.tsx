@@ -20,7 +20,7 @@ const SendMessage: React.FC = () => {
     const [recipientIds, setRecipientIds] = useState<number[]>([]);
     const [content, setContent] = useState<string>("");
     const [readOnly, setReadOnly] = useState<boolean>(false);
-    const [selectedFormId, setSelectedFormId] = useState<number | null>(null);
+    const [selectedFormId, setSelectedFormId] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
@@ -49,7 +49,7 @@ const SendMessage: React.FC = () => {
 
         let messageContent = content;
         if (selectedFormId) {
-            const selectedForm = forms?.find((form) => form.id === selectedFormId);
+            const selectedForm = forms?.find((form) => String(form.id) === selectedFormId);
             if (selectedForm) {
                 messageContent += `\n\nForm URL: ${selectedForm.shareUrl}`;
             }
@@ -57,7 +57,7 @@ const SendMessage: React.FC = () => {
 
         try {
             setLoading(true);
-            await sendMessageToUsers(recipientIds, messageContent, readOnly, selectedFormId ?? 0);
+            await sendMessageToUsers(recipientIds, messageContent, readOnly, selectedFormId ?? "");
             toast({
                 title: "Success",
                 description: "Message sent successfully.",
@@ -116,7 +116,7 @@ const SendMessage: React.FC = () => {
                     <label className="block text-sm font-medium">Reference Form:</label>
                     <select
                         value={selectedFormId?.toString() || ""}
-                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedFormId(e.target.value ? Number(e.target.value) : null)}
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedFormId(e.target.value ? String(e.target.value) : null)}
                         className="block w-full mt-1 border border-gray-300 rounded-md p-2"
                         aria-label="Select a reference form"
                     >

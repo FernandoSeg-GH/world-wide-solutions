@@ -485,7 +485,7 @@ export interface AppContextType {
         recipientIds: number[],
         content: string,
         readOnly: boolean,
-        accidentClaimId: number
+        accidentClaimId: string
       ) => Promise<void>;
       sendMessage: (conversationId: number, content: string) => Promise<void>;
       markAsRead: (messageId: number) => Promise<void>;

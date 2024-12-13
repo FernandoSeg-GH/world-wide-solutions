@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
       accident_claim_id,
       read_only = false,
     } = body;
-
+    console.log("body", body);
     if (!recipient_ids?.length || !content || !accident_claim_id) {
       return NextResponse.json(
         { message: "Missing required fields" },

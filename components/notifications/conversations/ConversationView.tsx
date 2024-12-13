@@ -5,9 +5,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useMessagesContext } from "@/context/MessagesContext";
-import { useLayout } from "@/hooks/layout/useLayout";
 import { useToast } from "@/components/ui/use-toast";
-import Submissions from "@/components/business/forms/submissions";
+import { useSession } from "next-auth/react";
+import { cn } from "@/lib/utils";
 
 interface ConversationViewProps {
     conversationId: number;
@@ -18,13 +18,11 @@ const ConversationView: React.FC<ConversationViewProps> = ({ conversationId }) =
         messages,
         fetchMessages,
         replyToMessage,
-        setMessages, // Corrected type usage
-        loading
+        loading,
     } = useMessagesContext();
 
-    const { switchSection, currentSection } = useLayout();
     const { toast } = useToast();
-
+    const { data: session } = useSession();
     const [content, setContent] = useState<string>("");
     const [sending, setSending] = useState<boolean>(false);
 
@@ -50,12 +48,9 @@ const ConversationView: React.FC<ConversationViewProps> = ({ conversationId }) =
             }
 
             await replyToMessage(lastMessage.messageId, content);
-            toast({
-                title: "Success",
-                description: "Reply sent successfully.",
-            });
+            toast({ title: "Success", description: "Reply sent successfully." });
             setContent("");
-            await fetchMessages(conversationId); // Let context handle message updates
+            await fetchMessages(conversationId);
         } catch (error: any) {
             toast({
                 title: "Error",
@@ -67,75 +62,57 @@ const ConversationView: React.FC<ConversationViewProps> = ({ conversationId }) =
         }
     };
 
-    const getUserInitial = (username: string) => username.charAt(0).toUpperCase();
-
-    if (currentSection === "Submissions") {
-        return <Submissions />;
-    }
-
     return (
-        <div className="flex flex-col h-full">
-            <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-semibold">Conversation</h2>
-            </div>
+        <div className="flex flex-col h-full p-4 space-y-4">
+            <h2 className="text-2xl font-semibold dark:text-white">Conversation</h2>
 
-            <div className="flex-1 overflow-y-auto p-4 bg-gray-50 rounded-md relative">
+            <div className="flex-1 overflow-y-auto p-4 bg-gray-100 rounded-md dark:bg-gray-700 relative">
                 {loading ? (
                     <div className="flex items-center justify-center h-full text-gray-500">
                         <Loader2 className="animate-spin w-6 h-6 text-gray-500" />
-                        <span className="ml-2">Loading your messages...</span>
+                        <span className="ml-2">Loading messages...</span>
                     </div>
-                ) : (
-                    messages.length > 0 ? (
-                        messages.map((msg) => {
-                            const isUserMessage = msg.senderId === conversationId;
-                            return (
-                                <div
-                                    key={msg.messageId}
-                                    className={`flex items-start mb-4 ${isUserMessage ? "justify-end" : "justify-start"}`}
-                                >
-                                    {!isUserMessage && (
-                                        <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-white bg-gray-500 mr-4 shadow-md mt-4">
-                                            {getUserInitial(msg.senderUsername || "U")}
-                                        </div>
-                                    )}
-
-                                    <div className={`max-w-xl p-3 rounded-md shadow-md break-words ${isUserMessage ? "bg-blue-100 text-right" : "bg-gray-200 text-left"}`}>
-                                        <p>{msg.content}</p>
-                                        <small className="text-gray-500 block mt-1">
-                                            {new Date(msg.timestamp).toLocaleString()}
-                                        </small>
-                                    </div>
-
-                                    {isUserMessage && (
-                                        <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-white bg-blue-500 ml-4 shadow-md mt-4">
-                                            {getUserInitial(msg.senderUsername || "U")}
-                                        </div>
-                                    )}
+                ) : messages.length > 0 ? (
+                    messages.map((msg) => (
+                        <div
+                            key={msg.messageId}
+                            className={`flex items-start mb-4 ${msg.senderUsername === session?.user?.username ? "justify-end" : "justify-start"}`}
+                        >
+                            <div className={cn("flex items-start space-x-2", msg.senderUsername === session?.user?.username ? "flex-row-reverse" : "flex-row")}>
+                                <div className={cn("w-8 h-8 mt-3 flex items-center justify-center rounded-full  text-white font-bold uppercase mr-2", msg.senderUsername === session?.user?.username ? "bg-navyBlue ml-3" : "bg-blue-500")}>
+                                    {msg.senderUsername[0]}
                                 </div>
-                            );
-                        })
-                    ) : (
-                        <div className="flex items-center justify-center h-full text-gray-500 text-center">
-                            No messages found in this conversation.
+                                <div
+                                    className={`max-w-lg p-4 rounded-md shadow-md text-sm break-words ${msg.senderUsername === session?.user?.username ? "bg-blue-100 text-right" : "bg-gray-200 text-left"}`}
+                                >
+                                    <p>{msg.content}</p>
+                                    <small className="text-gray-500 block mt-1">
+                                        {new Date(msg.timestamp).toLocaleString()}
+                                    </small>
+                                </div>
+                            </div>
                         </div>
-                    )
+                    ))
+                ) : (
+                    <div className="flex items-center justify-center h-full text-gray-500">
+                        No messages found in this conversation.
+                    </div>
                 )}
             </div>
 
-            <div className="mt-4 flex flex-col">
+            <div className="mt-4 space-y-2">
                 <Textarea
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                     placeholder="Type your reply..."
                     rows={3}
-                    className="block w-full mt-1 border border-gray-300 rounded-md p-2"
+                    className="w-full p-2 rounded-md border border-gray-300"
                     disabled={loading || sending}
                 />
                 <Button
                     onClick={handleSendReply}
                     disabled={sending || !content.trim() || loading}
-                    className="mt-2 bg-primary hover:bg-primary-dark text-white"
+                    className="w-full text-white bg-primary hover:bg-primary-dark"
                 >
                     {sending ? "Sending..." : "Send Reply"}
                 </Button>

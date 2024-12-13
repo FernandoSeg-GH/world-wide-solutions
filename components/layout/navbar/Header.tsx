@@ -38,7 +38,7 @@ export function Header({ currentSection, isExpanded }: HeaderProps) {
     //     }
     // }, [session, fetchForms]);
     return (
-        <header className="sticky top-0 right-0 z-10 flex h-14 items-center gap-4 bg-lightBlue-foreground dark:bg-card-dark shadow-md px-4 w-full">
+        <header className="fixed top-0 right-0 z-10 flex h-14 items-center gap-4 bg-lightBlue-foreground dark:bg-card-dark shadow-md px-4 w-full">
             {/* {breadcrumbs &&
                 <Breadcrumb className="hidden md:flex">
                     <BreadcrumbList>

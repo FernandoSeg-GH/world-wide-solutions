@@ -22,7 +22,7 @@ export const useUser = () => {
 
     try {
       setLoading(true);
-      const res = await fetch(`/api/users/bis`);
+      const res = await fetch(`/api/users`);
 
       if (!res.ok) {
         const errorData = await res.json();

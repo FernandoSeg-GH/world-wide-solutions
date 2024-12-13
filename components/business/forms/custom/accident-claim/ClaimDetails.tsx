@@ -567,7 +567,7 @@ export default function ClaimDetails({
     };
 
     return (
-        <div className={cn("min-h-screen flex flex-col items-center justify-start pt-12")}>
+        <div className={cn("min-h-screen flex w-full flex-col items-center justify-start pt-12")}>
             {/* Edit/Save/Cancel Buttons outside the form */}
             <div className="w-full max-w-5xl flex justify-end items-center mb-8">
                 {isEditing ? (
@@ -602,7 +602,7 @@ export default function ClaimDetails({
 
             <div className={cn("w-full max-w-5xl bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 xl:p-16 overflow-y-auto", pdf)}>
                 {/* Header */}
-                <div className="mb-8 flex flex-row items-center justify-between w-full gap-16 text-start">
+                <div className="mb-4 flex flex-col-reverse items-center justify-start w-full gap-8 text-start lg:flex-row lg:items-center lg:justify-between">
                     <h1 className="text-navyBlue dark:text-white text-3xl leading-7 font-bold underline flex items-center gap-2 justify-center lg:justify-start">
                         <FaFileUpload />
                         Accident Claim Report
@@ -610,12 +610,12 @@ export default function ClaimDetails({
                     <Image
                         src="/assets/vws-hor.png"
                         alt="Publicuy Logo"
-                        className="h-auto object-contain ml-auto"
+                        className="h-auto object-contain m-auto lg:m-0"
                         width={300}
                         height={50}
                     />
                 </div>
-                <p className="text-gray-600 dark:text-gray-400 my-4 mb-6 text-justify">
+                <p className="text-gray-600 dark:text-gray-400 my-4 mb-6 text-center lg:text-left">
                     This form displays all details related to the claim assistance.
                 </p>
 
