@@ -39,6 +39,10 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
 
     const sidebarItems: SidebarItem[] = getSidebarItems(godMode, forms, session?.user.role.id);
 
+    useEffect(() => {
+        fetchConversations(); // Ensure conversations are fetched on mount
+    }, [fetchConversations]);
+
     const toggleSubmenu = (label: string) => {
         setOpenSubmenus((prev) => {
             const newSet = new Set(prev);

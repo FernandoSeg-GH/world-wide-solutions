@@ -56,7 +56,6 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             if (!response.ok) throw new Error("Failed to fetch conversations");
 
             const data: ConversationSummary[] = await response.json();
-            console.log("Fetched Conversations:", data);
             setConversations(data);
 
             return data;
@@ -83,7 +82,6 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                 if (!response.ok) throw new Error("Failed to fetch messages");
 
                 const data: InboxMessage[] = await response.json();
-                console.log(`Fetched Messages for Conversation ${conversationId}:`, data);
                 setMessages(data);
             } catch (error) {
                 console.error("Error fetching messages:", error);
@@ -217,7 +215,6 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             }
 
             const data: InboxMessage[] = await response.json();
-            console.log("Fetched Inbox Messages:", data);
             setMessages(data);
         } catch (error) {
             console.error("Error fetching inbox messages:", error);
@@ -243,7 +240,6 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             }
 
             const data: UserWithClaims[] = await response.json();
-            console.log("Fetched Users with Claims:", data);
             return data;
         } catch (error) {
             console.error("Error fetching users with claims:", error);

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import SignUp from "./SignUp";
 import SignIn from "./SignIn";
-import ForgotPassword from "./ForgotPassword"; // Import the ForgotPassword component
+import ForgotPassword from "./ForgotPassword";
 import Logo from "../Logo";
 
 export function AuthForm() {

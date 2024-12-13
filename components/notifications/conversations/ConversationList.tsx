@@ -147,7 +147,6 @@ const ConversationList: React.FC<ConversationListProps> = ({
         return userObj?.claims || [];
     }, [selectedUserId, usersWithClaims]);
 
-    console.log('conversations', conversations)
     return (
         <div className="h-full flex flex-col">
             {/* Header */}
@@ -231,7 +230,6 @@ const ConversationList: React.FC<ConversationListProps> = ({
                                 {/* Claim Selection */}
                                 <Select
                                     onValueChange={(value) => {
-                                        console.log("Claim selected:", value);  // Debug log
                                         setSelectedClaimId(value);
                                     }}
                                     disabled={(role_id !== 1 && !selectedUserId) || isLoading}

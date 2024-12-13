@@ -105,6 +105,7 @@ export default function SignUp({ onToggle }: { onToggle: () => void }) {
             </div>
             <div>
                 <Label htmlFor="password">Password</Label>
+                <p className="text-sm text-gray-600">Must be at least 8 characters long.</p>
                 <Input
                     id="password"
                     type="password"

@@ -100,6 +100,28 @@ export default function AccidentClaimForm() {
         }
     }, [formData.accident_country, formData.accident_state]);
 
+
+
+    if (session?.error) {
+        toast({
+            title: "Session Expired",
+            description: "Please sign in again.",
+            variant: "destructive",
+        });
+        router.push("/auth/sign-in");
+        return;
+    }
+
+    if (!session?.accessToken) {
+        toast({
+            title: "Access Denied",
+            description: "You are not authorized to perform this action.",
+            variant: "destructive",
+        });
+        return;
+    }
+
+
     const handleInputChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => {
@@ -371,6 +393,7 @@ export default function AccidentClaimForm() {
             return { ...prevData, [costType]: updatedCosts };
         });
     };
+
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 p-4 md:p-16 2xl:p-28">

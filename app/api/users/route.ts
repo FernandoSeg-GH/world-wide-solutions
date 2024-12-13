@@ -29,7 +29,6 @@ export async function GET(req: NextRequest) {
     }
 
     const users = await response.json();
-    console.log("Fetched Users Data:", users);
 
     return NextResponse.json(users);
   } catch (error) {

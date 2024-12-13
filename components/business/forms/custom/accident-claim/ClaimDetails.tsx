@@ -1001,7 +1001,6 @@ export default function ClaimDetails({
                                     <FileUpload
                                         multiple
                                         onFilesSelected={(files) => {
-                                            console.log('files', files)
                                             handleFieldChange(claim.claim_id, "new_file_uploads", files)
                                         }
                                         }
@@ -1123,7 +1122,6 @@ export default function ClaimDetails({
                                         <FileUpload
                                             multiple
                                             onFilesSelected={(files) => {
-                                                console.log('files', files)
                                                 handleFieldChange(claim.claim_id, "new_file_uploads", files)
                                             }
                                             }
@@ -1217,7 +1215,6 @@ export default function ClaimDetails({
                                 <FileUpload
                                     multiple
                                     onFilesSelected={(files) => {
-                                        console.log('files', files)
                                         handleFieldChange(claim.claim_id, "new_file_uploads", files)
                                     }
                                     }
@@ -1297,7 +1294,6 @@ export default function ClaimDetails({
                             <FileUpload
                                 multiple
                                 onFilesSelected={(files) => {
-                                    console.log('files', files)
                                     handleFieldChange(claim.claim_id, "new_file_uploads", files)
                                 }
                                 }
@@ -1361,7 +1357,6 @@ export default function ClaimDetails({
                                     <FileUpload
                                         multiple
                                         onFilesSelected={(files) => {
-                                            console.log('files', files)
                                             handleFieldChange(claim.claim_id, "new_file_uploads", files)
                                         }
                                         }
@@ -1415,7 +1410,6 @@ export default function ClaimDetails({
                                     <FileUpload
                                         multiple
                                         onFilesSelected={(files) => {
-                                            console.log('files', files)
                                             handleFieldChange(claim.claim_id, "new_file_uploads", files)
                                         }
                                         }
@@ -1452,7 +1446,6 @@ export default function ClaimDetails({
                                     <FileUpload
                                         multiple
                                         onFilesSelected={(files) => {
-                                            console.log('files', files)
                                             handleFieldChange(claim.claim_id, "new_file_uploads", files)
                                         }
                                         }
@@ -1523,7 +1516,6 @@ export default function ClaimDetails({
                                 <FileUpload
                                     multiple
                                     onFilesSelected={(files) => {
-                                        console.log('files', files)
                                         handleFieldChange(claim.claim_id, "new_file_uploads", files)
                                     }
                                     }

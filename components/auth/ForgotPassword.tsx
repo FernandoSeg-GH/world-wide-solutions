@@ -116,6 +116,7 @@ export default function ForgotPassword({ onToggle }: ForgotPasswordProps) {
 
             <div>
                 <Label htmlFor="new_password">New Password</Label>
+                <p className="text-sm text-gray-600">Must be at least 8 characters long.</p>
                 <Input
                     id="new_password"
                     type="password"
