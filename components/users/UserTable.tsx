@@ -74,12 +74,12 @@ const UserTable: React.FC<UserTableProps> = ({
             <TableBody>
                 {filteredUsers.map((user) => (
                     <TableRow key={user.id}>
-                        <TableCell>{user.username}</TableCell>
-                        <TableCell>{user.email}</TableCell>
-                        <TableCell>{user.roleName}</TableCell>
-                        <TableCell>{user.businessName}</TableCell>
-                        <TableCell>{formatDate(user.lastLoginAt)}</TableCell>
-                        <TableCell>
+                        <TableCell className="bg-gray-50">{user.username}</TableCell>
+                        <TableCell className="bg-gray-50">{user.email}</TableCell>
+                        <TableCell className="bg-gray-50">{user.roleName}</TableCell>
+                        <TableCell className="bg-gray-50">{user.businessName}</TableCell>
+                        <TableCell className="bg-gray-50">{formatDate(user.lastLoginAt)}</TableCell>
+                        <TableCell className="bg-gray-50">
                             <Select
                                 value={user.isActive ? "yes" : "no"}
                                 onValueChange={(value) =>
