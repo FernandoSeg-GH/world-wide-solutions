@@ -10,8 +10,9 @@ import {
 } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/components/ui/use-toast";
-import { User } from "@/types";
 import { formatDate } from "@/lib/utils";
+import { User } from "@/types/next-auth";
+
 
 type UserTableProps = {
     users: User[];
@@ -26,7 +27,7 @@ const UserTable: React.FC<UserTableProps> = ({
 }) => {
     const filteredUsers = users.filter((user) => {
         if (currentUserRole === 3) {
-            return user.businessId === selectedBusiness;
+            return user.business_id === selectedBusiness;
         }
         return true;
     });
@@ -76,12 +77,12 @@ const UserTable: React.FC<UserTableProps> = ({
                     <TableRow key={user.id}>
                         <TableCell className="bg-gray-50">{user.username}</TableCell>
                         <TableCell className="bg-gray-50">{user.email}</TableCell>
-                        <TableCell className="bg-gray-50">{user.roleName}</TableCell>
-                        <TableCell className="bg-gray-50">{user.businessName}</TableCell>
-                        <TableCell className="bg-gray-50">{formatDate(user.lastLoginAt)}</TableCell>
+                        <TableCell className="bg-gray-50">{user.role_name}</TableCell>
+                        <TableCell className="bg-gray-50">{user.business_name}</TableCell>
+                        <TableCell className="bg-gray-50">{formatDate(user.last_login_at)}</TableCell>
                         <TableCell className="bg-gray-50">
                             <Select
-                                value={user.isActive ? "yes" : "no"}
+                                value={user.is_active ? "yes" : "no"}
                                 onValueChange={(value) =>
                                     handleToggleUserStatus(user.id, value === "yes")
                                 }

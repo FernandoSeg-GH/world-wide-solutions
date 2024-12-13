@@ -40,13 +40,19 @@ export interface User {
   id: number;
   username: string;
   email: string;
-  roleId: number;
+  roleId?: number;
   roleName?: string;
   businessId?: number;
   businessName?: string;
   lastLoginAt?: string;
-  isActive: boolean;
-  onboarded: boolean;
+  isActive?: boolean;
+  onboarded?: boolean;
+  is_active?: boolean;
+  last_login_at?: string;
+  role_id?: number;
+  role_name?: string;
+  business_id?: number;
+  business_name?: string;
 
   sentMessages?: Message[];
   receivedMessages?: MessageRecipient[];
