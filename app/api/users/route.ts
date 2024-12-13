@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/users?role_id=${roleId}&business_id=${businessId}`,
+      `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/users `,
       {
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
