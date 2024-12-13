@@ -427,18 +427,19 @@ const AccidentClaimsView: React.FC = () => {
                         </p>
                     </div>
 
-                    <div className="flex flex-col items-end gap-4">
-                        <div className="flex items-center">
-                            <span className="mr-2 text-gray-700 dark:text-gray-200 whitespace-nowrap">
-                                {isSpreadsheetView ? "Spreadsheet View" : "Card View"}
-                            </span>
-                            <Switch
-                                checked={isSpreadsheetView}
-                                onCheckedChange={setIsSpreadsheetView}
-                            />
-                        </div>
-                        {/* Download Buttons */}
-                        {/* {isSpreadsheetView && (
+                    {session?.user.role.id !== 1 &&
+                        <div className="flex flex-col items-end gap-4">
+                            <div className="flex items-center">
+                                <span className="mr-2 text-gray-700 dark:text-gray-200 whitespace-nowrap">
+                                    {isSpreadsheetView ? "Spreadsheet View" : "Card View"}
+                                </span>
+                                <Switch
+                                    checked={isSpreadsheetView}
+                                    onCheckedChange={setIsSpreadsheetView}
+                                />
+                            </div>
+                            {/* Download Buttons */}
+                            {/* {isSpreadsheetView && (
                                 <div className="flex items-center gap-2">
                                     <Button onClick={() => handleDownloadAllClaims('csv')} variant="outline">
                                         <FaEdit className="mr-2" /> Download CSV
@@ -450,8 +451,9 @@ const AccidentClaimsView: React.FC = () => {
                             )} 
                         */}
 
-                    </div>
+                        </div>
 
+                    }
                 </div>
                 {[2, 3, 4].includes(Number(session?.user?.role.id)) && (
                     <div className="mb-4">

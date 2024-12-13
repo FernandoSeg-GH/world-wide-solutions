@@ -814,16 +814,34 @@ export default function ClaimDetails({
                                         <option key={country.value} value={country.value}>{country.label}</option>
                                     ))}
                                 </select> */}
-                                <Select value={data.accident_country || ""} onValueChange={(val) => handleFieldChange(claim.claim_id, "accident_country", val)}>
+                                <Select
+                                    value={data.accident_country || ""}
+                                    onValueChange={(val) => handleFieldChange(claim.claim_id, "accident_country", val)}
+                                >
                                     <SelectTrigger className="w-full capitalize">
-                                        <SelectValue className="">{data.accident_country || "Select Country of Accident"}</SelectValue>
+                                        <SelectValue className="">
+                                            {data.accident_country
+                                                ? data.accident_country
+                                                    .split("_")
+                                                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                                                    .join(" ")
+                                                : "Select Country of Accident"}
+                                        </SelectValue>
                                     </SelectTrigger>
+
                                     <SelectContent className="max-h-[320px] overflow-y-auto">
                                         {countryOptions.map((country) => (
-                                            <SelectItem className="hover:bg-slate-100 cursor-pointer text-sm px-2" key={country.value} value={country.value}>{country.label}</SelectItem>
+                                            <SelectItem
+                                                className="hover:bg-slate-100 cursor-pointer text-sm px-2"
+                                                key={country.value}
+                                                value={country.value}
+                                            >
+                                                {country.label}
+                                            </SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
+
                             </div>
                             <div>
                                 <Label>State or City of Accident <span className="text-red-500">*</span></Label>
