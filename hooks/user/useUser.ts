@@ -22,11 +22,7 @@ export const useUser = () => {
 
     try {
       setLoading(true);
-      const res = await fetch(`/api/users`, {
-        headers: {
-          Authorization: `Bearer ${session.accessToken}`,
-        },
-      });
+      const res = await fetch(`/api/users/bis`);
 
       if (!res.ok) {
         const errorData = await res.json();
