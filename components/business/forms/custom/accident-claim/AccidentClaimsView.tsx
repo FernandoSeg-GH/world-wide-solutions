@@ -179,8 +179,6 @@ const AccidentClaimsView: React.FC = () => {
                     if (
                         value === null ||
                         value === undefined ||
-                        value === "" ||
-                        (Array.isArray(value) && value.length === 0) ||
                         (typeof value === "object" && !Object.keys(value).length)
                     ) {
                         errors.push(`${field.label} is required.`);
