@@ -1,3 +1,4 @@
+"use client";
 import { useEffect } from "react";
 import { useSession, signIn } from "next-auth/react";
 
@@ -9,16 +10,16 @@ const useTokenRefresh = () => {
 
     const interval = setInterval(() => {
       const now = Date.now();
-      const timeLeft = session?.accessTokenExpires! - now;
+      const timeLeft = (session?.accessTokenExpires ?? 0) - now;
 
       if (timeLeft < 5 * 60 * 1000) {
         // Trigger token refresh 5 minutes before expiration
-        signIn("credentials", { callbackUrl: window.location.href });
+        signIn("credentials", { redirect: false });
       }
     }, 60 * 1000); // Check every minute
 
-    return () => clearInterval(interval);
-  }, [session, status]);
+    return () => clearInterval(interval); // Clear interval on component unmount
+  }, [status, session]);
 
   return null;
 };
