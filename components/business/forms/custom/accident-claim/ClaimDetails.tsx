@@ -733,7 +733,7 @@ export default function ClaimDetails({
                         Other Contact
                     </h2>
                     {isEditing ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <div>
                                 <Label>Relative or Friend</Label>
                                 <Input
@@ -748,6 +748,7 @@ export default function ClaimDetails({
                                     value={data.other_contact_phone || ""}
                                     onChange={(val) => handleFieldChange(claim.claim_id, "other_contact_phone", val)}
                                     placeholder="+1 234 567 890"
+                                    className="w-full"
                                 />
                             </div>
                         </div>
@@ -769,7 +770,7 @@ export default function ClaimDetails({
                         In this section, complete with the most important accident details and select the type of accident that will guide you through specific requirements for that incident.
                     </p>
                     {isEditing ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 ">
                             <div className="">
                                 <Label>Type of Accident</Label>
                                 {/* <select
