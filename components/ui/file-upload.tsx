@@ -86,6 +86,7 @@ export function FileUpload({ multiple = false, onFilesSelected, className, descr
                     </Button>
                 </div>
             </div>
+            <p className="text-gray-600 text-sm font-base">Accepted file formats: DOC, PDF, CSV, .XSLX, JPEG, JPG, PNG</p>
 
             {/* Thumbnails / Previews */}
             {selectedFiles.length > 0 && (
