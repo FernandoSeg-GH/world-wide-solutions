@@ -37,9 +37,18 @@ async function refreshAccessToken(refreshToken: string) {
   }
 }
 
-export async function middleware(req: NextRequest) {
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+export const config = {
+  matcher: "/api/forms/:path*", // Apply only to specific routes
+};
 
+export async function middleware(req: NextRequest) {
+  if (req.method !== "POST") return NextResponse.next();
+  const contentLength = req.headers.get("content-length");
+  if (contentLength && parseInt(contentLength, 10) > 50 * 1024 * 1024) {
+    return NextResponse.json({ message: "Payload too large" }, { status: 413 });
+  }
+
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   if (!token || !token.accessTokenExpires) {
     return NextResponse.next(); // Skip if token or expiration is undefined
   }

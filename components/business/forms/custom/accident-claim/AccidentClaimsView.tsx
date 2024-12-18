@@ -318,24 +318,24 @@ const AccidentClaimsView: React.FC = () => {
         submitData.append("business_id", businessId);
 
         try {
-            // const response = await fetch(
-            //     `/api/forms/submissions/claim/${claim_id}/update`,
-            //     {
-            //         method: "PUT",
-            //         body: submitData,
-            //     }
-            // );
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/custom/forms/accident-claim/${claim_id}/update`,
+                `/api/forms/submissions/claim/${claim_id}/update`,
                 {
                     method: "PUT",
-                    headers: {
-                        Authorization: `Bearer ${session?.accessToken}`,
-                    },
                     body: submitData,
                 }
             );
 
+            // const response = await fetch(
+            //     `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/custom/forms/accident-claim/${claim_id}/update`,
+            //     {
+            //         method: "PUT",
+            //         headers: {
+            //             Authorization: `Bearer ${session?.accessToken}`,
+            //         },
+            //         body: submitData,
+            //     }
+            // );
 
             if (!response.ok) {
                 const errorData = await response.json();

@@ -297,24 +297,24 @@ export default function AccidentClaimForm() {
 
 
         try {
-            // const response = await fetch('/api/forms/accident-claims/submit',
-            //     {
-            //         method: "POST",
-            //         headers: {
-            //             Authorization: `Bearer ${session?.accessToken}`,
-            //         },
-            //         body: submitData,
-            //     }
-            // );
+            const response = await fetch('/api/forms/accident-claims/submit',
+                {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${session?.accessToken}`,
+                    },
+                    body: submitData,
+                }
+            );
 
-            const response = await fetch(`${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/custom/forms/accident-claim/submit`, {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${session?.accessToken}`,
-                    // Do NOT set 'Content-Type'; let the browser set it for FormData
-                },
-                body: submitData,
-            });
+            // const response = await fetch('https://vinci-api.com/leo/custom/forms/accident-claim/submit', {
+            //     method: "POST",
+            //     headers: {
+            //         Authorization: `Bearer ${session?.accessToken}`,
+            //         // Do NOT set 'Content-Type'; let the browser set it for FormData
+            //     },
+            //     body: submitData,
+            // });
 
             if (!response.ok) {
                 const errorData = await response.json();
