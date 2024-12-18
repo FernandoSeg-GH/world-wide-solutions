@@ -112,6 +112,7 @@ export default function ForgotPassword({ onToggle }: ForgotPasswordProps) {
                     onChange={(e) => setIdentifier(e.target.value)}
                     required
                 />
+                <p className="text-xs text-muted-foreground italic">Username is case sensitive.</p>
             </div>
 
             <div>

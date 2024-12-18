@@ -90,6 +90,7 @@ export default function SignUp({ onToggle }: { onToggle: () => void }) {
                     }
                     required
                 />
+                <p className="text-xs text-muted-foreground italic">Username is case sensitive.</p>
             </div>
             <div>
                 <Label htmlFor="email">Email</Label>

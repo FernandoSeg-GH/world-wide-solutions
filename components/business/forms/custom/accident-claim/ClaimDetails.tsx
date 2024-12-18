@@ -211,19 +211,20 @@ export default function ClaimDetails({
                             key={index}
                             className="flex items-center gap-2 bg-gray-200 dark:bg-gray-600 p-2 rounded"
                         >
-                            <a
+                            {/* <a
                                 href={fileUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex-1 truncate"
                             >
                                 {fileName}
-                            </a>
+                            </a> */}
+                            <p className="cursor-default text-sm text-gray-800 dark:text-gray-200 flex-1 truncate">{fileName}</p>
                             <Button
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => handleFileDownload(fileUrl)}
-                                className="text-gray-500 dark:text-gray-300"
+                                className="text-gray-100 bg-gray-400 dark:text-gray-300"
                             >
                                 Download
                             </Button>

@@ -45,7 +45,7 @@ import { useRouter } from "next/navigation";
 import CustomPhoneInput from "@/components/ui/phone-input";
 import { Ellipsis, Hospital, PlaneTakeoff, PlusCircle } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { FileUpload } from "@/components/ui/file-upload";
+import { FileUpload, MAX_TOTAL_SIZE } from "@/components/ui/file-upload";
 import { currencyOptions } from "./config/currencies";
 
 export function formatCurrency(value: string) {
@@ -79,6 +79,51 @@ export default function AccidentClaimForm() {
     const [successMessage, setSuccessMessage] = useState<boolean>(false);
     const router = useRouter()
 
+    let totalUploadedSize = 0;
+
+    if (formData?.new_file_uploads) {
+        totalUploadedSize = formData.new_file_uploads.reduce((acc, file) => acc + file.size, 0);
+    }
+
+    const remainingSize = MAX_TOTAL_SIZE - totalUploadedSize;
+    const remainingSizeInMB = (remainingSize / (1024 * 1024)).toFixed(2);
+
+    // State variables to track if toasts have been shown
+    const [hasExceededLimit, setHasExceededLimit] = useState<boolean>(false);
+    const [hasReachedLimit, setHasReachedLimit] = useState<boolean>(false);
+
+    // Alert if total uploaded size exceeds the limit
+    useEffect(() => {
+        if (totalUploadedSize > MAX_TOTAL_SIZE) {
+            if (!hasExceededLimit) {
+                toast({
+                    title: "File Size Limit Exceeded",
+                    description: `The total size of all uploaded files exceeds the limit of ${MAX_TOTAL_SIZE / (1024 * 1024)} MB.`,
+                    variant: "destructive",
+                });
+                setHasExceededLimit(true);
+            }
+        } else {
+            // Reset the flag when size is within the limit
+            if (hasExceededLimit) {
+                setHasExceededLimit(false);
+            }
+        }
+    }, [totalUploadedSize, hasExceededLimit]);
+
+    // lets alter if no more remianing size is available to not upload more files saying you've reached the limit
+    useEffect(() => {
+        if (remainingSize <= 0) {
+            toast({
+                title: "File Size Limit Reached",
+                description: `You have
+                reached the total size limit of ${MAX_TOTAL_SIZE / (1024 * 1024)} MB.`,
+
+                variant: "destructive",
+            });
+        }
+    }, [remainingSize]);
+
     useEffect(() => {
         if (
             formData.country.toLowerCase() === "usa" ||
@@ -101,25 +146,27 @@ export default function AccidentClaimForm() {
     }, [formData.accident_country, formData.accident_state]);
 
 
+    useEffect(() => {
+        if (session?.error) {
+            toast({
+                title: "Session Expired",
+                description: "Please sign in again.",
+                variant: "destructive",
+            });
+            router.push("/auth/sign-in");
+            return;
+        }
 
-    if (session?.error) {
-        toast({
-            title: "Session Expired",
-            description: "Please sign in again.",
-            variant: "destructive",
-        });
-        router.push("/auth/sign-in");
-        return;
-    }
-
-    if (!session?.accessToken) {
-        toast({
-            title: "Access Denied",
-            description: "You are not authorized to perform this action.",
-            variant: "destructive",
-        });
-        return;
-    }
+        if (!session?.accessToken) {
+            toast({
+                title: "Access Denied",
+                description: "You are not authorized to perform this action.",
+                variant: "destructive",
+            });
+            router.push("/auth/sign-in");
+            return;
+        }
+    }, [router, session?.accessToken, session?.error]);
 
 
     const handleInputChange = (

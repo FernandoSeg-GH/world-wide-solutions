@@ -1,3 +1,5 @@
+// pages/api/forms/accident-claims/submit.ts
+
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
@@ -9,18 +11,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  const roleId = session.user.role.id;
-  const businessId = session.user.businessId;
-
   const formData = await req.formData();
-  const submitData: Record<string, any> = {};
+  const submitData = new FormData();
 
   formData.forEach((value, key) => {
-    if (key.includes("file")) {
-      submitData[key] = value;
-    } else {
-      submitData[key] = value.toString();
-    }
+    submitData.append(key, value);
   });
 
   const endpoint = `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/custom/forms/accident-claim/submit`;
@@ -30,8 +25,9 @@ export async function POST(req: NextRequest) {
       method: "POST",
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
+        // Do NOT set 'Content-Type' when sending FormData; the browser will set it, including boundaries.
       },
-      body: new URLSearchParams(submitData),
+      body: submitData,
     });
 
     if (!response.ok) {

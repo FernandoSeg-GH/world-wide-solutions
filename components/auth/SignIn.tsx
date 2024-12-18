@@ -81,6 +81,7 @@ export default function SignIn({ onToggle, onForgotPassword, callbackUrl }: Sign
                     }
                     required
                 />
+                <p className="text-xs text-muted-foreground italic">Username is case sensitive.</p>
             </div>
             <div>
                 <Label htmlFor="password">Password</Label>

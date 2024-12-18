@@ -18,6 +18,8 @@ import { flattenClaimData } from "@/lib/utils";
 import _ from "lodash";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LoaderCircle } from "lucide-react";
+import { FaSearch, FaSort } from "react-icons/fa";
+import { debounce } from "lodash";
 
 const AccidentClaimsView: React.FC = () => {
     const { data: session } = useSession();
