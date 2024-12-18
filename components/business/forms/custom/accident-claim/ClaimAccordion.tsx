@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react";
-import { FaDownload, FaEdit } from "react-icons/fa";
+import { FaDownload, FaEdit, FaSave, FaTimes } from "react-icons/fa";
 import ClaimDetails from "./ClaimDetails";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
@@ -204,6 +204,7 @@ const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
                                         onClick={() => handleDownloadClaim('csv')}
                                         variant="outline"
                                         className="flex items-center gap-2"
+                                        type="button"
                                     >
                                         <FaDownload />
                                         Download CSV
@@ -211,26 +212,50 @@ const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
                                     {/* <Button
                                         onClick={() => handleDownloadClaim('excel')}
                                         variant="outline"
+                                        type="button"
                                         className="flex items-center gap-2"
                                     >
                                         <FaDownload />
                                         Download Excel
                                     </Button> */}
-                                    <Button
+                                    {/* <Button
                                         onClick={() => handleDownloadClaim('pdf')}
                                         variant="outline"
                                         className="flex items-center gap-2"
+                                        type="button"
                                     >
                                         <FaDownload />
                                         Download PDF
-                                    </Button>
-                                    <Button
-                                        onClick={() => toggleEdit(claim.claim_id)}
-                                        className="flex items-center gap-2"
-                                    >
-                                        <FaEdit />
-                                        Edit
-                                    </Button>
+                                    </Button> */}
+                                    {claim.isEditing ? (
+                                        <>
+                                            <Button
+                                                onClick={() => handleSave(claim.claim_id)}
+                                                className="flex items-center gap-2"
+                                                type="button"
+                                            >
+                                                <FaSave />
+                                                Save Changes
+                                            </Button>
+                                            <Button
+                                                onClick={() => handleCancel(claim.claim_id)}
+                                                className="flex items-center gap-2"
+                                                type="button"
+                                            >
+                                                <FaTimes />
+                                                Cancel
+                                            </Button>
+                                        </>
+                                    ) : (
+                                        <Button
+                                            onClick={() => toggleEdit(claim.claim_id)}
+                                            className="flex items-center gap-2"
+                                            type="button"
+                                        >
+                                            <FaEdit />
+                                            Edit
+                                        </Button>
+                                    )}
                                 </div>
                             </CardContent>
                         </Card>

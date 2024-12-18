@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { FaEdit } from "react-icons/fa";
 import { useRouter } from 'next/navigation';
@@ -20,6 +20,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { LoaderCircle } from "lucide-react";
 import { FaSearch, FaSort } from "react-icons/fa";
 import { debounce } from "lodash";
+import { Input } from "@/components/ui/input";
+import { SubmissionStatusEnum } from "@/types";
 
 const AccidentClaimsView: React.FC = () => {
     const { data: session } = useSession();
@@ -31,6 +33,43 @@ const AccidentClaimsView: React.FC = () => {
     const businessId = String(session?.user?.businessId);
     const [isSpreadsheetView, setIsSpreadsheetView] = useState<boolean>(false);
     const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+
+    const [searchClaimId, setSearchClaimId] = useState<string>("");
+    const [searchPatientName, setSearchPatientName] = useState<string>("");
+    const [sortOption, setSortOption] = useState<string>("date_desc");
+    const [statusFilter, setStatusFilter] = useState<SubmissionStatusEnum | "all">("all");
+
+
+    // Debounce search inputs to optimize performance
+
+    const debouncedSetSearchClaimId = useMemo(
+        () => debounce((value: string) => setSearchClaimId(value), 300),
+        []
+    );
+
+    const debouncedSetSearchPatientName = useMemo(
+        () => debounce((value: string) => setSearchPatientName(value), 300),
+        []
+    );
+
+    const debouncedSetSortOption = useMemo(
+        () => debounce((value: string) => setSortOption(value), 300),
+        []
+    );
+
+    const debouncedSetStatusFilter = useMemo(
+        () => debounce((value: SubmissionStatusEnum | "all") => setStatusFilter(value), 300),
+        []
+    );
+
+    useEffect(() => {
+        return () => {
+            debouncedSetSearchClaimId.cancel();
+            debouncedSetSearchPatientName.cancel();
+            debouncedSetSortOption.cancel();
+            debouncedSetStatusFilter.cancel();
+        };
+    }, [debouncedSetSearchClaimId, debouncedSetSearchPatientName, debouncedSetSortOption, debouncedSetStatusFilter]);
 
     // AccidentClaimsView.tsx
     useEffect(() => {
@@ -105,6 +144,50 @@ const AccidentClaimsView: React.FC = () => {
             setGroupedClaims(groupedArray);
         }
     }, [claims, session?.user?.role.id]);
+
+
+    const filterClaims = (claimsList: EditableClaim[]): EditableClaim[] => {
+        return claimsList.filter((claim) => {
+            const matchesClaimId = claim.claim_id.toLowerCase().includes(searchClaimId.toLowerCase());
+            const matchesPatientName = claim.full_name.toLowerCase().includes(searchPatientName.toLowerCase());
+            const matchesStatus = !statusFilter || claim.status === statusFilter || statusFilter === "all";
+            return matchesClaimId && matchesPatientName && matchesStatus;
+        });
+    };
+
+    // Function to perform sorting
+    const sortClaims = (claimsList: EditableClaim[]): EditableClaim[] => {
+        return [...claimsList].sort((a, b) => {
+            switch (sortOption) {
+                case "date_desc":
+                    return new Date(b.accident_date).getTime() - new Date(a.accident_date).getTime();
+                case "date_asc":
+                    return new Date(a.accident_date).getTime() - new Date(b.accident_date).getTime();
+                case "name_asc":
+                    return a.full_name.localeCompare(b.full_name);
+                case "name_desc":
+                    return b.full_name.localeCompare(a.full_name);
+                case "id_asc":
+                    return a.claim_id.localeCompare(b.claim_id);
+                case "id_desc":
+                    return b.claim_id.localeCompare(a.claim_id);
+                default:
+                    return 0;
+            }
+        });
+    };
+
+    const displayedClaims = useMemo(() => {
+        let filtered = filterClaims(claims);
+
+        // If the user has selected a specific user (for roles 2,3,4), filter accordingly
+        if (selectedUserId && selectedUserId !== "all") {
+            filtered = filtered.filter(claim => claim.user.user_id === selectedUserId);
+        }
+
+        let sorted = sortClaims(filtered);
+        return sorted;
+    }, [claims, searchClaimId, searchPatientName, sortOption, selectedUserId]);
 
     const toggleEdit = (claim_id: string) => {
         setClaims((prevClaims) =>
@@ -358,7 +441,7 @@ const AccidentClaimsView: React.FC = () => {
     const handleStatusChange = async (claim_id: string, newStatus: string) => {
         try {
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/custom/forms/accident-claim/${claim_id}/status`,
+                `/api/forms/submissions/claim/${claim_id}/status`,
                 {
                     method: "PUT",
                     headers: {
@@ -393,6 +476,7 @@ const AccidentClaimsView: React.FC = () => {
             });
         }
     };
+
     if (loading)
         return (
             <div className="min-h-screen flex-col gap-2 flex items-center justify-center bg-gray-100 dark:bg-gray-900">
@@ -480,16 +564,80 @@ const AccidentClaimsView: React.FC = () => {
                 )}
 
 
+                <section className="mb-6">
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                        {/* Filter Inputs */}
+                        <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+                            {/* Search by Claim ID */}
+                            <div className="flex items-center gap-2">
+                                <FaSearch className="text-gray-500" />
+                                <Input
+                                    type="text"
+                                    placeholder="Search by Claim ID"
+                                    value={searchClaimId}
+                                    onChange={(e) => setSearchClaimId(e.target.value)}
+                                    className="w-48"
+                                />
+                            </div>
+                            {/* Search by Patient Name */}
+                            <div className="flex items-center gap-2">
+                                <FaSearch className="text-gray-500" />
+                                <Input
+                                    type="text"
+                                    placeholder="Search by Patient Name"
+                                    value={searchPatientName}
+                                    onChange={(e) => setSearchPatientName(e.target.value)}
+                                    className="w-48"
+                                />
+                            </div>
+                        </div>
+                        {/* <Select onValueChange={(value) => setStatusFilter(value as SubmissionStatusEnum | "all")} value={statusFilter}>
+                            <SelectTrigger className="w-48">
+                                <SelectValue placeholder="Filter by Status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All Statuses</SelectItem>
+                                <SelectItem value="UNDER_REVIEW">Under Review</SelectItem>
+                                <SelectItem value="PENDING_DOCUMENTATION">Pending Documentation</SelectItem>
+                                <SelectItem value="SETTLE">Settle</SelectItem>
+                                <SelectItem value="CLOSED">Closed</SelectItem>
+                                <SelectItem value="DENIED">Denied</SelectItem>
+                            </SelectContent>
+                        </Select> */}
+                        {/* Sort Dropdown */}
+                        <div className="flex items-center gap-2">
+                            <FaSort className="text-gray-500" />
+                            <Select
+                                onValueChange={(value) => setSortOption(value)}
+                                value={sortOption}
+                            >
+                                <SelectTrigger className="w-48">
+                                    <SelectValue placeholder="Sort By" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="date_desc">Date (Newest First)</SelectItem>
+                                    <SelectItem value="date_asc">Date (Oldest First)</SelectItem>
+                                    <SelectItem value="name_asc">Name (A-Z)</SelectItem>
+                                    <SelectItem value="name_desc">Name (Z-A)</SelectItem>
+                                    <SelectItem value="id_asc">ID (Ascending)</SelectItem>
+                                    <SelectItem value="id_desc">ID (Descending)</SelectItem>
+
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                </section>
+
                 {/* Claims List */}
                 {claims.length === 0 ? (
                     <p className="text-center text-gray-500 dark:text-gray-400">No claims found.</p>
                 ) : isSpreadsheetView ? (
-                    <SpreadsheetView claims={claims} selectedUserId={selectedUserId} />
+                    <SpreadsheetView claims={displayedClaims} selectedUserId={selectedUserId} />
                 ) : (
                     <div className="space-y-6">
                         {session?.user?.role.id === 1 ? (
                             // Role 1: User - Show their own claims in accordions
-                            claims.map((claim) => (
+                            displayedClaims.map((claim) => (
                                 <ClaimAccordion
                                     handleStatusChange={handleStatusChange}
                                     key={claim.claim_id}
@@ -507,21 +655,26 @@ const AccidentClaimsView: React.FC = () => {
                                     selectedUserId === "all" || !selectedUserId
                                         ? true
                                         : group.user.user_id === selectedUserId
-                                ).map((group) => (
-                                    <div key={group.user.user_id} className="border-t border-gray-300 dark:border-gray-600 pt-6">
-                                        {/* User Subheader */}
-                                        <div className="mb-4">
-                                            <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
-                                                Submitted by: <span className="capitalize">{group.user.username}</span>
-                                            </h2>
-                                            <p className="text-gray-600 dark:text-gray-400">
-                                                {group.user.user_email}
-                                            </p>
-                                        </div>
-                                        {/* Claims for the User */}
-                                        <div className="space-y-6">
-                                            {group.claims.map((claim) => {
-                                                return (
+                                )
+                                .map((group) => {
+                                    // Further filter the group's claims based on search inputs
+                                    const filteredGroupClaims = filterClaims(group.claims);
+                                    const sortedGroupClaims = sortClaims(filteredGroupClaims);
+
+                                    return (
+                                        <div key={group.user.user_id} className="border-t border-gray-300 dark:border-gray-600 pt-6">
+                                            {/* User Subheader */}
+                                            <div className="mb-4">
+                                                <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
+                                                    Submitted by: <span className="capitalize">{group.user.username}</span>
+                                                </h2>
+                                                <p className="text-gray-600 dark:text-gray-400">
+                                                    {group.user.user_email}
+                                                </p>
+                                            </div>
+                                            {/* Claims for the User */}
+                                            <div className="space-y-6">
+                                                {sortedGroupClaims.map((claim) => (
                                                     <ClaimAccordion
                                                         handleStatusChange={handleStatusChange}
                                                         key={claim.claim_id}
@@ -531,15 +684,11 @@ const AccidentClaimsView: React.FC = () => {
                                                         handleSave={handleSave}
                                                         handleCancel={handleCancel}
                                                     />
-                                                )
-                                            })}
+                                                ))}
+                                            </div>
                                         </div>
-                                        {/* Optional: Add a horizontal separator between user groups, except after the last group */}
-                                        {/* {index < groupedClaims.length - 1 && (
-                                        <hr className="mt-6 border-gray-300 dark:border-gray-600" />
-                                    )} */}
-                                    </div>
-                                ))
+                                    );
+                                })
                         )}
                     </div>
                 )}
