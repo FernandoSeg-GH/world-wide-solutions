@@ -37,10 +37,6 @@ async function refreshAccessToken(refreshToken: string) {
   }
 }
 
-export const config = {
-  matcher: "/api/forms/:path*", // Apply only to specific routes
-};
-
 export async function middleware(req: NextRequest) {
   if (req.method !== "POST") return NextResponse.next();
   const contentLength = req.headers.get("content-length");
