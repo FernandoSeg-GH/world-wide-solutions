@@ -312,13 +312,13 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }, [fetchConversations, markMessagesAsRead, session]);
 
     // Polling for real-time updates
-    useEffect(() => {
-        const interval = setInterval(() => {
-            fetchConversations();
-        }, 60000); // Fetch every 60 seconds
+    // useEffect(() => {
+    //     const interval = setInterval(() => {
+    //         fetchConversations();
+    //     }, 60000); // Fetch every 60 seconds
 
-        return () => clearInterval(interval);
-    }, [fetchConversations]);
+    //     return () => clearInterval(interval);
+    // }, [fetchConversations]);
 
     return (
         <MessagesContext.Provider value={{
