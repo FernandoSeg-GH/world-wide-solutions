@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
+export const runtime = "edge";
+
 export async function PUT(
   req: NextRequest,
   { params }: { params: { claimId: string } }
