@@ -327,7 +327,7 @@ const AccidentClaimsView: React.FC = () => {
             // );
 
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/custom/forms/accident-claim/${claim_id}/update`,
+                `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/custom/forms/update_accident_claim/${claim_id}`,
                 {
                     method: "PUT",
                     headers: {
