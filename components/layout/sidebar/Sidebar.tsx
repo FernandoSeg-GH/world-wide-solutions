@@ -31,17 +31,17 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
 
     const { fetchConversations, conversations, totalUnread, markAllMessagesAsRead } = useMessagesContext(); // Use the context
 
-    useEffect(() => {
-        if (session?.user.businessId && session.user.role.id !== 1) {
-            fetchFormsByBusinessId(session.user.businessId);
-        }
-    }, [session?.user.businessId, fetchFormsByBusinessId, session?.user.role.id]);
+    // useEffect(() => {
+    //     if (session?.user.businessId && session.user.role.id !== 1) {
+    //         fetchFormsByBusinessId(session.user.businessId);
+    //     }
+    // }, [session?.user.businessId, fetchFormsByBusinessId, session?.user.role.id]);
 
     const sidebarItems: SidebarItem[] = getSidebarItems(godMode, forms, session?.user.role.id);
 
-    useEffect(() => {
-        fetchConversations(); // Ensure conversations are fetched on mount
-    }, [fetchConversations]);
+    // useEffect(() => {
+    //     fetchConversations(); // Ensure conversations are fetched on mount
+    // }, [fetchConversations]);
 
     const toggleSubmenu = (label: string) => {
         setOpenSubmenus((prev) => {
