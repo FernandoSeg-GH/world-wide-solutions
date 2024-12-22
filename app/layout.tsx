@@ -8,6 +8,7 @@ import ClientProvider from '@/context/ClientProvider'
 import { AppProvider } from '@/context/AppProvider'
 import ErrorBoundary from '@/components/ui/error-boundary'
 import { MessagesProvider } from '@/context/MessagesContext'
+import { TooltipProvider } from '@/components/ui/tooltip'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -30,7 +31,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <AppProvider>
                 <ErrorBoundary>
                   <NextTopLoader />
-                  {children}
+                  <TooltipProvider>
+                    {children}
+                  </TooltipProvider>
                   <Toaster />
                 </ErrorBoundary>
               </AppProvider>

@@ -48,10 +48,10 @@ export const getSidebarItems = (
     //   icon: Folders,
     //   label: "Submissions",
     // },
-    // {
-    //   icon: MailCheck,
-    //   label: "Messages",
-    // },
+    {
+      icon: MailCheck,
+      label: "Messages",
+    },
   ];
 
   // Role-specific sidebar items

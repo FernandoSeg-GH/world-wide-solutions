@@ -205,16 +205,24 @@ export interface Chat {
   user?: User;
 }
 
+// types.ts
 export interface ConversationSummary {
-  conversationId: number;
-  claimId: string;
-  fullName: string;
-  accidentType: string;
+  accidentClaimId: string;
+  fullName: string; // Added fullName
   messageCount: number;
   lastMessageTime: string | null;
   unreadCount: number;
-  lastMessage: LastMessage;
-  participants: Participant[];
+  lastMessage: {
+    messageId: number;
+    content: string;
+    timestamp: string;
+    senderId: number;
+    senderUsername: string;
+  } | null;
+  participants: Array<{
+    userId: number;
+    username: string;
+  }>;
 }
 
 export interface Message {
@@ -244,8 +252,20 @@ export interface InboxMessage {
   senderUsername: string;
   content: string;
   timestamp: string;
-  read: boolean;
+  isSender: boolean;
+  readAt?: string;
+  threadId?: string; // ID of the thread or conversation
+  receiverId?: number; // Receiver information
+  conversationId?: number; // Conversation ID
+  receiverUsername?: string; // Optional receiver username
+  deliveryStatus?: "sent" | "delivered" | "failed"; // Status of the message
+  attachments?: { type: string; url: string }[]; // Array of attachments
+  readBy?: { userId: number; readAt: string }[]; // Read receipts
+  type?: "user" | "system" | "notification"; // Message type
+  priority?: "high" | "normal" | "low"; // Priority of the message
+  parentMessageId?: number; // For threaded replies
 }
+
 export interface UserAICharacter {
   userId: number;
   aiCharacterId: number;
@@ -488,7 +508,7 @@ export interface AppContextType {
         accidentClaimId: string
       ) => Promise<void>;
       sendMessage: (conversationId: number, content: string) => Promise<void>;
-      markAsRead: (messageId: number) => Promise<void>;
+      markAsRead: (accidentClaimId: string, messageId: number) => Promise<void>;
       fetchInboxMessages: () => Promise<void>;
     };
   };
@@ -595,7 +615,9 @@ export interface Business {
 
 export interface LastMessage {
   id: number;
-  senderUsername: string;
+  senderId: number;
+  senderUsername?: string; // Optional if not always provided
+  messageId: number;
   content: string;
   timestamp: string;
 }

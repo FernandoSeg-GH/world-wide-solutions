@@ -91,11 +91,11 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         }
     }, [formState.forms, initialForm, formState.setForm, formState]);
 
-    useEffect(() => {
-        if (formState.form && formState.form.businessId) {
-            submissionState.fetchSubmissions(formState.form.shareUrl);
-        }
-    }, [formState.form, submissionState, submissionState.fetchSubmissions]);
+    // useEffect(() => {
+    //     if (formState.form && formState.form.businessId) {
+    //         submissionState.fetchSubmissions(formState.form.shareUrl);
+    //     }
+    // }, [formState.form, submissionState, submissionState.fetchSubmissions]);
 
     const selectors = useMemo(
         () => ({
@@ -183,12 +183,15 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
             },
             messageActions: {
                 fetchConversations: messageState.fetchConversations,
-                fetchMessages: messageState.fetchMessages,
+                fetchMessages: (conversationId: number) => messageState.fetchMessages(conversationId.toString()),
                 setConversations: messageState.setConversations,
                 setMessages: messageState.setMessages,
-                replyToMessage: messageState.replyToMessage,
-                sendMessageToUsers: messageState.sendMessageToUsers,
-                sendMessage: messageState.sendMessage,
+                replyToMessage: (messageId: number, content: string) =>
+                    messageState.replyToMessage("0", messageId, content), // Adjusted to match the expected signature
+                sendMessageToUsers: (recipientIds: number[], content: string, readOnly: boolean, accidentClaimId: string) =>
+                    messageState.sendMessageToUsers(recipientIds, content, accidentClaimId), // Adjusted to match the expected signature
+                sendMessage: (conversationId: number, content: string) =>
+                    messageState.sendMessage(conversationId.toString(), content),
                 markAsRead: messageState.markAsRead,
                 fetchInboxMessages: messageState.fetchInboxMessages,
             },

@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
     );
 
     const data = await response.json();
-
+    console.log("data", data);
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
     console.error("Error sending message:", error);

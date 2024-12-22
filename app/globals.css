@@ -85,3 +85,10 @@
     scrollbar-width: none; /* Firefox */
   }
 }
+
+.truncate-item {
+  overflow: hidden; /* Hide overflowing content */
+  text-overflow: ellipsis; /* Add ellipsis when text overflows */
+  white-space: nowrap; /* Prevent text from wrapping */
+  display: block; /* Ensure proper behavior */ 
+}

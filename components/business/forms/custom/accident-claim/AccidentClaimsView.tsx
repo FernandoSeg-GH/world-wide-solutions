@@ -673,7 +673,7 @@ const AccidentClaimsView: React.FC = () => {
                                     const sortedGroupClaims = sortClaims(filteredGroupClaims);
 
                                     return (
-                                        <div key={group.user.user_id} className="border-t border-gray-300 dark:border-gray-600 pt-6">
+                                        <div key={group.user.user_id} className="border-t border-gray-300 dark:border-gray-600 pt-6 w-full">
                                             {/* User Subheader */}
                                             <div className="mb-4">
                                                 <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">

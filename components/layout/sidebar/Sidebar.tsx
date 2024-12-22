@@ -2,7 +2,7 @@
 
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ChevronLeft, ChevronsRight, ChevronRight } from "lucide-react";
 import { useAppContext } from "@/context/AppProvider";
@@ -14,6 +14,7 @@ import { getSidebarItems, SidebarItem } from "./SidebarItems";
 import { Badge } from "@/components/ui/badge"; // Import Badge component
 import { useMessagesContext } from "@/context/MessagesContext"; // Import the context hook
 import { Button } from "@/components/ui/button";
+import { debounce } from "lodash";
 
 interface SidebarProps {
     isExpanded: boolean;
@@ -39,9 +40,6 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
 
     const sidebarItems: SidebarItem[] = getSidebarItems(godMode, forms, session?.user.role.id);
 
-    // useEffect(() => {
-    //     fetchConversations(); // Ensure conversations are fetched on mount
-    // }, [fetchConversations]);
 
     const toggleSubmenu = (label: string) => {
         setOpenSubmenus((prev) => {

@@ -1,6 +1,5 @@
-"use client";
-
-import React, { createContext, useState, useContext, useCallback, useEffect, useMemo, ReactNode } from "react";
+"use client"
+import React, { createContext, useState, useContext, useCallback, useMemo, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { InboxMessage, ConversationSummary, UserWithClaims } from "@/types";
 import { toast } from "@/components/ui/use-toast";
@@ -11,25 +10,50 @@ interface MessagesContextProps {
     loading: boolean;
     totalUnread: number;
     fetchConversations: () => Promise<ConversationSummary[]>;
-    fetchMessages: (conversationId: number) => Promise<void>;
-    replyToMessage: (originalMessageId: number, content: string) => Promise<void>;
+    fetchMessages: (accidentClaimId: string, page?: number) => Promise<void>;
+    replyToMessage: (accidentClaimId: string, messageId: number, content: string) => Promise<void>;
     sendMessageToUsers: (
         recipientIds: number[],
         content: string,
-        readOnly: boolean,
         accidentClaimId: string
     ) => Promise<void>;
-    markAsRead: (messageId: number) => Promise<void>;
+    markAsRead: (accidentClaimId: string, messageId: number) => Promise<void>;
     fetchInboxMessages: () => Promise<void>;
     fetchUsersWithClaims: () => Promise<UserWithClaims[] | null>;
-    markMessagesAsRead: (conversationId: number) => Promise<void>;
+    markMessagesAsRead: (accidentClaimId: string) => Promise<void>;
     markAllMessagesAsRead: () => Promise<void>;
     setConversations: React.Dispatch<React.SetStateAction<ConversationSummary[]>>;
     setMessages: React.Dispatch<React.SetStateAction<InboxMessage[]>>;
-    sendMessage: (conversationId: number, content: string) => Promise<void>;
+    sendMessage: (accidentClaimId: string, content: string) => Promise<void>;
 }
 
 const MessagesContext = createContext<MessagesContextProps | undefined>(undefined);
+
+const apiRequest = async (url: string, options: RequestInit) => {
+    try {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "API request failed.");
+        }
+        return await response.json();
+    } catch (error: any) {
+        console.error(`Error with request to ${url}:`, error.message);
+        throw error;
+    }
+};
+
+const areConversationsEqual = (prev: ConversationSummary[], newData: ConversationSummary[]): boolean => {
+    if (prev.length !== newData.length) return false;
+    const prevMap = new Map(prev.map(conv => [conv.accidentClaimId, conv.lastMessage?.messageId]));
+    for (const conv of newData) {
+        const prevMessageId = prevMap.get(conv.accidentClaimId);
+        if (prevMessageId !== conv.lastMessage?.messageId) {
+            return false;
+        }
+    }
+    return true;
+};
 
 export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { data: session } = useSession();
@@ -39,83 +63,87 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     // Derive totalUnread from conversations
     const totalUnread = useMemo(() => {
+        if (!Array.isArray(conversations)) return 0; // Handle non-array scenarios
         return conversations.reduce((acc, convo) => acc + (convo.unreadCount || 0), 0);
     }, [conversations]);
 
-    // Fetch all conversations
+
+    // Fetch all conversations 
+    const isFetching = useRef(false);
     const fetchConversations = useCallback(async (): Promise<ConversationSummary[]> => {
-        if (!session?.accessToken) return [];
-
-        setLoading(true);
         try {
-            const response = await fetch("/api/messages/conversations", {
-                headers: {
-                    Authorization: `Bearer ${session.accessToken}`,
-                },
+            const data = await apiRequest('/api/messages/conversations', {
+                headers: { Authorization: `Bearer ${session?.accessToken}` },
             });
-            if (!response.ok) throw new Error("Failed to fetch conversations");
-
-            const data: ConversationSummary[] = await response.json();
-            setConversations(data);
-
-            return data;
+            console.log("Fetched Conversations:", data); // Debug log
+            setConversations((prev) => {
+                if (JSON.stringify(prev) === JSON.stringify(data)) return prev; // Prevent unnecessary updates
+                return data.conversations || []; // Ensure `data.conversations` exists
+            });
+            return data.conversations || [];
         } catch (error) {
             console.error("Error fetching conversations:", error);
             return [];
-        } finally {
-            setLoading(false);
         }
-    }, [session]);
+    }, [session?.accessToken]);
 
-    // Fetch messages for a specific conversation
+
     const fetchMessages = useCallback(
-        async (conversationId: number): Promise<void> => {
-            if (!session?.accessToken) return;
-            setLoading(true);
+        async (accidentClaimId: string, page = 1): Promise<void> => {
+            if (!session?.accessToken || !accidentClaimId) return;
 
             try {
-                const response = await fetch(`/api/messages/conversations/${conversationId}`, {
-                    headers: {
-                        Authorization: `Bearer ${session.accessToken}`,
-                    },
-                });
-                if (!response.ok) throw new Error("Failed to fetch messages");
+                const response = await apiRequest(
+                    `/api/messages/conversations/${accidentClaimId}?page=${page}`,
+                    {
+                        headers: { Authorization: `Bearer ${session.accessToken}` },
+                    }
+                );
 
-                const data: InboxMessage[] = await response.json();
-                setMessages(data);
+                if (response.messages) {
+                    setMessages((prev) => [
+                        ...prev.filter((msg) => !response.messages.some((newMsg: InboxMessage) => newMsg.messageId === msg.messageId)),
+                        ...response.messages.map((msg: InboxMessage) => ({
+                            ...msg,
+                            conversationId: accidentClaimId, // Add conversationId to each message
+                        })),
+                    ]);
+                }
             } catch (error) {
                 console.error("Error fetching messages:", error);
-            } finally {
-                setLoading(false);
             }
         },
-        [session]
+        [session?.accessToken]
     );
 
     // Reply to a message
     const replyToMessage = useCallback(
-        async (originalMessageId: number, content: string): Promise<void> => {
+        async (accidentClaimId: string, messageId: number, content: string): Promise<void> => {
             if (!session?.accessToken) throw new Error("Unauthorized");
 
-            const response = await fetch("/api/messages/reply", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${session.accessToken}`,
-                },
-                body: JSON.stringify({
-                    message_id: originalMessageId,
-                    content,
-                }),
-            });
+            try {
+                const response = await fetch(
+                    `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/messages/conversations/${accidentClaimId}/messages/${messageId}/reply`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${session.accessToken}`,
+                        },
+                        body: JSON.stringify({ content }),
+                    }
+                );
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || "Failed to send reply");
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || "Failed to send reply");
+                }
+
+                toast({ title: "Success", description: "Reply sent successfully." });
+                await fetchMessages(accidentClaimId);
+            } catch (error: any) {
+                toast({ title: "Error", description: error.message || "Failed to send reply.", variant: "destructive" });
             }
-
-            // Optionally, refetch messages to update state
-            await fetchMessages(originalMessageId); // Assuming originalMessageId maps to conversationId
         },
         [session, fetchMessages]
     );
@@ -125,7 +153,6 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         async (
             recipientIds: number[],
             content: string,
-            readOnly: boolean,
             accidentClaimId: string
         ): Promise<void> => {
             const response = await fetch("/api/messages/send", {
@@ -137,7 +164,6 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                 body: JSON.stringify({
                     recipient_ids: recipientIds,
                     content,
-                    read_only: readOnly,
                     accident_claim_id: accidentClaimId,
                 }),
             });
@@ -147,7 +173,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                 throw new Error(errorData.message || "Failed to send message");
             }
 
-            // Optionally, refetch conversations to update state
+            // Refetch conversations to update state
             await fetchConversations();
         },
         [session, fetchConversations]
@@ -155,15 +181,17 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     // Send a message to a specific conversation
     const sendMessage = useCallback(
-        async (conversationId: number, content: string): Promise<void> => {
-            const response = await fetch(`/api/messages/conversations/${conversationId}/send`, {
+        async (accidentClaimId: string, content: string): Promise<void> => {
+            const response = await fetch("/api/messages/send", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${session?.accessToken}`,
                 },
                 body: JSON.stringify({
+                    recipient_ids: [/* Populate with appropriate recipient IDs based on context */],
                     content,
+                    accident_claim_id: accidentClaimId,
                 }),
             });
 
@@ -172,31 +200,46 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                 throw new Error(errorData.message || "Failed to send message");
             }
 
-            // Optionally, refetch messages to update state
-            await fetchMessages(conversationId);
+            // Refetch conversations to update state
+            await fetchConversations();
         },
-        [session, fetchMessages]
+        [session, fetchConversations]
     );
 
-    // Mark a single message as read
-    const markAsRead = useCallback(
-        async (messageId: number): Promise<void> => {
-            const response = await fetch("/api/messages/read", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${session?.accessToken}`,
-                },
-                body: JSON.stringify({ message_id: messageId }),
-            });
+    // Mark a message as read
+    const markAsRead = useCallback(async (accidentClaimId: string, messageId?: number) => {
+        if (!messageId) {
+            console.error("No messageId provided for markAsRead");
+            return;
+        }
+
+        console.log(`Marking message as read: ${messageId} in claim ${accidentClaimId}`);
+
+        try {
+            const response = await fetch(
+                `/api/messages/conversations/claim/${accidentClaimId}/messages/${messageId}/mark-read`,
+                {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${session?.accessToken}`,
+                    },
+                }
+            );
+
+            const textResponse = await response.text(); // Capture raw response for debugging
+            console.log("Raw backend response:", textResponse);
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || "Failed to mark message as read");
+                throw new Error(textResponse || "Failed to mark message as read");
             }
-        },
-        [session]
-    );
+
+            const result = JSON.parse(textResponse);
+            console.log("Message marked as read successfully:", result);
+        } catch (error) {
+            console.error("Error marking message as read:", error);
+        }
+    }, [session?.accessToken]);
 
 
     // Fetch inbox messages
@@ -226,66 +269,42 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     // Fetch users with claims
     const fetchUsersWithClaims = useCallback(async (): Promise<UserWithClaims[] | null> => {
-        if (!session?.accessToken) return null;
-        setLoading(true);
-
+        const flaskBaseUrl = process.env.NEXT_PUBLIC_FLASK_BACKEND_URL;
         try {
-            const response = await fetch("/api/messages/users_claims", {
-                headers: { Authorization: `Bearer ${session.accessToken}` },
+            const data = await apiRequest(`${flaskBaseUrl}/messages/users_claims`, {
+                headers: { Authorization: `Bearer ${session?.accessToken}` },
             });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || "Failed to fetch users with claims");
-            }
-
-            const data: UserWithClaims[] = await response.json();
             return data;
         } catch (error) {
             console.error("Error fetching users with claims:", error);
             return null;
-        } finally {
-            setLoading(false);
         }
     }, [session]);
 
     // Mark all messages in a conversation as read
     const markMessagesAsRead = useCallback(
-        async (conversationId: number): Promise<void> => {
-            if (!session?.accessToken) return;
-
-            const unreadMessages = messages.filter((msg) => !msg.read);
-
+        async (accidentClaimId: string): Promise<void> => {
             try {
-                await Promise.all(
-                    unreadMessages.map(async (msg) => {
-                        const res = await fetch("/api/messages/read", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                Authorization: `Bearer ${session.accessToken}`,
-                            },
-                            body: JSON.stringify({ message_id: msg.messageId }),
-                        });
+                const response = await apiRequest(`/api/messages/read?accidentClaimId=${accidentClaimId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${session?.accessToken}`,
+                    },
+                });
 
-                        if (!res.ok) throw new Error("Failed to mark message as read");
-                    })
-                );
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || "Failed to mark messages as read");
+                }
 
-                setConversations((prev) =>
-                    prev.map((convo) =>
-                        convo.conversationId === conversationId
-                            ? { ...convo, unreadCount: 0 }
-                            : convo
-                    )
-                );
+                await fetchConversations(); // Refresh unread counts after marking messages as read
             } catch (error) {
-                console.error("Error marking messages as read:", error);
+                console.error('Error marking messages as read:', error);
             }
         },
-        [messages, session, setConversations]
+        [session, fetchConversations]
     );
-
 
     // Mark all messages as read across all conversations
     const markAllMessagesAsRead = useCallback(async (): Promise<void> => {
@@ -294,31 +313,22 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setLoading(true);
         try {
             // Fetch all conversations
-            const conversations = await fetchConversations();
+            const currentConversations = await fetchConversations();
 
-            // Iterate through each conversation and mark unread messages as read
-            await Promise.all(
-                conversations.map(async (convo) => {
-                    if (convo.unreadCount > 0) {
-                        await markMessagesAsRead(Number(convo.conversationId));
-                    }
-                })
+            // Filter conversations with unread messages
+            const conversationsToUpdate = currentConversations.filter(
+                (convo) => convo.unreadCount > 0
             );
+
+            for (const convo of conversationsToUpdate) {
+                await markMessagesAsRead(String(convo.accidentClaimId));
+            }
         } catch (error) {
             console.error("Error marking all messages as read:", error);
         } finally {
             setLoading(false);
         }
     }, [fetchConversations, markMessagesAsRead, session]);
-
-    // Polling for real-time updates
-    // useEffect(() => {
-    //     const interval = setInterval(() => {
-    //         fetchConversations();
-    //     }, 60000); // Fetch every 60 seconds
-
-    //     return () => clearInterval(interval);
-    // }, [fetchConversations]);
 
     return (
         <MessagesContext.Provider value={{

@@ -1,15 +1,9 @@
-// ConversationList.tsx
-
 import React, { useState, useEffect, useMemo } from "react";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+import { useSession } from "next-auth/react";
+import { useMessagesContext } from "@/context/MessagesContext";
+import ConversationSummary from "./ConversationSummary";
+import { Loader2, PlusIcon } from "lucide-react";
 import {
     Dialog,
     DialogContent,
@@ -18,16 +12,20 @@ import {
     DialogFooter,
     DialogDescription,
 } from "@/components/ui/dialog";
-import { useSession } from "next-auth/react";
-import { useMessagesContext } from "@/context/MessagesContext"; // Import the context hook
-import { ConversationSummary as ConversationType, UserWithClaims } from "@/types";
-import { Loader2, PlusIcon } from "lucide-react";
-import ConversationSummary from "./ConversationSummary";
-import { Claim } from "@/components/business/forms/custom/accident-claim/config/types";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { UserWithClaims } from "@/types";
+import { debounce } from "lodash";
 
 interface ConversationListProps {
-    onSelectConversation: (conversationId: number) => void;
-    selectedConversationId: number | null;
+    onSelectConversation: (accidentClaimId: string) => void;
+    selectedConversationId: string | null;
 }
 
 const ConversationList: React.FC<ConversationListProps> = ({
@@ -36,6 +34,8 @@ const ConversationList: React.FC<ConversationListProps> = ({
 }) => {
     const { toast } = useToast();
     const { data: session } = useSession();
+    const [searchTerm, setSearchTerm] = useState<string>("");
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string>("");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
     const [selectedClaimId, setSelectedClaimId] = useState<string | null>(null);
@@ -44,13 +44,14 @@ const ConversationList: React.FC<ConversationListProps> = ({
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const {
-        sendMessageToUsers,
+        conversations,
         fetchConversations,
         fetchUsersWithClaims,
-        conversations,
-        markMessagesAsRead,
+        markAsRead,
+        sendMessageToUsers,
         setConversations,
-    } = useMessagesContext(); // Use the context
+        loading,
+    } = useMessagesContext();
 
     const role_id = session?.user?.role?.id;
 
@@ -61,7 +62,6 @@ const ConversationList: React.FC<ConversationListProps> = ({
                 await fetchConversations();
                 const data = await fetchUsersWithClaims();
                 setUsersWithClaims(data || []);
-
                 if (role_id === 1 && session?.user?.id) {
                     setSelectedUserId(Number(session.user.id));
                 }
@@ -76,9 +76,27 @@ const ConversationList: React.FC<ConversationListProps> = ({
                 setIsLoading(false);
             }
         };
-
         loadData();
     }, [fetchConversations, fetchUsersWithClaims, session, toast, role_id]);
+
+    const filteredConversations = useMemo(() => {
+        const parseDate = (dateString: string | null) =>
+            dateString ? new Date(dateString).getTime() : -Infinity;
+
+        const sortedConversations = conversations
+            .slice()
+            .sort((a, b) => parseDate(b.lastMessageTime) - parseDate(a.lastMessageTime));
+
+        if (!debouncedSearchTerm) return sortedConversations;
+
+        return sortedConversations.filter((conv) =>
+            conv.accidentClaimId?.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+        );
+    }, [debouncedSearchTerm, conversations]);
+
+    const handleSearch = debounce((term: string) => {
+        setDebouncedSearchTerm(term);
+    }, 300);
 
     const handleOpenModal = () => {
         setSelectedClaimId(null);
@@ -109,8 +127,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
             await sendMessageToUsers(
                 payload.recipient_ids,
                 payload.content,
-                false, // readOnly
-                String(payload.accident_claim_id)
+                payload.accident_claim_id
             );
 
             toast({
@@ -132,147 +149,147 @@ const ConversationList: React.FC<ConversationListProps> = ({
         }
     };
 
-    const uniqueUsers = useMemo(
-        () =>
-            usersWithClaims.map((user) => ({
-                userId: user.userId,
-                username: user.username,
-            })),
-        [usersWithClaims]
-    );
-
     const selectedUserClaims = useMemo(() => {
         if (!selectedUserId) return [];
         const userObj = usersWithClaims.find((u) => u.userId === selectedUserId);
         return userObj?.claims || [];
     }, [selectedUserId, usersWithClaims]);
 
+    console.log('filteredConversations', filteredConversations)
+
     return (
         <div className="h-full flex flex-col">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-2 pt-4 pb-2">
-                <h2 className="text-xl font-semibold">Your Conversations</h2>
-                <div className="md:hidden">
-                    <Button onClick={handleOpenModal} variant="outline" size="sm">
+            <div className="p-4  flex justify-between items-center">
+                <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Inbox</h1>
+                {session?.user?.role.id && [2, 3, 4].includes(session.user.role.id) && (
+                    <Button
+                        onClick={handleOpenModal}
+                        variant="outline"
+                        className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700"
+                    >
                         <PlusIcon className="mr-2" size={16} />
-                        New Conversation
+                        New Message
                     </Button>
-                </div>
+                )}
+            </div>
+            <div className="flex flex-col space-y-2 p-4 border-b border-t dark:border-gray-700">
+                <input
+                    type="text"
+                    placeholder="Search by claim ID or name"
+                    className="w-full px-3 py-2 border rounded-lg text-sm "
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
             </div>
 
-            {/* Conversations List */}
-            <div className="flex-1 overflow-auto flex flex-col gap-4">
-                {isLoading ? (
+            <div className="flex-1 overflow-auto flex flex-col p-4">
+                {loading ? (
                     <div className="flex items-center justify-center h-full text-gray-500">
+                        <Loader2 className="animate-spin w-6 h-6 mr-2" />
                         Loading conversations...
                     </div>
-                ) : conversations.length > 0 ? (
-                    conversations.map((conversation) =>
-                        conversation.conversationId !== undefined ? (
-                            <ConversationSummary
-                                key={conversation.conversationId}
-                                conversation={conversation}
-                                isSelected={conversation.conversationId === selectedConversationId}
-                                onClick={() => {
-                                    onSelectConversation(conversation.conversationId!);
-                                    markMessagesAsRead(conversation.conversationId!); // Mark as read on click
-                                }}
-                                unreadCount={conversation.unreadCount}
-                                onMarkAsRead={(id: number) => markMessagesAsRead(id)}
-                            />
-                        ) : null
-                    )
+                ) : filteredConversations && filteredConversations.length > 0 ? (
+                    filteredConversations.map((conversation) => (
+                        <ConversationSummary
+                            key={conversation.accidentClaimId}
+                            conversation={conversation}
+                            isSelected={
+                                String(conversation.accidentClaimId) === String(selectedConversationId)
+                            }
+                            onClick={() => onSelectConversation(conversation.accidentClaimId)}
+                            unreadCount={conversation.unreadCount || 0}
+                            onMarkAsRead={(messageId) =>
+                                markAsRead(conversation.accidentClaimId, Number(messageId))
+                            }
+                        />
+                    ))
                 ) : (
-                    <p className="text-gray-500 mt-4">No conversations found</p>
+                    <p className="text-gray-500 mt-4 text-center">
+                        {conversations.length > 0
+                            ? "No conversations match your search."
+                            : "No conversations available."}
+                    </p>
                 )}
             </div>
 
-            {/* New Conversation Button for Desktop */}
-            <div className="my-4 hidden md:block w-full">
-                <Button onClick={handleOpenModal} variant="outline" className="w-full">
-                    <PlusIcon className="mr-2" size={16} />
-                    New Conversation
-                </Button>
-            </div>
-
-            {/* New Conversation Modal */}
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>New Conversation</DialogTitle>
+                        <DialogTitle>New Message</DialogTitle>
                     </DialogHeader>
-                    <DialogDescription className="space-y-4">
+                    <DialogDescription>
                         {isLoading ? (
                             <div className="flex items-center justify-center">
                                 <Loader2 className="animate-spin w-6 h-6 text-gray-500" />
-                                <span className="ml-2 text-gray-600">Loading users...</span>
+                                <span className="ml-2">Loading users...</span>
                             </div>
                         ) : (
-                            <>
+                            <div className="flex flex-col gap-4">
                                 {/* User Selection */}
-                                <Select
-                                    onValueChange={(value) => setSelectedUserId(Number(value))}
-                                    value={selectedUserId ? String(selectedUserId) : undefined}
-                                    disabled={role_id === 1} // Disable for Role 1
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select a user" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {uniqueUsers.map((user) => (
-                                            <SelectItem key={user.userId} value={String(user.userId)}>
-                                                {user.username}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                <div>
+                                    <label htmlFor="userSelect" className="block text-sm font-medium text-gray-700">
+                                        Select a User
+                                    </label>
+                                    <Select
+                                        onValueChange={(value) => setSelectedUserId(Number(value))}
+                                        value={selectedUserId ? String(selectedUserId) : undefined}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a user" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {usersWithClaims.map((user) => (
+                                                <SelectItem key={user.userId} value={String(user.userId)}>
+                                                    {user.username}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
 
                                 {/* Claim Selection */}
-                                <Select
-                                    onValueChange={(value) => {
-                                        setSelectedClaimId(value);
-                                    }}
-                                    disabled={(role_id !== 1 && !selectedUserId) || isLoading}
-                                    value={selectedClaimId || undefined}
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select a claim" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {selectedUserId ? (
-                                            selectedUserClaims.length > 0 ? (
-                                                selectedUserClaims.map((claim: Claim) => (
+                                <div>
+                                    <label htmlFor="claimSelect" className="block text-sm font-medium text-gray-700">
+                                        Select a Claim
+                                    </label>
+                                    <Select
+                                        onValueChange={setSelectedClaimId}
+                                        value={selectedClaimId || undefined}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a claim" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {selectedUserId ? (
+                                                selectedUserClaims.map((claim) => (
                                                     <SelectItem key={claim.claim_id} value={claim.claim_id}>
                                                         {`Claim #${claim.claim_id || "N/A"} - ${claim.full_name || "Unknown"} (${claim.status || "Unknown"})`}
                                                     </SelectItem>
                                                 ))
                                             ) : (
-                                                <div className="p-2">No claims available for this user</div>
-                                            )
-                                        ) : role_id === 1 ? (
-                                            usersWithClaims
-                                                .filter(user => user.userId === Number(session?.user?.id))
-                                                .flatMap(user => user.claims)
-                                                .map((claim) => (
-                                                    <SelectItem key={claim.claim_id} value={claim.claim_id}>
-                                                        {`Claim #${claim.claim_id || "N/A"} - ${claim.full_name || "Unknown"} (${claim.status || "Unknown"})`}
-                                                    </SelectItem>
-                                                ))
-                                        ) : (
-                                            <div className="p-2">Select a user first</div>
-                                        )}
-                                    </SelectContent>
-                                </Select>
+                                                <div className="p-2">Select a user first</div>
+                                            )}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
 
-
-                                {/* Message Content */}
-                                <textarea
-                                    className="w-full border rounded-md p-2"
-                                    placeholder="Enter your message..."
-                                    value={messageContent}
-                                    onChange={(e) => setMessageContent(e.target.value)}
-                                />
-                            </>
+                                {/* Message Input */}
+                                <div>
+                                    <label
+                                        htmlFor="messageContent"
+                                        className="block text-sm font-medium text-gray-700"
+                                    >
+                                        Message Content
+                                    </label>
+                                    <textarea
+                                        id="messageContent"
+                                        className="w-full border rounded-md p-2"
+                                        placeholder="Enter your message..."
+                                        value={messageContent}
+                                        onChange={(e) => setMessageContent(e.target.value)}
+                                    />
+                                </div>
+                            </div>
                         )}
                     </DialogDescription>
                     <DialogFooter>
@@ -281,17 +298,16 @@ const ConversationList: React.FC<ConversationListProps> = ({
                         </Button>
                         <Button
                             onClick={handleSendMessage}
-                            disabled={
-                                (role_id !== 1 && (!selectedUserId || !selectedClaimId)) || !messageContent.trim()
-                            }
+                            disabled={!selectedClaimId || !messageContent.trim()}
                         >
                             Send Message
                         </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
         </div>
     );
-}
+};
 
 export default ConversationList;

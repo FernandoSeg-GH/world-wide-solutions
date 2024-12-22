@@ -95,7 +95,7 @@ export function Dashboard() {
                     currentSection={currentSection}
                     isExpanded={isExpanded}
                 />
-                <div className="flex-grow overflow-y-auto w-full overflow-hidden no-scrollbar px-2 md:px-4 lg:px-8 py-6  pt-20">{RenderComponent(currentSection)}</div>
+                <div className="flex-grow overflow-y-auto w-full overflow-hidden no-scrollbar px-2 md:px-4  py-6  pt-20">{RenderComponent(currentSection)}</div>
             </div>
         </div>
     );

@@ -30,11 +30,21 @@ export async function POST(req: NextRequest) {
           Authorization: `Bearer ${session.accessToken}`,
         },
         body: JSON.stringify({
-          message_id, // Correct variable usage
-          content, // Correct variable usage
+          message_id,
+          content,
         }),
       }
     );
+
+    // Handle non-JSON responses
+    if (!response.ok) {
+      const text = await response.text(); // Get raw response
+      console.error("Error from backend:", text);
+      return NextResponse.json(
+        { message: `Error from backend: ${text}` },
+        { status: response.status }
+      );
+    }
 
     const data = await response.json();
     return NextResponse.json(data, { status: response.status });

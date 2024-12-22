@@ -111,7 +111,7 @@ const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
                             "flex flex-col justify-start w-full text-sm font-medium text-left border rounded-lg shadow-sm",
                         )}
                     >
-                        <div className="flex items-center justify-between w-full px-4 py-3 bg-navyBlue rounded-t-lg">
+                        <div className="flex flex-col items-start justify-start gap-4 lg:flex-row lg:items-center lg:justify-between w-full px-4 py-3 bg-navyBlue rounded-t-lg">
                             <div className="flex flex-col items-start w-full justify-between text-white ">
                                 <span className="font-semibold">
                                     Patient:    {claim.full_name}

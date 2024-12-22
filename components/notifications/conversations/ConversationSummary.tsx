@@ -1,16 +1,14 @@
-"use client"
 import React from "react";
 import { ConversationSummary as ConversationType } from "@/types";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
+import { Button } from "@/components/ui/button";
 
 interface ConversationSummaryProps {
     conversation: ConversationType;
     isSelected: boolean;
     onClick: () => void;
     unreadCount: number;
-    onMarkAsRead: (conversationId: number) => void;
+    onMarkAsRead: (accidentClaimId: string, messageId: number) => void;
 }
 
 const ConversationSummary: React.FC<ConversationSummaryProps> = ({
@@ -20,53 +18,87 @@ const ConversationSummary: React.FC<ConversationSummaryProps> = ({
     unreadCount,
     onMarkAsRead,
 }) => {
-    const { claimId, lastMessage, participants } = conversation;
+    const { accidentClaimId, lastMessage, participants } = conversation;
     const { data: session } = useSession();
 
-    const userIsRecipient = lastMessage?.senderUsername !== session?.user?.username;
     const formattedTimestamp = lastMessage?.timestamp
         ? new Date(lastMessage.timestamp).toLocaleString()
         : "Unknown";
 
-    const fromUser = participants[0]?.username;
-    const toUser = participants.length > 1 ? participants[1]?.username : "Unknown";
+    const fromUser =
+        lastMessage?.senderId === session?.user?.id
+            ? "You"
+            : lastMessage?.senderUsername || "Unknown";
+
+    const hasParticipants = Array.isArray(participants);
+    const recipientUsernames = hasParticipants
+        ? participants
+            .filter(p => p.userId !== session?.user?.id)
+            .map(p => p.username)
+            .join(", ") || "Unknown"
+        : "Unknown";
+
+    const handleMarkAsRead = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.stopPropagation(); // Prevent triggering onClick of the parent div
+        if (lastMessage?.messageId) {
+            onMarkAsRead(accidentClaimId, lastMessage.messageId);
+        } else {
+            console.error("messageId is undefined for conversation:", conversation);
+        }
+    };
 
     return (
         <div
-            className={`flex flex-col space-y-2 p-4 mb-2 border cursor-pointer hover:bg-gray-200 rounded-lg transition-colors duration-150 
+            className={`flex flex-col space-y-2 2xl:space-y-0 p-4 mb-2 border cursor-pointer hover:bg-gray-200 rounded-lg transition-colors duration-150 
             ${isSelected ? "bg-gray-200" : ""} 
             ${unreadCount > 0 ? "bg-blue-100" : ""}`}
             onClick={onClick}
         >
-            <div className="flex justify-between items-center">
+            {/* Claim ID and Timestamp */}
+            <div className="flex flex-col ">
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-                    Claim: <span className="text-blue-600 underline">{claimId}</span>
+                    Claim: <span className="underline">{accidentClaimId}</span>
                 </h3>
-                <span className="text-sm text-gray-500">{formattedTimestamp}</span>
+                <span className="text-sm text-gray-500 2xl:text-right">
+                    {formattedTimestamp}
+                </span>
             </div>
 
-            <div className="text-sm text-gray-600">
-                <span className="font-bold">From:</span> {fromUser}
-                <span className="font-bold ml-4">To:</span> {toUser}
+            {/* From and To Information */}
+            <div className="flex flex-col 2xl:flex-row 2xl:space-x-4 text-sm text-gray-600">
+                <div>
+                    <span className="font-bold">From:</span> {fromUser}
+                </div>
+                <div>
+                    <span className="font-bold">To:</span> {recipientUsernames}
+                </div>
             </div>
 
-            <div className="text-sm text-gray-600">
+            {/* Last Message */}
+            <div className="text-sm text-gray-600 truncate 2xl:max-w-xs">
                 {lastMessage?.content || "No messages yet"}
             </div>
 
-            {userIsRecipient && unreadCount > 0 && (
-                <button
-                    className="text-sm text-blue-600 underline"
+            {/* Mark as Read Button */}
+            {lastMessage && unreadCount > 0 && (
+                <Button
                     onClick={(e) => {
-                        e.stopPropagation();
-                        onMarkAsRead(conversation.conversationId);
+                        e.stopPropagation(); // Prevent parent click
+                        if (lastMessage?.messageId) {
+                            onMarkAsRead(accidentClaimId, lastMessage.messageId); // Correctly pass messageId
+                        } else {
+                            console.error("messageId is undefined for conversation:", conversation);
+                        }
                     }}
+                    size="sm"
+                    variant="outline"
                 >
                     Mark as Read
-                </button>
+                </Button>
+
             )}
         </div>
     );
 };
 
-export default ConversationSummary; 
+export default ConversationSummary;
