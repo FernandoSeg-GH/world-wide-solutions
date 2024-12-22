@@ -645,7 +645,7 @@ const AccidentClaimsView: React.FC = () => {
                 ) : isSpreadsheetView ? (
                     <SpreadsheetView claims={displayedClaims} selectedUserId={selectedUserId} />
                 ) : (
-                    <div className="space-y-6">
+                    <div className=" flex flex-col items-start justify-start gap-6 w-full">
                         {session?.user?.role.id === 1 ? (
                             // Role 1: User - Show their own claims in accordions
                             displayedClaims.map((claim) => (

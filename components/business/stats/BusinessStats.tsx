@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { Users, Briefcase, FileText, DollarSign } from "lucide-react";
+import { Users, Briefcase, FileText, DollarSign, Mail, MessageCircle } from "lucide-react";
 import StatCard from "./StatCard";
 
 const BusinessStats = () => {
@@ -58,13 +58,13 @@ const BusinessStats = () => {
             />
             <StatCard
                 title="Messages Sent"
-                icon={<Briefcase className="h-4 w-4 text-muted-foreground" />}
+                icon={<MessageCircle className="h-4 w-4 text-muted-foreground" />}
                 value={stats.messagesCount}
                 description="+10% since last month"
             />
             <StatCard
                 title="New Messages"
-                icon={<DollarSign className="h-4 w-4 text-muted-foreground" />}
+                icon={<Mail className="h-4 w-4 text-muted-foreground" />}
                 value={stats.newMessagesCount}
                 description="+12% since last month"
             />

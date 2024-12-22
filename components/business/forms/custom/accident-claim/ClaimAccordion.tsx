@@ -103,88 +103,86 @@ const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
     return (
         <Disclosure>
             {({ open }) => (
-                <div className="border border-gray-300 rounded-lg">
+                <div className="w-full">
                     {/* Disclosure Button */}
                     <DisclosureButton
                         as="div"
                         className={cn(
-                            "flex justify-between w-full text-sm font-medium text-left ",
+                            "flex flex-col justify-start w-full text-sm font-medium text-left border rounded-lg shadow-sm",
                         )}
                     >
-                        <div className="w-full rounded-lg">
-                            <div className="flex items-center justify-between w-full px-4 py-3 bg-navyBlue">
-                                <div className="flex flex-col items-start w-full justify-between text-white">
-                                    <span className="font-semibold">
-                                        Patient:    {claim.full_name}
-                                    </span>
-                                    <span className="text-sm text-gray-200">
-                                        Submitted by: <span className="capitalize">{claim.username}</span> ({claim.user_email})
-                                    </span>
-                                </div>
-                                <div>
-                                    {userRole === 1 ? (
-                                        // Show badge for regular users
-                                        <Badge
-                                            className={`text-sm whitespace-nowrap capitalize ${claim.status === "received"
-                                                ? "bg-green-100 text-green-800"
-                                                : claim.status === "approved"
-                                                    ? "bg-blue-100 text-blue-800"
-                                                    : claim.status === "in progress"
-                                                        ? "bg-yellow-100 text-yellow-800"
-                                                        : claim.status === "documentation missing"
-                                                            ? "bg-red-100 text-red-800"
-                                                            : claim.status === "reviewing"
-                                                                ? "bg-purple-100 text-purple-800"
-                                                                : "bg-gray-100 text-gray-800"
-                                                }`}
-                                        >
-                                            {claim.status}
-                                        </Badge>
-                                    ) : (
-                                        // Show dropdown for admins
-                                        <Select
-                                            value={claim.status}
-                                            onValueChange={(value) => handleStatusChange(claim.claim_id, value)}
-                                        >
-                                            <SelectTrigger className={`min-w-[200px] whitespace-nowrap capitalize text-sm text-center ${claim.status === "received"
-                                                ? "bg-green-100 text-green-800"
-                                                : claim.status === "approved"
-                                                    ? "bg-blue-100 text-blue-800"
-                                                    : claim.status === "in progress"
-                                                        ? "bg-yellow-100 text-yellow-800"
-                                                        : claim.status === "documentation missing"
-                                                            ? "bg-red-100 text-red-800"
-                                                            : claim.status === "reviewing"
-                                                                ? "bg-purple-100 text-purple-800"
-                                                                : "bg-gray-100 text-gray-800"
-                                                }`}>
-                                                <SelectValue placeholder="Select status" className="text-center" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem className="text-center" value="Under Review">Under Review</SelectItem>
-                                                <SelectItem className="text-center" value="Pending Documentation">Pending Documentation</SelectItem>
-                                                <SelectItem className="text-center" value="Settle">Settle</SelectItem>
-                                                <SelectItem className="text-center" value="Closed">Closed</SelectItem>
-                                                <SelectItem className="text-center" value="Denied">Denied</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    )}
-                                </div>
+                        <div className="flex items-center justify-between w-full px-4 py-3 bg-navyBlue rounded-t-lg">
+                            <div className="flex flex-col items-start w-full justify-between text-white ">
+                                <span className="font-semibold">
+                                    Patient:    {claim.full_name}
+                                </span>
+                                <span className="text-sm text-gray-200">
+                                    Submitted by: <span className="capitalize">{claim.username}</span> ({claim.user_email})
+                                </span>
                             </div>
-                            <div className="w-full bg-white px-4 py-3 ">
-
-                                <p className="mt-2 text-gray-600 dark:text-gray-400">
-                                    Patient: <strong>{claim.full_name}</strong>
-                                </p>
-                                <CardDescription className="mt-1 text-gray-600 dark:text-gray-400">
-                                    Submission ID: <span className="font-medium">{claim.claim_id}</span>
-                                </CardDescription>
-                                <p className="text-sm text-gray-500 dark:text-gray-300">
-                                    Submitted At: {new Date(String(claim.created_at)).toLocaleString()}
-                                </p>
+                            <div>
+                                {userRole === 1 ? (
+                                    // Show badge for regular users
+                                    <Badge
+                                        className={`text-sm whitespace-nowrap capitalize ${claim.status === "received"
+                                            ? "bg-green-100 text-green-800"
+                                            : claim.status === "approved"
+                                                ? "bg-blue-100 text-blue-800"
+                                                : claim.status === "in progress"
+                                                    ? "bg-yellow-100 text-yellow-800"
+                                                    : claim.status === "documentation missing"
+                                                        ? "bg-red-100 text-red-800"
+                                                        : claim.status === "reviewing"
+                                                            ? "bg-purple-100 text-purple-800"
+                                                            : "bg-gray-100 text-gray-800"
+                                            }`}
+                                    >
+                                        {claim.status}
+                                    </Badge>
+                                ) : (
+                                    // Show dropdown for admins
+                                    <Select
+                                        value={claim.status}
+                                        onValueChange={(value) => handleStatusChange(claim.claim_id, value)}
+                                    >
+                                        <SelectTrigger className={`min-w-[200px] whitespace-nowrap capitalize text-sm text-center ${claim.status === "received"
+                                            ? "bg-green-100 text-green-800"
+                                            : claim.status === "approved"
+                                                ? "bg-blue-100 text-blue-800"
+                                                : claim.status === "in progress"
+                                                    ? "bg-yellow-100 text-yellow-800"
+                                                    : claim.status === "documentation missing"
+                                                        ? "bg-red-100 text-red-800"
+                                                        : claim.status === "reviewing"
+                                                            ? "bg-purple-100 text-purple-800"
+                                                            : "bg-gray-100 text-gray-800"
+                                            }`}>
+                                            <SelectValue placeholder="Select status" className="text-center" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem className="text-center" value="Under Review">Under Review</SelectItem>
+                                            <SelectItem className="text-center" value="Pending Documentation">Pending Documentation</SelectItem>
+                                            <SelectItem className="text-center" value="Settle">Settle</SelectItem>
+                                            <SelectItem className="text-center" value="Closed">Closed</SelectItem>
+                                            <SelectItem className="text-center" value="Denied">Denied</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                )}
                             </div>
-
                         </div>
+                        <div className="w-full rounded-b-lg px-4 py-3">
+
+                            <p className="mt-2 text-gray-600 dark:text-gray-400">
+                                Patient: <strong>{claim.full_name}</strong>
+                            </p>
+                            <CardDescription className="mt-1 text-gray-600 dark:text-gray-400">
+                                Submission ID: <span className="font-medium">{claim.claim_id}</span>
+                            </CardDescription>
+                            <p className="text-sm text-gray-500 dark:text-gray-300">
+                                Submitted At: {new Date(String(claim.created_at)).toLocaleString()}
+                            </p>
+                        </div>
+
                     </DisclosureButton>
 
                     {/* Disclosure Panel */}
