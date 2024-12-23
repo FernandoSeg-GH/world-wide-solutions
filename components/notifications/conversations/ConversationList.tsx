@@ -213,7 +213,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
                         <Button
                             onClick={handleOpenModal}
                             variant="outline"
-                            className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700"
+                            className="px-4 py-2 text-sm font-semibold text-white bg-navyBlue/80 hover:bg-navyBlue"
                         >
                             <PlusIcon className="mr-2" size={16} />
                             New Message
