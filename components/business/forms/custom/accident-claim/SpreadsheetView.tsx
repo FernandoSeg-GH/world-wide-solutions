@@ -20,14 +20,14 @@ interface SpreadsheetViewProps {
 const flattenClaim = (claim: EditableClaim) => {
     const flatClaim: Record<string, any> = { ...claim };
 
-    // Format date fields
+
     ["accident_date", "created_at", "updated_at"].forEach((dateField) => {
         if (flatClaim[dateField]) {
             flatClaim[dateField] = formatDate(flatClaim[dateField]);
         }
     });
 
-    // Safely parse JSON-like fields
+
     ["vehicle_details", "medical_provider_costs", "repatriation_costs", "other_costs"].forEach((key) => {
         try {
             const parsed = typeof flatClaim[key] === "string" ? JSON.parse(flatClaim[key]) : flatClaim[key];
@@ -45,7 +45,6 @@ const flattenClaim = (claim: EditableClaim) => {
         }
     });
 
-    // Remove unwanted keys
     ["file_uploads", "vehicle_details", "medical_provider_costs", "repatriation_costs", "other_costs"].forEach((key) => {
         delete flatClaim[key];
     });
@@ -53,11 +52,9 @@ const flattenClaim = (claim: EditableClaim) => {
     return flatClaim;
 };
 
-
 const expandClaims = (claims: EditableClaim[]) => {
     const expandedClaims = claims.map(flattenClaim);
 
-    // Generate headers while filtering out unwanted columns
     const headers = Array.from(
         new Set(
             expandedClaims.flatMap((claim) =>

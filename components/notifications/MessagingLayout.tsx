@@ -1,5 +1,3 @@
-// components/MessagingLayout.tsx
-
 "use client";
 
 import React, { useState } from "react";

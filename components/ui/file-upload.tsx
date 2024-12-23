@@ -1,5 +1,3 @@
-// components/ui/file-upload.tsx
-
 import React from "react";
 import { Button } from "./button";
 import { FaFileUpload, FaTrash } from "react-icons/fa";
@@ -13,8 +11,8 @@ interface FileUploadProps {
     description?: string;
 }
 
-export const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
-export const MAX_TOTAL_SIZE = 50 * 1024 * 1024; // 50 MB
+export const MAX_FILE_SIZE = 25 * 1024 * 1024;
+export const MAX_TOTAL_SIZE = 50 * 1024 * 1024;
 
 export function FileUpload({ multiple = false, onFilesSelected, className, description }: FileUploadProps) {
     const [selectedFiles, setSelectedFiles] = React.useState<File[]>([]);
@@ -32,7 +30,7 @@ export function FileUpload({ multiple = false, onFilesSelected, className, descr
         if (event.target.files) {
             let files = Array.from(event.target.files);
 
-            // Filter out files exceeding MAX_FILE_SIZE
+
             const oversizedFiles = files.filter(file => file.size > MAX_FILE_SIZE);
             if (oversizedFiles.length > 0) {
                 toast({
@@ -40,7 +38,7 @@ export function FileUpload({ multiple = false, onFilesSelected, className, descr
                     description: `Each file must be smaller than 25 MB. ${oversizedFiles.length} file(s) were not added.`,
                     variant: "destructive",
                 });
-                // Remove oversized files
+
                 files = files.filter(file => file.size <= MAX_FILE_SIZE);
             }
 
@@ -61,7 +59,7 @@ export function FileUpload({ multiple = false, onFilesSelected, className, descr
             setSelectedFiles(updatedFiles);
             onFilesSelected(updatedFiles);
 
-            // Clear input value to allow re-uploading the same file if needed
+
             event.target.value = "";
         }
     };
@@ -71,7 +69,7 @@ export function FileUpload({ multiple = false, onFilesSelected, className, descr
         if (event.dataTransfer.files) {
             let files = Array.from(event.dataTransfer.files);
 
-            // Filter out files exceeding MAX_FILE_SIZE
+
             const oversizedFiles = files.filter(file => file.size > MAX_FILE_SIZE);
             if (oversizedFiles.length > 0) {
                 toast({
@@ -79,7 +77,7 @@ export function FileUpload({ multiple = false, onFilesSelected, className, descr
                     description: `Each file must be smaller than 25 MB. ${oversizedFiles.length} file(s) were not added.`,
                     variant: "destructive",
                 });
-                // Remove oversized files
+
                 files = files.filter(file => file.size <= MAX_FILE_SIZE);
             }
 
@@ -100,7 +98,7 @@ export function FileUpload({ multiple = false, onFilesSelected, className, descr
             setSelectedFiles(updatedFiles);
             onFilesSelected(updatedFiles);
 
-            // Prevent default behavior
+
             event.stopPropagation();
         }
     };
@@ -153,7 +151,7 @@ export function FileUpload({ multiple = false, onFilesSelected, className, descr
                     {selectedFiles.map((file, index) => (
                         <div key={index} className="file-thumbnail relative border rounded-lg p-2 shadow-sm">
                             {file.type.startsWith("image/") ? (
-                                // eslint-disable-next-line @next/next/no-img-element
+
                                 <img
                                     src={URL.createObjectURL(file)}
                                     alt={file.name}

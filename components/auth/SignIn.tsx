@@ -1,5 +1,3 @@
-// src/components/auth/SignIn.tsx
-
 "use client";
 
 import { useState } from "react";
@@ -13,7 +11,7 @@ import { toast } from "@/components/ui/use-toast";
 
 interface SignInProps {
     onToggle: () => void;
-    onForgotPassword: () => void; // Added this line
+    onForgotPassword: () => void;
     callbackUrl: string;
 }
 

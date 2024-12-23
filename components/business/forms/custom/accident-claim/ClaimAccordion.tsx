@@ -1,4 +1,4 @@
-// components/ClaimAccordion.tsx
+
 
 import React from "react";
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react";
@@ -23,7 +23,7 @@ interface ClaimAccordionProps {
     handleFieldChange: (claim_id: string, fieldPath: string, value: any) => void;
     handleSave: (claim_id: string) => void;
     handleCancel: (claim_id: string) => void;
-    handleStatusChange: (claim_id: string, newStatus: string) => void; // Add handler for status change
+    handleStatusChange: (claim_id: string, newStatus: string) => void;
 }
 
 const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
@@ -55,24 +55,24 @@ const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
                 saveAs(blob, `claim_${claim.claim_id}.csv`);
             }
         } else if (format === 'pdf') {
-            // const element = document.querySelector(`[data-claim-id="${claim.claim_id}"]`);
+
             const element = document.querySelector(`[data-claim-id="${claim.claim_id}"] .claim-content`);
 
             if (element) {
                 try {
                     const canvas = await html2canvas(element as HTMLElement, {
-                        scale: 1.5, // Lower scale for smaller file size
+                        scale: 1.5,
                         useCORS: true,
                         logging: false,
-                        // ignoreElements: (el) => el.classList.contains("exclude-pdf"),
+
                     });
 
-                    const imgData = canvas.toDataURL("image/jpeg", 0.6); // Compression
+                    const imgData = canvas.toDataURL("image/jpeg", 0.6);
                     const pdf = new jsPDF("p", "mm", "a4");
                     const pageWidth = pdf.internal.pageSize.getWidth();
                     const pageHeight = pdf.internal.pageSize.getHeight();
 
-                    let imgWidth = pageWidth - 20; // Margins
+                    let imgWidth = pageWidth - 20;
                     let imgHeight = (canvas.height * imgWidth) / canvas.width;
                     let position = 10;
                     let heightLeft = imgHeight;
@@ -122,7 +122,7 @@ const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
                             </div>
                             <div>
                                 {userRole === 1 ? (
-                                    // Show badge for regular users
+
                                     <Badge
                                         className={`text-sm whitespace-nowrap capitalize ${claim.status === "received"
                                             ? "bg-green-100 text-green-800"
@@ -140,7 +140,7 @@ const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
                                         {claim.status}
                                     </Badge>
                                 ) : (
-                                    // Show dropdown for admins
+
                                     <Select
                                         value={claim.status}
                                         onValueChange={(value) => handleStatusChange(claim.claim_id, value)}

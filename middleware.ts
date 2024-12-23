@@ -4,7 +4,7 @@ import { getToken, JWT } from "next-auth/jwt";
 import { jwtDecode } from "jwt-decode";
 import jwt from "jsonwebtoken";
 
-const TOKEN_EXPIRATION_THRESHOLD = 5 * 60 * 1000; // 5 minutes
+const TOKEN_EXPIRATION_THRESHOLD = 5 * 60 * 1000;
 
 async function refreshAccessToken(refreshToken: string) {
   try {
@@ -46,7 +46,7 @@ export async function middleware(req: NextRequest) {
 
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   if (!token || !token.accessTokenExpires) {
-    return NextResponse.next(); // Skip if token or expiration is undefined
+    return NextResponse.next();
   }
 
   const timeUntilExpiration = token.accessTokenExpires - Date.now();

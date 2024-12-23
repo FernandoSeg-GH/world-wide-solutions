@@ -30,7 +30,7 @@ export default function TokenRefresher() {
                 console.error("Error refreshing token:", error);
                 signOut();
             }
-        }, 10 * 60 * 1000); // Every 10 minutes
+        }, 10 * 60 * 1000);
 
         return () => clearInterval(refreshInterval);
     }, [session]);

@@ -61,20 +61,16 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const [messages, setMessages] = useState<InboxMessage[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
 
-    // Derive totalUnread from conversations
     const totalUnread = useMemo(() => {
         return conversations.reduce((acc, convo) => acc + (convo.unreadCount || 0), 0);
     }, [conversations]);
 
-
-    // Fetch all conversations 
     const isFetching = useRef(false);
     const fetchConversations = useCallback(async (): Promise<ConversationSummary[]> => {
         try {
             const data = await apiRequest('/api/messages/conversations', {
                 headers: { Authorization: `Bearer ${session?.accessToken}` },
             });
-            console.log("Fetched Conversations:", data); // Debug log
             if (!areConversationsEqual(conversations, data.conversations)) {
                 setConversations(data.conversations || []);
             }
@@ -103,11 +99,10 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                         ...prev.filter((msg) => !response.messages.some((newMsg: InboxMessage) => newMsg.messageId === msg.messageId)),
                         ...response.messages.map((msg: InboxMessage) => ({
                             ...msg,
-                            conversationId: accidentClaimId, // Add conversationId to each message
+                            conversationId: accidentClaimId,
                         })),
                     ]);
                 }
-                console.log('messages___', messages)
             } catch (error) {
                 console.error("Error fetching messages:", error);
             }
@@ -115,7 +110,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         [session?.accessToken]
     );
 
-    // Reply to a message
+
     const replyToMessage = useCallback(
         async (accidentClaimId: string, messageId: number, content: string): Promise<void> => {
             if (!session?.accessToken) throw new Error("Unauthorized");
@@ -148,7 +143,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         [session, fetchMessages]
     );
 
-    // Send a message to multiple users
+
     const sendMessageToUsers = useCallback(
         async (
             recipientIds: number[],
@@ -173,13 +168,13 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                 throw new Error(errorData.message || "Failed to send message");
             }
 
-            // Refetch conversations to update state
+
             await fetchConversations();
         },
         [session, fetchConversations]
     );
 
-    // Send a message to a specific conversation
+
     const sendMessage = useCallback(
         async (accidentClaimId: string, content: string): Promise<void> => {
             const response = await fetch("/api/messages/send", {
@@ -200,13 +195,13 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                 throw new Error(errorData.message || "Failed to send message");
             }
 
-            // Refetch conversations to update state
+
             await fetchConversations();
         },
         [session, fetchConversations]
     );
 
-    // Mark a message as read
+
     const markAsRead = useCallback(
         async (accidentClaimId: string, messageId: number): Promise<void> => {
             try {
@@ -226,7 +221,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                     throw new Error(errorData.error || "Failed to mark message as read");
                 }
 
-                // Update conversation state to reflect unread count decrement
+
                 setConversations((prev) =>
                     prev.map((conv) =>
                         conv.accidentClaimId === accidentClaimId
@@ -249,7 +244,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     );
 
 
-    // Fetch inbox messages
+
     const fetchInboxMessages = useCallback(async (): Promise<void> => {
         if (!session?.accessToken) return;
         setLoading(true);
@@ -274,7 +269,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
     }, [session]);
 
-    // Fetch users with claims
+
     const fetchUsersWithClaims = useCallback(async (): Promise<UserWithClaims[] | null> => {
         const flaskBaseUrl = process.env.NEXT_PUBLIC_FLASK_BACKEND_URL;
         try {
@@ -288,7 +283,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
     }, [session]);
 
-    // Mark all messages in a conversation as read
+
     const markMessagesAsRead = useCallback(
         async (accidentClaimId: string): Promise<void> => {
             try {
@@ -296,7 +291,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
-                        // Authorization is handled server-side
+
                     },
                 });
 
@@ -305,7 +300,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                     throw new Error(errorData.message || "Failed to mark messages as read");
                 }
 
-                await fetchConversations(); // Refresh unread counts after marking messages as read
+                await fetchConversations();
             } catch (error) {
                 console.error('Error marking messages as read:', error);
             }
@@ -313,16 +308,16 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         [fetchConversations]
     );
 
-    // Mark all messages as read across all conversations
+
     const markAllMessagesAsRead = useCallback(async (): Promise<void> => {
         if (!session?.accessToken) return;
 
         setLoading(true);
         try {
-            // Fetch all conversations
+
             const currentConversations = await fetchConversations();
 
-            // Filter conversations with unread messages
+
             const conversationsToUpdate = currentConversations.filter(
                 (convo) => convo.unreadCount > 0
             );

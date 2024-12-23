@@ -38,8 +38,8 @@ function Calendar({
   }
 
   const years = React.useMemo(() => {
-    const startYear = new Date().getFullYear() - 100 // Allows going 100 years back
-    const endYear = new Date().getFullYear() + 10 // Allows 10 years in the future
+    const startYear = new Date().getFullYear() - 100
+    const endYear = new Date().getFullYear() + 10
     return Array.from({ length: endYear - startYear + 1 }, (_, i) => startYear + i)
   }, [])
 

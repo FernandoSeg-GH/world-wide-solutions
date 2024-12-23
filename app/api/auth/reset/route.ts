@@ -1,5 +1,3 @@
-// pages/api/auth/reset.ts
-
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {

@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
 
     const response = await fetch(fetchUrl, {
       headers: {
-        Authorization: `Bearer ${session.accessToken}`, // Double-check this value
+        Authorization: `Bearer ${session.accessToken}`,
       },
     });
 

@@ -13,12 +13,11 @@ const useTokenRefresh = () => {
       const timeLeft = (session?.accessTokenExpires ?? 0) - now;
 
       if (timeLeft < 5 * 60 * 1000) {
-        // Trigger token refresh 5 minutes before expiration
         signIn("credentials", { redirect: false });
       }
-    }, 60 * 1000); // Check every minute
+    }, 60 * 1000);
 
-    return () => clearInterval(interval); // Clear interval on component unmount
+    return () => clearInterval(interval);
   }, [status, session]);
 
   return null;

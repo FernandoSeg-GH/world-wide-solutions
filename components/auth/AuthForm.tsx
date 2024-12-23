@@ -38,8 +38,8 @@ export function AuthForm() {
                     ) : (
                         <SignIn
                             onToggle={() => setIsRegistering(true)}
-                            onForgotPassword={() => setIsForgotPassword(true)} // Pass onForgotPassword
-                            callbackUrl={"/"} // Adjust as needed
+                            onForgotPassword={() => setIsForgotPassword(true)}
+                            callbackUrl={"/"}
                         />
                     )}
                 </CardContent>

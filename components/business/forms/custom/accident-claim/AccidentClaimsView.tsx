@@ -39,9 +39,6 @@ const AccidentClaimsView: React.FC = () => {
     const [sortOption, setSortOption] = useState<string>("date_desc");
     const [statusFilter, setStatusFilter] = useState<SubmissionStatusEnum | "all">("all");
 
-
-    // Debounce search inputs to optimize performance
-
     const debouncedSetSearchClaimId = useMemo(
         () => debounce((value: string) => setSearchClaimId(value), 300),
         []
@@ -71,7 +68,7 @@ const AccidentClaimsView: React.FC = () => {
         };
     }, [debouncedSetSearchClaimId, debouncedSetSearchPatientName, debouncedSetSortOption, debouncedSetStatusFilter]);
 
-    // AccidentClaimsView.tsx
+
     useEffect(() => {
         const fetchClaims = async () => {
             try {
@@ -100,7 +97,6 @@ const AccidentClaimsView: React.FC = () => {
                     }))
                     : [];
 
-                // Sort claims by accident_date (newest first)
                 initializedClaims.sort((a, b) =>
                     new Date(a.updated_at || "").getTime() - new Date(b.updated_at || "").getTime()
                 );
@@ -120,7 +116,7 @@ const AccidentClaimsView: React.FC = () => {
     }, [businessId, session]);
 
     useEffect(() => {
-        // Group claims by user for roles 2,3,4
+
         if ([2, 3, 4].includes(Number(session?.user?.role.id))) {
             const groups: { [key: string]: GroupedClaims } = {};
 
@@ -135,10 +131,10 @@ const AccidentClaimsView: React.FC = () => {
                 groups[userKey].claims.push(claim);
             });
 
-            // Convert the groups object to an array
+
             const groupedArray: GroupedClaims[] = Object.values(groups);
 
-            // Optional: Sort the groups alphabetically by username
+
             groupedArray.sort((a, b) => a.user.username.localeCompare(b.user.username));
 
             setGroupedClaims(groupedArray);
@@ -155,7 +151,7 @@ const AccidentClaimsView: React.FC = () => {
         });
     };
 
-    // Function to perform sorting
+
     const sortClaims = (claimsList: EditableClaim[]): EditableClaim[] => {
         return [...claimsList].sort((a, b) => {
             switch (sortOption) {
@@ -180,7 +176,7 @@ const AccidentClaimsView: React.FC = () => {
     const displayedClaims = useMemo(() => {
         let filtered = filterClaims(claims);
 
-        // If the user has selected a specific user (for roles 2,3,4), filter accordingly
+
         if (selectedUserId && selectedUserId !== "all") {
             filtered = filtered.filter(claim => claim.user.user_id === selectedUserId);
         }
@@ -215,7 +211,7 @@ const AccidentClaimsView: React.FC = () => {
         let current = obj;
         for (let i = 0; i < path.length - 1; i++) {
             const part = path[i];
-            // Handle array indices
+
             if (part.includes("[")) {
                 const [arrayKey, indexStr] = part.split("[");
                 const index = parseInt(indexStr.replace("]", ""), 10);
@@ -291,7 +287,7 @@ const AccidentClaimsView: React.FC = () => {
 
         const submitData = new FormData();
 
-        // Append all fields except file uploads
+
         Object.entries(claimToUpdate.editedData).forEach(([key, value]) => {
             if (key === 'new_file_uploads') return;
 
@@ -304,7 +300,7 @@ const AccidentClaimsView: React.FC = () => {
             }
         });
 
-        // Handle new file uploads
+
         if (claimToUpdate.editedData.new_file_uploads?.length) {
             claimToUpdate.editedData.new_file_uploads.forEach((file) => {
                 if (file instanceof File) {
@@ -318,13 +314,13 @@ const AccidentClaimsView: React.FC = () => {
         submitData.append("business_id", businessId);
 
         try {
-            // const response = await fetch(
-            //     `/api/forms/submissions/claim/${claim_id}/update`,
-            //     {
-            //         method: "PUT",
-            //         body: submitData,
-            //     }
-            // );
+
+
+
+
+
+
+
 
             const response = await fetch(
                 `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/custom/forms/update_accident_claim/${claim_id}`,
@@ -356,8 +352,8 @@ const AccidentClaimsView: React.FC = () => {
                                 editedData: mapClaimToFormData(updatedClaim, businessId),
                                 user: {
                                     user_id: String(updatedClaim.user_id),
-                                    username: updatedClaim.username || "", // Provide default
-                                    user_email: updatedClaim.user_email || "", // Provide default
+                                    username: updatedClaim.username || "",
+                                    user_email: updatedClaim.user_email || "",
                                 },
                             }
                             : claim
@@ -647,7 +643,7 @@ const AccidentClaimsView: React.FC = () => {
                 ) : (
                     <div className=" flex flex-col items-start justify-start gap-6 w-full">
                         {session?.user?.role.id === 1 ? (
-                            // Role 1: User - Show their own claims in accordions
+
                             displayedClaims.map((claim) => (
                                 <ClaimAccordion
                                     handleStatusChange={handleStatusChange}
@@ -660,7 +656,7 @@ const AccidentClaimsView: React.FC = () => {
                                 />
                             ))
                         ) : (
-                            // Roles 2,3,4: Business/Admin - Group claims by user
+
                             groupedClaims
                                 .filter((group) =>
                                     selectedUserId === "all" || !selectedUserId
@@ -668,7 +664,7 @@ const AccidentClaimsView: React.FC = () => {
                                         : group.user.user_id === selectedUserId
                                 )
                                 .map((group) => {
-                                    // Further filter the group's claims based on search inputs
+
                                     const filteredGroupClaims = filterClaims(group.claims);
                                     const sortedGroupClaims = sortClaims(filteredGroupClaims);
 

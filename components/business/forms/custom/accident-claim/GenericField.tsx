@@ -1,4 +1,4 @@
-// components/GenericField.tsx
+
 import React from "react";
 import { FieldConfig } from "./config/form-config";
 import { Input } from "@/components/ui/input";
@@ -62,9 +62,7 @@ const GenericField: React.FC<GenericFieldProps> = ({ field, value, onChange, exi
                     </Select>
                 );
             case "conditionalSelect":
-                // Example: Conditional rendering based on country
                 return (
-                    // Implement conditional select logic here
                     <Input
                         id={field.id}
                         name={field.id}
@@ -81,7 +79,7 @@ const GenericField: React.FC<GenericFieldProps> = ({ field, value, onChange, exi
                         id={field.id}
                         label={field.label}
                         files={value as FileList | null}
-                        // existingFiles={existingFiles || []}
+
                         onChange={onChange}
                     />
                 );

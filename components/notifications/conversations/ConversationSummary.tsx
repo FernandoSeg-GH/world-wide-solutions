@@ -8,7 +8,7 @@ interface ConversationSummaryProps {
     isSelected: boolean;
     onClick: () => void;
     unreadCount: number;
-    onMarkAsRead: (messageId: number) => void; // Updated prop
+    onMarkAsRead: (messageId: number) => void;
 }
 
 const ConversationSummary: React.FC<ConversationSummaryProps> = ({
@@ -32,22 +32,23 @@ const ConversationSummary: React.FC<ConversationSummaryProps> = ({
 
     const hasParticipants = Array.isArray(participants);
     const recipientUsernames = hasParticipants
-        ? participants
-            .filter(p => p.userId !== session?.user?.id)
-            .map(p => p.username)
-            .join(", ") || "Unknown"
+        ? "Team"
         : "Unknown";
+    // const recipientUsernames = hasParticipants
+    //     ? participants
+    //         .filter(p => p.userId !== session?.user?.id)
+    //         .map(p => p.username)
+    //         .join(", ") || "Unknown"
+    //     : "Unknown";
 
     const handleMarkAsRead = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        e.stopPropagation(); // Prevent triggering onClick of the parent div
+        e.stopPropagation();
         if (lastMessage?.messageId) {
-            onMarkAsRead(lastMessage.messageId); // Pass only messageId
+            onMarkAsRead(lastMessage.messageId);
         } else {
             console.error("messageId is undefined for conversation:", conversation);
         }
     };
-
-    console.log('conversation', conversation);
 
     return (
         <div
@@ -84,7 +85,7 @@ const ConversationSummary: React.FC<ConversationSummaryProps> = ({
             {/* Mark as Read Button */}
             {lastMessage && unreadCount > 0 && (
                 <Button
-                    onClick={handleMarkAsRead} // Updated handler
+                    onClick={handleMarkAsRead}
                     size="sm"
                     variant="outline"
                 >

@@ -1,4 +1,3 @@
-// components/ClaimDetails.tsx
 "use client";
 
 import React, { useMemo, useState } from "react";
@@ -84,12 +83,11 @@ export default function ClaimDetails({
         }
     }, [data.file_uploads]);
 
-
     const vehicleDetails = Array.isArray(data.vehicle_details) ? data.vehicle_details : [];
     const selectedAccidentType = accidentTypeOptions.find((opt) => opt.value === data.accident_type);
 
     const renderViewField = (label: string, value: any, placeholder: string = "N/A") => {
-        // Render label and value inline with margin for view mode
+
         return (
             <div className="flex items-baseline flex-wrap mb-2">
                 <span className="font-semibold text-gray-800 dark:text-gray-200 mr-2">{label}:</span>
@@ -98,8 +96,6 @@ export default function ClaimDetails({
         );
     };
 
-    // For fields that require multiple lines (like textarea) in view mode, we can still inline them
-    // or just render the text. We'll keep it inline for consistency.
     const renderViewText = (label: string, value: any, placeholder: string = "N/A") => {
         return renderViewField(label, value, placeholder);
     };
@@ -182,7 +178,7 @@ export default function ClaimDetails({
     const renderExistingFiles = (files?: string[] | string | null) => {
         let validFiles: string[] = [];
 
-        // Handle different file formats: empty array, stringified array, or null
+
         if (Array.isArray(files)) {
             validFiles = files;
         } else if (typeof files === "string" && files.trim().length > 0) {
@@ -244,7 +240,7 @@ export default function ClaimDetails({
     };
 
 
-    // Vehicle details editing
+
     const addVehicle = () => {
         const newVehicle: VehicleDetail = {
             licenseNumber: "",
@@ -266,7 +262,7 @@ export default function ClaimDetails({
     };
 
 
-    // Costs
+
     const renderCostSection = (
         costType: keyof AccidentClaimFormData,
         title: string,
@@ -538,7 +534,7 @@ export default function ClaimDetails({
         );
     };
 
-    // Validation on save
+
     const validateRequiredFields = () => {
         const errors = [];
         if (!data.claim_id) errors.push("Claim Reference Number");
@@ -547,8 +543,8 @@ export default function ClaimDetails({
         if (!data.accident_country) errors.push("Country of Accident");
         if (!data.accident_state) errors.push("State/City of Accident");
 
-        // if (!data.accident_country) errors.push("Country of accident");
-        // if (!data.accident_state) errors.push("State of accident");
+
+
         if (errors.length > 0) {
             toast({
                 title: "Missing Required Fields",

@@ -130,19 +130,11 @@ export interface Submission {
   formUrl: string;
   status: string;
   content?: Record<string, string>;
-  // content?: Record<string, { label: string; value: string | null }>;
   created_at: string;
   fileUrls?: string[];
 }
 
 export enum SubmissionStatusEnum {
-  // PENDING = "PENDING",
-  // RECEIVED = "RECEIVED",
-  // PROCESSING = "PROCESSING",
-  // REVIEWING = "REVIEWING",
-  // STARTED = "STARTED",
-  // APPROVED = "APPROVED",
-  // REJECTED = "REJECTED",
   UNDER_REVIEW = "UNDER_REVIEW",
   PENDING_DOCUMENTATION = "PENDING_DOCUMENTATION",
   SETTLE = "SETTLE",
@@ -205,10 +197,9 @@ export interface Chat {
   user?: User;
 }
 
-// types.ts
 export interface ConversationSummary {
   accidentClaimId: string;
-  fullName: string; // Added fullName
+  fullName: string;
   messageCount: number;
   lastMessageTime: string | null;
   unreadCount: number;
@@ -232,10 +223,10 @@ export interface ConversationSummary {
 export interface Message {
   id: number;
   senderId: number;
-  senderUsername?: string; // Make optional if not always available
+  senderUsername?: string;
   content: string;
   timestamp: string;
-  read?: boolean; // Make optional if not always applicable
+  read?: boolean;
   sender?: User;
   recipients?: MessageRecipient[];
 }
@@ -258,16 +249,16 @@ export interface InboxMessage {
   timestamp: string;
   isSender: boolean;
   readAt?: string;
-  threadId?: string; // ID of the thread or conversation
-  receiverId?: number; // Receiver information
-  conversationId?: number; // Conversation ID
-  receiverUsername?: string; // Optional receiver username
-  deliveryStatus?: "sent" | "delivered" | "failed"; // Status of the message
-  attachments?: { type: string; url: string }[]; // Array of attachments
-  readBy?: { userId: number; readAt: string }[]; // Read receipts
-  type?: "user" | "system" | "notification"; // Message type
-  priority?: "high" | "normal" | "low"; // Priority of the message
-  parentMessageId?: number; // For threaded replies
+  threadId?: string;
+  receiverId?: number;
+  conversationId?: number;
+  receiverUsername?: string;
+  deliveryStatus?: "sent" | "delivered" | "failed";
+  attachments?: { type: string; url: string }[];
+  readBy?: { userId: number; readAt: string }[];
+  type?: "user" | "system" | "notification";
+  priority?: "high" | "normal" | "low";
+  parentMessageId?: number;
 }
 
 export interface UserAICharacter {
@@ -430,7 +421,7 @@ export interface AppContextType {
     totalPages?: number;
     roles?: Role[];
     tasks?: Task[];
-    // messages?: Message[];
+
     chats?: Chat[];
     aiCharacters?: AICharacter[];
     landingPages?: LandingPage[];
@@ -620,7 +611,7 @@ export interface Business {
 export interface LastMessage {
   id: number;
   senderId: number;
-  senderUsername?: string; // Optional if not always provided
+  senderUsername?: string;
   messageId: number;
   content: string;
   timestamp: string;

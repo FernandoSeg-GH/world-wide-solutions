@@ -15,12 +15,12 @@ export default function ForgotPassword({ onToggle }: ForgotPasswordProps) {
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [captchaQuestion, setCaptchaQuestion] = useState("");
-    const [expectedAnswer, setExpectedAnswer] = useState(""); // Store answer here
+    const [expectedAnswer, setExpectedAnswer] = useState("");
     const [userCaptchaInput, setUserCaptchaInput] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        generateCaptcha(); // Pseudo-CAPTCHA on page load
+        generateCaptcha();
     }, []);
 
     const generateCaptcha = () => {
@@ -41,7 +41,7 @@ export default function ForgotPassword({ onToggle }: ForgotPasswordProps) {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Validate form fields
+
         if (!identifier || !newPassword || !confirmPassword || !userCaptchaInput) {
             toast({ title: "Error", description: "All fields are required.", variant: "destructive" });
             return;
@@ -57,10 +57,10 @@ export default function ForgotPassword({ onToggle }: ForgotPasswordProps) {
             return;
         }
 
-        // Verify CAPTCHA before making the request
+
         if (userCaptchaInput.trim() !== expectedAnswer) {
             toast({ title: "Error", description: "Incorrect CAPTCHA answer.", variant: "destructive" });
-            generateCaptcha(); // Reset CAPTCHA
+            generateCaptcha();
             setUserCaptchaInput("");
             return;
         }
@@ -84,7 +84,7 @@ export default function ForgotPassword({ onToggle }: ForgotPasswordProps) {
 
             if (response.ok) {
                 toast({ title: "Success", description: data.message, variant: "default" });
-                onToggle(); // Redirect to Sign In page
+                onToggle();
             } else {
                 toast({ title: "Error", description: data.message || "Failed to reset password.", variant: "destructive" });
             }

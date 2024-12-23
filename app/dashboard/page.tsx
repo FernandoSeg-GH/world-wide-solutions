@@ -9,7 +9,6 @@ export default function DashboardPage() {
     const { data: session, status } = useSession();
     const router = useRouter();
     if (status === "loading") {
-        // Show a skeleton while session data is loading
         return <Skeleton />;
     }
 

@@ -1,3 +1,4 @@
+"use client"
 import React, { useState, useEffect, useMemo } from "react";
 import { useMessagesContext } from "@/context/MessagesContext";
 import { useToast } from "@/components/ui/use-toast";
@@ -25,7 +26,6 @@ const NewMessage: React.FC<NewMessageProps> = ({ onClose }) => {
     const [messageContent, setMessageContent] = useState<string>("");
     const [loading, setLoading] = useState(false);
 
-    // Fetch users and claims when the modal is opened
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
@@ -48,7 +48,7 @@ const NewMessage: React.FC<NewMessageProps> = ({ onClose }) => {
         }
 
         try {
-            // Use selected user ID or logged-in user's ID
+
             const recipientIds = selectedUserId ? [selectedUserId] : [];
             await sendMessageToUsers(recipientIds, messageContent.trim(), claimId);
             toast({ title: "Success", description: "Message sent successfully." });
@@ -58,7 +58,7 @@ const NewMessage: React.FC<NewMessageProps> = ({ onClose }) => {
         }
     };
 
-    // Get the claims for the selected user
+
     const selectedUserClaims = useMemo(() => {
         if (!selectedUserId) return [];
         const user = usersWithClaims.find((u) => u.userId === selectedUserId);
@@ -98,7 +98,7 @@ const NewMessage: React.FC<NewMessageProps> = ({ onClose }) => {
                             <label className="block text-sm font-medium mb-2">Select Claim</label>
                             <Select
                                 onValueChange={(value) => setClaimId(value)}
-                                value={claimId || undefined} // Ensure the selected value is properly set
+                                value={claimId || undefined}
                             >
                                 <SelectTrigger className="truncate-item w-full text-left">
                                     <SelectValue placeholder="Select a claim" />

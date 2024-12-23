@@ -11,9 +11,9 @@ export interface FieldConfig {
   label: string;
   type: string;
   required?: boolean;
-  options?: { value: string; label: string }[]; // For select fields
-  nestedSection?: string; // For nested objects
-  multiple?: boolean; // For file uploads
+  options?: { value: string; label: string }[];
+  nestedSection?: string;
+  multiple?: boolean;
   description?: string;
 }
 
@@ -83,13 +83,13 @@ export const formSections: SectionConfig[] = [
       },
       { id: "mva_description", label: "Description of Accident", type: "textarea" },
 
-      // Medical Info - Flat Fields
+
       { id: "medical_assistance_type", label: "Assistance Type", type: "text", description: "In this section, complete with all ongoing medical treatments, or future medical needs." },
       { id: "medical_diagnosis", label: "Diagnosis", type: "text" },
       { id: "medical_treatment", label: "Treatment", type: "text" },
       { id: "primary_care_provider", label: "Primary Care Provider", type: "text" },
 
-      // Costs - Flat Fields
+
       { id: "medical_total_cost", label: "Total Cost", type: "number" },
       { id: "policy_limits", label: "Policy Limits", type: "number" },
       {
@@ -107,7 +107,7 @@ export const formSections: SectionConfig[] = [
       { id: "repatriation_costs", label: "Repatriation Costs", type: "nested" },
       { id: "other_costs", label: "Other Costs", type: "nested" },
 
-      // Third Party Info - Flat Fields
+
       { id: "insurance_company", label: "Insurance Company", type: "text" },
       { id: "claim_reference_number", label: "Claim Reference Number", type: "text" },
       { id: "adjuster_name", label: "Adjuster Name", type: "text" },
@@ -118,7 +118,7 @@ export const formSections: SectionConfig[] = [
       { id: "co_insured_name", label: "Co-Insured Name", type: "text" },
       { id: "other_party_info", label: "Other Party Information", type: "textarea" },
 
-      // Attorney Info - Flat Fields
+
       { id: "law_firm_name", label: "Law Firm Name", type: "text" },
       { id: "attorney_name", label: "Attorney Name", type: "text" },
       { id: "attorney_phone", label: "Attorney Phone", type: "text" },
@@ -205,7 +205,7 @@ export function mapClaimToFormData(claim: Claim, businessId: string): AccidentCl
 export function parseJSONField(field: string | any, fieldName: string = ""): any {
   if (typeof field === "string") {
     if (field.trim() === "") {
-      return null; // Treat empty strings as null
+      return null;
     }
     try {
       return JSON.parse(field);
@@ -287,7 +287,7 @@ export function dynamicMapClaimToFormData(
       claim[key as keyof Claim] || mappedData[key as keyof AccidentClaimFormData];
   }
 
-  // Handle specific nested or complex fields (e.g., JSON or arrays).
+
   mappedData.vehicle_details = parseJSONField(claim.vehicle_details, "vehicle_details");
 
   return mappedData;

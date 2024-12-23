@@ -14,7 +14,6 @@ export async function GET(
 
   try {
     const response = await fetch(
-      // `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/forms/submissions?user_id=${session.user.id}`,
       `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/forms/${encodeURIComponent(
         businessId
       )}/share_url/${encodeURIComponent(shareUrl)}/submissions`,

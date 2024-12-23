@@ -19,7 +19,7 @@ const ConversationView: React.FC<ConversationViewProps> = ({ conversationId }) =
     const { toast } = useToast();
     const [content, setContent] = useState<string>("");
     const [sending, setSending] = useState(false);
-    const hasMarkedRead = useRef<boolean>(false); // Ref to track marking as read
+    const hasMarkedRead = useRef<boolean>(false);
 
     const handleSendReply = async () => {
         if (!content.trim()) {
@@ -51,7 +51,6 @@ const ConversationView: React.FC<ConversationViewProps> = ({ conversationId }) =
 
     useEffect(() => {
         if (conversationId) {
-            console.log("Fetching messages for conversation:", conversationId);
             fetchMessages(conversationId);
         }
     }, [conversationId, fetchMessages]);
@@ -60,7 +59,7 @@ const ConversationView: React.FC<ConversationViewProps> = ({ conversationId }) =
     const messageEndRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
-        // Scroll to the bottom whenever messages change
+
         if (messageEndRef.current) {
             messageEndRef.current.scrollIntoView({ behavior: "smooth" });
         }
@@ -69,7 +68,7 @@ const ConversationView: React.FC<ConversationViewProps> = ({ conversationId }) =
     const renderMessages = () => {
         const filteredMessages = messages
             .filter((msg) => String(msg.conversationId) === conversationId)
-            .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()); // Sort by timestamp ascending
+            .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
         return (
             <div className="space-y-4">

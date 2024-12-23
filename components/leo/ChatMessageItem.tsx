@@ -43,36 +43,3 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message }) => {
 };
 
 export default ChatMessageItem;
-
-
-// "use client";
-
-// import React from "react";
-// import { ChatMessage } from "@/context/LeoProvider";
-
-// interface ChatMessageItemProps {
-//     message: ChatMessage;
-// }
-
-// const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message }) => {
-//     return (
-//         <div
-//             className={`flex mb-4 ${message.sender === "user" ? "justify-end" : "justify-start"
-//                 }`}
-//         >
-//             <div
-//                 className={`max-w-lg p-3 rounded-md ${message.sender === "user"
-//                     ? "bg-blue-100 text-right dark:bg-blue-700 dark:text-white"
-//                     : "bg-gray-200 text-left dark:bg-gray-800 dark:text-white"
-//                     }`}
-//             >
-//                 <p>{message.content}</p>
-//                 <small className="text-gray-500">
-//                     {message.timestamp.toLocaleString()}
-//                 </small>
-//             </div>
-//         </div>
-//     );
-// };
-
-// export default ChatMessageItem;

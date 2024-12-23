@@ -43,8 +43,8 @@ export function DatePicker({ selectedDate, onChange }: DatePickerProps) {
                     mode="single"
                     selected={selectedDateAsDate}
                     onSelect={(date) => {
-                        onChange(date ?? null); // Update the selected date
-                        setIsOpen(false); // Close the popover
+                        onChange(date ?? null);
+                        setIsOpen(false);
                     }}
                     initialFocus
                 />

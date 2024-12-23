@@ -21,7 +21,6 @@ export const getSidebarItems = (
   forms: Form[],
   roleId?: number
 ): SidebarItem[] => {
-  // Shared sidebar items across all roles
   const commonItems: SidebarItem[] = [
     {
       icon: FaHome,
@@ -98,7 +97,6 @@ export const getSidebarItems = (
       },
     ],
     4: [
-      // Specific items for superadmin (role 4)
       {
         icon: NotebookTabs,
         label: "All Forms",
@@ -122,7 +120,6 @@ export const getSidebarItems = (
     ],
   };
 
-  // GodMode items
   const godModeItems: SidebarItem[] = [
     {
       icon: FaBusinessTime,
@@ -138,7 +135,6 @@ export const getSidebarItems = (
     },
   ];
 
-  // Combine the base items with role-specific and GodMode items
   return [
     ...commonItems,
     ...(roleId ? roleItems[roleId] || [] : []),

@@ -49,19 +49,14 @@ import { FileUpload, MAX_TOTAL_SIZE } from "@/components/ui/file-upload";
 import { currencyOptions } from "./config/currencies";
 
 export function formatCurrency(value: string) {
-    // Allow only digits, commas, and periods
     const cleanedValue = value.replace(/[^\d.,]/g, '');
-
-    // Allow the user to type commas naturally
     const parts = cleanedValue.split('.');
 
-    // Ensure no more than 2 decimal places
     if (parts.length > 2 || parts[0] === '') return cleanedValue;
 
     const integerPart = parts[0].replace(/,/g, '');
     const decimalPart = parts[1]?.substring(0, 2);
 
-    // Format integer part with commas
     const formattedInteger = parseInt(integerPart || '0', 10).toLocaleString('en-US');
 
     return decimalPart !== undefined ? `${formattedInteger}.${decimalPart}` : formattedInteger;
@@ -88,11 +83,11 @@ export default function AccidentClaimForm() {
     const remainingSize = MAX_TOTAL_SIZE - totalUploadedSize;
     const remainingSizeInMB = (remainingSize / (1024 * 1024)).toFixed(2);
 
-    // State variables to track if toasts have been shown
+
     const [hasExceededLimit, setHasExceededLimit] = useState<boolean>(false);
     const [hasReachedLimit, setHasReachedLimit] = useState<boolean>(false);
 
-    // Alert if total uploaded size exceeds the limit
+
     useEffect(() => {
         if (totalUploadedSize > MAX_TOTAL_SIZE) {
             if (!hasExceededLimit) {
@@ -104,14 +99,14 @@ export default function AccidentClaimForm() {
                 setHasExceededLimit(true);
             }
         } else {
-            // Reset the flag when size is within the limit
+
             if (hasExceededLimit) {
                 setHasExceededLimit(false);
             }
         }
     }, [totalUploadedSize, hasExceededLimit]);
 
-    // lets alter if no more remianing size is available to not upload more files saying you've reached the limit
+
     useEffect(() => {
         if (remainingSize <= 0) {
             toast({
@@ -297,21 +292,21 @@ export default function AccidentClaimForm() {
 
 
         try {
-            // const response = await fetch('/api/forms/accident-claims/submit',
-            //     {
-            //         method: "POST",
-            //         headers: {
-            //             Authorization: `Bearer ${session?.accessToken}`,
-            //         },
-            //         body: submitData,
-            //     }
-            // );
+
+
+
+
+
+
+
+
+
 
             const response = await fetch('https://vinci-api.com/leo/custom/forms/accident-claim/submit', {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${session?.accessToken}`,
-                    // Do NOT set 'Content-Type'; let the browser set it for FormData
+
                 },
                 body: submitData,
             });
@@ -385,7 +380,7 @@ export default function AccidentClaimForm() {
                     amountBilled: "",
                     amountPaid: "",
                     amountUnpaid: "",
-                    currency: "USD", // Default currency
+                    currency: "USD",
                 },
             ],
         }));
@@ -401,7 +396,7 @@ export default function AccidentClaimForm() {
                     amountBilled: "",
                     amountPaid: "",
                     amountUnpaid: "",
-                    currency: "USD", // Default currency
+                    currency: "USD",
                 },
             ],
         }));
@@ -417,7 +412,7 @@ export default function AccidentClaimForm() {
                     amountBilled: "",
                     amountPaid: "",
                     amountUnpaid: "",
-                    currency: "USD", // Default currency
+                    currency: "USD",
                 },
             ],
         }));
@@ -433,7 +428,7 @@ export default function AccidentClaimForm() {
             const updatedCosts = [...(prevData[costType] as CostDetail[])];
             const cost = updatedCosts[index];
 
-            // Update the field value
+
             (cost[field] as string | number) = value;
 
             return { ...prevData, [costType]: updatedCosts };
@@ -1001,7 +996,7 @@ export default function AccidentClaimForm() {
                                     onFilesSelected={(files: File[]) =>
                                         setFormData({
                                             ...formData,
-                                            new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files)], // This converts FileList to File[]
+                                            new_file_uploads: [...(formData.new_file_uploads || []), ...Array.from(files)],
                                         })
                                     }
                                     className=""

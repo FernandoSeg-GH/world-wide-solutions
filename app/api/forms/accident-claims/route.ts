@@ -12,7 +12,6 @@ export async function GET(req: NextRequest) {
   const roleId = session.user.role.id;
   const businessId = session.user.businessId;
 
-  // Determine the appropriate endpoint based on the user's role
   let endpoint = "";
   if (roleId === 1) {
     endpoint = `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/custom/forms/user_accident_claims`;

@@ -10,7 +10,6 @@ export async function GET(req: NextRequest) {
   }
 
   const url = new URL(req.url);
-  // const businessId = url.searchParams.get("businessId");
   const businessId = session.user.businessId;
   const pageParam = url.searchParams.get("page") || "1";
   const page = parseInt(pageParam, 10);

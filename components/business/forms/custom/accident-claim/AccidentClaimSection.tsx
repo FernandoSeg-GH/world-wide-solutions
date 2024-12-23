@@ -1,4 +1,3 @@
-// components/AccidentClaimSection.tsx
 import React from "react";
 import { FieldConfig, SectionConfig } from "./config/form-config";
 import GenericField from "./GenericField";

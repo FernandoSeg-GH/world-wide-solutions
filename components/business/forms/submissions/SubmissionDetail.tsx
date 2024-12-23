@@ -19,7 +19,7 @@ const SubmissionDetail: React.FC<SubmissionDetailProps> = ({
     fileUrls,
 }) => {
     if (!row || Object.keys(row).length === 0) {
-        return <p>No data available.</p>; // Add a message for better UX
+        return <p>No data available.</p>;
     }
 
     const missingFields = fieldKeys.filter((key) => row[key] === undefined || row[key] === null || row[key] === '');

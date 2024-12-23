@@ -68,7 +68,7 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
         useUser();
 
     /* MESSAGES */
-    const messageState = useMessagesContext(); // Use the context
+    const messageState = useMessagesContext();
 
     const [loading, setLoadingState] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
@@ -90,12 +90,6 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
             formState.formInitializedRef.current = true;
         }
     }, [formState.forms, initialForm, formState.setForm, formState]);
-
-    // useEffect(() => {
-    //     if (formState.form && formState.form.businessId) {
-    //         submissionState.fetchSubmissions(formState.form.shareUrl);
-    //     }
-    // }, [formState.form, submissionState, submissionState.fetchSubmissions]);
 
     const selectors = useMemo(
         () => ({
@@ -166,7 +160,7 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
 
     const actions = useMemo(
         () => ({
-            setIsExpanded: layoutState.setIsExpanded, // Added at top-level
+            setIsExpanded: layoutState.setIsExpanded,
             formActions: {
                 createForm: formState.createForm,
                 saveForm: formState.saveForm,
@@ -187,18 +181,18 @@ export const AppProvider = ({ children, initialForm }: AppProviderProps): JSX.El
                 setConversations: messageState.setConversations,
                 setMessages: messageState.setMessages,
                 replyToMessage: (messageId: number, content: string) =>
-                    messageState.replyToMessage("0", messageId, content), // Adjusted to match the expected signature
+                    messageState.replyToMessage("0", messageId, content),
                 sendMessageToUsers: (recipientIds: number[], content: string, readOnly: boolean, accidentClaimId: string) =>
-                    messageState.sendMessageToUsers(recipientIds, content, accidentClaimId), // Adjusted to match the expected signature
+                    messageState.sendMessageToUsers(recipientIds, content, accidentClaimId),
                 sendMessage: (conversationId: number, content: string) =>
                     messageState.sendMessage(conversationId.toString(), content),
                 markAsRead: messageState.markAsRead,
                 fetchInboxMessages: messageState.fetchInboxMessages,
             },
-            fetchSubmissions: submissionState.fetchSubmissions, // Added at top-level
-            fetchAllSubmissions: submissionState.fetchAllSubmissions, // Added at top-level
-            updateSubmissionStatus: submissionState.updateSubmissionStatus, // Added at top-level
-            getFormSubmissionByCaseId: submissionState.getFormSubmissionByCaseId, // Added at top-level
+            fetchSubmissions: submissionState.fetchSubmissions,
+            fetchAllSubmissions: submissionState.fetchAllSubmissions,
+            updateSubmissionStatus: submissionState.updateSubmissionStatus,
+            getFormSubmissionByCaseId: submissionState.getFormSubmissionByCaseId,
             fetchSubscriptionPlans,
             createBusiness,
             editBusiness,

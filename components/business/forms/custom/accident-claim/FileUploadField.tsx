@@ -1,4 +1,3 @@
-// components/FileUploadField.tsx
 import { Label } from "@/components/ui/label";
 import React from "react";
 import { FaUpload } from "react-icons/fa";

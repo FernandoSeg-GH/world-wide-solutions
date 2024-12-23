@@ -122,7 +122,6 @@ const ConversationList: React.FC<ConversationListProps> = ({
             content: messageContent.trim(),
             accident_claim_id: selectedClaimId,
         };
-        console.log("Session user ID:", session?.user?.id);
         try {
             await sendMessageToUsers(
                 payload.recipient_ids,
@@ -160,24 +159,13 @@ const ConversationList: React.FC<ConversationListProps> = ({
     }, [selectedUserId, usersWithClaims, role_id, session]);
 
 
-    console.log('filteredConversations', filteredConversations);
-
     return (
         <div className="h-full flex flex-col">
-            <div className="p-4 flex justify-between items-center">
+            <div className="p-4 pb-2 flex flex-col justify-start items-start">
                 <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Inbox</h1>
-                {session?.user?.role.id && [1, 2, 3, 4].includes(session.user.role.id) && (
-                    <Button
-                        onClick={handleOpenModal}
-                        variant="outline"
-                        className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700"
-                    >
-                        <PlusIcon className="mr-2" size={16} />
-                        New Message
-                    </Button>
-                )}
+
             </div>
-            <div className="flex flex-col space-y-2 p-4 border-b border-t dark:border-gray-700">
+            <div className="flex flex-col space-y-2 p-4 pt-0 border-b   dark:border-gray-700">
                 <input
                     type="text"
                     placeholder="Search by claim ID or name"
@@ -190,34 +178,48 @@ const ConversationList: React.FC<ConversationListProps> = ({
                 />
             </div>
 
-            <div className="flex-1 overflow-auto flex flex-col p-4">
-                {loading ? (
-                    <div className="flex items-center justify-center h-full text-gray-500">
-                        <Loader2 className="animate-spin w-6 h-6 mr-2" />
-                        Loading conversations...
-                    </div>
-                ) : filteredConversations && filteredConversations.length > 0 ? (
-                    filteredConversations.map((conversation) => (
-                        <ConversationSummary
-                            key={conversation.accidentClaimId}
-                            conversation={conversation}
-                            isSelected={
-                                String(conversation.accidentClaimId) === String(selectedConversationId)
-                            }
-                            onClick={() => onSelectConversation(conversation.accidentClaimId)}
-                            unreadCount={conversation.unreadCount || 0}
-                            onMarkAsRead={(messageId) =>
-                                markAsRead(conversation.accidentClaimId, Number(messageId))
-                            }
-                        />
-                    ))
-                ) : (
-                    <p className="text-gray-500 mt-4 text-center">
-                        {conversations.length > 0
-                            ? "No conversations match your search."
-                            : "No conversations available."}
-                    </p>
-                )}
+            <div className="flex-1 overflow-auto flex flex-col justify-between p-4">
+                <div className="flex flex-col gap-1">
+                    {loading ? (
+                        <div className="flex items-center justify-center h-full text-gray-500">
+                            <Loader2 className="animate-spin w-6 h-6 mr-2" />
+                            Loading conversations...
+                        </div>
+                    ) : filteredConversations && filteredConversations.length > 0 ? (
+                        filteredConversations.map((conversation) => (
+                            <ConversationSummary
+                                key={conversation.accidentClaimId}
+                                conversation={conversation}
+                                isSelected={
+                                    String(conversation.accidentClaimId) === String(selectedConversationId)
+                                }
+                                onClick={() => onSelectConversation(conversation.accidentClaimId)}
+                                unreadCount={conversation.unreadCount || 0}
+                                onMarkAsRead={(messageId) =>
+                                    markAsRead(conversation.accidentClaimId, Number(messageId))
+                                }
+                            />
+                        ))
+                    ) : (
+                        <p className="text-gray-500 mt-4 text-center">
+                            {conversations.length > 0
+                                ? "No conversations match your search."
+                                : "No conversations available."}
+                        </p>
+                    )}
+                </div>
+                <>
+                    {session?.user?.role.id && [1, 2, 3, 4].includes(session.user.role.id) && (
+                        <Button
+                            onClick={handleOpenModal}
+                            variant="outline"
+                            className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700"
+                        >
+                            <PlusIcon className="mr-2" size={16} />
+                            New Message
+                        </Button>
+                    )}
+                </>
             </div>
 
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>

@@ -1,4 +1,3 @@
-// Sidebar.tsx
 
 "use client";
 
@@ -11,8 +10,8 @@ import Logo from "@/components/Logo";
 import { useFormState } from "@/hooks/forms/useFormState";
 import { useSession } from "next-auth/react";
 import { getSidebarItems, SidebarItem } from "./SidebarItems";
-import { Badge } from "@/components/ui/badge"; // Import Badge component
-import { useMessagesContext } from "@/context/MessagesContext"; // Import the context hook
+import { Badge } from "@/components/ui/badge";
+import { useMessagesContext } from "@/context/MessagesContext";
 import { Button } from "@/components/ui/button";
 import { debounce } from "lodash";
 
@@ -30,13 +29,13 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
     const { setForm } = selectors;
     const [openSubmenus, setOpenSubmenus] = useState<Set<string>>(new Set());
 
-    const { fetchConversations, conversations, totalUnread, markAllMessagesAsRead } = useMessagesContext(); // Use the context
+    const { fetchConversations, conversations, totalUnread, markAllMessagesAsRead } = useMessagesContext();
 
-    // useEffect(() => {
-    //     if (session?.user.businessId && session.user.role.id !== 1) {
-    //         fetchFormsByBusinessId(session.user.businessId);
-    //     }
-    // }, [session?.user.businessId, fetchFormsByBusinessId, session?.user.role.id]);
+
+
+
+
+
 
     const sidebarItems: SidebarItem[] = getSidebarItems(godMode, forms, session?.user.role.id);
 
@@ -106,15 +105,10 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
                                                 {item.label}
                                             </span>
                                         )}
-                                        {/* Display Badge if the item is Messages */}
 
                                         {isExpanded && item.label === "Messages" && totalUnread > 0 && (
                                             <Badge
                                                 className="ml-auto cursor-pointer"
-                                            // onClick={(e) => {
-                                            //     e.stopPropagation(); // Prevent triggering the button's onClick
-                                            //     markAllMessagesAsRead(); // Mark all messages as read
-                                            // }}
                                             >
                                                 {totalUnread}
                                             </Badge>

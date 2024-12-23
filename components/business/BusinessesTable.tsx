@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useAppContext } from '@/context/AppProvider';
 import { useRouter } from 'next/navigation';
 import { Business } from '@/types';
@@ -27,23 +27,9 @@ export default function BusinessesTable() {
 
     const router = useRouter();
 
-    // useEffect(() => {
-    //     getAllBusinesses();
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, []);
-
-    const handleEdit = (businessId: number) => {
-        router.push(`/edit-business?businessId=${businessId}`);
-    };
 
     const handleDelete = async (businessId: number) => {
         const confirmed = confirm("Are you sure you want to delete this business? This action cannot be undone.");
-        // if (confirmed) {
-        //     const success = await deleteBusiness(businessId);
-        //     if (success) {
-        //         getAllBusinesses();
-        //     }
-        // }
     };
 
     if (!godMode) {

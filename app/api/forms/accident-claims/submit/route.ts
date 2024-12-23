@@ -1,5 +1,3 @@
-// pages/api/forms/accident-claims/submit.ts
-
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
@@ -27,7 +25,6 @@ export async function POST(req: NextRequest) {
       method: "POST",
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
-        // Do NOT set 'Content-Type' when sending FormData; the browser will set it, including boundaries.
       },
       body: submitData,
     });

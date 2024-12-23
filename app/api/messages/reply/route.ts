@@ -36,9 +36,8 @@ export async function POST(req: NextRequest) {
       }
     );
 
-    // Handle non-JSON responses
     if (!response.ok) {
-      const text = await response.text(); // Get raw response
+      const text = await response.text();
       console.error("Error from backend:", text);
       return NextResponse.json(
         { message: `Error from backend: ${text}` },

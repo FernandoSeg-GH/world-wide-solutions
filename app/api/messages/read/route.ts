@@ -1,5 +1,3 @@
-// pages/api/messages/read.ts
-
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
@@ -32,7 +30,7 @@ export async function PATCH(req: NextRequest) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({ accidentClaimId, messageId }), // Body must not be inside headers
+        body: JSON.stringify({ accidentClaimId, messageId }),
       }
     );
 

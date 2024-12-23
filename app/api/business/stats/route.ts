@@ -9,7 +9,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  // Determine the endpoint based on the user's role
   const endpoint =
     session.user.role.id === 1
       ? `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/custom/forms/user_stats`

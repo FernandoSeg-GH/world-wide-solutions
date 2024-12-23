@@ -1,5 +1,3 @@
-// pages/api/messages/conversations/claim/[claimId]/messages/[messageId]/mark-read/route.ts
-
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";

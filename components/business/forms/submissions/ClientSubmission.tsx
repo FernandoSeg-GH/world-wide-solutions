@@ -105,9 +105,9 @@ function ClientSubmission({ formUrl }: { formUrl: string }) {
 
             Object.entries(filesRef.current).forEach(([fieldId, files]) => {
                 if (Array.isArray(files)) {
-                    files.forEach((file) => formData.append(`files_${fieldId}[]`, file)); // Properly append multiple files with `[]`
+                    files.forEach((file) => formData.append(`files_${fieldId}[]`, file));
                 } else if (files instanceof File) {
-                    formData.append(`files_${fieldId}`, files); // Append a single file directly
+                    formData.append(`files_${fieldId}`, files);
                 }
             });
 

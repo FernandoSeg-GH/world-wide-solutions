@@ -14,7 +14,6 @@ export default function HomePage() {
     useTokenRefresh();
 
     if (status === "loading") {
-        // Show a skeleton while session data is loading
         return <Skeleton />;
     }
 

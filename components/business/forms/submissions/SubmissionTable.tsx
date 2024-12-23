@@ -47,8 +47,8 @@ const SubmissionsTable = ({ form, admin }: { form: Form; admin: boolean }) => {
         return row;
     });
 
-    // Dynamically calculate the width percentage for each column
-    const totalColumns = fieldKeys.length + 1; // +1 for the "Submitted At" column
+
+    const totalColumns = fieldKeys.length + 1;
     const columnWidthPercentage = `${100 / totalColumns}%`;
 
     const handleDownloadCSV = () => {
@@ -93,21 +93,21 @@ const SubmissionsTable = ({ form, admin }: { form: Form; admin: boolean }) => {
         const workbook = new Workbook();
         const worksheet = workbook.addWorksheet('Submissions');
 
-        // Add headers
+
         const headers = fieldKeys.map((fieldKey) =>
             fieldMap[fieldKey]?.extraAttributes?.label || `Field ${fieldKey}`
         );
         headers.push('Submitted At');
         worksheet.addRow(headers);
 
-        // Add rows
+
         rows.forEach((row) => {
             const rowData = fieldKeys.map((key) => row[key]);
             rowData.push(new Date(row.submittedAt).toLocaleString());
             worksheet.addRow(rowData);
         });
 
-        // Generate Excel file and trigger download
+
         const buffer = await workbook.xlsx.writeBuffer();
         const blob = new Blob([buffer], { type: 'application/octet-stream' });
         saveAs(blob, `${form.name || 'submissions'}.xlsx`);
@@ -139,14 +139,14 @@ const SubmissionsTable = ({ form, admin }: { form: Form; admin: boolean }) => {
                         {fieldKeys.map((fieldKey) => (
                             <th
                                 key={fieldKey}
-                                style={{ minWidth: '150px', width: columnWidthPercentage }} // Min width for readability
+                                style={{ minWidth: '150px', width: columnWidthPercentage }}
                                 className="px-4 py-2 text-center text-xs font-medium text-gray-700 uppercase whitespace-nowrap overflow-hidden text-ellipsis"
                             >
                                 {fieldMap[fieldKey]?.extraAttributes?.label || `Field ${fieldKey}`}
                             </th>
                         ))}
                         <th
-                            style={{ minWidth: '150px', width: columnWidthPercentage }} // Set width for "Submitted At"
+                            style={{ minWidth: '150px', width: columnWidthPercentage }}
                             className="px-4 py-2 text-center text-xs font-medium text-gray-700 uppercase whitespace-nowrap overflow-hidden text-ellipsis"
                         >
                             Submitted At
