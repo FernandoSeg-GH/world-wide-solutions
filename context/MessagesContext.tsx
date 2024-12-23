@@ -63,7 +63,6 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     // Derive totalUnread from conversations
     const totalUnread = useMemo(() => {
-        if (!Array.isArray(conversations)) return 0; // Handle non-array scenarios
         return conversations.reduce((acc, convo) => acc + (convo.unreadCount || 0), 0);
     }, [conversations]);
 
@@ -76,16 +75,15 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                 headers: { Authorization: `Bearer ${session?.accessToken}` },
             });
             console.log("Fetched Conversations:", data); // Debug log
-            setConversations((prev) => {
-                if (JSON.stringify(prev) === JSON.stringify(data)) return prev; // Prevent unnecessary updates
-                return data.conversations || []; // Ensure `data.conversations` exists
-            });
+            if (!areConversationsEqual(conversations, data.conversations)) {
+                setConversations(data.conversations || []);
+            }
             return data.conversations || [];
         } catch (error) {
             console.error("Error fetching conversations:", error);
             return [];
         }
-    }, [session?.accessToken]);
+    }, [session?.accessToken, conversations]);
 
 
     const fetchMessages = useCallback(
@@ -109,6 +107,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                         })),
                     ]);
                 }
+                console.log('messages___', messages)
             } catch (error) {
                 console.error("Error fetching messages:", error);
             }
@@ -141,6 +140,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
                 toast({ title: "Success", description: "Reply sent successfully." });
                 await fetchMessages(accidentClaimId);
+
             } catch (error: any) {
                 toast({ title: "Error", description: error.message || "Failed to send reply.", variant: "destructive" });
             }
@@ -163,7 +163,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                 },
                 body: JSON.stringify({
                     recipient_ids: recipientIds,
-                    content,
+                    content: content,
                     accident_claim_id: accidentClaimId,
                 }),
             });
@@ -207,39 +207,46 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     );
 
     // Mark a message as read
-    const markAsRead = useCallback(async (accidentClaimId: string, messageId?: number) => {
-        if (!messageId) {
-            console.error("No messageId provided for markAsRead");
-            return;
-        }
+    const markAsRead = useCallback(
+        async (accidentClaimId: string, messageId: number): Promise<void> => {
+            try {
+                const response = await fetch(
+                    `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/messages/conversations/${accidentClaimId}/messages/${messageId}/mark_read`,
+                    {
+                        method: "PATCH",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${session?.accessToken}`,
+                        },
+                    }
+                );
 
-        console.log(`Marking message as read: ${messageId} in claim ${accidentClaimId}`);
-
-        try {
-            const response = await fetch(
-                `/api/messages/conversations/claim/${accidentClaimId}/messages/${messageId}/mark-read`,
-                {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${session?.accessToken}`,
-                    },
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || "Failed to mark message as read");
                 }
-            );
 
-            const textResponse = await response.text(); // Capture raw response for debugging
-            console.log("Raw backend response:", textResponse);
-
-            if (!response.ok) {
-                throw new Error(textResponse || "Failed to mark message as read");
+                // Update conversation state to reflect unread count decrement
+                setConversations((prev) =>
+                    prev.map((conv) =>
+                        conv.accidentClaimId === accidentClaimId
+                            ? {
+                                ...conv,
+                                unreadCount: Math.max((conv.unreadCount || 0) - 1, 0),
+                            }
+                            : conv
+                    )
+                );
+            } catch (error: any) {
+                toast({
+                    title: "Error",
+                    description: error.message || "Failed to mark message as read.",
+                    variant: "destructive",
+                });
             }
-
-            const result = JSON.parse(textResponse);
-            console.log("Message marked as read successfully:", result);
-        } catch (error) {
-            console.error("Error marking message as read:", error);
-        }
-    }, [session?.accessToken]);
+        },
+        [session, setConversations]
+    );
 
 
     // Fetch inbox messages
@@ -285,11 +292,11 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const markMessagesAsRead = useCallback(
         async (accidentClaimId: string): Promise<void> => {
             try {
-                const response = await apiRequest(`/api/messages/read?accidentClaimId=${accidentClaimId}`, {
-                    method: 'POST',
+                const response = await apiRequest(`/api/messages/conversations/claim/${accidentClaimId}/messages/mark_all_read`, {
+                    method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
-                        Authorization: `Bearer ${session?.accessToken}`,
+                        // Authorization is handled server-side
                     },
                 });
 
@@ -303,7 +310,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                 console.error('Error marking messages as read:', error);
             }
         },
-        [session, fetchConversations]
+        [fetchConversations]
     );
 
     // Mark all messages as read across all conversations
@@ -329,6 +336,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             setLoading(false);
         }
     }, [fetchConversations, markMessagesAsRead, session]);
+
 
     return (
         <MessagesContext.Provider value={{

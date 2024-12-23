@@ -111,14 +111,15 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
                                         {isExpanded && item.label === "Messages" && totalUnread > 0 && (
                                             <Badge
                                                 className="ml-auto cursor-pointer"
-                                                onClick={(e) => {
-                                                    e.stopPropagation(); // Prevent triggering the button's onClick
-                                                    markAllMessagesAsRead();
-                                                }}
+                                            // onClick={(e) => {
+                                            //     e.stopPropagation(); // Prevent triggering the button's onClick
+                                            //     markAllMessagesAsRead(); // Mark all messages as read
+                                            // }}
                                             >
                                                 {totalUnread}
                                             </Badge>
                                         )}
+
 
                                         {isExpanded && item.subItems && item.subItems.length > 0 && (
                                             <span className="ml-auto">

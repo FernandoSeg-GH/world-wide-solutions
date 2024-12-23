@@ -223,6 +223,10 @@ export interface ConversationSummary {
     userId: number;
     username: string;
   }>;
+  readStatus: Array<{
+    userId: number;
+    readAt: string | null;
+  }>;
 }
 
 export interface Message {

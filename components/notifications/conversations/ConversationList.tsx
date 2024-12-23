@@ -85,7 +85,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
 
         const sortedConversations = conversations
             .slice()
-            .sort((a, b) => parseDate(b.lastMessageTime) - parseDate(a.lastMessageTime));
+            .sort((a, b) => parseDate(b.lastMessage!.timestamp) - parseDate(a.lastMessage!.timestamp));
 
         if (!debouncedSearchTerm) return sortedConversations;
 
@@ -122,11 +122,11 @@ const ConversationList: React.FC<ConversationListProps> = ({
             content: messageContent.trim(),
             accident_claim_id: selectedClaimId,
         };
-
+        console.log("Session user ID:", session?.user?.id);
         try {
             await sendMessageToUsers(
                 payload.recipient_ids,
-                payload.content,
+                payload.content.trim(),
                 payload.accident_claim_id
             );
 
@@ -150,18 +150,23 @@ const ConversationList: React.FC<ConversationListProps> = ({
     };
 
     const selectedUserClaims = useMemo(() => {
+        if (role_id === 1 && session?.user?.id) {
+            const userObj = usersWithClaims.find((u) => u.userId === Number(session.user.id));
+            return userObj?.claims || [];
+        }
         if (!selectedUserId) return [];
         const userObj = usersWithClaims.find((u) => u.userId === selectedUserId);
         return userObj?.claims || [];
-    }, [selectedUserId, usersWithClaims]);
+    }, [selectedUserId, usersWithClaims, role_id, session]);
 
-    console.log('filteredConversations', filteredConversations)
+
+    console.log('filteredConversations', filteredConversations);
 
     return (
         <div className="h-full flex flex-col">
-            <div className="p-4  flex justify-between items-center">
+            <div className="p-4 flex justify-between items-center">
                 <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Inbox</h1>
-                {session?.user?.role.id && [2, 3, 4].includes(session.user.role.id) && (
+                {session?.user?.role.id && [1, 2, 3, 4].includes(session.user.role.id) && (
                     <Button
                         onClick={handleOpenModal}
                         variant="outline"
@@ -176,9 +181,12 @@ const ConversationList: React.FC<ConversationListProps> = ({
                 <input
                     type="text"
                     placeholder="Search by claim ID or name"
-                    className="w-full px-3 py-2 border rounded-lg text-sm "
+                    className="w-full px-3 py-2 border rounded-lg text-sm"
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => {
+                        setSearchTerm(e.target.value);
+                        handleSearch(e.target.value);
+                    }}
                 />
             </div>
 
@@ -226,26 +234,30 @@ const ConversationList: React.FC<ConversationListProps> = ({
                         ) : (
                             <div className="flex flex-col gap-4">
                                 {/* User Selection */}
-                                <div>
-                                    <label htmlFor="userSelect" className="block text-sm font-medium text-gray-700">
-                                        Select a User
-                                    </label>
-                                    <Select
-                                        onValueChange={(value) => setSelectedUserId(Number(value))}
-                                        value={selectedUserId ? String(selectedUserId) : undefined}
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select a user" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {usersWithClaims.map((user) => (
-                                                <SelectItem key={user.userId} value={String(user.userId)}>
-                                                    {user.username}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
+                                {
+                                    role_id !== 1 && (
+                                        <div>
+                                            <label htmlFor="userSelect" className="block text-sm font-medium text-gray-700">
+                                                Select a User
+                                            </label>
+                                            <Select
+                                                onValueChange={(value) => setSelectedUserId(Number(value))}
+                                                value={selectedUserId ? String(selectedUserId) : undefined}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select a user" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {usersWithClaims.map((user) => (
+                                                        <SelectItem key={user.userId} value={String(user.userId)}>
+                                                            {user.username}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                    )
+                                }
 
                                 {/* Claim Selection */}
                                 <div>
@@ -305,7 +317,6 @@ const ConversationList: React.FC<ConversationListProps> = ({
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-
         </div>
     );
 };
