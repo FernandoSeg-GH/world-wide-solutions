@@ -10,6 +10,7 @@ import { useSession } from "next-auth/react";
 import { getSidebarItems, SidebarItem } from "./SidebarItems";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useLogContext } from "@/context/LogProvider";
 
 interface SidebarProps {
     isExpanded: boolean;
@@ -18,31 +19,31 @@ interface SidebarProps {
 
 export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
     const { actions: layoutState, data, selectors } = useAppContext();
+    const { unreadLogsCount } = useLogContext();
     const { switchSection } = layoutState;
     const { currentSection, godMode } = data;
     const { data: session } = useSession();
     const [openSubmenus, setOpenSubmenus] = useState<Set<string>>(new Set());
-    const [unreadLogsCount, setUnreadLogsCount] = useState<number>(0);
 
     const sidebarItems: SidebarItem[] = getSidebarItems(godMode, [], session?.user.role.id);
 
     // Fetch unread logs count
-    const fetchUnreadLogsCount = useCallback(async () => {
-        try {
-            const response = await fetch("/api/logs");
-            if (response.ok) {
-                const { logs } = await response.json();
-                const unreadCount = logs.filter((log: any) => !log.is_read).length;
-                setUnreadLogsCount(unreadCount);
-            }
-        } catch (error) {
-            console.error("Error fetching logs:", error);
-        }
-    }, []);
+    // const fetchUnreadLogsCount = useCallback(async () => {
+    //     try {
+    //         const response = await fetch("/api/logs");
+    //         if (response.ok) {
+    //             const { logs } = await response.json();
+    //             const unreadCount = logs.filter((log: any) => !log.is_read).length;
+    //             setUnreadLogsCount(unreadCount);
+    //         }
+    //     } catch (error) {
+    //         console.error("Error fetching logs:", error);
+    //     }
+    // }, []);
 
-    useEffect(() => {
-        fetchUnreadLogsCount();
-    }, [fetchUnreadLogsCount]);
+    // useEffect(() => {
+    //     fetchUnreadLogsCount();
+    // }, [fetchUnreadLogsCount]);
 
     const toggleSubmenu = (label: string) => {
         setOpenSubmenus((prev) => {

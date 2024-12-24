@@ -9,6 +9,7 @@ import { AppProvider } from '@/context/AppProvider'
 import ErrorBoundary from '@/components/ui/error-boundary'
 import { MessagesProvider } from '@/context/MessagesContext'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { LogProvider } from '@/context/LogProvider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -29,13 +30,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
             <MessagesProvider>
               <AppProvider>
-                <ErrorBoundary>
-                  <NextTopLoader />
-                  <TooltipProvider>
-                    {children}
-                  </TooltipProvider>
-                  <Toaster />
-                </ErrorBoundary>
+                <LogProvider>
+                  <ErrorBoundary>
+                    <NextTopLoader />
+                    <TooltipProvider>
+                      {children}
+                    </TooltipProvider>
+                    <Toaster />
+                  </ErrorBoundary>
+                </LogProvider>
               </AppProvider>
             </MessagesProvider>
           </ThemeProvider>
