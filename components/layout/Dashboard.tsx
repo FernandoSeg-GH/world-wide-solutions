@@ -20,6 +20,7 @@ import FormDetails from "@/components/business/forms/FormDetails";
 import Users from "@/components/users";
 import MessagingLayout from "../notifications/MessagingLayout";
 import ClaimReports from "../business/forms/custom/ClaimReports";
+import Logs from "../logs/Logs";
 
 export const RenderComponent = (currentSection: string) => {
     const url = usePathname();
@@ -46,6 +47,8 @@ export const RenderComponent = (currentSection: string) => {
             return <Submissions />;
         case "Messages":
             return <MessagingLayout />;
+        case "Logs":
+            return <Logs />;
         case "Users":
             return <Users />;
         case "Businesses":

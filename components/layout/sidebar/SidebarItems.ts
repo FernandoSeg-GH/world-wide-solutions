@@ -7,6 +7,7 @@ import {
   NotebookTabs,
   Users2,
   DnaIcon,
+  Logs,
 } from "lucide-react";
 import { Form } from "@/types";
 
@@ -91,6 +92,10 @@ export const getSidebarItems = (
       //       }
       //     : {}),
       // },
+      {
+        icon: Logs,
+        label: "Logs",
+      },
       {
         icon: Users2,
         label: "Users",

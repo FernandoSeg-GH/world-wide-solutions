@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
@@ -7,13 +6,10 @@ import { ChevronLeft, ChevronsRight, ChevronRight } from "lucide-react";
 import { useAppContext } from "@/context/AppProvider";
 import { cn } from "@/lib/utils";
 import Logo from "@/components/Logo";
-import { useFormState } from "@/hooks/forms/useFormState";
 import { useSession } from "next-auth/react";
 import { getSidebarItems, SidebarItem } from "./SidebarItems";
 import { Badge } from "@/components/ui/badge";
-import { useMessagesContext } from "@/context/MessagesContext";
 import { Button } from "@/components/ui/button";
-import { debounce } from "lodash";
 
 interface SidebarProps {
     isExpanded: boolean;
@@ -24,21 +20,29 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
     const { actions: layoutState, data, selectors } = useAppContext();
     const { switchSection } = layoutState;
     const { currentSection, godMode } = data;
-    const { forms, fetchFormsByBusinessId } = useFormState();
     const { data: session } = useSession();
-    const { setForm } = selectors;
     const [openSubmenus, setOpenSubmenus] = useState<Set<string>>(new Set());
+    const [unreadLogsCount, setUnreadLogsCount] = useState<number>(0);
 
-    const { fetchConversations, conversations, totalUnread, markAllMessagesAsRead } = useMessagesContext();
+    const sidebarItems: SidebarItem[] = getSidebarItems(godMode, [], session?.user.role.id);
 
+    // Fetch unread logs count
+    const fetchUnreadLogsCount = useCallback(async () => {
+        try {
+            const response = await fetch("/api/logs");
+            if (response.ok) {
+                const { logs } = await response.json();
+                const unreadCount = logs.filter((log: any) => !log.is_read).length;
+                setUnreadLogsCount(unreadCount);
+            }
+        } catch (error) {
+            console.error("Error fetching logs:", error);
+        }
+    }, []);
 
-
-
-
-
-
-    const sidebarItems: SidebarItem[] = getSidebarItems(godMode, forms, session?.user.role.id);
-
+    useEffect(() => {
+        fetchUnreadLogsCount();
+    }, [fetchUnreadLogsCount]);
 
     const toggleSubmenu = (label: string) => {
         setOpenSubmenus((prev) => {
@@ -61,9 +65,17 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
             )}
         >
             <div onClick={(event: React.MouseEvent<HTMLDivElement>) => event.stopPropagation()}>
-                {
-                    isExpanded ? <Logo url="https://vinci-space-nest.nyc3.cdn.digitaloceanspaces.com/vinci-space-nest/business_id_2/branding/Logotipo-1.png" width={160} className="" /> : <Logo url="https://vinci-space-nest.nyc3.cdn.digitaloceanspaces.com/vinci-space-nest/business_id_2/branding/IsoVW-1.png" width={25} className="" />
-                }
+                {isExpanded ? (
+                    <Logo
+                        url="https://vinci-space-nest.nyc3.cdn.digitaloceanspaces.com/vinci-space-nest/business_id_2/branding/Logotipo-1.png"
+                        width={160}
+                    />
+                ) : (
+                    <Logo
+                        url="https://vinci-space-nest.nyc3.cdn.digitaloceanspaces.com/vinci-space-nest/business_id_2/branding/IsoVW-1.png"
+                        width={25}
+                    />
+                )}
             </div>
             <nav className="flex flex-col gap-4 px-2 py-4">
                 <TooltipProvider>
@@ -82,94 +94,81 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
                                         }}
                                         className={cn(
                                             "flex items-center rounded-lg transition-colors hover:text-foreground w-full",
-                                            currentSection === item.label || item.subItems?.some(sub => currentSection === sub.label)
+                                            currentSection === item.label ||
+                                                item.subItems?.some((sub) => currentSection === sub.label)
                                                 ? "bg-accent text-accent-foreground"
                                                 : "text-white/80",
                                             isExpanded ? "px-3 py-2" : "justify-center py-2"
                                         )}
-                                        aria-haspopup={item.subItems ? "true" : undefined}
-                                        aria-expanded={item.subItems ? openSubmenus.has(item.label) : undefined}
                                     >
                                         {item.icon &&
                                             React.createElement(item.icon, {
-                                                className: cn(
-                                                    "h-5 w-5",
-                                                    isExpanded
-                                                        ? "text-current"
-                                                        : (item.label === "Messages" ? "text-gray-400 animate-pulse animation-delay-400" : "text-primary-500")
-                                                ),
-                                            })
-                                        }
+                                                className: "h-5 w-5 text-current",
+                                            })}
                                         {isExpanded && (
-                                            <span className="ml-2 whitespace-nowrap">
-                                                {item.label}
-                                            </span>
+                                            <span className="ml-2 whitespace-nowrap">{item.label}</span>
                                         )}
 
-                                        {isExpanded && item.label === "Messages" && totalUnread > 0 && (
-                                            <Badge
-                                                className="ml-auto cursor-pointer"
-                                            >
-                                                {totalUnread}
+                                        {isExpanded && item.label === "Logs" && unreadLogsCount > 0 && (
+                                            <Badge className="ml-auto bg-red-600 text-white">
+                                                {unreadLogsCount}
                                             </Badge>
                                         )}
 
-
                                         {isExpanded && item.subItems && item.subItems.length > 0 && (
                                             <span className="ml-auto">
-                                                {openSubmenus.has(item.label) ? <ChevronLeft /> : <ChevronRight />}
+                                                {openSubmenus.has(item.label) ? (
+                                                    <ChevronLeft />
+                                                ) : (
+                                                    <ChevronRight />
+                                                )}
                                             </span>
                                         )}
                                     </button>
-                                    {item.subItems && isExpanded && openSubmenus.has(item.label) && (
-                                        <div className="ml-6 mt-1 flex flex-col gap-1">
-                                            {item.subItems.map((subItem) => (
-                                                <Tooltip key={subItem.label}>
-                                                    <TooltipTrigger asChild>
-                                                        <button
-                                                            onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
-                                                                event.stopPropagation();
-                                                                const selectedForm = forms.find((form) => form.name === subItem.label);
-                                                                if (selectedForm) {
-                                                                    setForm(selectedForm);
-                                                                    switchSection('Form');
-                                                                }
-                                                            }}
-                                                            className={cn(
-                                                                "flex items-center rounded-lg transition-colors hover:text-white w-full",
-                                                                currentSection === subItem.label
-                                                                    ? "bg-accent text-accent-foreground"
-                                                                    : "text-white/60",
-                                                                isExpanded ? "px-3 py-2" : "justify-center py-2"
-                                                            )}
-                                                        >
-                                                            {subItem.icon && (
-                                                                React.createElement(subItem.icon, {
-                                                                    className: "h-5 w-5",
-                                                                })
-                                                            )}
-                                                            {isExpanded && (
-                                                                <span className="ml-2 whitespace-nowrap truncate text-ellipsis pr-2 text-sm">
-                                                                    {subItem.label}
-                                                                </span>
-                                                            )}
-                                                        </button>
-                                                    </TooltipTrigger>
-                                                    {!isExpanded && (
-                                                        <TooltipContent side="right">
-                                                            {subItem.label}
-                                                        </TooltipContent>
-                                                    )}
-                                                </Tooltip>
-                                            ))}
-                                        </div>
-                                    )}
+                                    {item.subItems &&
+                                        isExpanded &&
+                                        openSubmenus.has(item.label) && (
+                                            <div className="ml-6 mt-1 flex flex-col gap-1">
+                                                {item.subItems.map((subItem) => (
+                                                    <Tooltip key={subItem.label}>
+                                                        <TooltipTrigger asChild>
+                                                            <button
+                                                                onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+                                                                    event.stopPropagation();
+                                                                    switchSection(subItem.label);
+                                                                }}
+                                                                className={cn(
+                                                                    "flex items-center rounded-lg transition-colors hover:text-white w-full",
+                                                                    currentSection === subItem.label
+                                                                        ? "bg-accent text-accent-foreground"
+                                                                        : "text-white/60",
+                                                                    isExpanded ? "px-3 py-2" : "justify-center py-2"
+                                                                )}
+                                                            >
+                                                                {subItem.icon &&
+                                                                    React.createElement(subItem.icon, {
+                                                                        className: "h-5 w-5",
+                                                                    })}
+                                                                {isExpanded && (
+                                                                    <span className="ml-2 whitespace-nowrap truncate text-ellipsis pr-2 text-sm">
+                                                                        {subItem.label}
+                                                                    </span>
+                                                                )}
+                                                            </button>
+                                                        </TooltipTrigger>
+                                                        {!isExpanded && (
+                                                            <TooltipContent side="right">
+                                                                {subItem.label}
+                                                            </TooltipContent>
+                                                        )}
+                                                    </Tooltip>
+                                                ))}
+                                            </div>
+                                        )}
                                 </div>
                             </TooltipTrigger>
                             {!isExpanded && (
-                                <TooltipContent side="right">
-                                    {item.label}
-                                </TooltipContent>
+                                <TooltipContent side="right">{item.label}</TooltipContent>
                             )}
                         </Tooltip>
                     ))}

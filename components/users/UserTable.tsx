@@ -1,4 +1,5 @@
 "use client";
+
 import React from "react";
 import {
     Table,
@@ -8,11 +9,16 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { toast } from "@/components/ui/use-toast";
-import { formatDate } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { User } from "@/types";
-
 
 type UserTableProps = {
     users: User[];
@@ -61,33 +67,47 @@ const UserTable: React.FC<UserTableProps> = ({
     };
 
     return (
-        <Table>
+        <Table className="w-full text-sm bg-gray-50 dark:bg-gray-800 rounded-lg shadow-md">
             <TableHeader>
                 <TableRow>
-                    <TableHead className="whitespace-nowrap text-left">Username</TableHead>
-                    <TableHead className="whitespace-nowrap text-leftr">Email</TableHead>
-                    <TableHead className="whitespace-nowrap text-center">Role</TableHead>
-                    <TableHead className="whitespace-nowrap text-center">Business</TableHead>
-                    <TableHead className="whitespace-nowrap text-center">Last Login</TableHead>
-                    <TableHead className="whitespace-nowrap text-center">Is Active</TableHead>
+                    <TableHead className="text-left px-4 py-2">Username</TableHead>
+                    <TableHead className="text-left px-4 py-2">Email</TableHead>
+                    <TableHead className="text-center px-4 py-2">Role</TableHead>
+                    <TableHead className="text-center px-4 py-2">Business</TableHead>
+                    <TableHead className="text-center px-4 py-2">Last Login</TableHead>
+                    <TableHead className="text-center px-4 py-2">Is Active</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
                 {filteredUsers.map((user) => (
-                    <TableRow key={user.id}>
-                        <TableCell className="bg-gray-50 whitespace-nowrap">{user.username}</TableCell>
-                        <TableCell className="bg-gray-50 whitespace-nowrap">{user.email}</TableCell>
-                        <TableCell className="bg-gray-50 whitespace-nowrap text-center">{user.role_name}</TableCell>
-                        <TableCell className="bg-gray-50 whitespace-nowrap text-center">{user.business_name}</TableCell>
-                        <TableCell className="bg-gray-50 whitespace-nowrap text-right">{formatDate(user.last_login_at)}</TableCell>
-                        <TableCell className="bg-gray-50 whitespace-nowrap text-center">
+                    <TableRow
+                        key={user.id}
+                        className="bg-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                        <TableCell className="px-4 py-2">{user.username}</TableCell>
+                        <TableCell className="px-4 py-2">{user.email}</TableCell>
+                        <TableCell className="text-center px-4 py-2">
+                            <div className={cn("px-3 py-1 rounded-full w-16 text-center flex items-center justify-center text-sm",
+                                user.role_name === "Admin" ? "bg-red-500 text-white" :
+                                    user.role_name === "Manager" ? "bg-blue-500 text-white" :
+                                        user.role_name === "User" ? "bg-green-500 text-white" :
+                                            "bg-gray-500 text-white"
+                            )}>
+                                {user.role_name}
+                            </div>
+                        </TableCell>
+                        <TableCell className="text-center px-4 py-2">{user.business_name}</TableCell>
+                        <TableCell className="text-center px-4 py-2">
+                            {formatDate(user.last_login_at)}
+                        </TableCell>
+                        <TableCell className="text-center px-4 py-2">
                             <Select
                                 value={user.is_active ? "yes" : "no"}
                                 onValueChange={(value) =>
                                     handleToggleUserStatus(user.id, value === "yes")
                                 }
                             >
-                                <SelectTrigger>
+                                <SelectTrigger className="w-20">
                                     <SelectValue placeholder="Select status" />
                                 </SelectTrigger>
                                 <SelectContent>

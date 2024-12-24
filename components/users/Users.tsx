@@ -44,7 +44,7 @@ const Users: React.FC = () => {
     }
 
     return (
-        <div className="container text-black dark:text-white bg-white dark:bg-gray-800 p-6 rounded">
+        <div className="w-full text-black dark:text-white bg-white dark:bg-gray-800 p-6 rounded">
             <SectionHeader title="Users" subtitle="Manage and view your users." />
 
             <div className="card shadow-lg p-6 mb-8">

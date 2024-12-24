@@ -293,16 +293,7 @@ export default function AccidentClaimForm() {
 
         try {
 
-
-
-
-
-
-
-
-
-
-            const response = await fetch('https://vinci-api.com/leo/custom/forms/accident-claim/submit', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/custom/forms/accident-claim/submit`, {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${session?.accessToken}`,
@@ -609,7 +600,7 @@ export default function AccidentClaimForm() {
                             <FaPhone />
                             Other Contact
                         </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                             <div>
                                 <Label htmlFor="other_contact_name">Relative or Friend</Label>
                                 <Input
@@ -628,7 +619,7 @@ export default function AccidentClaimForm() {
                                     id="other_contact_phone"
                                     value={formData.other_contact_phone}
                                     onChange={handlePhoneChange("other_contact_phone")}
-                                    className=""
+                                    className="w-full"
                                     placeholder="+1 234 567 890"
                                 />
                             </div>
