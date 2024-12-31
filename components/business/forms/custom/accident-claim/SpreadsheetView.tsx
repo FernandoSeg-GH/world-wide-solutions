@@ -1,12 +1,19 @@
 "use client";
 
 import React from "react";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable, { RowInput } from "jspdf-autotable";
-import { FaDownload } from "react-icons/fa";
 import { EditableClaim } from "./config/types";
 
 const formatDate = (dateString: string | null | undefined): string =>
@@ -20,34 +27,66 @@ interface SpreadsheetViewProps {
 const flattenClaim = (claim: EditableClaim) => {
     const flatClaim: Record<string, any> = { ...claim };
 
+    // Flatten user details
+    if (flatClaim.user) {
+        const { user_email, user_id, username } = flatClaim.user;
+        flatClaim["USER EMAIL"] = user_email;
+        flatClaim["USER ID"] = user_id;
+        flatClaim["USERNAME"] = username;
+        delete flatClaim.user;
+    }
 
+    // Format dates
     ["accident_date", "created_at", "updated_at"].forEach((dateField) => {
         if (flatClaim[dateField]) {
             flatClaim[dateField] = formatDate(flatClaim[dateField]);
         }
     });
 
-
-    ["vehicle_details", "medical_provider_costs", "repatriation_costs", "other_costs"].forEach((key) => {
+    // Flatten nested fields: vehicle_details
+    if (flatClaim.vehicle_details) {
         try {
-            const parsed = typeof flatClaim[key] === "string" ? JSON.parse(flatClaim[key]) : flatClaim[key];
+            const parsed = typeof flatClaim.vehicle_details === "string"
+                ? JSON.parse(flatClaim.vehicle_details)
+                : flatClaim.vehicle_details;
+
             if (Array.isArray(parsed)) {
                 parsed.forEach((item: Record<string, any>, idx: number) => {
                     Object.entries(item).forEach(([subKey, value]) => {
-                        flatClaim[`${key}_${idx + 1}_${subKey}`] = typeof value === "object"
-                            ? JSON.stringify(value)
-                            : value;
+                        flatClaim[`VEHICLE DETAILS ${idx + 1} ${subKey.toUpperCase()}`] =
+                            typeof value === "object" ? JSON.stringify(value) : value;
                     });
                 });
             }
         } catch (error) {
-            console.error(`Error parsing ${key}:`, error);
+            console.error("Error parsing vehicle_details:", error);
         }
-    });
+        delete flatClaim.vehicle_details;
+    }
 
-    ["file_uploads", "vehicle_details", "medical_provider_costs", "repatriation_costs", "other_costs"].forEach((key) => {
-        delete flatClaim[key];
-    });
+    // Flatten nested fields: medical_provider_costs
+    if (flatClaim.medical_provider_costs) {
+        try {
+            const parsed = typeof flatClaim.medical_provider_costs === "string"
+                ? JSON.parse(flatClaim.medical_provider_costs)
+                : flatClaim.medical_provider_costs;
+
+            if (Array.isArray(parsed)) {
+                parsed.forEach((item: Record<string, any>, idx: number) => {
+                    Object.entries(item).forEach(([subKey, value]) => {
+                        flatClaim[`MEDICAL PROVIDER COSTS ${idx + 1} ${subKey.toUpperCase()}`] =
+                            typeof value === "object" ? JSON.stringify(value) : value;
+                    });
+                });
+            }
+        } catch (error) {
+            console.error("Error parsing medical_provider_costs:", error);
+        }
+        delete flatClaim.medical_provider_costs;
+    }
+
+    // Remove unnecessary fields
+    ["file_uploads", "editedData", "archive"].forEach((key) => delete flatClaim[key]);
 
     return flatClaim;
 };
@@ -55,18 +94,18 @@ const flattenClaim = (claim: EditableClaim) => {
 const expandClaims = (claims: EditableClaim[]) => {
     const expandedClaims = claims.map(flattenClaim);
 
+    // Create headers from expanded claims
     const headers = Array.from(
-        new Set(
-            expandedClaims.flatMap((claim) =>
-                Object.keys(claim).filter((header) => header !== "file_uploads")
-            )
-        )
+        new Set(expandedClaims.flatMap((claim) => Object.keys(claim)))
     );
 
-    return { expandedClaims, headers };
+    // Filter out unnecessary columns
+    const filteredHeaders = headers.filter(
+        (header) => !["file_uploads", "editedData", "archive"].includes(header)
+    );
+
+    return { expandedClaims, headers: filteredHeaders };
 };
-
-
 
 const SpreadsheetView: React.FC<SpreadsheetViewProps> = ({ claims, selectedUserId }) => {
     const filteredClaims = selectedUserId && selectedUserId !== "all"
@@ -104,47 +143,48 @@ const SpreadsheetView: React.FC<SpreadsheetViewProps> = ({ claims, selectedUserI
     };
 
     return (
-        <div className="overflow-x-auto w-full">
+        <div className="w-full bg-white dark:bg-gray-800 p-6 rounded shadow-md">
             <div className="flex justify-end mb-4">
                 <Button onClick={() => handleDownload("csv")} className="mr-2">
-                    <FaDownload className="mr-2" /> Download CSV
+                    Download CSV
                 </Button>
                 <Button onClick={() => handleDownload("excel")} className="mr-2">
-                    <FaDownload className="mr-2" /> Download Excel
-                </Button>
-                <Button onClick={() => handleDownload("pdf")}>
-                    <FaDownload className="mr-2" /> Download PDF
+                    Download Excel
                 </Button>
             </div>
-
-            <div className="overflow-x-auto">
-                <table className="min-w-full border-collapse text-black">
-                    <thead>
-                        <tr>
-                            {headers.map((header) => (
-                                <th
-                                    key={header}
-                                    className="border px-4 py-2 bg-gray-200 dark:bg-gray-700 whitespace-nowrap"
-                                >
-                                    {header.replace(/_/g, " ").toUpperCase()}
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {expandedClaims.map((claim, index) => (
-                            <tr key={index}>
-                                {headers.map((header) => (
-                                    <td key={header} className="border px-4 py-2 whitespace-nowrap">
-                                        {typeof claim[header] === "object" ? JSON.stringify(claim[header]) : claim[header] || ""}
-                                    </td>
-                                ))}
-                            </tr>
+            <Table className="w-full text-sm rounded-lg">
+                <TableHeader>
+                    <TableRow>
+                        {headers.map((header) => (
+                            <TableHead
+                                key={header}
+                                className="px-4 py-2 text-left bg-gray-200 dark:bg-gray-700 whitespace-nowrap"
+                            >
+                                {header.replace(/_/g, " ").toUpperCase()}
+                            </TableHead>
                         ))}
-                    </tbody>
-
-                </table>
-            </div>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {expandedClaims.map((claim, index) => (
+                        <TableRow
+                            key={index}
+                            className="bg-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                        >
+                            {headers.map((header) => (
+                                <TableCell
+                                    key={header}
+                                    className="px-4 py-2 text-gray-600 dark:text-gray-300 whitespace-nowrap"
+                                >
+                                    {typeof claim[header] === "object"
+                                        ? JSON.stringify(claim[header])
+                                        : claim[header] || "N/A"}
+                                </TableCell>
+                            ))}
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
         </div>
     );
 };

@@ -1,9 +1,8 @@
-
-
+"use client"
 import React from "react";
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react";
 import { FaDownload, FaEdit, FaSave, FaTimes } from "react-icons/fa";
-import ClaimDetails from "./ClaimDetails";
+import ClaimDetails from "./details/ClaimDetails";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { cn, flattenClaimData } from "@/lib/utils";
@@ -16,6 +15,7 @@ import { EditableClaim } from "./config/types";
 import { useSession } from "next-auth/react";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Archive } from "./details/Archive";
 
 interface ClaimAccordionProps {
     claim: EditableClaim;
@@ -24,6 +24,7 @@ interface ClaimAccordionProps {
     handleSave: (claim_id: string) => void;
     handleCancel: (claim_id: string) => void;
     handleStatusChange: (claim_id: string, newStatus: string) => void;
+    refreshClaims: () => void;
 }
 
 const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
@@ -33,6 +34,7 @@ const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
     handleSave,
     handleCancel,
     handleStatusChange,
+    refreshClaims
 }) => {
     const { data: session } = useSession();
     const userRole = session?.user?.role.id;
@@ -197,17 +199,9 @@ const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
                                     handleFieldChange={handleFieldChange}
                                     pdf="claim-content"
                                 />
-                                <div className="flex justify-end mt-4 space-x-2">
-                                    <Button
-                                        onClick={() => handleDownloadClaim('csv')}
-                                        variant="outline"
-                                        className="flex items-center gap-2"
-                                        type="button"
-                                    >
-                                        <FaDownload />
-                                        Download CSV
-                                    </Button>
-                                    {/* <Button
+                                <div className="flex justify-between w-full max-w-5xl mt-4 space-x-2">
+                                    <div className="flex items-center gap-4">
+                                        {/* <Button
                                         onClick={() => handleDownloadClaim('excel')}
                                         variant="outline"
                                         type="button"
@@ -216,7 +210,7 @@ const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
                                         <FaDownload />
                                         Download Excel
                                     </Button> */}
-                                    {/* <Button
+                                        {/* <Button
                                         onClick={() => handleDownloadClaim('pdf')}
                                         variant="outline"
                                         className="flex items-center gap-2"
@@ -225,35 +219,52 @@ const ClaimAccordion: React.FC<ClaimAccordionProps> = ({
                                         <FaDownload />
                                         Download PDF
                                     </Button> */}
-                                    {claim.isEditing ? (
-                                        <>
+                                        {claim.isEditing ? (
+                                            <>
+                                                <Button
+                                                    onClick={() => handleSave(claim.claim_id)}
+                                                    className="flex items-center gap-2"
+                                                    type="button"
+                                                >
+                                                    <FaSave />
+                                                    Save Changes
+                                                </Button>
+                                                <Button
+                                                    onClick={() => handleCancel(claim.claim_id)}
+                                                    className="flex items-center gap-2"
+                                                    type="button"
+                                                >
+                                                    <FaTimes />
+                                                    Cancel
+                                                </Button>
+                                            </>
+                                        ) : (
                                             <Button
-                                                onClick={() => handleSave(claim.claim_id)}
-                                                className="flex items-center gap-2"
+                                                onClick={() => toggleEdit(claim.claim_id)}
+                                                className={cn("flex items-center gap-2")}
                                                 type="button"
                                             >
-                                                <FaSave />
-                                                Save Changes
+                                                <FaEdit />
+                                                Edit
                                             </Button>
-                                            <Button
-                                                onClick={() => handleCancel(claim.claim_id)}
-                                                className="flex items-center gap-2"
-                                                type="button"
-                                            >
-                                                <FaTimes />
-                                                Cancel
-                                            </Button>
-                                        </>
-                                    ) : (
-                                        <Button
-                                            onClick={() => toggleEdit(claim.claim_id)}
+                                        )}
+
+                                        {session?.user.role.id !== 1 && <Button
+                                            onClick={() => handleDownloadClaim('csv')}
+                                            variant="outline"
                                             className="flex items-center gap-2"
                                             type="button"
                                         >
-                                            <FaEdit />
-                                            Edit
-                                        </Button>
-                                    )}
+                                            <FaDownload />
+                                            Download CSV
+                                        </Button>}
+                                    </div>
+                                    {session?.user.role.id !== 1 &&
+                                        <Archive
+                                            claim_id={claim.claim_id}
+                                            onArchived={refreshClaims}
+                                        />
+                                    }
                                 </div>
                             </CardContent>
                         </Card>

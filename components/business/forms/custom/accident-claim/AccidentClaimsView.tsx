@@ -115,6 +115,42 @@ const AccidentClaimsView: React.FC = () => {
         }
     }, [businessId, session]);
 
+    const refreshClaims = async () => {
+        try {
+            setLoading(true);
+            const response = await fetch("/api/forms/accident-claims");
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || "Failed to fetch claims.");
+            }
+            const data = await response.json();
+            const initializedClaims: EditableClaim[] = data.claims.map((claim: Claim) => ({
+                ...claim,
+                accident_date: claim.accident_date
+                    ? new Date(claim.accident_date).toISOString()
+                    : "",
+                isEditing: false,
+                editedData: mapClaimToFormData(claim, String(session?.user?.businessId) || ""),
+                user: {
+                    user_id: String(claim.user_id),
+                    username: claim.username,
+                    user_email: claim.user_email,
+                },
+            }));
+            setClaims(initializedClaims);
+            setLoading(false);
+        } catch (err: any) {
+            console.error(err);
+            setError(err.message || "An error occurred.");
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        refreshClaims();
+    }, []);
+
+
     useEffect(() => {
 
         if ([2, 3, 4].includes(Number(session?.user?.role.id))) {
@@ -314,14 +350,6 @@ const AccidentClaimsView: React.FC = () => {
         submitData.append("business_id", businessId);
 
         try {
-
-
-
-
-
-
-
-
             const response = await fetch(
                 `${process.env.NEXT_PUBLIC_FLASK_BACKEND_URL}/custom/forms/update_accident_claim/${claim_id}`,
                 {
@@ -649,6 +677,7 @@ const AccidentClaimsView: React.FC = () => {
                                     handleStatusChange={handleStatusChange}
                                     key={claim.claim_id}
                                     claim={claim}
+                                    refreshClaims={refreshClaims}
                                     toggleEdit={toggleEdit}
                                     handleFieldChange={handleFieldChange}
                                     handleSave={handleSave}
@@ -686,6 +715,7 @@ const AccidentClaimsView: React.FC = () => {
                                                         handleStatusChange={handleStatusChange}
                                                         key={claim.claim_id}
                                                         claim={claim}
+                                                        refreshClaims={refreshClaims}
                                                         toggleEdit={toggleEdit}
                                                         handleFieldChange={handleFieldChange}
                                                         handleSave={handleSave}

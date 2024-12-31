@@ -11,6 +11,7 @@ import { getSidebarItems, SidebarItem } from "./SidebarItems";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useLogContext } from "@/context/LogProvider";
+import { useMessagesContext } from "@/context/MessagesContext";
 
 interface SidebarProps {
     isExpanded: boolean;
@@ -24,7 +25,7 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
     const { currentSection, godMode } = data;
     const { data: session } = useSession();
     const [openSubmenus, setOpenSubmenus] = useState<Set<string>>(new Set());
-
+    const { totalUnread } = useMessagesContext();
     const sidebarItems: SidebarItem[] = getSidebarItems(godMode, [], session?.user.role.id);
 
     // Fetch unread logs count
@@ -111,8 +112,14 @@ export function Sidebar({ isExpanded, setIsExpanded }: SidebarProps) {
                                         )}
 
                                         {isExpanded && item.label === "Logs" && unreadLogsCount > 0 && (
-                                            <Badge className="ml-auto bg-red-600 text-white">
+                                            <Badge className="ml-auto bg-navyBlue text-white border-white">
                                                 {unreadLogsCount}
+                                            </Badge>
+                                        )}
+
+                                        {isExpanded && item.label === "Messages" && totalUnread > 0 && (
+                                            <Badge className="ml-auto bg-navyBlue border-white text-white">
+                                                {totalUnread}
                                             </Badge>
                                         )}
 

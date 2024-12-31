@@ -95,6 +95,8 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                 );
 
                 if (response.messages) {
+                    const unreadCount = response.messages.filter((msg: InboxMessage) => !msg.readAt);
+
                     setMessages((prev) => [
                         ...prev.filter((msg) => !response.messages.some((newMsg: InboxMessage) => newMsg.messageId === msg.messageId)),
                         ...response.messages.map((msg: InboxMessage) => ({
@@ -102,6 +104,15 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                             conversationId: accidentClaimId,
                         })),
                     ]);
+
+                    // Update total unread count based on new messages
+                    setConversations((prevConversations) =>
+                        prevConversations.map((conv) =>
+                            conv.accidentClaimId === accidentClaimId
+                                ? { ...conv, unreadCount }
+                                : conv
+                        )
+                    );
                 }
             } catch (error) {
                 console.error("Error fetching messages:", error);
@@ -169,7 +180,8 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             }
 
 
-            await fetchConversations();
+            const updatedConversations = await fetchConversations();
+            setConversations(updatedConversations);
         },
         [session, fetchConversations]
     );
@@ -196,7 +208,8 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             }
 
 
-            await fetchConversations();
+            await fetchConversations(); const updatedConversations = await fetchConversations();
+            setConversations(updatedConversations);
         },
         [session, fetchConversations]
     );
@@ -225,13 +238,11 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                 setConversations((prev) =>
                     prev.map((conv) =>
                         conv.accidentClaimId === accidentClaimId
-                            ? {
-                                ...conv,
-                                unreadCount: Math.max((conv.unreadCount || 0) - 1, 0),
-                            }
+                            ? { ...conv, unreadCount: 0 }
                             : conv
                     )
                 );
+
             } catch (error: any) {
                 toast({
                     title: "Error",
@@ -300,7 +311,8 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                     throw new Error(errorData.message || "Failed to mark messages as read");
                 }
 
-                await fetchConversations();
+                const updatedConversations = await fetchConversations();
+                setConversations(updatedConversations);
             } catch (error) {
                 console.error('Error marking messages as read:', error);
             }

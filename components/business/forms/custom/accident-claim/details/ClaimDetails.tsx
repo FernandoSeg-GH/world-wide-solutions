@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { EditableClaim, AccidentClaimFormData, VehicleDetail, CostDetail } from "./config/types";
+import { EditableClaim, AccidentClaimFormData, VehicleDetail, CostDetail } from "../config/types";
 import {
     FaUser,
     FaPhone,
@@ -28,7 +28,7 @@ import FileUpload from "@/components/ui/file-upload";
 import { usaStates } from "@/components/business/forms/custom/accident-claim/config/state-options";
 import { countryOptions } from "@/components/business/forms/custom/accident-claim/config/country-options";
 import { accidentTypeOptions } from "@/components/business/forms/custom/accident-claim/config/accident-options";
-import { currencyOptions } from "./config/currencies";
+import { currencyOptions } from "../config/currencies";
 import DatePicker from "@/components/ui/date-picker";
 import { toast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
@@ -38,6 +38,7 @@ import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SelectItem } from "@radix-ui/react-select";
 import JSZip from "jszip";
+import { Archive } from "./Archive";
 
 interface ClaimDetailsProps {
     claim: EditableClaim;
@@ -103,6 +104,7 @@ export default function ClaimDetails({
     const handleFileDownload = async (fileUrl: string) => {
         try {
             const response = await fetch(fileUrl);
+            console.log('fileUrl', fileUrl)
             if (!response.ok) throw new Error("Failed to fetch file");
             const blob = await response.blob();
             const blobUrl = window.URL.createObjectURL(blob);
@@ -175,6 +177,7 @@ export default function ClaimDetails({
     };
 
 
+
     const renderExistingFiles = (files?: string[] | string | null) => {
         let validFiles: string[] = [];
 
@@ -227,6 +230,17 @@ export default function ClaimDetails({
                         </div>
                     );
                 })}
+                {validFiles.length > 1 && (
+                    <div className="w-full flex items-center justify-end pt-3 border-t !mt-3">
+
+                        <Button
+                            onClick={() => handleDownloadAll(validFiles)}
+                            className="text-white bg-navyBlue"
+                        >
+                            Download All
+                        </Button>
+                    </div>
+                )}
                 {/* {validFiles.length > 1 && (
                     <Button
                         onClick={() => handleDownloadAll(validFiles)}

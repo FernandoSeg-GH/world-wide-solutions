@@ -249,7 +249,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select a user" />
                                                 </SelectTrigger>
-                                                <SelectContent>
+                                                <SelectContent className="overflow-auto">
                                                     {usersWithClaims.map((user) => (
                                                         <SelectItem key={user.userId} value={String(user.userId)}>
                                                             {user.username}
