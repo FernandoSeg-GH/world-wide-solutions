@@ -141,27 +141,27 @@ export default function AccidentClaimForm() {
     }, [formData.accident_country, formData.accident_state]);
 
 
-    useEffect(() => {
-        if (session?.error) {
-            toast({
-                title: "Session Expired",
-                description: "Please sign in again.",
-                variant: "destructive",
-            });
-            router.push("/auth/sign-in");
-            return;
-        }
+    // useEffect(() => {
+    //     if (session?.error) {
+    //         toast({
+    //             title: "Session Expired",
+    //             description: "Please sign in again.",
+    //             variant: "destructive",
+    //         });
+    //         router.push("/auth/sign-in");
+    //         return;
+    //     }
 
-        if (!session?.accessToken) {
-            toast({
-                title: "Access Denied",
-                description: "You are not authorized to perform this action.",
-                variant: "destructive",
-            });
-            router.push("/auth/sign-in");
-            return;
-        }
-    }, [router, session?.accessToken, session?.error]);
+    //     if (!session?.accessToken) {
+    //         toast({
+    //             title: "Access Denied",
+    //             description: "You are not authorized to perform this action.",
+    //             variant: "destructive",
+    //         });
+    //         router.push("/auth/sign-in");
+    //         return;
+    //     }
+    // }, [router, session?.accessToken, session?.error]);
 
 
     const handleInputChange = (
