@@ -10,6 +10,7 @@ import ErrorBoundary from '@/components/ui/error-boundary'
 import { MessagesProvider } from '@/context/MessagesContext'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { LogProvider } from '@/context/LogProvider'
+import { Analytics } from "@vercel/analytics/react"
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -37,6 +38,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                       {children}
                     </TooltipProvider>
                     <Toaster />
+                    <Analytics />
                   </ErrorBoundary>
                 </LogProvider>
               </AppProvider>
